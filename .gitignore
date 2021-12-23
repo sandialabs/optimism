@@ -1,0 +1,14 @@
+# Byte compiled files
+*.py[cod]
+__pycache__/
+
+# packaging files
+*.egg-info
+*.whl
+
+# automatic temp file cruft
+.DS_Store
+*~
+*#
+*.swp
+
