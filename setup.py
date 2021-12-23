@@ -4,7 +4,7 @@ setuptools.setup(
     name='optimism',
     description='Rapid development platform for solid mechanics research using optimization tools',
     author="Michael Tupek and Brandon Talamini",
-    author_email='mrtupek@sandia.gov', # todo: make an email list
+    author_email='btalami@sandia.gov', # todo: make an email list
     install_requires=['jax',
                       'jaxlib',
                       'scipy',
