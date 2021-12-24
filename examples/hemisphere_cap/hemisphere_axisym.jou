@@ -1,0 +1,44 @@
+## Cubit Version 15.7
+# {Ri = 1.0}
+# {t = 0.05}
+# {Ro = Ri + t}
+# {load_area_fraction = 0.05}
+# {h = t/4.0}
+
+reset
+
+create vertex 0 0 0
+create vertex {Ri} 0 0
+create vertex {Ro} 0 0
+create vertex 0 {Ro} 0
+create vertex 0 {Ri} 0
+
+create curve arc center vertex 1 2 5
+create curve vertex 2 3
+create curve vertex 4 5
+create curve arc center vertex 1 3 4
+
+# curves 4, 5
+split curve 4 fraction {load_area_fraction} from end
+
+create surface curve 1 2 5 6 3
+
+sideset 1 add curve 1
+sideset 1 name "inner"
+sideset 2 add curve 5 6
+sideset 2 name "outer"
+sideset 3 add curve 3
+sideset 3 name "axis"
+sideset 4 add curve 2
+sideset 4 name "rim"
+sideset 5 add curve 6
+sideset 5 name "push"
+
+block 1 surface all
+block 1 element type tri3
+surface all scheme trimesh
+surface all size {h}
+mesh surface all
+
+#export mesh "hemisphere_axisym.g" dimension 2 overwrite 
+
