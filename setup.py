@@ -14,4 +14,6 @@ setuptools.setup(
     extras_require={'sparse': ['scikit-sparse']},
     python_requires='>=3.7',
     version='0.0.1',
-    license='MIT')
+    license='MIT',
+    url='https://github.com/sandialabs/optimism'
+)
