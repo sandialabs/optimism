@@ -1,0 +1,60 @@
+## /projects/cubit/claro.Lin64.15.3/bin/clarox
+## Cubit Version 15.3
+## Cubit Build 413520
+## Revised 2018-09-20 09:38:41 -0600 (Thu, 20 Sep 2018)
+## Running 04/12/2019 09:22:29 AM
+## Command Options:
+# {width = 0.065}
+# {height = 0.048}
+# {refined_size = 0.0001}
+# {coarse_size = 0.0065}
+# {precrack = width/2.0}
+# {refine_width = 7.5e-4}
+undo on
+create surface rectangle width {width} height {height} zplane
+move surface 1 x {width/2.0} y {height/2.0}
+move surface 1 x {-precrack} y 0.0
+create vertex on curve 3 distance {precrack} from vertex 3
+create vertex on curve 2 distance {refine_width} from vertex 3
+create vertex on curve 4 distance {refine_width} from vertex 4
+create curve vertex 6 7
+split curve 3 at vertex 5
+imprint surface 1 curve 5
+surface 2 size {refined_size}
+surface 3 size {coarse_size}
+surface all scheme trimesh geometry approximation angle 15
+block 1 surface all
+block 1 element type TRI3
+mesh surface 2 3
+sideset 1 curve 7
+sideset 1 name "ysymm"
+sideset 2 curve 1
+sideset 2 name "top"
+sideset 3 curve 9 12
+sideset 3 name "left"
+sideset 4 curve 10 11
+sideset 4 name "right"
+sideset 5 curve 6
+sideset 5 name "precrack"
+sideset 6 curve 10 11 1 9 12
+sideset 6 name "contour"
+nodeset 1 add curve 7
+nodeset 1 name "ysymm"
+nodeset 2 add curve 1
+nodeset 2 name "top"
+nodeset 3 add curve 9 12
+nodeset 3 name "left"
+nodeset 4 add curve 10 11
+nodeset 4 name "right"
+nodeset 5 curve 6
+nodeset 5 name "precrack"
+nodeset 6 curve 10 11 1 9 12
+nodeset 6 name "external"
+undo group begin
+set exodus netcdf4 off
+set large exodus file on
+export mesh "surfingMesh.g" dimension 2 overwrite
+undo group end
+
+
+
