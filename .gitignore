@@ -12,3 +12,5 @@ __pycache__/
 *#
 *.swp
 
+# typical name for python virtual environment
+venv/
