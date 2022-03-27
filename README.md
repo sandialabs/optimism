@@ -82,7 +82,7 @@ sudo port install SuiteSparse
 or with Homebrew by
 
 ```bash
-install suite-sparse
+brew install suite-sparse
 ```
 
 On a Fedora system, you would run
@@ -97,10 +97,10 @@ website](https://people.engr.tamu.edu/davis/suitesparse.html) (a
 GitHub link is also provided there).
 
 Once the SuiteSparse library is in place, navigate into the
-`jax-fem` directory and execute
+`optimism` directory and execute
 
 ```bash
-pip install -e .[sparse]
+pip install -e . [sparse]
 ```
 
 Note that you can always start with the basic installation, and if you
