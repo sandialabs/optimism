@@ -189,10 +189,10 @@ def update_state(elasticTrialStrain, stateOld, stateNewGuess, phase, props):
 def compute_element_energy(compute_free_energy_density, U, state, shapeGrad, conn):
     nodalDisp = U[conn,:2]
     dispGrad = np.tensordot(nodalDisp, shapeGrad, axes=[0,0]) 
-    dispGrad3D = ops.index_update(np.zeros((3,3)), ops.index[0:2,0:2], dispGrad)
+    dispGrad3D = np.zeros((3,3)).at[0:2,0:2].set(dispGrad)
     nodalPhase = U[conn,2]
     phaseGrad = np.tensordot(nodalPhase, shapeGrad, axes=[0,0])
-    phaseGrad3D = ops.index_update(np.zeros(3), ops.index[0:2], phaseGrad)
+    phaseGrad3D = np.zeros(3).at[0:2].set(phaseGrad)
     phase = np.average(nodalPhase)
     return compute_free_energy_density(dispGrad3D, phase, phaseGrad3D, state)
 
@@ -206,12 +206,12 @@ def compute_total_energy(compute_free_energy_density, U, states, mesh):
 def interpolate_element_kinematics(U, shapeGrad, conn):
     nodalDisp = U[conn,:2]
     dispGrad = np.tensordot(nodalDisp, shapeGrad, axes=[0,0]) 
-    dispGrad = ops.index_update(np.zeros((3,3)), ops.index[0:2,0:2], dispGrad)
+    dispGrad = np.zeros((3,3)).at[0:2,0:2].set(dispGrad)
     
     nodalPhase = U[conn,2]
     phase = np.average(nodalPhase)
     phaseGrad = np.tensordot(nodalPhase, shapeGrad, axes=[0,0])
-    phaseGrad = ops.index_update(np.zeros(3), ops.index[0:2], phaseGrad)
+    phaseGrad = np.zeros(3).at[0:2].set(phaseGrad)
     return dispGrad, phase, phaseGrad
     
 

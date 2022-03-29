@@ -225,7 +225,7 @@ class Buckle:
             self.U = create_field(self.Uu, p, self.mesh, self.dofManager, self.useTraction)
             if self.useTraction:
                 outputForce.append(reaction_func(self.Uu, p))
-                topIndex = ops.index[self.mesh.nodeSets[top],1]
+                topIndex = (self.mesh.nodeSets[top],1)
                 topDispField = self.U[topIndex]
                 outputDisp.append(np.average(topDispField))
             else:
@@ -281,15 +281,11 @@ def create_field(Uu, p, mesh, dofManager, useTraction):
 def get_ubcs(p, mesh, dofManager, useTraction):
     V = np.zeros(dofManager.ids.shape)
     if not useTraction:
-        yTopIndices=ops.index[mesh.nodeSets[top],1]
-        V = ops.index_update(V,
-                             yTopIndices,
-                             p[0][0])
+        yTopIndices = mesh.nodeSets[top][1]
+        V = V.at[yTopIndices].set(p[0][0]),
         
-    yBottomIndices=ops.index[mesh.nodeSets[bottom],1]
-    V = ops.index_update(V,
-                         yBottomIndices,
-                         p[0][1])
+    yBottomIndices = mesh.nodeSets[bottom][1]
+    V = V.at[yBottomIndices].set(p[0][1])
     
     return dofManager.get_bc_values(V)
 

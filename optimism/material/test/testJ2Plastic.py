@@ -69,9 +69,7 @@ class GradOfPlasticityModelFixture(TestFixture):
 
         F = dispGrad + np.identity(3)
         kirchhoffStress = self.stress_func(dispGrad, state) @ F.T
-        kirchhoffstressExact = ops.index_update(np.zeros((3,3)),
-                                       ops.index[0,0],
-                                       self.props['elastic modulus']*strainBelowYield)
+        kirchhoffstressExact = np.zeros((3,3)).at[0,0].set(self.props['elastic modulus']*strainBelowYield)
         self.assertArrayNear(kirchhoffStress, kirchhoffstressExact, 12)
 
         
@@ -96,7 +94,7 @@ class GradOfPlasticityModelFixture(TestFixture):
             energyHistory.append(energy)
 
             stateOld = stateNew
-            strain = ops.index_add(dispGrad, ops.index[0,0], strain_inc)
+            strain = dispGrad.at[0,0].add(strain_inc)
 
         E = self.props['elastic modulus']
         nu = self.props['poisson ratio']
@@ -116,7 +114,7 @@ class GradOfPlasticityModelFixture(TestFixture):
         eqpsHistory = []
         energyHistory = []
         for i in range(2):
-            strain = ops.index_add(strain, ops.index[0,0], strain_inc)
+            strain = strain.at[0,0].add(strain_inc)
             dispGrad = make_disp_grad_from_strain(strain)
             F = dispGrad + np.identity(3)
             energy  = self.energy_density(dispGrad, stateOld)

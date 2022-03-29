@@ -90,7 +90,7 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
 
 
     def test_sparse_hessian_at_nonzero_phase(self):
-        U = ops.index_update(self.U, ops.index[:,2], np.linspace(0.1, 0.9, self.Nx*self.Ny))
+        U = self.U.at[:,2].set(np.linspace(0.1, 0.9, self.Nx*self.Ny))
 
         elementStiffnesses = self.bvpFunctions.\
             compute_element_stiffnesses(U, self.stateVars)

@@ -192,14 +192,14 @@ class SurfingProblem:
     
     
     def objective_function_phase(self, Uphase, p):
-        Uu = ops.index_update(p[2], self.phaseIds, Uphase)
+        Uu = p[2].at[self.phaseIds].set(Uphase)
         U = self.create_field(Uu, p)
         internalVars = p[1]
         return self.bvpFunctions.compute_internal_energy(U, internalVars)
 
     
     def objective_function_disp(self, Udisp, p):
-        Uu = ops.index_update(p[2], self.dispIds, Udisp)
+        Uu = p[2].at[self.dispIds].set(Udisp)
         U = self.create_field(Uu, p)
         internalVars = p[1]
         return self.bvpFunctions.compute_internal_energy(U, internalVars)
@@ -222,13 +222,13 @@ class SurfingProblem:
 
 
     def assemble_phase_stiffness(self, Uphase, p):
-        Uu = ops.index_update(p[2], self.phaseIds, Uphase)
+        Uu = p[2].at[self.phaseIds].set(Uphase)
         K = self.assemble_objective_stiffness(Uu, p) 
         return K[:,self.phaseIds][self.phaseIds,:]
 
 
     def assemble_disp_stiffness(self, Udisp, p):
-        Uu = ops.index_update(p[2], self.dispIds, Udisp)
+        Uu = p[2].at[self.dispIds].set(Udisp)
         K = self.assemble_objective_stiffness(Uu, p) 
         return K[:,self.dispIds][self.dispIds,:]
     
@@ -237,15 +237,15 @@ class SurfingProblem:
         nNodes = self.mesh.coords.shape[0]
         V = np.zeros((nNodes,3))
 
-        index = ops.index[self.mesh.nodeSets['precrack'],2]
-        V = ops.index_update(V, index, 1.0)
+        index = (self.mesh.nodeSets['precrack'],2)
+        V = V.at[index].set(1.0)
 
         KI, origin = p[0]
         Xb = self.mesh.coords[self.mesh.nodeSets['external'],:]
-        Xb = ops.index_add(Xb, ops.index[:,0], -origin)
+        Xb = Xb.at[:,0].add(-origin)
         modeIBcs = apply_mode_I_Bc(Xb, KI)
-        index = ops.index[self.mesh.nodeSets['external'],:2]
-        V = ops.index_update(V, index, modeIBcs)
+        index = (self.mesh.nodeSets['external'],:2)
+        V = V.at[index].set(modeIBcs)
                              
         return self.dofManager.get_bc_values(V)
 
@@ -327,9 +327,7 @@ class SurfingProblem:
                                                                         precondStrategy=precondStrategy)
         
         U = self.create_field(Uu, p)
-        lamField = ops.index_update(np.zeros_like(U[:,0]),
-                                    self.dofManager.isUnknown[:,2],
-                                    objective.get_multipliers())
+        lamField = np.zeros_like(U[:,0]).at[self.dofManager.isUnknown[:,2]].set(objective.get_multipliers())
         
         numTrustRegionSolves = []
         runTimes = []
@@ -368,9 +366,7 @@ class SurfingProblem:
             U = self.create_field(Uu, p)
             #internalVars = self.bvpFunctions.\
             #    compute_updated_internal_variables(U, p[1])
-            lamField = ops.index_update(np.zeros_like(U[:,0]),
-                                        self.dofManager.isUnknown[:,2],
-                                        objective.get_multipliers())
+            lamField = np.zeros_like(U[:,0]).at[self.dofManager.isUnknown[:,2]].set(objective.get_multipliers())
             
             self.plot_solution(U,
                                p,
@@ -452,7 +448,7 @@ class SurfingProblem:
                     bound_constrained_solve(phaseObjective, UuPhase, p,
                                             phaseAlSettings, phaseSettings,
                                             useWarmStart=False)
-                Uu = ops.index_update(Uu, self.phaseIds, UuPhase)
+                Uu = Uu.at[self.phaseIds].set(UuPhase)
                 print("Minimized phase: objective = ", phaseObjective.get_value(UuPhase))
                 
                 p = Objective.param_index_update(p, 0, np.array([KI, bcCrackTip]))
@@ -473,7 +469,7 @@ class SurfingProblem:
                                                            dispSettings,
                                                            useWarmStart=False)
                 
-                Uu = ops.index_update(Uu, self.dispIds, UuDisp)
+                Uu = Uu.at[self.dispIds].set(UuDisp)
                 print("Minimized disp: objective = ", dispObjective.get_value(UuDisp))
 
                 p = Objective.param_index_update(p, 0, np.array([KI, bcCrackTip]))
@@ -509,9 +505,7 @@ class SurfingProblem:
             internalVars = self.bvpFunctions.\
                 compute_updated_internal_variables(U, p[1])
             
-            lamField = ops.index_update(np.zeros_like(U[:,0]),
-                                        self.dofManager.isUnknown[:,2],
-                                        phaseObjective.get_multipliers())
+            lamField = np.zeros_like(U[:,0]).at[self.dofManager.isUnknown[:,2]].set(phaseObjective.get_multipliers())
             self.plot_solution(U,
                                p,
                                lamField,

@@ -210,7 +210,7 @@ class TestFunctionSpaceMultiQuadPointFixture(MeshFixture.MeshFixture):
         # we understand why it fails
         self.assertEqual(nElements % 2, 0)
         
-        blockWithHalfTheVolume = ops.index[0:nElements//2]
+        blockWithHalfTheVolume = slice(0,nElements//2)
         integral = FunctionSpace.integrate_over_block(self.fs,
                                                       self.U,
                                                       self.state,

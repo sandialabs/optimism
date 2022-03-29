@@ -115,7 +115,7 @@ class UniaxialDynamic:
         Uu0 = self.dofManager.get_unknown_values(U0)
 
         v0 = 1.0
-        V0 = ops.index_update(np.zeros(self.fieldShape), ops.index[:,0], v0/self.L*self.mesh.coords[:,0])
+        V0 = np.zeros(self.fieldShape).at[:,0].set(v0/self.L*self.mesh.coords[:,0])
         Vu0 = self.dofManager.get_unknown_values(V0)
         return Uu0, Vu0
 
@@ -137,9 +137,7 @@ class UniaxialDynamic:
 
         # Ubc = self.dofManager.get_bc_values(U)
         # _,rxnBc = self.compute_reactions_from_bcs(Uu, Ubc, internalVariables)
-        # reactions = ops.index_update(np.zeros(U.shape),
-        #                              ops.index[self.dofManager.isBc],
-        #                              rxnBc)
+        # reactions = np.zeros(U.shape).at[self.dofManager.isBc].set(rxnBc)
         # writer.add_nodal_field(name='reactions', nodalData=reactions, fieldType=VTKWriter.VTKFieldType.VECTORS)
 
         # eqpsField = internalVariables[:,:,J2Plastic.EQPS]

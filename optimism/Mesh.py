@@ -72,7 +72,7 @@ def combine_sidesets(set1, set2, elemOffset):
     if set2!=None:
         for key in set2:
             val = set2[key]
-            newSet[key] = ops.index_add(val, ops.index[:,0], elemOffset) if len(val)>0 else np.array([])
+            newSet[key] = val.at[:,0].add(elemOffset) if len(val)>0 else np.array([])
     return newSet
 
 
@@ -151,10 +151,10 @@ def create_edges(coords, conns):
             for i,existingEdge in enumerate(edgeConns[:nEdges]):
                 if (edgeConn[0]==existingEdge[1]) and (edgeConn[1]==existingEdge[0]):
                     foundAlready = True
-                    edges = ops.index_update(edges, ops.index[i,2:], [e,n])
+                    edges = edges.at[i,2:].set([e,n])
             if not foundAlready:
-                edgeConns = ops.index_update(edgeConns, ops.index[nEdges], edgeConn)
-                edges = ops.index_update(edges, ops.index[nEdges,:2], [e,n])
+                edgeConns = edgeConns.at[nEdges].set(edgeConn)
+                edges = edges.at[nEdges,:2].set([e,n])
                 nEdges += 1
 
     return edgeConns[:nEdges], edges[:nEdges]
@@ -173,7 +173,7 @@ def create_higher_order_mesh_from_simplex_mesh(mesh, order, useBubbleElement=Fal
     conns = np.zeros((num_elements(mesh), master.coordinates.shape[0]), dtype=np.int_)
 
     # step 1/3: vertex nodes
-    conns = ops.index_update(conns, ops.index[:, master.vertexNodes], mesh.conns)
+    conns = conns.at[:,master.vertexNodes].set(mesh.conns)
     simplexNodesOrdinals = np.arange(mesh.coords.shape[0])
 
     nodeOrdinalOffset = mesh.coords.shape[0] # offset for later node numbering
@@ -191,17 +191,13 @@ def create_higher_order_mesh_from_simplex_mesh(mesh, order, useBubbleElement=Fal
         elemLeft = edge[0]
         sideLeft = edge[1]
         edgeMasterNodes = master.faceNodes[sideLeft][master1d.interiorNodes]
-        conns = ops.index_update(conns,
-                                 ops.index[elemLeft, edgeMasterNodes],
-                                 edgeNodeOrdinals)
+        conns = conns.at[elemLeft, edgeMasterNodes].set(edgeNodeOrdinals)
 
         elemRight = edge[2]
         if elemRight > 0:
             sideRight = edge[3]
             edgeMasterNodes = master.faceNodes[sideRight][master1d.interiorNodes]
-            conns = ops.index_update(conns,
-                                     ops.index[elemRight, edgeMasterNodes],
-                                     np.flip(edgeNodeOrdinals))
+            conns = conns.at[elemRight, edgeMasterNodes].set(np.flip(edgeNodeOrdinals))
 
     nEdges = edges.shape[0]
     nodeOrdinalOffset += nEdges*nNodesPerEdge # for offset of interior node numbering
@@ -216,7 +212,7 @@ def create_higher_order_mesh_from_simplex_mesh(mesh, order, useBubbleElement=Fal
         interiorCoords = vmap(lambda triConn: np.dot(A, mesh.coords[triConn]))(mesh.conns)
 
         def add_element_interior_nodes(conn, newNodeOrdinals):
-            return ops.index_update(conn, ops.index[master.interiorNodes], newNodeOrdinals)
+            return conn.at[master.interiorNodes].set(newNodeOrdinals)
 
         nTri = conns.shape[0]
         newNodeOrdinals = np.arange(nTri*nInNodesPerTri).reshape(nTri,nInNodesPerTri) \
@@ -279,9 +275,7 @@ class DofManager:
         self.bcIndices = self.ids[self.isBc]
         
         ones = np.ones(self.isBc.size, dtype=int) * -1
-        self.dofToUnknown = ops.index_update(ones,
-                                             self.unknownIndices,
-                                             np.arange(self.unknownIndices.size))
+        self.dofToUnknown = ones.at[self.unknownIndices].set(np.arange(self.unknownIndices.size)) 
 
         self.HessRowCoords, self.HessColCoords = self._make_hessian_coordinates(mesh.conns)
 
@@ -297,8 +291,8 @@ class DofManager:
     
     
     def create_field(self, Uu, Ubc=0.0):
-        U = ops.index_update(np.zeros(self.isBc.shape), self.isBc, Ubc)
-        return ops.index_update(U, self.isUnknown, Uu)
+        U = np.zeros(self.isBc.shape).at[self.isBc].set(Ubc)
+        return U.at[self.isUnknown].set(Uu)
     
 
     def get_bc_values(self, U):

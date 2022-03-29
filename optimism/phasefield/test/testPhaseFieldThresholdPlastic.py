@@ -77,9 +77,7 @@ class GradOfPlasticPhaseFieldModelFixture(TestFixture):
         self.assertNear(energy, WExact, 12)
 
         stress,_,_ = flux_func(dispGrad, phase, phaseGrad, state, self.props)
-        stressExact = ops.index_update(np.zeros((3,3)),
-                                       ops.index[0,0],
-                                       self.props.E*strainBelowYield)
+        stressExact = np.zeros((3,3)).at[0,0].set(self.props.E*strainBelowYield)
         self.assertArrayNear(stress, stressExact, 12)
 
 
@@ -132,7 +130,7 @@ class GradOfPlasticPhaseFieldModelFixture(TestFixture):
             energyHistory.append(energy)
 
             stateOld = stateNew
-            strain = ops.index_add(strain, ops.index[0,0], strain_inc)
+            strain = strain.at[0,0].add(strain_inc)
             dispGrad = strain
 
         if plotting:

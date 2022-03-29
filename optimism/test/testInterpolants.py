@@ -163,9 +163,7 @@ class TestInterpolants(TestFixture.TestFixture):
         y = np.zeros(npts)
         for i in range(npts):
             key,subkey = jax.random.split(key)
-            y = ops.index_update(y,
-                                 ops.index[i],
-                                 jax.random.uniform(subkey, minval=0.0, maxval=1.0-x[i]))
+            y = y.at[i].set(jax.random.uniform(subkey, minval=0.0, maxval=1.0-x[i]))
                      
         return np.column_stack((x,y))
 

@@ -48,9 +48,7 @@ def get_ubcs(p, mesh, dofManager):
     V = np.zeros(dofManager.ids.shape)
 
     topDispY = p[0]
-    V = ops.index_update(V,
-                         ops.index[mesh.nodeSets['top4'], 1],
-                         topDispY)
+    V = V.at[mesh.nodeSets['top4'], 1].set(topDispY)
     
     return dofManager.get_bc_values(V)
 

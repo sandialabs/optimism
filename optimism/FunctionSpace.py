@@ -52,7 +52,7 @@ def construct_weighted_function_space(mesh, quadratureRule, quadratureWeights=1.
             n2 = (e+1)%3
             edge = [coords[n1], coords[n2]]
             normal = normal_vector(edge)
-            shape = ops.index_add(shape, np.array([n1,n2]), normal*halfVol)
+            shape = shape.at[np.array([n1,n2])].add(normal*halfVol)
         return shape.reshape((1,3,2))
     
     shapes = np.ones( (mesh.conns.shape[0], 1, 3) )

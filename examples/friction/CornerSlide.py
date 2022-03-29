@@ -171,7 +171,7 @@ class CornerSlide(MeshFixture):
             print("----- LOAD STEP " + str(i+1) + " -----")
             
             forceRatio = 0.29025 + i*0.0003
-            p = Objective.Params(ops.index_update(p[0], 0, forceRatio))
+            p = Objective.Params( p[0].at[0].set(forceRatio) )
             print('force ratio = ', forceRatio)
             
             Uu = AlSolver.augmented_lagrange_solve(objective, Uu, p, alSettings, settings)

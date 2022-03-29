@@ -27,9 +27,9 @@ class DofManagerTest(MeshFixture.MeshFixture):
 
         self.nDof = self.nFields*self.nNodes
         U = np.zeros((self.nNodes, self.nFields))
-        U = ops.index_update(U, ops.index[:,1], 1.0)
-        U = ops.index_update(U, ops.index[self.mesh.nodeSets['top'],0], 2.0)
-        self.U = ops.index_update(U, ops.index[self.mesh.nodeSets['right'],1], 3.0)
+        U = U.at[:,1].set(1.0)
+        U = U.at[self.mesh.nodeSets['top'],0].set(2.0)
+        self.U = U.at[self.mesh.nodeSets['right'],1].set(3.0)
         
     def test_get_bc_size(self):
         # number of dofs from top, field 0
@@ -49,9 +49,9 @@ class DofManagerTest(MeshFixture.MeshFixture):
 
     def test_slice_unknowns_with_dof_indices(self):
         Uu = self.dofManager.get_unknown_values(self.U)
-        Uu_x = self.dofManager.slice_unknowns_with_dof_indices(Uu, ops.index[:,0])
+        Uu_x = self.dofManager.slice_unknowns_with_dof_indices(Uu, (slice(None),0) )
         self.assertArrayEqual(Uu_x, np.zeros(self.Nx*(self.Ny-1)))
-        Uu_y = self.dofManager.slice_unknowns_with_dof_indices(Uu, ops.index[:,1])
+        Uu_y = self.dofManager.slice_unknowns_with_dof_indices(Uu, (slice(None),1) )
         self.assertArrayEqual(Uu_y, np.ones(self.Ny*(self.Nx-1)))
         
         

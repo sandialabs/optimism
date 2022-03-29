@@ -64,7 +64,7 @@ class AxisymmPatchTest(MeshFixture.MeshFixture):
         dofManager = Mesh.DofManager(self.mesh, self.U.shape, EBCs)
 
         V = np.zeros(self.U.shape)
-        V = ops.index_update(V, ops.index[self.mesh.nodeSets['top'],1], self.targetDispGrad[1,1])
+        V = V.at[self.mesh.nodeSets['top'],1].set(self.targetDispGrad[1,1])
         Ubc = dofManager.get_bc_values(V)
         
         @jit

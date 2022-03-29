@@ -95,8 +95,8 @@ class Uniaxial:
     
     def get_ubcs(self, p):
         endDisp = p[0]
-        EbcIndex = ops.index[self.mesh.nodeSets['right'],0]
-        V = ops.index_update(np.zeros(self.fieldShape), EbcIndex, endDisp)
+        EbcIndex = (self.mesh.nodeSets['right'],0)
+        V = np.zeros(self.fieldShape).at[EbcIndex].set(endDisp)
         return self.dofManager.get_bc_values(V)
 
         
@@ -115,9 +115,7 @@ class Uniaxial:
 
         Ubc = self.dofManager.get_bc_values(U)
         _,rxnBc = self.compute_reactions_from_bcs(Uu, Ubc, internalVariables)
-        reactions = ops.index_update(np.zeros(U.shape),
-                                     ops.index[self.dofManager.isBc],
-                                     rxnBc)
+        reactions = np.zeros(U.shape).at[self.dofManager.isBc].set(rxnBc)
         writer.add_nodal_field(name='reactions', nodalData=reactions, fieldType=VTKWriter.VTKFieldType.VECTORS)
 
         if hasattr(Material, 'EQPS'):

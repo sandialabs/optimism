@@ -44,8 +44,8 @@ def _compute_block_diagonal_element_stiffnesses(U, internalVariables, functionSp
     print('zeroing cross terms')
     
     def zero_out_cross_terms(eStiff):
-        eStiff = ops.index_update(eStiff, ops.index[:,:2,:,2], 0.0)
-        return ops.index_update(eStiff, ops.index[:,2,:,:2], 0.0)
+        eStiff = eStiff.at[:,:2,:,2].set(0.0)
+        return eStiff.at[:,2,:,:2].set(0.0)
 
     return vmap(zero_out_cross_terms)(elementKMats)
 
@@ -77,9 +77,7 @@ def compute_phase_field_constraint_hessian(Lambda, kappa, constraint, dofManager
     phasePenaltyStiffness = np.where(Lambda >= constraint*kappa, kappa, 0.0)
     phaseDofIds = dofManager.ids[dofManager.isUnknown[:,2],2]
     phaseUnknownIds = dofManager.dofToUnknown[phaseDofIds]
-    d = ops.index_update(np.zeros(dofManager.get_unknown_size()),
-                         phaseUnknownIds,
-                         phasePenaltyStiffness)
+    d = np.zeros(dofManager.get_unknown_size()).at[phaseUnknownIds].set(phasePenaltyStiffness)
     return onp.array(d)
 
 
@@ -119,7 +117,7 @@ def axisymmetric_gradient(gradU, U, coord):
     dispGrad2D, phaseGrad2D = unpack_gradients_2D(gradU)
     disp, _ = unpack_fields_2D(U)
     dispGrad = tensor_2D_to_3D(dispGrad2D)
-    dispGrad = ops.index_update(dispGrad, ops.index[2,2], disp[0]/coord[0])
+    dispGrad = dispGrad.at[2,2].set(disp[0]/coord[0])
     phaseGrad = np.hstack((phaseGrad2D,0.0))
     return np.row_stack((dispGrad, phaseGrad))
 
@@ -144,18 +142,18 @@ def create_phasefield_functions(functionSpace, mode2D,
     L = energy_density_to_lagrangian_density(materialModel.compute_energy_density)
     
     def compute_internal_energy(U, Q):
-        return FunctionSpace.integrate_over_block(fs, U, Q, L, ops.index[:], modify_element_gradient)
+        return FunctionSpace.integrate_over_block(fs, U, Q, L, slice(None), modify_element_gradient)
 
     L_output = energy_density_to_lagrangian_density(materialModel.compute_output_energy_density)
     L_and_fluxes = value_and_grad(L_output, 1)
 
     def compute_output_energy_densities_and_stresses(U, Q):
-        return FunctionSpace.evaluate_on_block(fs, U, Q, L_and_fluxes, ops.index[:], modify_element_gradient)
+        return FunctionSpace.evaluate_on_block(fs, U, Q, L_and_fluxes, slice(None), modify_element_gradient)
 
     L_strain = energy_density_to_lagrangian_density(materialModel.compute_strain_energy_density)
 
     def compute_strain_energy_density(U,Q):
-        return FunctionSpace.evaluate_on_block(fs, U, Q, L_strain, ops.index[:], modify_element_gradient)
+        return FunctionSpace.evaluate_on_block(fs, U, Q, L_strain, slice(None), modify_element_gradient)
 
     def compute_initial_state():
         return materialModel.compute_initial_state((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule), 1))
@@ -164,7 +162,7 @@ def create_phasefield_functions(functionSpace, mode2D,
     
     def compute_updated_internal_variables(U, Q):
         return FunctionSpace.\
-            evaluate_on_block(fs, U, Q, L_compute_state_new, ops.index[:], modify_element_gradient)
+            evaluate_on_block(fs, U, Q, L_compute_state_new, slice(None), modify_element_gradient)
 
     def compute_element_stiffnesses(U, Q):
         return _compute_element_stiffnesses(U, Q, fs, L, modify_element_gradient)
@@ -175,7 +173,7 @@ def create_phasefield_functions(functionSpace, mode2D,
 
     Lphase = energy_density_to_lagrangian_density(materialModel.compute_phase_potential_density)
     def compute_phase_potential_energy(U, Q):
-        return FunctionSpace.integrate_over_block(fs, U, Q, Lphase, ops.index[:], modify_element_gradient)
+        return FunctionSpace.integrate_over_block(fs, U, Q, Lphase, slice(None), modify_element_gradient)
     
     return PhaseFieldFunctions(compute_internal_energy,
                                jit(compute_output_energy_densities_and_stresses),

@@ -53,7 +53,7 @@ def solve_sub_step(alObjective, x, ncpErrorOld, alSettings, subSettings, sub_pro
 
     if (np.any(poorProgress)):
         print('Poor progress on ncp detected, increasing some penalty parameters')
-        alObjective.kappa = ops.index_update(kappa, poorProgress, alSettings.penalty_scaling*kappa[poorProgress])
+        alObjective.kappa = kappa.at[poorProgress].set(alSettings.penalty_scaling*kappa[poorProgress])
         
     return x, ncpError
 
@@ -75,8 +75,8 @@ def linear_update(alObjective, x, rhs_func, alSettings):
         constraintDiffCap = alSettings.inverse_ncp_hessian_bound
         nearSingularValues = D > -constraintDiffCap
         
-        DInv = 1.0 / ops.index_update(D, nearSingularValues, -constraintDiffCap)
-        DInvCapped = ops.index_update(D, nearSingularValues, 0.0)
+        DInv = 1.0 / D.at[nearSingularValues].set(-constraintDiffCap)
+        DInvCapped = D.at[nearSingularValues].set(0.0)
         
         deltaL = lR * DInv
         deltaX = alObjective.apply_precond(xR - alObjective.jacobian_l_vec(x, lR * DInvCapped))

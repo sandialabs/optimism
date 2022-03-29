@@ -21,10 +21,10 @@ def numerical_grad(f):
         ff = f(A)
         for i in range(3):
             for j in range(3):
-                Ap = ops.index_add(A, ops.index[i,j], eps)
+                Ap = A.at[i,j].add(eps)
                 fp = f(Ap)
                 fprime = (fp-ff)/eps
-                df = ops.index_add(df, ops.index[i,j], fprime)
+                df = df.at[i,j].add(fprime)
         return df
     return lam
 
