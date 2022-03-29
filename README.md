@@ -111,8 +111,8 @@ package first.
 
 ## Sample Installation on OSX using Homebrew
 
-Current as of March 2022:
-```
+From the `optimism` directory:
+```bash
 brew install suite-sparse
 brew install python-tk 
 
