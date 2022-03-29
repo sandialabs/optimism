@@ -82,8 +82,8 @@ class SharpNotchProblem:
 
         def get_ubcs(yDisp):
             V = np.zeros(self.fieldShape)
-            index = ops.index[self.mesh.nodeSets['top'],1]
-            V = ops.index_update(V, index, yDisp)
+            index = (self.mesh.nodeSets['top'],1)
+            V = V.at[index].set(yDisp)
             return self.dofManager.get_bc_values(V)
 
         self.get_ubcs = get_ubcs
@@ -125,9 +125,7 @@ class SharpNotchProblem:
         rxnBc = self.compute_reactions(self.dofManager.get_bc_values(U),
                                        self.dofManager.get_unknown_values(U),
                                        p)
-        reactions = ops.index_update(np.zeros(U.shape),
-                                     ops.index[self.dofManager.isBc],
-                                     rxnBc)
+        reactions = np.zeros(U.shape).at[self.dofManager.isBc].set(rxnBc)
         writer.add_nodal_field(name='reactions',
                                nodalData=reactions,
                                fieldType=VTKWriter.VTKFieldType.VECTORS)      
@@ -192,9 +190,7 @@ class SharpNotchProblem:
             constraintStiffnessScaling=phaseStiffnessRelativeTolerance,
             precondStrategy=precondStrategy)
 
-        lamField = ops.index_update(np.zeros(self.fieldShape[0]),
-                                    self.dofManager.isUnknown[:,2],
-                                    objective.get_multipliers())
+        lamField = np.zeros(self.fieldShape[0]).at[self.dofManager.isUnknown[:,2]].set(objective.get_multipliers())
         
         self.plot_solution(np.zeros(self.fieldShape), p, lamField, "sharpNotch-"+str(0).zfill(3))
         
@@ -222,9 +218,7 @@ class SharpNotchProblem:
             p = Objective.param_index_update(p, 1, internalVariables)
             objective.p = p
 
-            lamField = ops.index_update(np.zeros(self.fieldShape[0]),
-                                        self.dofManager.isUnknown[:,2],
-                                        objective.get_multipliers())
+            lamField = np.zeros(self.fieldShape[0]).at[self.dofManager.isUnknown[:,2]].set(objective.get_multipliers())
             
             self.plot_solution(U, p, lamField, "sharpNotch-"+str(step).zfill(3))
 

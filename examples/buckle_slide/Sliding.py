@@ -110,10 +110,10 @@ class Sliding(MeshFixture):
     def get_ubcs(self, p):
         dispX = p[0][0]
         V = np.zeros(self.U.shape)
-        indexR = ops.index[self.mesh.nodeSets['right'],0]
-        V = ops.index_update(V, indexR, -dispX)
-        indexL = ops.index[self.mesh.nodeSets['left'],0]
-        V = ops.index_update(V, indexL, dispX)
+        indexR = (self.mesh.nodeSets['right'],0)
+        V = V.at[indexR].set(-dispX)
+        indexL = (self.mesh.nodeSets['left'],0)
+        V = V.at[indexL].set(dispX)
         return self.dofManager.get_bc_values(V)
 
     def plot_solution(self, dispField, plotName, p):

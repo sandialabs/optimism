@@ -45,7 +45,7 @@ def free_energy_density(props, strain, phase, gradPhase):
 def compute_element_energy(compute_free_energy_density, U, shapeGrad, conn):
     nodalDisp = U[conn,:2]
     dispGrad = np.tensordot(nodalDisp, shapeGrad, axes=[0,0]) 
-    strain = ops.index_update(np.zeros((3,3)), ops.index[0:2,0:2], dispGrad)
+    strain = np.zeros((3,3)).at[0:2,0:2].set(dispGrad)
     nodalPhase = U[conn,2]
     phaseGrad = np.tensordot(nodalPhase, shapeGrad, axes=[0,0]) 
     phase = np.average(nodalPhase)

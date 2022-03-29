@@ -55,7 +55,7 @@ def logh_from_eigen(eVals, eVecs):
 
 
 def tensor_2D_to_3D(H):
-    return ops.index_update(np.zeros((3,3)), ops.index[0:H.shape[0],0:H.shape[1]], H)
+    return np.zeros((3,3)).at[ 0:H.shape[0], 0:H.shape[1] ].set(H)
 
 
 #  Compute eigen values and vectors of a symmetric 3x3 tensor

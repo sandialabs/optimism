@@ -40,10 +40,10 @@ class ModelProblem():
         g = np.zeros((N))
         
         for i in range(N):
-            g = ops.index_update(g, i, self.v[i]@self.b)
+            g = g.at[i].set( self.v[i]@self.b )
             # g[i] = self.v[i]@self.b
             for j in range(N):
-                H = ops.index_update(H,ops.index[i,j],self.v[i]@self.Kv[j])
+                H = H.at[i,j].set( self.v[i]@self.Kv[j] )
             # H[i,j] = vi^T K vj
 
         self.g = g

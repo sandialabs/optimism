@@ -80,9 +80,7 @@ class PhaseFieldThresholdModelFixture(TestFixture.TestFixture):
 
         piolaStress,_,_ = self.flux_func(dispGrad, phase, phaseGrad, self.internalVariables)
         kStress = piolaStress@(dispGrad + np.identity(3)).T
-        kStressExact = ops.index_update(np.zeros((3,3)),
-                                        ops.index[0,0],
-                                        g*self.E*strain)
+        kStressExact = np.zeros((3,3)).at[0,0].set(g*self.E*strain)
         self.assertArrayNear(kStress, kStressExact, 12)
 
 

@@ -92,9 +92,7 @@ class TractionArch():
         Ubc = self.get_ubcs(p)
         internalVariables = p[1]
         rxnBc = self.compute_bc_reactions(Uu, Ubc, p)
-        reactions = ops.index_update(np.zeros(U.shape),
-                                     ops.index[self.dofManager.isBc],
-                                     rxnBc)
+        reactions = np.zeros(U.shape).at[self.dofManager.isBc].set(rxnBc)
         writer.add_nodal_field(name='reactions', nodalData=reactions, fieldType=VTKWriter.VTKFieldType.VECTORS)
 
         energyDensities, stresses = self.bvpFuncs.\

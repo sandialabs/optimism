@@ -97,9 +97,7 @@ class ContactArch(MeshFixture):
         Ubc = self.get_ubcs(p)
         internalVariables = p[1]
         energy, rxnBc = self.compute_bc_reactions(Uu, Ubc, internalVariables)
-        reactions = ops.index_update(np.zeros(U.shape),
-                                     ops.index[self.dofManager.isBc],
-                                     rxnBc)
+        reactions = np.zeros(U.shape).at[self.dofManager.isBc].set(rxnBc)
         writer.add_nodal_field(name='reactions', nodalData=reactions, fieldType=VTKWriter.VTKFieldType.VECTORS)
 
         energyDensities, stresses = self.bvpFuncs.\
@@ -128,8 +126,8 @@ class ContactArch(MeshFixture):
     def get_ubcs(self, p):
         yLoc = p[0]
         V = np.zeros(self.mesh.coords.shape)
-        index = ops.index[self.mesh.nodeSets['push'],1]
-        V = ops.index_update(V, index, yLoc)
+        index = (self.mesh.nodeSets['push'],1)
+        V = V.at[index].set(yLoc)
         return self.dofManager.get_bc_values(V)
 
     

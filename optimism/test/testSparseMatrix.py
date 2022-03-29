@@ -132,8 +132,8 @@ class SparsePatchFixture(MeshFixture.MeshFixture):
 
         dU = np.zeros(self.U.shape)
         for b, ebc in enumerate(EBCs):
-            idx = ops.index[self.mesh.nodeSets[ebc.nodeSet], ebc.field]
-            dU = ops.index_update(dU, idx,  bcVals[b])
+            idx = (self.mesh.nodeSets[ebc.nodeSet], ebc.field)
+            dU = dU.at[idx].set(bcVals[b])
 
         Ubc = dofManager.get_bc_values(self.U)
         Uu = dofManager.get_unknown_values(self.U)
@@ -141,7 +141,7 @@ class SparsePatchFixture(MeshFixture.MeshFixture):
         F = -compute_bc_cross_stiffness_action(Uu, Ubc, dofManager.get_bc_values(dU))
         u = linalg.spsolve(K, F)
         
-        dU = ops.index_update(dU, dofManager.isUnknown, u)
+        dU = dU.at[dofManager.isUnknown].set(u)
         UNew = self.U + dU
 
         # plane strain, Uy should be -nu/(1-nu)*Ux

@@ -84,9 +84,7 @@ class GradOfPlasticPhaseFieldModelFixture(TestFixture.TestFixture):
 
         piolaStress,_,_ = self.flux_func(dispGrad, phase, phaseGrad, self.internalVariables)
         mandelStress = piolaStress@(dispGrad + np.identity(3)).T
-        stressExact = ops.index_update(np.zeros((3,3)),
-                                       ops.index[0,0],
-                                       self.E*strainBelowYield)
+        stressExact = np.zeros((3,3)).at[0,0].set(self.E*strainBelowYield)
         self.assertArrayNear(mandelStress, stressExact, 12)
 
 

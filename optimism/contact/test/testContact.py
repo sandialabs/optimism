@@ -72,8 +72,8 @@ class TestContactFrictionData(MeshFixture):
         block1Nodes = sort_uniq(self.mesh.conns[self.mesh.blocks['block1']].ravel())
         block2Nodes = sort_uniq(self.mesh.conns[self.mesh.blocks['block2']].ravel())
         
-        self.U = ops.index_add(self.U, ops.index[block1Nodes,0], 0.1)
-        self.U = ops.index_add(self.U, ops.index[block2Nodes,0], -0.25)
+        self.U = self.U.at[block1Nodes,0].add(0.1)
+        self.U = self.U.at[block2Nodes,0].add(-0.25)
         
         coordsQ = Contact.compute_q_coordinates(self.mesh, self.U, self.quadRule, self.surfI)
         coordsFromWeights = Contact.compute_q_coordinates_from_field_weights(self.mesh, self.U,

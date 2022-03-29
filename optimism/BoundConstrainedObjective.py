@@ -56,18 +56,14 @@ class BoundConstrainedObjective(ConstrainedObjective.ConstrainedObjective):
             precondStrategy.initialize(x0, p)
             K0 = precondStrategy.precond_at_attempt(0)
             scaling = np.sqrt(K0.diagonal())
-            scaling = ops.index_mul(scaling,
-                                    constrainedIndices,
-                                    1.0/constraintStiffnessScaling)
+            scaling = scaling.at[constrainedIndices].multiply(1.0/constraintStiffnessScaling)
             invScaling = 1.0/scaling
 
 
             def scaled_constraint_hessian(xBar, p, lam, kappa):
                 c = xBar[constrainedIndices]
                 phasePenaltyStiffness = np.where(lam >= c*kappa, kappa, 0.0)
-                d = ops.index_update(np.zeros_like(xBar),
-                                     constrainedIndices,
-                                     phasePenaltyStiffness)
+                d = np.zeros_like(xBar).at[constrainedIndices].set(phasePenaltyStiffness)
                 return sparse_diags(onp.array(d), format='csc')
 
 

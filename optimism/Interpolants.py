@@ -79,12 +79,8 @@ def make_master_tri_element(degree):
         for i in range(degree):
             for j in range(degree + 1 - i):
                 k = degree - i - j
-                points = ops.index_update(points,
-                                          ops.index[point,0],
-                                          (1.0 + 2.0*lobattoPoints[k] - lobattoPoints[j] - lobattoPoints[i])/3.0)        
-                points = ops.index_update(points,
-                                          ops.index[point,1],
-                                          (1.0 + 2.0*lobattoPoints[j] - lobattoPoints[i] - lobattoPoints[k])/3.0)
+                points = points.at[ (point,0) ].set( (1.0 + 2.0*lobattoPoints[k] - lobattoPoints[j] - lobattoPoints[i])/3.0 )
+                points = points.at[ (point,1) ].set( (1.0 + 2.0*lobattoPoints[j] - lobattoPoints[i] - lobattoPoints[k])/3.0 )
                 point += 1
     
         vertexPoints = np.array([0, degree, nPoints - 1], dtype=int)
@@ -184,7 +180,7 @@ def compute_vandermonde_tri(x, degree):
         pVal = np.polyval(PP, E[:,0])
         qVal = np.polyval(QP, E[:,1])
         weight = np.sqrt( (2*pq[i,0]+1) * 2*(pq[i,0]+pq[i,1]+1))
-        A = ops.index_update(A, ops.index[:,i], (weight*pVal*qVal))
+        A = A.at[:,i].set(weight*pVal*qVal)
     return np.array(A)
 
 
@@ -230,16 +226,10 @@ def make_master_tri_bubble_element(degree):
     nPoints = nPointsBase + nPointsBubble
 
     nNodesBase = num_nodes(baseMaster)
-    baseNonInteriorNodes = ops.index_update(np.full(nNodesBase, True),
-                                            ops.index[baseMaster.interiorNodes],
-                                            False)
+    baseNonInteriorNodes = np.full(nNodesBase, True).at[baseMaster.interiorNodes].set(False)
 
-    coords = ops.index_update(np.zeros((nPoints,2)),
-                              ops.index[:nPointsBase],
-                              baseMaster.coordinates[baseNonInteriorNodes])
-    coords = ops.index_update(coords,
-                              ops.index[nPointsBase:],
-                              bubbleMaster.coordinates[bubbleMaster.interiorNodes])
+    coords = np.zeros((nPoints,2)).at[:nPointsBase].set(baseMaster.coordinates[baseNonInteriorNodes])
+    coords = coords.at[nPointsBase:].set(bubbleMaster.coordinates[bubbleMaster.interiorNodes])
 
     vertexNodes = np.array([0, degree , nPointsBase - 1], dtype=int)
 

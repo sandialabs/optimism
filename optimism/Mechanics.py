@@ -50,7 +50,7 @@ def volume_average_J_gradient_transformation(elemDispGrads, elemVols, pShapes):
 
 def axisymmetric_gradient(dispGrad, disp, coord):
     dispGrad = tensor_2D_to_3D(dispGrad)
-    dispGrad = ops.index_update(dispGrad, ops.index[2,2], disp[0]/coord[0])
+    dispGrad = dispGrad.at[2,2].set(disp[0]/coord[0])
     return dispGrad
 
 
@@ -92,7 +92,7 @@ def _compute_strain_energy(functionSpace, UField, stateField,
                            modify_element_gradient):
     L = strain_energy_density_to_lagrangian_density(compute_energy_density)
     return FunctionSpace.integrate_over_block(functionSpace, UField, stateField, L,
-                                              ops.index[:],
+                                              slice(None),
                                               modify_element_gradient)
 
 
@@ -135,7 +135,7 @@ def _compute_updated_internal_variables_multi_block(functionSpace, U, states, bl
         dgQuadPointRavel = blockDispGrads.reshape(blockDispGrads.shape[0]*blockDispGrads.shape[1],*blockDispGrads.shape[2:])
         stQuadPointRavel = blockStates.reshape(blockStates.shape[0]*blockStates.shape[1],*blockStates.shape[2:])
         blockStatesNew = vmap(compute_state_new)(dgQuadPointRavel, stQuadPointRavel).reshape(blockStates.shape)        
-        statesNew = ops.index_update(stateNew, elemIds, blockStatesNew)
+        statesNew = stateNew.at[elemIds].set(blockStatesNew)
         
 
     return statesNew
@@ -149,7 +149,7 @@ def _compute_initial_state_multi_block(fs, blockModels):
     for blockKey in blockModels:
         elemIds = fs.mesh.blocks[blockKey]
         blockInitialState = blockModels[blockKey].compute_initial_state( (elemIds.size, numQuadPoints, 1) )
-        initialState = ops.index_update(initialState, elemIds, blockInitialState)
+        initialState = initialState.at[elemIds].set(blockInitialState)
         
     return initialState
 
@@ -249,7 +249,7 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel, pressurePro
 
     
     def compute_output_energy_densities_and_stresses(U, stateVariables):
-        return FunctionSpace.evaluate_on_block(fs, U, stateVariables, output_constitutive, ops.index[:], modify_element_gradient)
+        return FunctionSpace.evaluate_on_block(fs, U, stateVariables, output_constitutive, slice(None), modify_element_gradient)
 
     
     def compute_initial_state():
@@ -262,7 +262,7 @@ def compute_element_mass_matrix(density, elemShapes, elemVols):
     m = elemShapes.T@np.diag(density*elemVols)@elemShapes
     M = np.zeros((m.shape[0],2,m.shape[0],2))
     for i in range(2):
-        M = ops.index_update(M, ops.index[:,i,:,i], m)
+        M = M.at[:,i,:,i].set(m)
     return M
 
     
@@ -352,7 +352,7 @@ def create_dynamics_functions(functionSpace, mode2D, materialModel, newmarkParam
     output_lagrangian = strain_energy_density_to_lagrangian_density(compute_output_energy_density)
     output_constitutive = value_and_grad(output_lagrangian, 1)
     def compute_output_potential_densities_and_stresses(U, stateVariables):
-        return FunctionSpace.evaluate_on_block(fs, U, stateVariables, output_constitutive, ops.index[:], modify_element_gradient)
+        return FunctionSpace.evaluate_on_block(fs, U, stateVariables, output_constitutive, slice(None), modify_element_gradient)
 
     def compute_initial_state():
         return materialModel.compute_initial_state((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule), 1))

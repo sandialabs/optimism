@@ -85,7 +85,7 @@ class DynamicsFixture(MeshFixture.MeshFixture):
     def test_compute_kinetic_energy(self):
         velocity = 3.1
         V = np.zeros(self.mesh.coords.shape)
-        V = ops.index_update(V, ops.index[:,0], velocity)
+        V = V.at[:,0].set(velocity)
         T = Mechanics.compute_kinetic_energy(V, self.elementMasses, self.mesh.conns)
         m = self.w*self.L*rho
         TExact = 0.5*m*velocity**2
@@ -155,7 +155,7 @@ class DynamicsFixture(MeshFixture.MeshFixture):
             Uu, Vu, Au = self.time_step(Uu, Vu, Au, objective, dt)
             U = self.create_field(Uu, p)
             t = objective.p[4][0]
-            Uexact = ops.index_update(np.zeros(self.fieldShape), ops.index[:,0], t)
+            Uexact = np.zeros(self.fieldShape).at[:,0].set(t)
             self.assertArrayNear(U, Uexact, 14)
 
 
@@ -191,7 +191,7 @@ class DynamicsFixture(MeshFixture.MeshFixture):
             Uu, Vu, Au = self.time_step(Uu, Vu, Au, objective, dt)
             U = self.dofManager.create_field(Uu, self.get_ubcs())
             t = objective.p.time[0]
-            UExact = ops.index_update(np.zeros(U.shape), ops.index[:,0], t + 0.5*t**2)
+            UExact = np.zeros(U.shape).at[:,0].set(t + 0.5*t**2)
             self.assertArrayNear(U, UExact, 10)
 
             
@@ -225,7 +225,7 @@ class DynamicsFixture(MeshFixture.MeshFixture):
         Uu = self.dofManager.get_unknown_values(zeroField)
 
         v0 = 1.0
-        V = ops.index_update(zeroField, ops.index[:,0], v0)
+        V = zeroField.at[:,0].set(v0)
         Vu = self.dofManager.get_unknown_values(V)
 
         Au = self.dofManager.get_unknown_values(zeroField)

@@ -28,13 +28,9 @@ def get_ubcs(p, mesh, dofManager):
     V = np.zeros(dofManager.ids.shape)
     dispY = p[0]
 
-    V = ops.index_update(V,
-                         ops.index[mesh.nodeSets['left2'], 1],
-                         dispY)
+    V = V.at[mesh.nodeSets['left2'], 1].set(dispY)
     
-    V = ops.index_update(V,
-                         ops.index[mesh.nodeSets['right2'], 1],
-                         dispY)
+    V = V.at[mesh.nodeSets['right2'], 1].set(dispY)
     
     bcVals = dofManager.get_bc_values(V)
     return bcVals
@@ -64,7 +60,7 @@ class ContactArch(MeshFixture):
 
         R = -np.identity(2)
         coords2 = vmap(lambda x: R@x)(mesh2.coords)
-        coords2 = ops.index_add(coords2, ops.index[:,1], self.initialTopDisp)
+        coords2 = coords2.at[:,1].add(self.initialTopDisp)
         mesh2 = Mesh.mesh_with_coords(mesh2, coords2)
 
         self.mesh, self.U = Mesh.combine_mesh(m1, (mesh2,disp2) )
