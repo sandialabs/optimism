@@ -109,7 +109,18 @@ SuiteSpase and run the above recommended installation command to get
 the additional functionality. You don't need to remove the basic
 package first.
 
+## Sample Installation on OSX using Homebrew
 
+Current as of March 2022:
+```
+brew install suite-sparse
+brew install python-tk 
+
+INC=/usr/local/Cellar/suite-sparse/5.11.0/include
+LIB=/usr/local/Cellar/suite-sparse/5.11.0/lib
+pip=/usr/local/opt/python/bin/pip3
+SUITESPARSE_INCLUDE_DIR=$INC SUITESPARSE_LIBRARY_DIR=$LIB $pip install -e . sparse
+```
 
 ## Citing OptimiSM
 
