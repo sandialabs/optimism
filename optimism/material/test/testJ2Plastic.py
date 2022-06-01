@@ -6,6 +6,7 @@ from optimism.JaxConfig import *
 from optimism import EquationSolver as EqSolver
 from optimism import FunctionSpace
 from optimism.material import J2Plastic as J2
+from optimism.material import MaterialPointUniaxialSimulator
 from optimism import Mechanics
 from optimism import Mesh
 from optimism import Objective
@@ -170,7 +171,40 @@ class GradOfPlasticityModelFixture(TestFixture):
 
         self.assertNear( stressHistory[-1], stressNewExp, 11 )
         self.assertArrayNear(eqpsHistory, eqpsExp, 12)
-       
+
+class J2PlasticUniaxial(TestFixture):
+
+    def setUp(self):
+        E = 100.0e3
+        nu = 0.25
+        Y0 = 30.0
+        H = E/200
+
+        properties = {'elastic modulus': E,
+                      'poisson ratio': nu,
+                      'yield strength': Y0,
+                      'kinematics': 'large deformations',
+                      'hardening model': 'linear',
+                      'hardening modulus': H}
+        self.E = E
+        self.Y0 = Y0
+        self.H = H
+        self.mat = J2.create_material_model_functions(properties)
+        self.simulator = MaterialPointUniaxialSimulator.MaterialPointUniaxialSimulator(
+            self.mat, maxStrain=0.02, strainRate=1e-3, steps=100)
+
+
+    def test_uniaxial(self):
+        uniaxial = self.simulator.run()
+
+        logStrainHistory = np.log(1.0 + uniaxial.strainHistory)
+        yieldStrain = self.Y0/self.E
+        exact = np.where(logStrainHistory < yieldStrain,
+                         self.E*logStrainHistory,
+                         self.E/(self.E + self.H)*(self.H*logStrainHistory + self.Y0))
+
+        self.assertArrayNear(uniaxial.kirchhoffStressHistory, exact,2)
+
 
 class PlasticityOnMesh(MeshFixture):
 

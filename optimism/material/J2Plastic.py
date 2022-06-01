@@ -133,10 +133,9 @@ def energy_density_generic(elStrain, state, props, hardening_model, doUpdate):
 
         isYielding = trialStress > flowStress
 
-        stateInc = lax.cond(isYielding,
-                            lambda e: update_state(e, state, state, props, hardening_model),
-                            lambda e: np.zeros(NUM_STATE_VARS),
-                            elStrain)
+        stateInc = np.where(isYielding,
+                            update_state(elStrain, state, state, props, hardening_model),
+                            np.zeros(NUM_STATE_VARS))
     else:
         stateInc = np.zeros(NUM_STATE_VARS)
     
