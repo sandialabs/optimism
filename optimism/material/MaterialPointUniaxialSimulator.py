@@ -7,7 +7,10 @@ from optimism import Objective
 from optimism import TensorMath
 
 
-UniaxialOutput = namedtuple('UniaxialOutput', ['times', 'strainHistory', 'stressHistory', 'cauchyStressHistory', 'energyHistory', 'internalVariableHistory'])
+UniaxialOutput = namedtuple('UniaxialOutput',
+                            ['times', 'strainHistory',
+                             'stressHistory', 'kirchhoffStressHistory',
+                             'energyHistory', 'internalVariableHistory'])
 
 
 class MaterialPointUniaxialSimulator:
@@ -72,7 +75,7 @@ class MaterialPointUniaxialSimulator:
         o = Objective.Objective(obj_func, freeStrains, p)
         
         stressHistory = []
-        cauchyStressHistory = []
+        kirchhoffStressHistory = []
         energyHistory = []
         internalVariableHistory = []
         for i in range(self.steps):
@@ -90,12 +93,12 @@ class MaterialPointUniaxialSimulator:
             cauchy = stress@F.T/J
             
             stressHistory.append(stress[0,0])
-            cauchyStressHistory.append(cauchy[0,0])
+            kirchhoffStressHistory.append(cauchy[0,0])
             energyHistory.append(energyDensity)
             internalVariableHistory.append(internalVariables)
             
         return UniaxialOutput(onp.array(self.times), onp.array(self.strainHistory),
-                              onp.array(stressHistory), onp.array(cauchyStressHistory),
+                              onp.array(stressHistory), onp.array(kirchhoffStressHistory),
                               onp.array(energyHistory), onp.array(internalVariableHistory))
 
     
