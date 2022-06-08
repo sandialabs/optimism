@@ -29,13 +29,13 @@ class RtsafeFixture(TestFixture.TestFixture):
         # print('scipy iterations ', result.iterations)
         
 
-    def test_rtsafe(self):
+    def test_find_root(self):
         rootBracket = np.array([float_info.epsilon, 100.0])
         root = ScalarRootFind.find_root(f, self.rootGuess, rootBracket, self.settings)
         self.assertNear(root, self.rootExpected, 13)
 
         
-    def test_rtsafe_jits(self):
+    def test_find_root_with_jit(self):
         rtsafe_jit = jit(ScalarRootFind.find_root, static_argnums=(0,3))
         rootBracket = np.array([float_info.epsilon, 100.0])
         root = rtsafe_jit(f, self.rootGuess, rootBracket, self.settings)
@@ -76,6 +76,32 @@ class RtsafeFixture(TestFixture.TestFixture):
                                             rootBracket, self.settings)
         r = my_sqrt(9.0)
         self.assertNear(r, 3.0, 12)
+
+
+    def test_root_find_with_vmap_and_jit(self):
+        myfunc = lambda x, a: x**2 - a
+        def my_sqrt(a):
+            rootBracket = np.array([float_info.epsilon, 100.0])
+            return ScalarRootFind.find_root(lambda x: myfunc(x, a), 8.0,
+                                            rootBracket, self.settings)
+        x = np.array([1.0, 4.0, 9.0, 16.0])
+        F = jit(vmap(my_sqrt, 0))
+        expectedRoots = np.array([1.0, 2.0, 3.0, 4.0])
+        self.assertArrayNear(F(x), expectedRoots, 12)
+
+
+    # def test_root_find_can_abort_with_vmap_and_jit(self):
+    #     settings = ScalarRootFind.get_settings(max_iters=1)
+    #     myfunc = lambda x, a: x**2 - a
+    #     def my_sqrt(a):
+    #         rootBracket = np.array([float_info.epsilon, 100.0])
+    #         return ScalarRootFind.find_root(lambda x: myfunc(x, a), 25.0,
+    #                                         rootBracket, self.settings)
+    #     F = jit(my_sqrt)
+    #     v = np.array([1.0, 4.0, 9.0, 16.0])
+    #     # this should hang forever
+    #     r = vmap(F, 0)(v)
+    #     print(r)
 
 if __name__ == '__main__':
     TestFixture.unittest.main()
