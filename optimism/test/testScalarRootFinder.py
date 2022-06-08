@@ -67,5 +67,15 @@ class RtsafeFixture(TestFixture.TestFixture):
         x = 3.0
         self.assertNear(df(x), x**(-2/3)/3, 13)
 
+
+    def test_find_root_with_forced_bisection_step(self):
+        myfunc = lambda x, a: x**2 - a
+        def my_sqrt(a):
+            rootBracket = np.array([float_info.epsilon, 100.0])
+            return ScalarRootFind.rtsafe_(lambda x: myfunc(x, a), 8.0,
+                                          rootBracket, self.settings)
+        r = my_sqrt(9.0)
+        self.assertNear(r, 3.0, 12)
+
 if __name__ == '__main__':
     TestFixture.unittest.main()

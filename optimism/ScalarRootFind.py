@@ -96,10 +96,11 @@ def rtsafe_(f, x0, bracket, settings):
         newtonOutOfRange = ((root - xh)*DF - F) * ((root - xl)*DF - F) >= 0
         newtonDecreasingSlowly = np.abs(2.*F) > np.abs(dxOld*DF)
         dxOld = dx
-        dx = if_then_else(newtonOutOfRange | newtonDecreasingSlowly,
-                          bisectStep,
-                          newtonStep)
-        root += dx
+        xOld = root
+        root = if_then_else(newtonOutOfRange | newtonDecreasingSlowly,
+                            xl + bisectStep,
+                            root + newtonStep)
+        dx = root - xOld
 
         F, DF = f_and_fprime(root)
         
