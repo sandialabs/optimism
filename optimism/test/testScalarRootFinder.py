@@ -10,7 +10,7 @@ from optimism.test import TestFixture
 def f(x): return x**3 - 4.0
 
 
-class RtsafeFixture(TestFixture.TestFixture):
+class ScalarRootFindTestFixture(TestFixture.TestFixture):
 
     def setUp(self):
         self.settings = ScalarRootFind.get_settings()
