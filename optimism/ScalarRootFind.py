@@ -57,15 +57,17 @@ def rtsafe_(f, x0, bracket, settings):
 
     #print('b0, b1 = ', bracket[0], bracket[1])
     #print('fs = ', fl, fh)
-    
-    x0 = if_then_else(fl*fh < 0,
-                      x0,
-                      np.nan)
+
+    # If root is not bracketed, send sentinel value (nan)
+    x0 = np.where(fl*fh < 0,
+                  x0,
+                  np.nan)
 
     # ORIENT THE SEARCH SO THAT F(XL) < 0.
-    xl, xh = if_then_else(fl < 0,
-                          (bracket[0], bracket[1]),
-                          (bracket[1], bracket[0]))
+    xl, xh = lax.cond(fl < 0,
+                      lambda _: (bracket[0], bracket[1]),
+                      lambda _:(bracket[1], bracket[0]),
+                      None)
 
     # INITIALIZE THE GUESS FOR THE ROOT, THE ''STEP SIZE
     # BEFORE LAST'', AND THE LAST STEP
@@ -97,17 +99,18 @@ def rtsafe_(f, x0, bracket, settings):
         newtonDecreasingSlowly = np.abs(2.*F) > np.abs(dxOld*DF)
         dxOld = dx
         xOld = root
-        root = if_then_else(newtonOutOfRange | newtonDecreasingSlowly,
-                            xl + bisectStep,
-                            root + newtonStep)
+        root = np.where(newtonOutOfRange | newtonDecreasingSlowly,
+                        xl + bisectStep,
+                        root + newtonStep)
         dx = root - xOld
 
         F, DF = f_and_fprime(root)
         
         # MAINTAIN THE BRACKET ON THE ROOT
-        xl,xh = if_then_else(F < 0,
-                             (root,xh),
-                             (xl,root))
+        xl,xh = lax.cond(F < 0,
+                         lambda rt, lo, hi: (rt, hi),
+                         lambda rt, lo, hi: (lo, rt),
+                         root, xl, xh)
 
         i += 1
         #converged = (np.abs(dx) < x_tol*root) # relative tolerance

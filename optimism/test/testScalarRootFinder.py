@@ -72,8 +72,8 @@ class RtsafeFixture(TestFixture.TestFixture):
         myfunc = lambda x, a: x**2 - a
         def my_sqrt(a):
             rootBracket = np.array([float_info.epsilon, 100.0])
-            return ScalarRootFind.rtsafe_(lambda x: myfunc(x, a), 8.0,
-                                          rootBracket, self.settings)
+            return ScalarRootFind.find_root(lambda x: myfunc(x, a), 8.0,
+                                            rootBracket, self.settings)
         r = my_sqrt(9.0)
         self.assertNear(r, 3.0, 12)
 
