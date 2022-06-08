@@ -8,6 +8,7 @@ with warnings.catch_warnings():
     from jax import custom_jvp, custom_vjp
     from jax import jit as jaxJit
     from jax import vmap as jaxVmap
+    from jax.lax import while_loop
     from jax.config import config
 
     
@@ -23,6 +24,11 @@ if jaxDebug:
     
     vmap = jaxVmap
 
+    def while_loop(cond_fun, body_fun, init_val):
+        val = init_val
+        while cond_fun(val):
+            val = body_fun(val)
+        return val
 else:
     jit = jaxJit
     vmap = jaxVmap
