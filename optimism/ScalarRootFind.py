@@ -24,8 +24,8 @@ def find_root(f, x0, bracket, settings):
     x0 : real
         Initial guess for root. The value of x0 should be within the
         range defined by bracket. If not, the initial guess will be
-        automatically moved to the midpoint of the bracket.
-    bracket : list or tuple of 2 reals
+        automatically clipped to the nearest bound.
+    bracket : sequence of 2 reals (list, tuple, numpy array, etc)
         Upper and lower bounds for the root search.
     settings : A settings object from this module
         Sets algorithmic settings.
@@ -71,13 +71,8 @@ def rtsafe_(f, x0, bracket, settings):
 
     # INITIALIZE THE GUESS FOR THE ROOT, THE ''STEP SIZE
     # BEFORE LAST'', AND THE LAST STEP
-    midpoint = 0.5*(xl + xh)
-    x0 = if_then_else(x0 > xh,
-                      midpoint,
-                      x0)
-    x0 = if_then_else(x0 < xl,
-                      midpoint,
-                      x0)
+    bracket = np.array(bracket)
+    x0 = np.clip(x0, np.min(bracket), np.max(bracket))
     dxOld = np.abs(bracket[1] - bracket[0])
     dx = dxOld
 
