@@ -89,5 +89,19 @@ class RtsafeFixture(TestFixture.TestFixture):
         expectedRoots = np.array([1.0, 2.0, 3.0, 4.0])
         self.assertArrayNear(F(x), expectedRoots, 12)
 
+
+    def test_solves_when_left_bracket_is_solution(self):
+        rootBracket = np.array([0.0, 1.0])
+        guess = 3.0
+        root = ScalarRootFind.find_root(lambda x: x*(x**2 - 10.0), guess, rootBracket, self.settings)
+        self.assertNear(root, 0.0, 12)
+
+
+    def test_solves_when_right_bracket_is_solution(self):
+        rootBracket = np.array([-1.0, 0.0])
+        guess = 3.0
+        root = ScalarRootFind.find_root(lambda x: x*(x**2 - 10.0), guess, rootBracket, self.settings)
+        self.assertNear(root, 0.0, 12)
+
 if __name__ == '__main__':
     TestFixture.unittest.main()

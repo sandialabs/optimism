@@ -49,29 +49,35 @@ def rtsafe_(f, x0, bracket, settings):
     r_tol = settings.r_tol
 
     f_and_fprime = value_and_grad(f)
+
+    bracket = np.array(bracket) # convert to numpy array if not already
+    converged = False
     
     # check that root is bracketed
     fl = f(bracket[0])
     fh = f(bracket[1])
     functionCalls = 2
 
-    #print('b0, b1 = ', bracket[0], bracket[1])
-    #print('fs = ', fl, fh)
-
-    # If root is not bracketed, send sentinel value (nan)
     x0 = np.where(fl*fh < 0,
                   x0,
                   np.nan)
 
+    leftBracketIsSolution = (fl == 0.0)
+    x0 = np.where(leftBracketIsSolution, bracket[0], x0)
+    converged = np.where(leftBracketIsSolution, True, converged)
+
+    rightBracketIsSolution = (fh == 0.0)
+    x0 = np.where(fh == 0.0, bracket[1], x0)
+    converged = np.where(rightBracketIsSolution, True, converged)
+
     # ORIENT THE SEARCH SO THAT F(XL) < 0.
     xl, xh = lax.cond(fl < 0,
                       lambda _: (bracket[0], bracket[1]),
-                      lambda _:(bracket[1], bracket[0]),
+                      lambda _: (bracket[1], bracket[0]),
                       None)
 
     # INITIALIZE THE GUESS FOR THE ROOT, THE ''STEP SIZE
     # BEFORE LAST'', AND THE LAST STEP
-    bracket = np.array(bracket)
     x0 = np.clip(x0, np.min(bracket), np.max(bracket))
     dxOld = np.abs(bracket[1] - bracket[0])
     dx = dxOld
@@ -96,7 +102,7 @@ def rtsafe_(f, x0, bracket, settings):
                                        root, xl, xh, DF, F)
 
         F, DF = f_and_fprime(root)
-        
+
         # MAINTAIN THE BRACKET ON THE ROOT
         xl,xh = lax.cond(F < 0,
                          lambda rt, lo, hi: (rt, hi),
@@ -108,7 +114,7 @@ def rtsafe_(f, x0, bracket, settings):
 
     x, _, _, _, _, _, _, converged, iters = while_loop(cond,
                                                        loop_body,
-                                                       (x0, dx, dxOld, F, DF, xl, xh, False, 0))
+                                                       (x0, dx, dxOld, F, DF, xl, xh, converged, 0))
 
     x = np.where(converged, x, np.nan)
     
