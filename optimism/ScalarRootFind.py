@@ -1,5 +1,6 @@
-from jax.lax import while_loop
 from optimism.JaxConfig import *
+
+from jax.lax import while_loop, custom_root
 
 SolutionInfo = namedtuple('SolutionInfo', ['converged', 'iterations', 'function_calls'])
 
@@ -10,7 +11,35 @@ def get_settings(max_iters=50, x_tol=1e-13, r_tol=1e-13):
     return Settings(max_iters, x_tol, r_tol)
 
 
-def rtsafe(f, x0, bracket, settings):
+def find_root(f, x0, bracket, settings):
+    """Find a root of a nonlinear scalar-valued equation.
+
+    Uses Newton's method, safeguarded with bisection.
+    See rtsafe(...) from Numerical Recipes.
+
+    Parameters
+    ==========
+    f : callable
+        Scalar function of which to find a root.
+    x0 : real
+        Initial guess for root. The value of x0 should be within the
+        range defined by bracket. If not, the initial guess will be
+        automatically moved to the midpoint of the bracket.
+    bracket : list or tuple of 2 reals
+        Upper and lower bounds for the root search.
+    settings : A settings object from this module
+        Sets algorithmic settings.
+
+    Returns
+    =======
+    x : real
+        Argument of f such that f(x) = 0 (within provided tolerances)
+    """
+    return custom_root(f, x0, lambda F, X0: rtsafe_(F, X0, bracket, settings),
+                       lambda g, y: y/g(1.0))
+
+
+def rtsafe_(f, x0, bracket, settings):
     # Find root of a scalar function
     # Newton's method, safeguarded with bisection
     # from Numerical Recipes

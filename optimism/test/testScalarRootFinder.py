@@ -31,12 +31,12 @@ class RtsafeFixture(TestFixture.TestFixture):
 
     def test_rtsafe(self):
         rootBracket = np.array([float_info.epsilon, 100.0])
-        root = ScalarRootFind.rtsafe(f, self.rootGuess, rootBracket, self.settings)
+        root = ScalarRootFind.find_root(f, self.rootGuess, rootBracket, self.settings)
         self.assertNear(root, self.rootExpected, 13)
 
         
     def test_rtsafe_jits(self):
-        rtsafe_jit = jit(ScalarRootFind.rtsafe, static_argnums=(0,3))
+        rtsafe_jit = jit(ScalarRootFind.find_root, static_argnums=(0,3))
         rootBracket = np.array([float_info.epsilon, 100.0])
         root = rtsafe_jit(f, self.rootGuess, rootBracket, self.settings)
         self.assertNear(root, self.rootExpected, 13)
@@ -44,15 +44,28 @@ class RtsafeFixture(TestFixture.TestFixture):
 
     def test_unbracketed_root_gives_nan(self):
         rootBracket = np.array([2.0, 100.0])
-        root = ScalarRootFind.rtsafe(f, self.rootGuess, rootBracket, self.settings)
+        root = ScalarRootFind.find_root(f, self.rootGuess, rootBracket, self.settings)
         self.assertTrue(np.isnan(root))
 
         
-    def test_converged_with_terrible_guess(self):
+    def test_find_root_converges_with_terrible_guess(self):
         rootBracket = np.array([float_info.epsilon, 200.0])
-        root = ScalarRootFind.rtsafe(f, 199.0, rootBracket, self.settings)
+        root = ScalarRootFind.find_root(f, 199.0, rootBracket, self.settings)
         self.assertNear(root, self.rootExpected, 13)
 
         
+    def test_root_find_is_differentiable(self):
+        myfunc = lambda x, a: x**3 - a
+        def cube_root(a):
+            rootBracket = np.array([float_info.epsilon, 100.0])
+            return ScalarRootFind.find_root(lambda x: myfunc(x, a), 8.0,
+                                            rootBracket, self.settings)
+        root = cube_root(4.0)
+        self.assertNear(root, self.rootExpected, 13)
+
+        df = jacfwd(cube_root)
+        x = 3.0
+        self.assertNear(df(x), x**(-2/3)/3, 13)
+
 if __name__ == '__main__':
     TestFixture.unittest.main()
