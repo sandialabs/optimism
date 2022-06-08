@@ -1,6 +1,6 @@
 from optimism.JaxConfig import *
 
-from jax.lax import while_loop, custom_root
+from jax.lax import custom_root
 
 SolutionInfo = namedtuple('SolutionInfo', ['converged', 'iterations', 'function_calls'])
 
@@ -81,23 +81,19 @@ def rtsafe_(f, x0, bracket, settings):
 
     def cond(carry):
         root, dx, dxOld, F, DF, xl, xh, converged, i = carry
-        keepLooping = ~converged & (i < max_iters)
+        keepLooping = (~converged) & (i < max_iters)
         return keepLooping
 
     def loop_body(carry):
         root, dx, dxOld, F, DF, xl, xh, converged, i = carry
         
-        bisectStep = 0.5*(xh - xl)
-        newtonStep = -F/DF
-
-        newtonOutOfRange = ((root - xh)*DF - F) * ((root - xl)*DF - F) >= 0
+        newtonOutOfRange = ((root - xh)*DF - F) * ((root - xl)*DF - F) > 0
         newtonDecreasingSlowly = np.abs(2.*F) > np.abs(dxOld*DF)
         dxOld = dx
-        xOld = root
-        root = np.where(newtonOutOfRange | newtonDecreasingSlowly,
-                        xl + bisectStep,
-                        root + newtonStep)
-        dx = root - xOld
+        root, dx, converged = lax.cond(newtonOutOfRange | newtonDecreasingSlowly,
+                                       bisection_step,
+                                       newton_step,
+                                       root, xl, xh, DF, F)
 
         F, DF = f_and_fprime(root)
         
@@ -106,16 +102,30 @@ def rtsafe_(f, x0, bracket, settings):
                          lambda rt, lo, hi: (rt, hi),
                          lambda rt, lo, hi: (lo, rt),
                          root, xl, xh)
-
         i += 1
-        #converged = (np.abs(dx) < x_tol*root) # relative tolerance
-        converged = (np.abs(dx) < x_tol) # absolute tolerance
+        converged = converged | (np.abs(dx) < x_tol) # absolute tolerance
         return root, dx, dxOld, F, DF, xl, xh, converged, i
 
     x, _, _, _, _, _, _, converged, iters = while_loop(cond,
                                                        loop_body,
                                                        (x0, dx, dxOld, F, DF, xl, xh, False, 0))
+
+    x = np.where(converged, x, np.nan)
     
     return x#, SolutionInfo(converged=converged, function_calls=functionCalls,
              #              iterations=iters)
 
+
+def bisection_step(x, xl, xh, df, f):
+    dx = 0.5*(xh - xl)
+    x = xl + dx
+    converged = (x == xl)
+    return x, dx, converged
+
+
+def newton_step(x, xl, xh, df, f):
+    dx = -f/df
+    temp = x
+    x = x + dx
+    converged = (x == temp)
+    return x, dx, converged

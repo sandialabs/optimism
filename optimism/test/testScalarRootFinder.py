@@ -89,19 +89,5 @@ class RtsafeFixture(TestFixture.TestFixture):
         expectedRoots = np.array([1.0, 2.0, 3.0, 4.0])
         self.assertArrayNear(F(x), expectedRoots, 12)
 
-
-    # def test_root_find_can_abort_with_vmap_and_jit(self):
-    #     settings = ScalarRootFind.get_settings(max_iters=1)
-    #     myfunc = lambda x, a: x**2 - a
-    #     def my_sqrt(a):
-    #         rootBracket = np.array([float_info.epsilon, 100.0])
-    #         return ScalarRootFind.find_root(lambda x: myfunc(x, a), 25.0,
-    #                                         rootBracket, self.settings)
-    #     F = jit(my_sqrt)
-    #     v = np.array([1.0, 4.0, 9.0, 16.0])
-    #     # this should hang forever
-    #     r = vmap(F, 0)(v)
-    #     print(r)
-
 if __name__ == '__main__':
     TestFixture.unittest.main()
