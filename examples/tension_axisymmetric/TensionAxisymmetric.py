@@ -35,14 +35,10 @@ class AxisymmetricTension:
         xRange = [0.0, R0]
         yRange = [0.0, L0]
 
-        coords, conns = Mesh.create_structured_mesh_data(N, M, xRange, yRange)
-        blocks = {'block_0': np.arange(conns.shape[0])}
-        mesh = Mesh.construct_mesh_from_basic_data(coords, conns, blocks=blocks)
-        pOrder = 2
-        master, master1d = Interpolants.make_master_elements(degree=pOrder)
-        mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(mesh, master, master1d)
-
-        nodeSets = {'top': np.flatnonzero(mesh.coords[:,1] > yRange[1] - 1e-8),
+        pOrder = 1
+        mesh = Mesh.construct_structured_mesh(N, M, xRange, yRange, pOrder)
+        nodeSets = {'axis': np.flatnonzero(mesh.coords[:,0] < xRange[0] + 1e-8),
+                    'top': np.flatnonzero(mesh.coords[:,1] > yRange[1] - 1e-8),
                     'right': np.flatnonzero(mesh.coords[:,0] > xRange[1] - 1e-8),
                     'bot': np.flatnonzero(mesh.coords[:,1] < yRange[0] + 1e-8)}
         self.mesh = Mesh.mesh_with_nodesets(mesh, nodeSets)
