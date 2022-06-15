@@ -25,6 +25,8 @@ NUM_STATE_VARS = 10
 ENERGY_DENSITY  = 0
 FLOW_STRESS     = 1
 
+# tolerance on EPQS change
+TOL = 1e-10
 
 def create_material_model_functions(properties):
     props = make_properties(properties['elastic modulus'],
@@ -131,11 +133,12 @@ def energy_density_generic(elStrain, state, props, hardening_model, doUpdate):
         trialStress = 2 * props[PROPS_MU] * np.tensordot(TensorMath.dev(elStrain), N)
         flowStress = hardening_model[FLOW_STRESS](eqps)
 
-        isYielding = trialStress > flowStress
+        isYielding = trialStress - flowStress > 3*props[PROPS_MU]*TOL
 
-        stateInc = np.where(isYielding,
-                            update_state(elStrain, state, state, props, hardening_model),
-                            np.zeros(NUM_STATE_VARS))
+        stateInc = lax.cond(isYielding,
+                            lambda e: update_state(e, state, state, props, hardening_model),
+                            lambda e: np.zeros(NUM_STATE_VARS),
+                            elStrain)
     else:
         stateInc = np.zeros(NUM_STATE_VARS)
     
@@ -154,7 +157,7 @@ def compute_state_increment(elasticTrialStrain, stateOld, props, hardening_model
     trialStress = 2 * props[PROPS_MU] * np.tensordot(TensorMath.dev(elasticTrialStrain), N)
     flowStress = hardening_model[FLOW_STRESS](eqpsOld)
 
-    isYielding = trialStress > flowStress
+    isYielding = trialStress - flowStress > 3*props[PROPS_MU]*TOL
 
     stateInc = lax.cond(isYielding,
                         lambda e: update_state(e, stateOld, stateOld, props, hardening_model),
@@ -201,45 +204,22 @@ def incremental_potential(elasticTrialStrain, eqps, eqpsOld, props, hardening_mo
 
 
 r = jacfwd(incremental_potential, 1)
-r_and_deqps = value_and_grad(r, 1)
-dr_dstrain_and_deqps_and_deqpsOld = jacfwd(r, (0,1,2))
 
 
 def update_state(elasticTrialStrain, stateOld, stateNewGuess, props, hardening_model):
-    tol = 1e-8*props[PROPS_Y0]
-    @custom_jvp
-    def radial_return(eqpsGuess, estrain, eqpsOld):
-        maxIterations = 20
-        def cond_func(eqpsAndIter):
-            eqps, i = eqpsAndIter
-            return (np.abs(r(estrain, eqps, eqpsOld, props, hardening_model)) > tol) & (i < maxIterations)
-        
-        def update(eqpsAndIter):
-            eqps, i  = eqpsAndIter
-            R, dR_dEqps = r_and_deqps(estrain, eqps, eqpsOld, props, hardening_model)
-            return (eqps - R / dR_dEqps, i+1)
-
-        eqpsNew, iters = while_loop(cond_func,
-                                    update,
-                                    (eqpsGuess,0))
-
-        return eqpsNew
-
-    
-    @radial_return.defjvp
-    def radial_return_jvp(diffArgs, vt):
-        eqpsGuess, estrain, eqpsOld  = diffArgs
-        vEqpsGuess, vStrain, vEqpsOld = vt
-        eqpsNew = radial_return(eqpsGuess, estrain, eqpsOld)
-        drdstrain, J, drdEqpsOld = dr_dstrain_and_deqps_and_deqpsOld(estrain, eqpsNew, eqpsOld, props, hardening_model)
-        #tangent_out = -(np.tensordot(vStrain, drdstrain) + vEqpsOld*drdEqpsOld + 0.0*vEqpsGuess) / J
-        tangent_out = -np.tensordot(vStrain, drdstrain) / J
-        return eqpsNew, tangent_out
-
+    settings = ScalarRootFind.get_settings(x_tol=TOL)
     eqpsOld = stateOld[EQPS]
-    eqps = radial_return(stateNewGuess[EQPS], elasticTrialStrain, eqpsOld)
-    DeltaEqps = eqps - eqpsOld
+    eqpsGuess = stateNewGuess[EQPS]
+
     N = compute_flow_direction(elasticTrialStrain)
+    lb = eqpsOld
+    trialMises = 2 * props[PROPS_MU] * np.tensordot(TensorMath.dev(elasticTrialStrain), N)
+    ub = eqpsOld + (trialMises - hardening_model.compute_flow_stress(eqpsOld))/(3.0*props[PROPS_MU])
+    eqps = ScalarRootFind.find_root(lambda e: r(elasticTrialStrain, e, eqpsOld, props, hardening_model),
+                                    eqpsGuess,
+                                    np.array([lb, ub]),
+                                    settings)
+    DeltaEqps = eqps - eqpsOld
     DeltaPlasticStrain = DeltaEqps*N
     return np.hstack( (DeltaEqps, DeltaPlasticStrain.ravel()) )
 
