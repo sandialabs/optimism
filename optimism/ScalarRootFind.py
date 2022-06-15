@@ -4,36 +4,55 @@ from jax.lax import custom_root
 
 SolutionInfo = namedtuple('SolutionInfo', ['converged', 'iterations', 'function_calls'])
 
-Settings = namedtuple('Settings', ['max_iters', 'x_tol', 'r_tol'])
+Settings = namedtuple('Settings', ['max_iters', 'x_tol'])
 
 
-def get_settings(max_iters=50, x_tol=1e-13, r_tol=1e-13):
-    return Settings(max_iters, x_tol, r_tol)
+def get_settings(max_iters=50, x_tol=1e-13):
+    """Get numerical settings for the root finder.
+
+    Parameters
+    ==========
+    max_iters : int
+        Maximum number of iterations to use in search
+    x_tol : real
+        Tolerance on independent variable for convergence. The root finder will
+        terminate when the independent variable changes by less than `x_tol` in
+        an iteration.
+
+    Returns
+    =======
+    settings : A Settings object, which can be used in `find_root`.
+    """
+    return Settings(max_iters, x_tol)
 
 
 def find_root(f, x0, bracket, settings):
     """Find a root of a nonlinear scalar-valued equation.
 
     Uses Newton's method, safeguarded with bisection.
-    See rtsafe(...) from Numerical Recipes.
+    See rtsafe(...) from Numerical Recipes. This function is differentiable
+    using Jax transforms, and can be compsed with `vmap` and `jit`.
 
     Parameters
     ==========
     f : callable
         Scalar function of which to find a root.
     x0 : real
-        Initial guess for root. The value of x0 should be within the
-        range defined by bracket. If not, the initial guess will be
-        automatically clipped to the nearest bound.
+        Initial guess for root. The value of x0 should be within the range
+        defined by bracket. If not, the initial guess will be automatically
+        clipped to the nearest bound.
     bracket : sequence of 2 reals (list, tuple, numpy array, etc)
-        Upper and lower bounds for the root search.
+        Upper and lower bounds for the root search. The existence of a
+        root is inferred by checking that the values of `f` at both brackets
+        do not have the same sign. If this check fails, `nan` is returned.
     settings : A settings object from this module
-        Sets algorithmic settings.
+        Algorithmic settings.
 
     Returns
     =======
-    x : real
-        Argument of f such that f(x) = 0 (within provided tolerances)
+    x : real (or nan)
+        Argument of f such that f(x) = 0 (within provided tolerance). If the
+        root is not bracketed, `nan` is returned.
     """
     return custom_root(f, x0, lambda F, X0: rtsafe_(F, X0, bracket, settings),
                        lambda g, y: y/g(1.0))
@@ -46,19 +65,17 @@ def rtsafe_(f, x0, bracket, settings):
 
     max_iters = settings.max_iters
     x_tol = settings.x_tol
-    r_tol = settings.r_tol
 
     f_and_fprime = value_and_grad(f)
 
-    bracket = np.array(bracket) # convert to numpy array if not already
     converged = False
-    
-    # check that root is bracketed
+
     fl = f(bracket[0])
     fh = f(bracket[1])
     functionCalls = 2
 
-    x0 = np.where(fl*fh < 0,
+    # check that root is bracketed
+    x0 = np.where(fl*fh < 0.0,
                   x0,
                   np.nan)
 
@@ -67,14 +84,14 @@ def rtsafe_(f, x0, bracket, settings):
     converged = np.where(leftBracketIsSolution, True, converged)
 
     rightBracketIsSolution = (fh == 0.0)
-    x0 = np.where(fh == 0.0, bracket[1], x0)
+    x0 = np.where(rightBracketIsSolution, bracket[1], x0)
     converged = np.where(rightBracketIsSolution, True, converged)
 
     # ORIENT THE SEARCH SO THAT F(XL) < 0.
     xl, xh = lax.cond(fl < 0,
-                      lambda _: (bracket[0], bracket[1]),
-                      lambda _: (bracket[1], bracket[0]),
-                      None)
+                      lambda b: (b[0], b[1]),
+                      lambda b: (b[1], b[0]),
+                      bracket)
 
     # INITIALIZE THE GUESS FOR THE ROOT, THE ''STEP SIZE
     # BEFORE LAST'', AND THE LAST STEP
