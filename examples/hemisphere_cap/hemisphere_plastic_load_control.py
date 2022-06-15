@@ -21,7 +21,7 @@ def get_surface_area(quadRule, edges, mesh):
     A = 0.0
     for edge in edges:
         coords = Surface.get_coords(mesh, edge)
-        A += Surface.integrate_function(quadRule, coords, lambda X: 1.0)
+        A += Surface.integrate_function(quadRule, coords, lambda X: 2*np.pi*X[0])
     return A
 
 
@@ -40,7 +40,7 @@ def integrate_field_function_on_surface(quadratureRule, edges, mesh, func):
 
 
 def get_surface_area2(quadRule, edges, mesh):
-    return integrate_field_function_on_surface(quadRule, edges, mesh, lambda X: 1.0)
+    return integrate_field_function_on_surface(quadRule, edges, mesh, lambda X: 2.0*np.pi*X[0])
 
 
 class TractionArch():
@@ -48,10 +48,11 @@ class TractionArch():
     def __init__(self):
         #'hemisphere_axisym.g'
         mesh = ReadExodusMesh.read_exodus_mesh('hemi_fine.g')
-        
-        self.mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(mesh,
-                                                                    order=2,
-                                                                    createNodeSetsFromSideSets=True)
+        nodeSets = Mesh.create_nodesets_from_sidesets(mesh)
+        self.mesh = Mesh.mesh_with_nodesets(mesh, nodeSets)
+        # self.mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(mesh,
+        #                                                             order=2,
+        #                                                             createNodeSetsFromSideSets=True)
         EBCs = [EssentialBC(nodeSet='axis', field=0),
                 EssentialBC(nodeSet='rim', field=0),
                 EssentialBC(nodeSet='rim', field=1)]
@@ -65,7 +66,7 @@ class TractionArch():
                                          self.mesh)
 
         print('outer surface area = ', get_surface_area2(self.lineQuadRule, self.mesh.sideSets['inner'], self.mesh))
-        print('should be ', np.pi/4)
+        print('should be ', 4*np.pi*1.0**2/2)
         print('old answer ', get_surface_area(self.lineQuadRule, self.mesh.sideSets['inner'], self.mesh))
         
         quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=3)
@@ -106,7 +107,7 @@ class TractionArch():
         internalVariables = p[1]
         strainEnergy = self.bvpFuncs.compute_strain_energy(U, internalVariables)
         F = p[0]
-        loadPotential = TractionBC.compute_traction_potential_energy(self.mesh, U, self.lineQuadRule, self.mesh.sideSets['push'], lambda X: np.array([0.0, -F/self.pushArea]))
+        loadPotential = TractionBC.compute_traction_potential_energy(self.mesh, U, self.lineQuadRule, self.mesh.sideSets['push'], lambda X: np.array([0.0, -F/self.pushArea])*2*np.pi*X[0])
         return strainEnergy + loadPotential
 
     
