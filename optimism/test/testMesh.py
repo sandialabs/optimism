@@ -13,12 +13,6 @@ from optimism import Interpolants
 
 class TestSingleMeshFixture(MeshFixture.MeshFixture):
     
-    def is_constrained_in_xy(self, x, xRange, yRange):
-        tol = 1e-7
-        onBoundary = x[0] < xRange[0] + tol or x[0] > xRange[1] - tol or x[1] < yRange[0] + tol or x[1] > yRange[1] - tol
-        return [onBoundary, onBoundary]
-
-    
     def setUp(self):
         self.Nx = 3
         self.Ny = 2
@@ -30,10 +24,6 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
         self.mesh, self.U = self.create_mesh_and_disp(self.Nx, self.Ny, xRange, yRange,
                                                       lambda x : self.targetDispGrad.dot(x))
 
-        #EBCs = []
-        #EBCs.append(EssentialBC(nodeSet='all_boundary', field=0))
-        #EBCs.append(EssentialBC(nodeSet='all_boundary', field=1))
-        #self.dofManager = DofManager(self.mesh, self.U.shape, EBCs)                               
 
     def test_create_nodesets_from_sidesets(self):
         master = Interpolants.make_master_tri_element(1)
@@ -123,8 +113,7 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
                                        [3, 0, 2, 2]])
 
 
-    def test_order_2_mesh_creation(self):
-        # case with no interior nodes
+    def test_conversion_to_quadratic_mesh_is_valid(self):
         newMesh = Mesh.create_higher_order_mesh_from_simplex_mesh(self.mesh, 2)
 
         nNodes = newMesh.coords.shape[0]
@@ -136,33 +125,34 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
         # uncomment the following to inspect higher order mesh
         # print('coords=\n', newMesh.coords)
         # print('conns=\n', newMesh.conns)
-        # plt.triplot(self.mesh.coords[:,0], self.mesh.coords[:,1], newMesh.conns[:,master.vertexNodes])
+        # plt.triplot(newMesh.coords[:,0], newMesh.coords[:,1], newMesh.conns[:,master.vertexNodes])
         # plt.scatter(newMesh.coords[:,0], newMesh.coords[:,1], marker='o')
         # plt.show()
 
+        def triangle_inradius(tcoords):
+            area = 0.5*onp.cross(tcoords[1]-tcoords[0], tcoords[2]-tcoords[0])
+            peri = (onp.linalg.norm(tcoords[1]-tcoords[0])
+                    + onp.linalg.norm(tcoords[2]-tcoords[1])
+                    + onp.linalg.norm(tcoords[0]-tcoords[2]))
+            return area/peri
 
-    def test_order_3_mesh_creation(self):
-        # case with interior nodes
-        master, master1d = Interpolants.make_master_elements(3)
-        #newMesh = Mesh.create_higher_order_mesh_from_simplex_mesh(self.mesh, master, master1d)
-        newMesh = Mesh.create_higher_order_mesh_from_simplex_mesh(self.mesh, 3)
+        # check that all triangles are valid:
+        # compute inradius of each triangle and of the sub-triangle of the mid-edge nodes
+        # Both should be nonzero, and parent inradius should be 2x sub-triangle inradius
+        master = newMesh.masterElement
+        for t in newMesh.conns:
+            elCoords = newMesh.coords[t, :]
+            parentCoords = elCoords[master.vertexNodes, :]
+            midEdgeNodes = master.faceNodes[:, 1]
+            childCoords = elCoords[midEdgeNodes, :]
 
-        nNodes = newMesh.coords.shape[0]
-        self.assertEqual(nNodes, 28)
-
-        # make sure all of the newly created nodes got used in the connectivity
-        self.assertArrayEqual(np.unique(newMesh.conns.ravel()), np.arange(nNodes))
-
-        # uncomment the following to inspect higher order mesh
-        # print('coords=\n', newMesh.coords)
-        # print('conns=\n', newMesh.conns)
-        # plt.figure()
-        # plt.triplot(self.mesh.coords[:,0], self.mesh.coords[:,1], newMesh.conns[:,master.vertexNodes])
-        # plt.scatter(newMesh.coords[:,0], newMesh.coords[:,1], marker='o')
-        # plt.show()
-
-
+            parentArea = triangle_inradius(parentCoords)
+            childArea = triangle_inradius(childCoords)
             
+            self.assertGreater(parentArea, 0.0)
+            self.assertGreater(childArea, 0.0)
+            self.assertAlmostEqual(parentArea, 2.0*childArea, 10)
+
 if __name__ == '__main__':
     MeshFixture.unittest.main()
 

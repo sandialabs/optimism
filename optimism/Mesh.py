@@ -218,7 +218,7 @@ def create_higher_order_mesh_from_simplex_mesh(mesh, order, useBubbleElement=Fal
         conns = conns.at[elemLeft, edgeMasterNodes].set(edgeNodeOrdinals)
 
         elemRight = edge[2]
-        if elemRight > 0:
+        if elemRight >= 0:
             sideRight = edge[3]
             edgeMasterNodes = master.faceNodes[sideRight][master1d.interiorNodes]
             conns = conns.at[elemRight, edgeMasterNodes].set(np.flip(edgeNodeOrdinals))
