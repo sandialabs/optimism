@@ -10,7 +10,6 @@ from optimism import Interpolants
 
 #from matplotlib import pyplot as plt
 
-
 class TestSingleMeshFixture(MeshFixture.MeshFixture):
     
     def setUp(self):
@@ -122,20 +121,6 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
         # make sure all of the newly created nodes got used in the connectivity
         self.assertArrayEqual(np.unique(newMesh.conns.ravel()), np.arange(nNodes))
 
-        # uncomment the following to inspect higher order mesh
-        # print('coords=\n', newMesh.coords)
-        # print('conns=\n', newMesh.conns)
-        # plt.triplot(newMesh.coords[:,0], newMesh.coords[:,1], newMesh.conns[:,master.vertexNodes])
-        # plt.scatter(newMesh.coords[:,0], newMesh.coords[:,1], marker='o')
-        # plt.show()
-
-        def triangle_inradius(tcoords):
-            area = 0.5*onp.cross(tcoords[1]-tcoords[0], tcoords[2]-tcoords[0])
-            peri = (onp.linalg.norm(tcoords[1]-tcoords[0])
-                    + onp.linalg.norm(tcoords[2]-tcoords[1])
-                    + onp.linalg.norm(tcoords[0]-tcoords[2]))
-            return area/peri
-
         # check that all triangles are valid:
         # compute inradius of each triangle and of the sub-triangle of the mid-edge nodes
         # Both should be nonzero, and parent inradius should be 2x sub-triangle inradius
@@ -152,6 +137,21 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
             self.assertGreater(parentArea, 0.0)
             self.assertGreater(childArea, 0.0)
             self.assertAlmostEqual(parentArea, 2.0*childArea, 10)
+
+        # uncomment the following to inspect higher order mesh
+        # print('coords=\n', newMesh.coords)
+        # print('conns=\n', newMesh.conns)
+        # plt.triplot(newMesh.coords[:,0], newMesh.coords[:,1], newMesh.conns[:,master.vertexNodes])
+        # plt.scatter(newMesh.coords[:,0], newMesh.coords[:,1], marker='o')
+        # plt.show()
+
+
+def triangle_inradius(tcoords):
+    area = 0.5*onp.cross(tcoords[1]-tcoords[0], tcoords[2]-tcoords[0])
+    peri = (onp.linalg.norm(tcoords[1]-tcoords[0])
+            + onp.linalg.norm(tcoords[2]-tcoords[1])
+            + onp.linalg.norm(tcoords[0]-tcoords[2]))
+    return area/peri
 
 if __name__ == '__main__':
     MeshFixture.unittest.main()
