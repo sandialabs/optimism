@@ -106,10 +106,25 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
 
         goldInteriorEdgeConns = np.array([[0, 4],
                                           [1, 4],
-                                          [1, 5]])
+                                          [5, 1]])
         goldInteriorEdges = onp.array([[1, 0, 0, 2],
                                        [0, 1, 3, 2],
-                                       [3, 0, 2, 2]])
+                                       [2, 2, 3, 0]])
+
+        for ie, ic in zip(goldInteriorEdges, goldInteriorEdgeConns):
+            foundWithSameSense = onp.any(onp.all(edgeConns == ic, axis=1))
+            foundWithOppositeSense = onp.any(onp.all(edgeConns == onp.flip(ic), axis=1))
+            edgeDataMatches = False
+            if foundWithSameSense:
+                i = onp.where(onp.all(edgeConns == ic, axis=1))
+                edgeData = ie
+            elif foundWithOppositeSense:
+                i = onp.where((onp.all(edgeConns == onp.flip(ic), axis=1)))
+                edgeData = ie[[2, 3, 0, 1]]
+            else:
+                self.fail('edge not found with vertices ' + str(ic))
+            edgeDataMatches = np.all(edges[i,:] == edgeData)
+            self.assertTrue(edgeDataMatches)
 
 
     def test_conversion_to_quadratic_mesh_is_valid(self):
