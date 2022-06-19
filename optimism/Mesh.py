@@ -136,28 +136,52 @@ def mesh_with_nodesets(mesh, nodeSets):
                 mesh.blocks, nodeSets, mesh.sideSets)
 
 
-def create_edges(coords, conns):
-    nTris = conns.shape[0]
-    edgeConns = -np.ones((3*nTris, 2), dtype=np.int_)
-    # edges: [leftElem, lside, rightElem, rside]
-    edges = -np.ones((3*nTris, 4), dtype=np.int_)
-    nEdges = 0
-    
-    for e,eNodes in enumerate(conns):
-        for n in range(3):
-            nn = (n+1)%3
-            edgeConn = [eNodes[n],eNodes[nn]]
-            foundAlready = False
-            for i,existingEdge in enumerate(edgeConns[:nEdges]):
-                if (edgeConn[0]==existingEdge[1]) and (edgeConn[1]==existingEdge[0]):
-                    foundAlready = True
-                    edges = edges.at[i,2:].set([e,n])
-            if not foundAlready:
-                edgeConns = edgeConns.at[nEdges].set(edgeConn)
-                edges = edges.at[nEdges,:2].set([e,n])
-                nEdges += 1
+def create_edges(conns):
+    """Generate topological information about edges in a triangulation.
 
-    return edgeConns[:nEdges], edges[:nEdges]
+    Parameters
+    ----------
+    conns : (nTriangles, 3) array
+        Connectivity table of the triangulation.
+
+    Returns
+    -------
+    edgeConns : (nEdges, 2) array
+        Vertices of each edge. Boundary edges are always in the
+        counter-clockwise sense, so that the interior of the body is on the left
+        side when walking from the first vertex to the second.
+    edges : (nEdges, 4) array
+        Edge-to-triangle topological information. Each row provides the
+        follwing information for each edge: [leftT, leftP, rightT, rightP],
+        where leftT is the ID of the triangle to the left, leftP is the
+        permutation of the edge in the left triangle (edge 0, 1, or 2), rightT
+        is the ID of the triangle to the right, and rightP is the permutation
+        of the edge in the right triangle. If the edge is a boundary edge, the
+        values of rightT and rightP are -1.
+    """
+    nTris = conns.shape[0]
+    allTriFaces = onp.vstack((conns[:, (0,1)], conns[:, (1,2)], conns[:, (2,0)]))
+    foo = onp.sort(allTriFaces, axis=1)
+    bar, i = onp.unique(foo, return_index=True, axis=0)
+    edgeConns = (allTriFaces[i,:])
+
+    nEdges = edgeConns.shape[0]
+    edges = -onp.ones((nEdges, 4), dtype=onp.int_)
+    edgeElementIds = onp.tile(np.arange(nTris), 3)
+    edges[:,0] = edgeElementIds[i]
+    edges[:,1] = i // nTris
+
+    for i, ec in enumerate(edgeConns):
+        rowsMatch = onp.all(onp.flip(ec) == allTriFaces, axis=1)
+        if onp.any(rowsMatch):
+            j = onp.where(rowsMatch)[0]
+            # there should only be one matching row, but take element 0
+            # because j will have the same number of axes (2) as
+            # rowsMatch.
+            edges[i, 2] = edgeElementIds[j]
+            edges[i, 3] = j // nTris
+
+    return edgeConns, edges
 
 
 def create_higher_order_mesh_from_simplex_mesh(mesh, order, useBubbleElement=False, copyNodeSets=False, createNodeSetsFromSideSets=False):
@@ -179,7 +203,7 @@ def create_higher_order_mesh_from_simplex_mesh(mesh, order, useBubbleElement=Fal
     nodeOrdinalOffset = mesh.coords.shape[0] # offset for later node numbering
 
     # step 2/3: mid-edge nodes (excluding vertices)
-    edgeConns, edges = create_edges(mesh.coords, mesh.conns)
+    edgeConns, edges = create_edges(mesh.conns)
     A = np.column_stack((1.0-master1d.coordinates[master1d.interiorNodes],
                          master1d.coordinates[master1d.interiorNodes]))
     edgeCoords = vmap(lambda edgeConn: np.dot(A, mesh.coords[edgeConn,:]))(edgeConns)
@@ -194,7 +218,7 @@ def create_higher_order_mesh_from_simplex_mesh(mesh, order, useBubbleElement=Fal
         conns = conns.at[elemLeft, edgeMasterNodes].set(edgeNodeOrdinals)
 
         elemRight = edge[2]
-        if elemRight > 0:
+        if elemRight >= 0:
             sideRight = edge[3]
             edgeMasterNodes = master.faceNodes[sideRight][master1d.interiorNodes]
             conns = conns.at[elemRight, edgeMasterNodes].set(np.flip(edgeNodeOrdinals))
