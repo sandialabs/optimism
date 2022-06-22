@@ -79,5 +79,5 @@ def log_strain(dispGrad):
     J = np.linalg.det(F)
     traceStrain = np.log(J)
     CIso = J**(-2.0/3.0)*F.T@F
-    devStrain = 0.5*logm_iss(CIso)
+    devStrain = TensorMath.mtk_log_sqrt(CIso)
     return devStrain + traceStrain/3.0*np.identity(3)
