@@ -6,7 +6,7 @@ from optimism.JaxConfig import *
 from optimism import EquationSolver as EqSolver
 from optimism import FunctionSpace
 from optimism.material import J2Plastic as J2
-from optimism.material import MaterialPointUniaxialSimulator
+from optimism.material import MaterialUniaxialSimulator
 from optimism import Mechanics
 from optimism import Mesh
 from optimism import Objective
@@ -190,20 +190,29 @@ class J2PlasticUniaxial(TestFixture):
         self.Y0 = Y0
         self.H = H
         self.mat = J2.create_material_model_functions(properties)
-        self.simulator = MaterialPointUniaxialSimulator.MaterialPointUniaxialSimulator(
-            self.mat, maxStrain=0.02, strainRate=1e-3, steps=100)
 
 
     def test_uniaxial(self):
-        uniaxial = self.simulator.run()
+        strainRate = 1e-3
 
-        logStrainHistory = np.log(1.0 + uniaxial.strainHistory)
+        def constant_true_strain_rate(t):
+            return np.expm1(strainRate*t)
+
+        maxTime = 20.0
+
+        uniaxial = MaterialUniaxialSimulator.run(self.mat, constant_true_strain_rate, maxTime, steps=100)
+
+        logStrainHistory = np.log(1.0 + uniaxial.strainHistory[:,0,0])
         yieldStrain = self.Y0/self.E
         exact = np.where(logStrainHistory < yieldStrain,
                          self.E*logStrainHistory,
                          self.E/(self.E + self.H)*(self.H*logStrainHistory + self.Y0))
 
-        self.assertArrayNear(uniaxial.kirchhoffStressHistory, exact,2)
+        # convert Piola stress output to Kirchhoff stress
+        I = np.identity(3)
+        kirchhoffStressHistory = vmap(lambda H, P: P@(H + I).T)(uniaxial.strainHistory, uniaxial.stressHistory)
+
+        self.assertArrayNear(kirchhoffStressHistory[:,0,0], exact, 2)
 
 
 class PlasticityOnMesh(MeshFixture):
