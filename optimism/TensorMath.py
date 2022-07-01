@@ -552,9 +552,9 @@ def sqrtm_dbp(A):
     
     def body_f(loopData):
         X, M, error, k, diff = loopData
-        g = if_then_else(diff >= scaleTol,
-                         scaling(M),
-                         1.0)
+        g = np.where(diff >= scaleTol,
+                     scaling(M),
+                     1.0)
         
         X *= g
         M *= g * g
@@ -564,8 +564,8 @@ def sqrtm_dbp(A):
         I = np.identity(dim)
         X = 0.5 * X @ (I + N)
         M = 0.5 * (I + 0.5 * (M + N))
-        error = np.linalg.norm(M - I)
-        diff  = np.linalg.norm(X - Y) / np.linalg.norm(X)
+        error = np.linalg.norm(M - I, 'fro')
+        diff  = np.linalg.norm(X - Y, 'fro') / np.linalg.norm(X, 'fro')
         k += 1
         return (X, M, error, k, diff)
 
