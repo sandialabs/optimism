@@ -1,4 +1,3 @@
-from sys import float_info
 from jax import custom_jvp
 from jax.lax import while_loop
 from jax.scipy import linalg
@@ -37,7 +36,7 @@ def triaxiality(A):
     mean_normal = np.trace(A)/3.0
     mises_norm = mises_equivalent_stress(A)
     # avoid division by zero in case of spherical tensor
-    mises_norm += float_info.epsilon
+    mises_norm += np.finfo(np.dtype("float64")).eps
     return mean_normal/mises_norm
 
 
@@ -537,7 +536,7 @@ def sqrtm_dbp(A):
     SIAM, Philadelphia, PA, USA, 2008. ISBN 978-0-898716-46-7,
     """
     dim        = A.shape[0]
-    tol        = 0.5 * np.sqrt(dim) * float_info.epsilon
+    tol        = 0.5 * np.sqrt(dim) * np.finfo(np.dtype("float64")).eps
     maxIters   = 32
     scaleTol   = 0.01
 
@@ -572,7 +571,7 @@ def sqrtm_dbp(A):
 
     X0        = A
     M0        = A
-    error0    = float_info.max
+    error0    = np.finfo(np.dtype("float64")).max
     k0        = 0
     diff0     = 2.0*scaleTol # want to force scaling on first iteration
     loopData0 = (X0, M0, error0, k0, diff0)
