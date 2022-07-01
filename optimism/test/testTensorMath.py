@@ -257,6 +257,13 @@ class TensorMathFixture(TestFixture):
         self.assertArrayNear(shouldBeC, C, 12)
 
 
+    def test_sqrtm_derivatives_on_10x10(self):
+        key = random.PRNGKey(0)
+        F = random.uniform(key, (10,10), minval=1e-8, maxval=10.0)
+        C = F.T@F
+        check_grads(TensorMath.sqrtm, (C,), order=1, modes=["fwd", "rev"])
+
+
     def test_logm_iss_on_matrix_near_identity(self):
         key = random.PRNGKey(0)
         id_perturbation = 1.0 + random.uniform(key, (3,), minval=1e-8, maxval=0.01)

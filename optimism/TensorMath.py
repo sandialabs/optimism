@@ -518,10 +518,14 @@ def jvp_sqrtm(primals, tangents):
     A, = primals
     H, = tangents
     sqrtA = sqrtm(A)
-    I = np.identity(3)
-    M = np.kron(sqrtA, I) + np.kron(I, sqrtA)
-    Hvec = H.ravel()
-    return sqrtA, (linalg.solve(M, Hvec)).reshape((3,3))
+    dim = A.shape[0]
+    # TODO(brandon): Use a stable algorithm for solving a Sylvester equation.
+    # See https://en.wikipedia.org/wiki/Bartels%E2%80%93Stewart_algorithm
+    # The following will only reliably work for small matrices.
+    I = np.identity(dim)
+    M = np.kron(sqrtA.T, I) + np.kron(I, sqrtA)
+    Hvec = H.T.ravel()
+    return sqrtA, (linalg.solve(M, Hvec)).reshape((dim,dim)).T
 
 
 def sqrtm_dbp(A):
