@@ -1,4 +1,3 @@
-from sys import float_info
 from jax import custom_jvp
 from jax.lax import while_loop
 from jax.scipy import linalg
@@ -37,7 +36,7 @@ def triaxiality(A):
     mean_normal = np.trace(A)/3.0
     mises_norm = mises_equivalent_stress(A)
     # avoid division by zero in case of spherical tensor
-    mises_norm += float_info.epsilon
+    mises_norm += np.finfo(np.dtype("float64")).eps
     return mean_normal/mises_norm
 
 
@@ -518,10 +517,14 @@ def jvp_sqrtm(primals, tangents):
     A, = primals
     H, = tangents
     sqrtA = sqrtm(A)
-    I = np.identity(3)
-    M = np.kron(sqrtA, I) + np.kron(I, sqrtA)
-    Hvec = H.ravel()
-    return sqrtA, (linalg.solve(M, Hvec)).reshape((3,3))
+    dim = A.shape[0]
+    # TODO(brandon): Use a stable algorithm for solving a Sylvester equation.
+    # See https://en.wikipedia.org/wiki/Bartels%E2%80%93Stewart_algorithm
+    # The following will only reliably work for small matrices.
+    I = np.identity(dim)
+    M = np.kron(sqrtA.T, I) + np.kron(I, sqrtA)
+    Hvec = H.T.ravel()
+    return sqrtA, (linalg.solve(M, Hvec)).reshape((dim,dim)).T
 
 
 def sqrtm_dbp(A):
@@ -533,7 +536,7 @@ def sqrtm_dbp(A):
     SIAM, Philadelphia, PA, USA, 2008. ISBN 978-0-898716-46-7,
     """
     dim        = A.shape[0]
-    tol        = 0.5 * np.sqrt(dim) * float_info.epsilon
+    tol        = 0.5 * np.sqrt(dim) * np.finfo(np.dtype("float64")).eps
     maxIters   = 32
     scaleTol   = 0.01
 
@@ -549,9 +552,9 @@ def sqrtm_dbp(A):
     
     def body_f(loopData):
         X, M, error, k, diff = loopData
-        g = if_then_else(diff >= scaleTol,
-                         scaling(M),
-                         1.0)
+        g = np.where(diff >= scaleTol,
+                     scaling(M),
+                     1.0)
         
         X *= g
         M *= g * g
@@ -561,14 +564,14 @@ def sqrtm_dbp(A):
         I = np.identity(dim)
         X = 0.5 * X @ (I + N)
         M = 0.5 * (I + 0.5 * (M + N))
-        error = np.linalg.norm(M - I)
-        diff  = np.linalg.norm(X - Y) / np.linalg.norm(X)
+        error = np.linalg.norm(M - I, 'fro')
+        diff  = np.linalg.norm(X - Y, 'fro') / np.linalg.norm(X, 'fro')
         k += 1
         return (X, M, error, k, diff)
 
     X0        = A
     M0        = A
-    error0    = float_info.max
+    error0    = np.finfo(np.dtype("float64")).max
     k0        = 0
     diff0     = 2.0*scaleTol # want to force scaling on first iteration
     loopData0 = (X0, M0, error0, k0, diff0)
