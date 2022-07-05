@@ -616,9 +616,13 @@ def _logm_iss(A):
 
     def compute_pade_degree(diff, j, itk):
         j += 1
-        p = np.searchsorted(log_pade_coefficients[2:16], diff, side='right')
+        # Manually force the return type of searchsorted to be 64-bit int, because it
+        # returns 32-bit ints, ignoring the global `jax_enable_x64` flag. This looks
+        # like a bug. I filed an issue (#11375) with Jax to correct this.
+        # If they fix it, the conversions on p and q can be removed.
+        p = np.searchsorted(log_pade_coefficients[2:16], diff, side='right').astype(np.int64)
         p += 2
-        q = np.searchsorted(log_pade_coefficients[2:16], diff/2.0, side='right')
+        q = np.searchsorted(log_pade_coefficients[2:16], diff/2.0, side='right').astype(np.int64)
         q += 2
         m,j,converged = if_then_else((2 * (p - q) // 3 < itk) | (j == 2),
                                      (p+1,j,True), (0,j,False))
