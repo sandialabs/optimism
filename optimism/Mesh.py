@@ -136,6 +136,12 @@ def mesh_with_nodesets(mesh, nodeSets):
                 mesh.blocks, nodeSets, mesh.sideSets)
 
 
+def mesh_with_blocks(mesh, blocks):
+    return Mesh(mesh.coords, mesh.conns,
+                mesh.simplexNodesOrdinals,
+                mesh.masterElement, mesh.masterLineElement,
+                blocks, mesh.nodeSets, mesh.sideSets)
+
 def create_edges(conns):
     """Generate topological information about edges in a triangulation.
 
