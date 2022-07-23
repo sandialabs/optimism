@@ -1,5 +1,6 @@
-from optimism.JaxConfig import *
-
+from functools import partial
+import jax
+from jax import numpy as np
 
 from optimism.material import Neohookean
 from optimism import Mechanics
@@ -112,7 +113,7 @@ class CornerSlide(MeshFixture):
         self.constraint_func = constraint_func
         
 
-    @partial(jit, static_argnums=0)
+    @partial(jax.jit, static_argnums=0)
     def create_field(self, Uu, p):
         return self.dofManager.create_field(Uu, self.get_ubcs(p))
 
@@ -150,7 +151,7 @@ class CornerSlide(MeshFixture):
         penalty = 2.5
         kappa0 = penalty * np.ones(lam0.shape)
 
-        hess_func = jit(hessian(lambda Uu,p: self.energy_func(Uu,lam0,p)))
+        hess_func = jax.jit(jax.hessian(lambda Uu,p: self.energy_func(Uu,lam0,p)))
         
         objective = ConstrainedQuasiObjective(self.energy_func,
                                               self.constraint_func,

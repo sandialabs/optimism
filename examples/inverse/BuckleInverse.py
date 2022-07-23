@@ -1,4 +1,5 @@
-from optimism.JaxConfig import *
+import jax
+from jax import numpy as np
 from jax import custom_jvp, custom_vjp
 
 from optimism import ReadMesh
@@ -197,7 +198,7 @@ class Buckle:
         outputDisp = [0,]
         outputForce = [0,]
 
-        reaction_func = jit( lambda x,p: grad(self.energy_func,1)(x,p)[0][1] )
+        reaction_func = jax.jit( lambda x,p: jax.grad(self.energy_func,1)(x,p)[0][1] )
         
         N = 1
 
@@ -254,7 +255,7 @@ class Buckle:
         opt_state = opt_init(chi)
 
         def step(step, opt_state):
-            value, grads = value_and_grad(loss)(get_params(opt_state))
+            value, grads = jax.value_and_grad(loss)(get_params(opt_state))
             opt_state = opt_update(step, grads, opt_state)
             return value, opt_state
         

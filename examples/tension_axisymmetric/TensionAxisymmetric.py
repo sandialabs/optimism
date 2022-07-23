@@ -1,6 +1,8 @@
+from functools import partial
+import jax
+from jax import numpy as np
 from matplotlib import pyplot as plt
 
-from optimism.JaxConfig import *
 from optimism import EquationSolver as EqSolver
 from optimism import FunctionSpace
 from optimism import Interpolants
@@ -84,8 +86,8 @@ class AxisymmetricTension:
         return self.mechanicsFunctions.compute_strain_energy(U, internalVariables)
 
 
-    @partial(jit, static_argnums=0)
-    @partial(value_and_grad, argnums=2)
+    @partial(jax.jit, static_argnums=0)
+    @partial(jax.value_and_grad, argnums=2)
     def compute_reactions_from_bcs(self, Uu, Ubc, internalVariables):
         U = self.dofManager.create_field(Uu, Ubc)
         return self.mechanicsFunctions.compute_strain_energy(U, internalVariables)

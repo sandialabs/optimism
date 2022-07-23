@@ -1,8 +1,7 @@
 from matplotlib import pyplot as plt
+from jax import numpy as np
 
-from optimism.JaxConfig import *
 from optimism import EquationSolver as EqSolver
-
 from optimism import Mesh
 from optimism import Mechanics
 from optimism import FunctionSpace

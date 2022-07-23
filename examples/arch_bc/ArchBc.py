@@ -1,6 +1,5 @@
 from matplotlib import pyplot as plt
 
-from optimism.JaxConfig import *
 from optimism import EquationSolver as EqSolver
 from optimism import FunctionSpace
 from optimism import Interpolants

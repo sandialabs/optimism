@@ -1,8 +1,8 @@
 """Demonstrate the material testing tools."""
 
+from jax import numpy as np
 from matplotlib import pyplot as plt
 
-from optimism.JaxConfig import *
 from optimism.material import MaterialUniaxialSimulator
 from optimism.material import J2Plastic
 

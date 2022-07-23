@@ -1,6 +1,8 @@
+from functools import partial
+import jax
+from jax import numpy as np
 from scipy.sparse import diags as sp_sparse_diags
 
-from optimism.JaxConfig import *
 from optimism import AlSolver
 from optimism import BoundConstrainedSolver
 from optimism import BoundConstrainedObjective
@@ -39,7 +41,7 @@ phaseStiffnessRelativeTolerance = 1.0/20.0
 
 def compute_row_sum_gram_matrix(fs, dummyU, dummyInternalVars):
     func = lambda u, uGrad, q, x: u
-    compute = grad(FunctionSpace.integrate_over_block, 1)
+    compute = jax.grad(FunctionSpace.integrate_over_block, 1)
     return compute(fs, dummyU, dummyInternalVars, func, fs.mesh.blocks['block_1'])
 
 
@@ -112,8 +114,8 @@ class AxisymmetricTensionFracture:
         return self.bvpFunctions.compute_internal_energy(U, internalVariables)
 
 
-    @partial(jit, static_argnums=0)
-    @partial(value_and_grad, argnums=2)
+    @partial(jax.jit, static_argnums=0)
+    @partial(jax.value_and_grad, argnums=2)
     def compute_reactions_from_bcs(self, Uu, Ubc, internalVariables):
         U = self.dofManager.create_field(Uu, Ubc)
         return self.bvpFunctions.compute_internal_energy(U, internalVariables)
