@@ -1,4 +1,6 @@
-from optimism.JaxConfig import *
+import jax
+from jax import numpy as np
+
 from optimism import EquationSolver as EqSolver
 from optimism import FunctionSpace
 from optimism import Interpolants
@@ -31,11 +33,11 @@ def integrate_field_function_on_edge(quadratureRule, edge, mesh, func):
     jac = np.linalg.norm(edgeCoords[0,:] - edgeCoords[1,:])
     XGauss = edgeCoords[0] + np.outer(xigauss, edgeCoords[1] - edgeCoords[0])
     dX = jac*wgauss
-    return np.dot(vmap(func)(XGauss), dX)
+    return np.dot(jax.vmap(func)(XGauss), dX)
 
 
 def integrate_field_function_on_surface(quadratureRule, edges, mesh, func):
-    F = vmap(integrate_field_function_on_edge, (None,0,None,None))
+    F = jax.vmap(integrate_field_function_on_edge, (None,0,None,None))
     return np.sum(F(quadratureRule, edges, mesh, func))
 
 
@@ -94,7 +96,7 @@ class TractionArch():
             loadPotential = TractionBC.compute_traction_potential_energy(self.mesh, U, self.lineQuadRule, self.mesh.sideSets['push'], lambda X: np.array([0.0, -F/self.pushArea]))
             return strainEnergy + loadPotential
         
-        self.compute_bc_reactions = jit(grad(compute_energy_from_bcs, 1))
+        self.compute_bc_reactions = jax.jit(jax.grad(compute_energy_from_bcs, 1))
         
         self.trSettings = EqSolver.get_settings(max_trust_iters=400, t1=0.4, t2=1.5, eta1=1e-8, eta2=0.2, eta3=0.8, over_iters=100)
         

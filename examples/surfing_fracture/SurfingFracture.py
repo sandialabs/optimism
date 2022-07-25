@@ -1,8 +1,9 @@
+from functools import partial
+import jax
+from jax import numpy as np
 from matplotlib import pyplot as plt
-from scipy.sparse import diags as sparse_diags
 import numpy as onp
-
-from optimism.JaxConfig import *
+from scipy.sparse import diags as sparse_diags
 
 from optimism import BoundConstrainedObjective
 from optimism import ConstrainedObjective
@@ -64,7 +65,7 @@ def apply_mode_I_field_at_point(X, K_I):
 
 
 def apply_mode_I_Bc(boundaryNodeCoords, K_I):
-    return vmap(apply_mode_I_field_at_point, (0, None))(boundaryNodeCoords, K_I)
+    return jax.vmap(apply_mode_I_field_at_point, (0, None))(boundaryNodeCoords, K_I)
 
 
 crackDirection = np.array([1.0,0.0])
@@ -84,7 +85,7 @@ def J_integral(U, internals, mesh, fs, edges, bvpFuncs):
     stresses = FunctionSpace.project_quadrature_field_to_element_field(fs, stresses)
     Ws = FunctionSpace.project_quadrature_field_to_element_field(fs, Ws)
         
-    computeJs = vmap(compute_J_integral_on_edge, (None, 0, 0, 0, 0))
+    computeJs = jax.vmap(compute_J_integral_on_edge, (None, 0, 0, 0, 0))
     return np.sum(computeJs(mesh,
                             edges,
                             Ws[edges[:,0]],
@@ -244,8 +245,7 @@ class SurfingProblem:
         Xb = self.mesh.coords[self.mesh.nodeSets['external'],:]
         Xb = Xb.at[:,0].add(-origin)
         modeIBcs = apply_mode_I_Bc(Xb, KI)
-        index = (self.mesh.nodeSets['external'],:2)
-        V = V.at[index].set(modeIBcs)
+        V = V.at[self.mesh.nodeSets['external'],:2].set(modeIBcs)
                              
         return self.dofManager.get_bc_values(V)
 

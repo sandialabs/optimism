@@ -1,8 +1,7 @@
 from matplotlib import pyplot as plt
 
-from optimism.JaxConfig import *
 from optimism import TensorMath
-from optimism.phasefield import SandiaModel as MaterialModel
+from optimism.phasefield import PhaseFieldLorentzPlastic as MaterialModel
 from optimism.phasefield.MaterialPointSimulator import MaterialPointSimulator
 
 from properties import props

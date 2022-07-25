@@ -1,6 +1,7 @@
+from functools import partial
 import jax
+from jax import numpy as np
 
-from optimism.JaxConfig import *
 from optimism import AlSolver
 from optimism import BoundConstrainedSolver
 from optimism import BoundConstrainedObjective
@@ -102,7 +103,7 @@ class SharpNotchProblem:
             internalVariables = p[1]
             return self.bvpFunctions.compute_internal_energy(U, internalVariables)
         
-        self.compute_reactions = jit(grad(energy_for_rxns))
+        self.compute_reactions = jax.jit(jax.grad(energy_for_rxns))
     
 
     def plot_solution(self, U, p, lagrange, plotName):

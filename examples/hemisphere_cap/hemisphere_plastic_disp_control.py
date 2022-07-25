@@ -1,4 +1,6 @@
-from optimism.JaxConfig import *
+import jax
+from jax import numpy as np
+
 from optimism import EquationSolver as EqSolver
 from optimism import FunctionSpace
 from optimism import Interpolants
@@ -55,7 +57,7 @@ class TractionArch():
             strainEnergy = self.bvpFuncs.compute_strain_energy(U, internalVariables)
             return strainEnergy
         
-        self.compute_bc_reactions = jit(grad(compute_energy_from_bcs, 1))
+        self.compute_bc_reactions = jax.jit(jax.grad(compute_energy_from_bcs, 1))
         
         self.trSettings = EqSolver.get_settings(max_trust_iters=400, t1=0.4, t2=1.5, eta1=1e-8, eta2=0.2, eta3=0.8, over_iters=100)
         

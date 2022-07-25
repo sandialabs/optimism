@@ -1,4 +1,5 @@
-from optimism.JaxConfig import *
+import jax
+from jax import numpy as np
 
 from optimism import ReadMesh
 from optimism.material import Neohookean
@@ -105,7 +106,7 @@ class Buckle(MeshFixture):
 
 
     def reaction_func(self, Uu, p):
-        return grad(self.energy_func,1)(Uu,p)[0]
+        return jax.grad(self.energy_func,1)(Uu,p)[0]
 
 
     def compute_volume(self, p):
@@ -226,7 +227,7 @@ class Buckle(MeshFixture):
         opt_state = opt_init(chi)
 
         def step(step, opt_state):
-            value, grads = value_and_grad(loss)(get_params(opt_state))
+            value, grads = jax.value_and_grad(loss)(get_params(opt_state))
             opt_state = opt_update(step, grads, opt_state)
             return value, opt_state
         

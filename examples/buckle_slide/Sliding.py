@@ -1,4 +1,6 @@
-from optimism.JaxConfig import *
+from functools import partial
+from jax import jit
+from jax import numpy as np
 
 from optimism import EquationSolver as EqSolver
 from optimism import FunctionSpace
@@ -19,9 +21,6 @@ from optimism.ConstrainedObjective import ConstrainedObjective
 from optimism.material import Neohookean
 
 from optimism.test.MeshFixture import MeshFixture
-
-import os
-os.environ['XLA_FLAGS'] = "--xla_force_host_platform_device_count=2"
 
 props = {'elastic modulus': 10.0,
          'poisson ratio': 0.3}

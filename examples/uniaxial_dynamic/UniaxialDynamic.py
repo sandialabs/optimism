@@ -1,4 +1,4 @@
-#import sys
+from jax import numpy as np
 
 from optimism.JaxConfig import *
 from optimism import EquationSolver
@@ -92,13 +92,6 @@ class UniaxialDynamic:
         UuPredictor = p.dynamic_data
         UPredictor = self.create_field(UuPredictor, p)
         return self.dynamicsFunctions.compute_algorithmic_energy(U, UPredictor, internalVariables, dt)
-
-
-    # @partial(jit, static_argnums=0)
-    # @partial(value_and_grad, argnums=2)
-    # def compute_reactions_from_bcs(self, Uu, Ubc, internalVariables):
-    #     U = self.dofManager.create_field(Uu, Ubc)
-    #     return self.dynamicsFunctions.compute_output_potential_energies_and_stresses(U, internalVariables)
 
 
     def create_field(self, Uu, p):
