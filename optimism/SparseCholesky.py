@@ -51,7 +51,7 @@ class SparseCholesky:
         
     def apply(self, b):
         if type(b) == type(np.array([])):
-            b = onp.array(b)
+            b = onp.array(b, copy=False)
         return self.Precond(b)
 
         
