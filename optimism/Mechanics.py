@@ -142,7 +142,7 @@ def _compute_updated_internal_variables_multi_block(functionSpace, U, states, bl
         dgQuadPointRavel = blockDispGrads.reshape(blockDispGrads.shape[0]*blockDispGrads.shape[1],*blockDispGrads.shape[2:])
         stQuadPointRavel = blockStates.reshape(blockStates.shape[0]*blockStates.shape[1],-1)
         blockStatesNew = vmap(compute_state_new)(dgQuadPointRavel, stQuadPointRavel).reshape(blockStates.shape)        
-        statesNew = blockStatesNew.at[elemIds].set(blockStatesNew)
+        statesNew = statesNew.at[elemIds, :, :blockStatesNew.shape[2]].set(blockStatesNew)
         
 
     return statesNew
@@ -169,7 +169,7 @@ def _compute_initial_state_multi_block(fs, blockModels):
     for blockKey in blockModels:
         elemIds = fs.mesh.blocks[blockKey]
         blockInitialState = blockModels[blockKey].compute_initial_state( (elemIds.size, numQuadPoints, 1) )
-        initialState = initialState.at[elemIds].set(blockInitialState)
+        initialState = initialState.at[elemIds, :, :blockInitialState.shape[2]].set(blockInitialState)
 
     return initialState
 
