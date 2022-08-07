@@ -14,3 +14,6 @@ __pycache__/
 
 # typical name for python virtual environment
 venv/
+
+# IDE files
+.idea/
