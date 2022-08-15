@@ -100,7 +100,7 @@ Once the SuiteSparse library is in place, navigate into the
 `optimism` directory and execute
 
 ```bash
-pip install -e . [sparse]
+pip install -e ".[sparse]"
 ```
 
 Note that you can always start with the basic installation, and if you
