@@ -44,7 +44,7 @@ def create_material_model_functions(properties):
             finiteDeformations = False
             sethHill = True
         else:
-            raise valueError('Unknown value specified for kinematics in J2Plastic')
+            raise ValueError('Unknown value specified for kinematics in J2Plastic')
         
     if finiteDeformations:
         compute_elastic_strain = compute_elastic_logarithmic_strain
@@ -78,11 +78,14 @@ def create_material_model_functions(properties):
     def output_energy_density_function(dispGrad, state):
         elasticTrialStrain = compute_elastic_strain(dispGrad, state)
         return energy_density_generic(elasticTrialStrain, state, props, hardeningModel, doUpdate=False)
-    
+
+    density = properties.get('density')
+
     return MaterialModel(energy_density_function,
                          output_energy_density_function,
                          compute_initial_state,
-                         compute_state_new_function)
+                         compute_state_new_function,
+                         density)
 
 
 def make_properties(E, nu, Y0):

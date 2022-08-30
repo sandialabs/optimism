@@ -26,10 +26,13 @@ def create_material_model_functions(properties):
     def compute_state_new(dispGrad, internalVars):
         return _compute_state_new(dispGrad, internalVars, props)
     
+    density = properties.get('density')
+    
     return MaterialModel(strain_energy,
                          strain_energy,
                          make_initial_state,
-                         compute_state_new)
+                         compute_state_new,
+                         density)
 
 
 def _make_properties(E, nu):
