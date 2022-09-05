@@ -295,8 +295,8 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel, pressurePro
 
 
 def _compute_kinetic_energy(functionSpace, V, internals, density):
-    def lagrangian_density(V, gradV, Q, X):
-        return kinetic_energy_density(V, density)
+    def lagrangian_density(U, gradU, Q, X):
+        return kinetic_energy_density(U, density)
     return FunctionSpace.integrate_over_block(functionSpace, V, internals, lagrangian_density, slice(None))
 
 
@@ -314,21 +314,20 @@ def kinetic_energy_density(V, density):
 
 
 def compute_newmark_lagrangian(functionSpace, U, UPredicted, internals, density, dt, newmarkBeta, strain_energy_density, modify_element_gradient):
-    def lagrangian_density(u, gradu, q, X):
-        vAlgorithmic = (u - UPredicted)/dt
-        return kinetic_energy_density(vAlgorithmic, density)/newmarkBeta + strain_energy_density(gradu, q)
-    return FunctionSpace.integrate_over_block(functionSpace, U, internals, lagrangian_density,
+    def lagrangian_density(W, gradW, Q, X):
+        return kinetic_energy_density(W, density)/(newmarkBeta*dt**2) + strain_energy_density(gradW, Q)
+    return FunctionSpace.integrate_over_block(functionSpace, U - UPredicted, internals, lagrangian_density,
                                               slice(None), modify_element_gradient)
 
 
 def _compute_newmark_element_hessians(functionSpace, U, UPredicted, internals, density, dt, newmarkBeta, strain_energy_density, modify_element_gradient):
-    def lagrangian_density(u, gradu, q, X):
-        vAlgorithmic = (u - UPredicted)/dt
-        return kinetic_energy_density(vAlgorithmic, density)/newmarkBeta + strain_energy_density(gradu, q)
+    def lagrangian_density(W, gradW, Q, X):
+        return kinetic_energy_density(W, density)/(newmarkBeta*dt**2) + strain_energy_density(gradW, Q)
     f =  vmap(compute_element_stiffness_from_global_fields,
               (None, None, 0, 0, 0, 0, 0, None, None))
     fs = functionSpace
-    return f(U, fs.mesh.coords, internals, fs.mesh.conns, fs.shapes, fs.shapeGrads, fs.vols,
+    UAlgorithmic = U - UPredicted
+    return f(UAlgorithmic, fs.mesh.coords, internals, fs.mesh.conns, fs.shapes, fs.shapeGrads, fs.vols,
              lagrangian_density, modify_element_gradient)
 
 
