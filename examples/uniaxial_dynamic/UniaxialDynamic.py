@@ -3,7 +3,6 @@ from jax import numpy as np
 from optimism.JaxConfig import *
 from optimism import EquationSolver
 from optimism import FunctionSpace
-from optimism import Interpolants
 #from optimism.material import LinearElastic as Material
 from optimism.material import Neohookean as Material
 from optimism import Mechanics
@@ -55,19 +54,18 @@ class UniaxialDynamic:
         self.fieldShape = self.mesh.coords.shape
         self.dofManager = Mesh.DofManager(self.mesh, self.fieldShape, EBCs)
 
-        props = {'elastic modulus': E,
+        props = {'version': 'coupled',
+                 'elastic modulus': E,
                  'poisson ratio': nu,
                  'density': rho}
         
         materialModel = Material.create_material_model_functions(props)
         newmarkParams = Mechanics.NewmarkParameters(gamma=0.5, beta=0.25)
-        elementMasses = Mechanics.compute_element_masses(props['density'], self.mesh)
         
         self.dynamicsFunctions =  Mechanics.create_dynamics_functions(self.fs,
                                                                       "plane strain",
                                                                       materialModel,
-                                                                      newmarkParams,
-                                                                      elementMasses)
+                                                                      newmarkParams)
         
         self.outputTime = []
         self.outputDisp = []
@@ -79,7 +77,9 @@ class UniaxialDynamic:
         U = self.create_field(Uu, p)
         internalVariables = p[1]
         dt = p[4][0] - p[4][1]
-        elementHessians = self.dynamicsFunctions.compute_element_hessians(U, internalVariables, dt)
+        UuPre = p.dynamic_data
+        UPre = self.create_field(UuPre, p)
+        elementHessians = self.dynamicsFunctions.compute_element_hessians(U, UPre, internalVariables, dt)
         return SparseMatrixAssembler.assemble_sparse_stiffness_matrix(elementHessians,
                                                                       self.mesh.conns,
                                                                       self.dofManager)
@@ -89,9 +89,9 @@ class UniaxialDynamic:
         U = self.create_field(Uu, p)
         internalVariables = p[1]
         dt = p.time[0] - p.time[1]
-        UuPredictor = p.dynamic_data
-        UPredictor = self.create_field(UuPredictor, p)
-        return self.dynamicsFunctions.compute_algorithmic_energy(U, UPredictor, internalVariables, dt)
+        UuPre = p.dynamic_data
+        UPre = self.create_field(UuPre, p)
+        return self.dynamicsFunctions.compute_algorithmic_energy(U, UPre, internalVariables, dt)
 
 
     def create_field(self, Uu, p):
@@ -171,11 +171,12 @@ class UniaxialDynamic:
 
     
     def run(self):       
-        N = 48*4*2
         c = np.sqrt(E/(1-nu**2)/rho)
         exactPeriod = 4.0*self.L/c
         print('exact period = ', exactPeriod)
         dt = exactPeriod/8.0/2
+        totalTime = 4*exactPeriod
+        N = round(totalTime/dt)
         Uu, Vu = self.get_initial_conditions()
         internalVariables = self.dynamicsFunctions.compute_initial_state()
         tOld = -dt

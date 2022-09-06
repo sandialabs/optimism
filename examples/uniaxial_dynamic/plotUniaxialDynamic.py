@@ -14,10 +14,12 @@ fig, axs = plt.subplots(2, figsize=(12,10))
 axs[0].plot(t, u, marker='o', linestyle='--')
 axs[0].set(xlabel='time', ylabel='tip displacement')
 
-print(ke+se)
-axs[1].plot(t, ke + se, marker='o')
+axs[1].plot(t, ke, 'k-', label='KE')
+axs[1].plot(t, se, 'r-', label='SE')
+axs[1].plot(t, ke + se, '--', label='TOTAL')
 axs[1].set(xlabel='time', ylabel='energy')
 axs[1].set_ylim(0.0, None)
+axs[1].legend()
 
 plt.tight_layout()
 
