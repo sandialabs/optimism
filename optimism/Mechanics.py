@@ -314,10 +314,20 @@ def kinetic_energy_density(V, density):
 
 
 def compute_newmark_lagrangian(functionSpace, U, UPredicted, internals, density, dt, newmarkBeta, strain_energy_density, modify_element_gradient):
+    # We can't quite fuse these kernels because KE uses the velocity field and
+    # the strain energy uses the displacements. If profiling suggests fusing
+    # is beneficial, we could add the time derivative field to the Lagrangian
+    # density definition.
+
     def lagrangian_density(W, gradW, Q, X):
-        return kinetic_energy_density(W, density)/(newmarkBeta*dt**2) + strain_energy_density(gradW, Q)
-    return FunctionSpace.integrate_over_block(functionSpace, U - UPredicted, internals, lagrangian_density,
-                                              slice(None), modify_element_gradient)
+        return kinetic_energy_density(W, density)
+    KE = FunctionSpace.integrate_over_block(functionSpace, U - UPredicted, internals, lagrangian_density,
+                                            slice(None), modify_element_gradient) / (newmarkBeta*dt**2)
+
+    lagrangian_density = strain_energy_density_to_lagrangian_density(strain_energy_density)
+    SE = FunctionSpace.integrate_over_block(functionSpace, U, internals, lagrangian_density,
+                                            slice(None), modify_element_gradient)
+    return SE + KE
 
 
 def _compute_newmark_element_hessians(functionSpace, U, UPredicted, internals, density, dt, newmarkBeta, strain_energy_density, modify_element_gradient):
