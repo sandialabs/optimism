@@ -25,7 +25,7 @@ def create_material_model_functions(properties):
     elif strainMeasure == 'logarithmic':
         _strain = log_strain
     else:
-        raise valueError('Unrecognized strain measure')
+        raise ValueError('Unrecognized strain measure')
     
     def strain_energy(dispGrad, internalVars):
         strain = _strain(dispGrad)
@@ -34,11 +34,14 @@ def create_material_model_functions(properties):
     def compute_state_new(dispGrad, internalVars):
         strain = _strain(dispGrad)
         return _compute_state_new(strain, internalVars, props)
-    
+
+    density = properties.get('density')
+
     return MaterialModel(compute_energy_density = strain_energy,
                          compute_output_energy_density = strain_energy,
                          compute_initial_state = make_initial_state,
-                         compute_state_new = compute_state_new)
+                         compute_state_new = compute_state_new,
+                         density = density)
 
 
 def _make_properties(E, nu):
