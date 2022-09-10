@@ -86,7 +86,7 @@ def _compute_strain_energy(functionSpace, UField, stateField,
     L = strain_energy_density_to_lagrangian_density(compute_energy_density)
     return FunctionSpace.integrate_over_block(functionSpace, UField, stateField, L,
                                               slice(None),
-                                              modify_element_gradient)
+                                              modify_element_gradient=modify_element_gradient)
 
 
 def _compute_strain_energy_multi_block(functionSpace, UField, stateField, blockModels,
@@ -99,7 +99,7 @@ def _compute_strain_energy_multi_block(functionSpace, UField, stateField, blockM
         L = strain_energy_density_to_lagrangian_density(materialModel.compute_energy_density)
         
         blockEnergy = FunctionSpace.integrate_over_block(functionSpace, UField, stateField, L,
-                                                         elemIds, modify_element_gradient)
+                                                         elemIds, modify_element_gradient=modify_element_gradient)
         
         energy += blockEnergy
     return energy
@@ -229,7 +229,7 @@ def create_multi_block_mechanics_functions(functionSpace, mode2D, materialModels
             output_lagrangian = strain_energy_density_to_lagrangian_density(compute_output_energy_density)
             output_constitutive = value_and_grad(output_lagrangian, 1)
             elemIds = fs.mesh.blocks[blockKey]
-            blockEnergyDensities, blockStresses = FunctionSpace.evaluate_on_block(fs, U, stateVariables, output_constitutive, elemIds, modify_element_gradient)
+            blockEnergyDensities, blockStresses = FunctionSpace.evaluate_on_block(fs, U, stateVariables, output_constitutive, elemIds, modify_element_gradient=moodify_element_gradient)
             energy_densities = energy_densities.at[elemIds].set(blockEnergyDensities)
             stresses = stresses.at[elemIds].set(blockStresses)
         return energy_densities, stresses
@@ -285,7 +285,7 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel, pressurePro
 
     
     def compute_output_energy_densities_and_stresses(U, stateVariables):
-        return FunctionSpace.evaluate_on_block(fs, U, stateVariables, output_constitutive, slice(None), modify_element_gradient)
+        return FunctionSpace.evaluate_on_block(fs, U, stateVariables, output_constitutive, slice(None), modify_element_gradient=modify_element_gradient)
 
     
     def compute_initial_state():
@@ -322,11 +322,11 @@ def compute_newmark_lagrangian(functionSpace, U, UPredicted, internals, density,
     def lagrangian_density(W, gradW, Q, X):
         return kinetic_energy_density(W, density)
     KE = FunctionSpace.integrate_over_block(functionSpace, U - UPredicted, internals, lagrangian_density,
-                                            slice(None), modify_element_gradient) / (newmarkBeta*dt**2)
+                                            slice(None)) / (newmarkBeta*dt**2)
 
     lagrangian_density = strain_energy_density_to_lagrangian_density(strain_energy_density)
     SE = FunctionSpace.integrate_over_block(functionSpace, U, internals, lagrangian_density,
-                                            slice(None), modify_element_gradient)
+                                            slice(None), modify_element_gradient=modify_element_gradient)
     return SE + KE
 
 
@@ -392,7 +392,7 @@ def create_dynamics_functions(functionSpace, mode2D, materialModel, newmarkParam
     output_lagrangian = strain_energy_density_to_lagrangian_density(compute_output_energy_density)
     output_constitutive = value_and_grad(output_lagrangian, 1)
     def compute_output_potential_densities_and_stresses(U, stateVariables):
-        return FunctionSpace.evaluate_on_block(fs, U, stateVariables, output_constitutive, slice(None), modify_element_gradient)
+        return FunctionSpace.evaluate_on_block(fs, U, stateVariables, output_constitutive, slice(None), modify_element_gradient=modify_element_gradient)
 
     def compute_kinetic_energy(V):
         stateVariables = np.zeros((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule)))
