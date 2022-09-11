@@ -80,6 +80,28 @@ def interpolate_to_points(functionSpace, nodalField):
 
 def integrate_over_block(functionSpace, U, stateVars, func, block,
                          *params, modify_element_gradient=default_modify_element_gradient):
+    """Integrates a density function over a block of the mesh.
+
+    Args:
+      functionSpace: Function space object to do the integration with.
+      U: The vector of dofs for the primal field in the functional.
+      stateVars: Internal state variable array.
+      func: Lagrangian density function to integrate, Must have the signature 
+        ``func(u, dudx, q, x, *params) -> scalar``, where ``u`` is the primal field, ``q`` is the
+        value of the internal variables, ``x`` is the current point coordinates, and ``*p`` is a
+        variadic set of additional parameters, which correspond to the ``*params`` argument.
+      block: Group of elements to integrate over. This is an array of element indices. For
+        perfomance, the elements within the block should be numbered consecutively.
+      *params: Optional parameter fields to pass into Lagrangian density function. These are
+        represented as a single value per element.
+      modify_element_gradient: Optional function that modifies the gradient at the element level.
+        This can be to set the particular 2D mode, and additionally to enforce volume averaging
+        on the gradient operator. This is a keyword-only argument.
+
+    Returns:
+      A scalar value for the integral of the density functional ``func`` integrated over the
+      block of elements.
+    """
     
     vals = evaluate_on_block(functionSpace, U, stateVars, func, block, *params, modify_element_gradient=modify_element_gradient)
     return np.dot(vals.ravel(), functionSpace.vols[block].ravel())
@@ -87,6 +109,28 @@ def integrate_over_block(functionSpace, U, stateVars, func, block,
 
 def evaluate_on_block(functionSpace, U, stateVars, func, block,
                       *params, modify_element_gradient=default_modify_element_gradient):
+    """Evaluates a density function at every quadrature point in a block of the mesh.
+
+    Args:
+      functionSpace: Function space object to do the evaluation with.
+      U: The vector of dofs for the primal field in the functional.
+      stateVars: Internal state variable array.
+      func: Lagrangian density function to evaluate, Must have the signature 
+        ``func(u, dudx, q, x, *params) -> scalar``, where ``u`` is the primal field, ``q`` is the
+        value of the internal variables, ``x`` is the current point coordinates, and ``*p`` is a
+        variadic set of additional parameters, which correspond to the ``*params`` argument.
+      block: Group of elements to evaluate over. This is an array of element indices. For
+        perfomance, the elements within the block should be numbered consecutively.
+      *params: Optional parameter fields to pass into Lagrangian density function. These are
+        represented as a single value per element.
+      modify_element_gradient: Optional function that modifies the gradient at the element level.
+        This can be to set the particular 2D mode, and additionally to enforce volume averaging
+        on the gradient operator. This is a keyword-only argument.
+
+    Returns:
+      An array of shape (numElements, numQuadPtsPerElement) that contains the scalar values of the
+      density functional ``func`` at every quadrature point in the block.
+    """
     fs = functionSpace
     compute_elem_values = vmap(evaluate_on_element, (None, None, 0, 0, 0, 0, 0, None, None, *tuple(0 for p in params)))
     
