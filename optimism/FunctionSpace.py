@@ -79,20 +79,64 @@ def interpolate_to_points(functionSpace, nodalField):
 
 
 def integrate_over_block(functionSpace, U, stateVars, func, block,
-                         modify_element_gradient=default_modify_element_gradient):
+                         *params, modify_element_gradient=default_modify_element_gradient):
+    """Integrates a density function over a block of the mesh.
+
+    Args:
+      functionSpace: Function space object to do the integration with.
+      U: The vector of dofs for the primal field in the functional.
+      stateVars: Internal state variable array.
+      func: Lagrangian density function to integrate, Must have the signature
+        ``func(u, dudx, q, x, *params) -> scalar``, where ``u`` is the primal field, ``q`` is the
+        value of the internal variables, ``x`` is the current point coordinates, and ``*params`` is
+        a variadic set of additional parameters, which correspond to the ``*params`` argument.
+      block: Group of elements to integrate over. This is an array of element indices. For
+        performance, the elements within the block should be numbered consecutively.
+      *params: Optional parameter fields to pass into Lagrangian density function. These are
+        represented as a single value per element.
+      modify_element_gradient: Optional function that modifies the gradient at the element level.
+        This can be to set the particular 2D mode, and additionally to enforce volume averaging
+        on the gradient operator. This is a keyword-only argument.
+
+    Returns:
+      A scalar value for the integral of the density functional ``func`` integrated over the
+      block of elements.
+    """
     
-    vals = evaluate_on_block(functionSpace, U, stateVars, func, block, modify_element_gradient)
+    vals = evaluate_on_block(functionSpace, U, stateVars, func, block, *params, modify_element_gradient=modify_element_gradient)
     return np.dot(vals.ravel(), functionSpace.vols[block].ravel())
 
 
 def evaluate_on_block(functionSpace, U, stateVars, func, block,
-                      modify_element_gradient=default_modify_element_gradient):
+                      *params, modify_element_gradient=default_modify_element_gradient):
+    """Evaluates a density function at every quadrature point in a block of the mesh.
+
+    Args:
+      functionSpace: Function space object to do the evaluation with.
+      U: The vector of dofs for the primal field in the functional.
+      stateVars: Internal state variable array.
+      func: Lagrangian density function to evaluate, Must have the signature
+        ``func(u, dudx, q, x, *params) -> scalar``, where ``u`` is the primal field, ``q`` is the
+        value of the internal variables, ``x`` is the current point coordinates, and ``*params`` is
+        a variadic set of additional parameters, which correspond to the ``*params`` argument.
+      block: Group of elements to evaluate over. This is an array of element indices. For
+        performance, the elements within the block should be numbered consecutively.
+      *params: Optional parameter fields to pass into Lagrangian density function. These are
+        represented as a single value per element.
+      modify_element_gradient: Optional function that modifies the gradient at the element level.
+        This can be to set the particular 2D mode, and additionally to enforce volume averaging
+        on the gradient operator. This is a keyword-only argument.
+
+    Returns:
+      An array of shape (numElements, numQuadPtsPerElement) that contains the scalar values of the
+      density functional ``func`` at every quadrature point in the block.
+    """
     fs = functionSpace
-    compute_elem_values = vmap(evaluate_on_element, (None,None,0,0,0,0,0,None,None))
+    compute_elem_values = vmap(evaluate_on_element, (None, None, 0, 0, 0, 0, 0, None, None, *tuple(0 for p in params)))
     
     blockValues = compute_elem_values(U, fs.mesh.coords, stateVars[block], fs.shapes[block],
                                       fs.shapeGrads[block], fs.vols[block],
-                                      fs.mesh.conns[block], func, modify_element_gradient)
+                                      fs.mesh.conns[block], func, modify_element_gradient, *params)
     return blockValues
 
 
@@ -138,11 +182,12 @@ def integrate_element(U, coords, elemStates, elemShapes, elemShapeGrads, elemVol
     return np.dot(fVals, elemVols)
 
 
-def evaluate_on_element(U, coords, elemStates, elemShapes, elemShapeGrads, elemVols, elemConn, func, modify_element_gradient):
+def evaluate_on_element(U, coords, elemStates, elemShapes, elemShapeGrads, elemVols, elemConn, kernelFunc, modify_element_gradient, *params):
     elemVals = interpolate_to_element_points(U, elemShapes, elemConn)
     elemGrads = compute_element_field_gradient(U, coords, elemShapes, elemShapeGrads, elemVols, elemConn, modify_element_gradient)
     elemXs = interpolate_to_element_points(coords, elemShapes, elemConn)
-    fVals = vmap(func)(elemVals, elemGrads, elemStates, elemXs)
+    vmapArgs = 0, 0, 0, 0, *tuple(None for p in params)
+    fVals = vmap(kernelFunc, vmapArgs)(elemVals, elemGrads, elemStates, elemXs, *params)
     return fVals
 
 

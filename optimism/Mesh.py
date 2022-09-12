@@ -313,11 +313,11 @@ class DofManager:
         
         
     def get_bc_size(self):
-        return np.sum(self.isBc)
+        return np.sum(self.isBc).item() # item() converts singleton array to scalar
 
 
     def get_unknown_size(self):
-        return np.sum(self.isUnknown)
+        return np.sum(self.isUnknown).item() # item() converts singleton array to scalar
     
     
     def create_field(self, Uu, Ubc=0.0):

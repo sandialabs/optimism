@@ -74,7 +74,6 @@ class DynamicsFixture(MeshFixture.MeshFixture):
         dt = 0.1
         UPre, _ = self.dynamicsFunctions.predict(U, V, A, dt)
         action = self.dynamicsFunctions.compute_algorithmic_energy(U, UPre, self.internalVariables, dt)
-        print(action)
         self.assertGreater(np.abs(action), 0.0)
         
     def test_hessian_matrix_is_symmetric(self):

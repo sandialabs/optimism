@@ -25,9 +25,9 @@ def create_material_model_functions(properties):
 
     def compute_state_new(dispGrad, internalVars):
         return _compute_state_new(dispGrad, internalVars, props)
-    
+
     density = properties.get('density')
-    
+
     return MaterialModel(strain_energy,
                          strain_energy,
                          make_initial_state,
@@ -60,7 +60,7 @@ def _adagio_neohookean(dispGrad, internalVariables, props):
     #print('J = ', J)
     J23 = np.power(J, -2.0/3.0)
     I1Bar = J23*np.tensordot(F,F)
-    Wvol = 0.5*props[PROPS_KAPPA]*(0.5*J**2 - np.log(J))
+    Wvol = 0.5*props[PROPS_KAPPA]*(0.5*J**2 - 0.5 - np.log(J))
     Wdev = 0.5*props[PROPS_MU]*(I1Bar - 3.0)
     return Wdev + Wvol
 

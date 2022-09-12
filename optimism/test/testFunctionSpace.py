@@ -1,4 +1,5 @@
 import numpy as onp
+import unittest
 
 from optimism.JaxConfig import *
 from optimism import FunctionSpace
@@ -251,5 +252,36 @@ class TestFunctionSpaceMultiQuadPointFixture(MeshFixture.MeshFixture):
         self.assertArrayNear(dI[interiorNodeIds,:], np.zeros_like(self.U[interiorNodeIds,:]), 14)
                 
         
+class ParameterizationTestSuite(MeshFixture.MeshFixture):
+    def setUp(self) -> None:
+        self.quadratureRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2)
+
+        # mesh
+        self.Nx = 7
+        self.Ny = 7
+        self.xRange = [0.,3.]
+        self.yRange = [0.,1.]
+        self.A = np.array([[0.1, -0.2],
+                           [0.4, -0.1]])
+        self.b = 2.5
+        self.mesh, self.U = self.create_mesh_and_disp(self.Nx, self.Ny, self.xRange, self.yRange,
+                                                      lambda x : np.array([0.0, x[0]]))
+        # function space
+        self.fs = FunctionSpace.construct_function_space(self.mesh, self.quadratureRule)
+        nElements = Mesh.num_elements(self.mesh)
+        nQuadPoints = QuadratureRule.len(self.quadratureRule)
+        self.state = np.zeros((nElements,nQuadPoints,))
+
+    def test_integrate_with_parameter(self):
+        def centroid(v):
+            return np.average(v, axis=0)
+
+        xc = vmap(lambda conn, coords: centroid(coords[conn, :]), (0, None))(self.mesh.conns, self.mesh.coords)
+        weights = np.ones(Mesh.num_elements(self.mesh), dtype=np.float64)
+        weights = weights.at[xc[:,0] < self.xRange[1]/2].set(2.0)
+        f = FunctionSpace.integrate_over_block(self.fs, self.U, self.state, lambda u, dudx, q, x, p: p, self.mesh.blocks['block'], weights)
+        exact = 1.5*self.xRange[1]*self.yRange[1]
+        self.assertAlmostEqual(f, exact, 12)
+
 if __name__ == '__main__':
-    MeshFixture.unittest.main()
+    unittest.main()
