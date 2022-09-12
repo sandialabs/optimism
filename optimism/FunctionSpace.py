@@ -86,7 +86,7 @@ def integrate_over_block(functionSpace, U, stateVars, func, block,
       functionSpace: Function space object to do the integration with.
       U: The vector of dofs for the primal field in the functional.
       stateVars: Internal state variable array.
-      func: Lagrangian density function to integrate, Must have the signature 
+      func: Lagrangian density function to integrate, Must have the signature
         ``func(u, dudx, q, x, *params) -> scalar``, where ``u`` is the primal field, ``q`` is the
         value of the internal variables, ``x`` is the current point coordinates, and ``*p`` is a
         variadic set of additional parameters, which correspond to the ``*params`` argument.
@@ -115,7 +115,7 @@ def evaluate_on_block(functionSpace, U, stateVars, func, block,
       functionSpace: Function space object to do the evaluation with.
       U: The vector of dofs for the primal field in the functional.
       stateVars: Internal state variable array.
-      func: Lagrangian density function to evaluate, Must have the signature 
+      func: Lagrangian density function to evaluate, Must have the signature
         ``func(u, dudx, q, x, *params) -> scalar``, where ``u`` is the primal field, ``q`` is the
         value of the internal variables, ``x`` is the current point coordinates, and ``*p`` is a
         variadic set of additional parameters, which correspond to the ``*params`` argument.
