@@ -88,10 +88,10 @@ def integrate_over_block(functionSpace, U, stateVars, func, block,
       stateVars: Internal state variable array.
       func: Lagrangian density function to integrate, Must have the signature
         ``func(u, dudx, q, x, *params) -> scalar``, where ``u`` is the primal field, ``q`` is the
-        value of the internal variables, ``x`` is the current point coordinates, and ``*p`` is a
-        variadic set of additional parameters, which correspond to the ``*params`` argument.
+        value of the internal variables, ``x`` is the current point coordinates, and ``*params`` is
+        a variadic set of additional parameters, which correspond to the ``*params`` argument.
       block: Group of elements to integrate over. This is an array of element indices. For
-        perfomance, the elements within the block should be numbered consecutively.
+        performance, the elements within the block should be numbered consecutively.
       *params: Optional parameter fields to pass into Lagrangian density function. These are
         represented as a single value per element.
       modify_element_gradient: Optional function that modifies the gradient at the element level.
@@ -117,10 +117,10 @@ def evaluate_on_block(functionSpace, U, stateVars, func, block,
       stateVars: Internal state variable array.
       func: Lagrangian density function to evaluate, Must have the signature
         ``func(u, dudx, q, x, *params) -> scalar``, where ``u`` is the primal field, ``q`` is the
-        value of the internal variables, ``x`` is the current point coordinates, and ``*p`` is a
-        variadic set of additional parameters, which correspond to the ``*params`` argument.
+        value of the internal variables, ``x`` is the current point coordinates, and ``*params`` is
+        a variadic set of additional parameters, which correspond to the ``*params`` argument.
       block: Group of elements to evaluate over. This is an array of element indices. For
-        perfomance, the elements within the block should be numbered consecutively.
+        performance, the elements within the block should be numbered consecutively.
       *params: Optional parameter fields to pass into Lagrangian density function. These are
         represented as a single value per element.
       modify_element_gradient: Optional function that modifies the gradient at the element level.
