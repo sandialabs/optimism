@@ -9,8 +9,6 @@ Mesh = namedtuple('Mesh', ['coords','conns','simplexNodesOrdinals',
                            'nodeSets', 'sideSets'],
                   defaults=(None,None,None))
 
-EssentialBC = namedtuple('EssentialBC', ['nodeSet', 'field'])
-
 
 def create_structured_mesh_data(Nx, Ny, xExtent, yExtent):
     xs = np.linspace(xExtent[0], xExtent[1], Nx)
@@ -288,93 +286,3 @@ def num_elements(mesh):
 
 def num_nodes(mesh):
     return mesh.coords.shape[0]
-
-
-class DofManager:
-    
-    def __init__(self, mesh, fieldShape, EssentialBCs=[]):
-        self.fieldShape = fieldShape
-        self.isBc = onp.full(fieldShape, False, dtype=bool)
-        for ebc in EssentialBCs:
-            self.isBc[mesh.nodeSets[ebc.nodeSet], ebc.field] = True
-        self.isUnknown = ~self.isBc
-        
-        self.ids = np.arange(self.isBc.size).reshape(fieldShape)
-        
-        self.unknownIndices = self.ids[self.isUnknown]
-        self.bcIndices = self.ids[self.isBc]
-        
-        ones = np.ones(self.isBc.size, dtype=int) * -1
-        self.dofToUnknown = ones.at[self.unknownIndices].set(np.arange(self.unknownIndices.size)) 
-
-        self.HessRowCoords, self.HessColCoords = self._make_hessian_coordinates(mesh.conns)
-
-        self.hessian_bc_mask = self._make_hessian_bc_mask(mesh.conns)
-        
-        
-    def get_bc_size(self):
-        return np.sum(self.isBc)
-
-
-    def get_unknown_size(self):
-        return np.sum(self.isUnknown)
-    
-    
-    def create_field(self, Uu, Ubc=0.0):
-        U = np.zeros(self.isBc.shape).at[self.isBc].set(Ubc)
-        return U.at[self.isUnknown].set(Uu)
-    
-
-    def get_bc_values(self, U):
-        return U[self.isBc]
-
-
-    def get_unknown_values(self, U):
-        return U[self.isUnknown]
-
-    
-    def slice_unknowns_with_dof_indices(self, Uu, dofIndexSlice):
-        i = self.isUnknown[dofIndexSlice]
-        j = self.dofToUnknown.reshape(self.fieldShape)[dofIndexSlice]
-        return Uu[j[i]]
-
-
-    def _make_hessian_coordinates(self, conns):
-        nElUnknowns = onp.zeros(conns.shape[0], dtype=int)
-        nHessianEntries = 0
-        for e, eNodes in enumerate(conns):
-            elUnknownFlags = self.isUnknown[eNodes,:].ravel()
-            nElUnknowns[e] = onp.sum(elUnknownFlags)
-            nHessianEntries += onp.square(nElUnknowns[e])
-       
-        rowCoords = onp.zeros(nHessianEntries, dtype=int)
-        colCoords = rowCoords.copy()
-        rangeBegin = 0
-        for e,eNodes in enumerate(conns):
-            elDofs = self.ids[eNodes,:]
-            elUnknownFlags = self.isUnknown[eNodes,:]
-            elUnknowns = self.dofToUnknown[elDofs[elUnknownFlags]]
-            elHessCoords = onp.tile(elUnknowns, (nElUnknowns[e],1))
-
-            rangeEnd = rangeBegin + onp.square(nElUnknowns[e])
-
-            rowCoords[rangeBegin:rangeEnd] = elHessCoords.ravel()
-            colCoords[rangeBegin:rangeEnd] = elHessCoords.T.ravel()
-
-            rangeBegin += np.square(nElUnknowns[e])
-        return rowCoords, colCoords
-
-
-    def _make_hessian_bc_mask(self, conns):
-        nElements, nNodesPerElement = conns.shape
-        nFields = self.ids.shape[1]
-        nDofPerElement = nNodesPerElement*nFields
-
-        hessian_bc_mask = onp.full((nElements,nDofPerElement,nDofPerElement),
-                                   True, dtype=bool)
-        for e, eNodes in enumerate(conns):
-            eFlag = self.isBc[eNodes,:].ravel()
-            hessian_bc_mask[e,eFlag,:] = False
-            hessian_bc_mask[e,:,eFlag] = False
-        return hessian_bc_mask
-
