@@ -55,13 +55,15 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
         self.mesh, self.U = self.create_mesh_and_disp(self.Nx, self.Ny, xRange, yRange,
                                                       lambda x: self.targetFieldGrad@x + self.targetFieldOffset)
 
-        EBCs = [Mesh.EssentialBC(nodeSet='all_boundary', field=0),
-                Mesh.EssentialBC(nodeSet='all_boundary', field=1)]
-        self.dofManager = Mesh.DofManager(self.mesh, self.U.shape, EBCs)
-        self.Ubc = self.dofManager.get_bc_values(self.U)
-
         quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2)
         self.fs = FunctionSpace.construct_function_space(self.mesh, quadRule)
+        
+        dim = 3 # 2 displacements and scalar phase
+        ebc = [FunctionSpace.EssentialBC(nodeSet='all_boundary', component=0),
+               FunctionSpace.EssentialBC(nodeSet='all_boundary', component=1)]
+        self.dofManager = FunctionSpace.DofManager(self.fs, dim, ebc)
+        self.Ubc = self.dofManager.get_bc_values(self.U)
+
         self.bvpFunctions =  PhaseField.create_phasefield_functions(self.fs,
                                                                     "plane strain",
                                                                     materialModel)

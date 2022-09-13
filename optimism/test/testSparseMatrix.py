@@ -43,7 +43,7 @@ class SparsePatchFixture(MeshFixture.MeshFixture):
 
 
     def test_sparse_matrix_patch_test_noBC(self):
-        dofManager = Mesh.DofManager(self.mesh, self.U.shape)
+        dofManager = FunctionSpace.DofManager(self.fs, dim=2, EssentialBCs=[])
         K = assemble_sparse_stiffness_matrix(self.elementStiffnesses,
                                              self.mesh.conns,
                                              dofManager)
@@ -83,10 +83,9 @@ class SparsePatchFixture(MeshFixture.MeshFixture):
 
         
     def test_sparse_matrix_patch_test_traction_BC(self):
-        EBCs = []
-        EBCs.append(Mesh.EssentialBC(nodeSet='left', field=0))
-        EBCs.append(Mesh.EssentialBC(nodeSet='bottom', field=1))
-        dofManager = Mesh.DofManager(self.mesh, self.U.shape, EBCs)
+        ebcs = [FunctionSpace.EssentialBC(nodeSet='left', component=0),
+                FunctionSpace.EssentialBC(nodeSet='bottom', component=1)]
+        dofManager = FunctionSpace.DofManager(self.fs, dim=2, EssentialBCs=ebcs)
         Ubc = dofManager.get_bc_values(self.U)
         
         K = assemble_sparse_stiffness_matrix(self.elementStiffnesses,
@@ -108,12 +107,11 @@ class SparsePatchFixture(MeshFixture.MeshFixture):
 
 
     def test_sparse_matrix_patch_test_dirichlet_BC(self):
-        EBCs = []
-        EBCs.append(Mesh.EssentialBC(nodeSet='left', field=0))
-        EBCs.append(Mesh.EssentialBC(nodeSet='bottom', field=1))
-        EBCs.append(Mesh.EssentialBC(nodeSet='right', field=0))
+        ebcs = [FunctionSpace.EssentialBC(nodeSet='left', component=0),
+                FunctionSpace.EssentialBC(nodeSet='bottom', component=1),
+                FunctionSpace.EssentialBC(nodeSet='right', component=0)]
         
-        dofManager = Mesh.DofManager(self.mesh, self.U.shape, EBCs)
+        dofManager = FunctionSpace.DofManager(self.fs, dim=2, EssentialBCs=ebcs)
         Ubc = dofManager.get_bc_values(self.U)
         
         def compute_energy_again(Uu, Ubc):
@@ -131,8 +129,8 @@ class SparsePatchFixture(MeshFixture.MeshFixture):
         bcVals = np.array([0., 0., 1.0])
 
         dU = np.zeros(self.U.shape)
-        for b, ebc in enumerate(EBCs):
-            idx = (self.mesh.nodeSets[ebc.nodeSet], ebc.field)
+        for b, ebc in enumerate(ebcs):
+            idx = self.mesh.nodeSets[ebc.nodeSet], ebc.component
             dU = dU.at[idx].set(bcVals[b])
 
         Ubc = dofManager.get_bc_values(self.U)

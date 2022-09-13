@@ -45,9 +45,9 @@ class PatchTest(MeshFixture.MeshFixture):
 
         
     def test_dirichlet_patch_test(self):
-        EBCs = [Mesh.EssentialBC(nodeSet='all_boundary', field=0),
-                Mesh.EssentialBC(nodeSet='all_boundary', field=1)]
-        dofManager = Mesh.DofManager(self.mesh, self.U.shape, EBCs)
+        ebcs = [FunctionSpace.EssentialBC(nodeSet='all_boundary', component=0),
+                FunctionSpace.EssentialBC(nodeSet='all_boundary', component=1)]
+        dofManager = FunctionSpace.DofManager(self.fs, dim=self.U.shape[1], EssentialBCs=ebcs)
         Ubc = dofManager.get_bc_values(self.U)
         
         # Uu is U_unconstrained
@@ -72,12 +72,11 @@ class PatchTest(MeshFixture.MeshFixture):
 
 
     def test_neumann_patch_test(self):
-        EBCs = []
-        EBCs.append(Mesh.EssentialBC(nodeSet='left', field=0))
-        EBCs.append(Mesh.EssentialBC(nodeSet='bottom', field=1))
+        ebcs = [FunctionSpace.EssentialBC(nodeSet='left', component=0),
+                FunctionSpace.EssentialBC(nodeSet='bottom', component=1)]
 
         self.U = np.zeros(self.U.shape)
-        dofManager = Mesh.DofManager(self.mesh, self.U.shape, EBCs)
+        dofManager = FunctionSpace.DofManager(self.fs, self.U.shape[1], ebcs)
         Ubc = dofManager.get_bc_values(self.U)
         
         sigma11 = 1.0
@@ -140,10 +139,9 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
 
     
     def test_dirichlet_patch_test_with_quadratic_elements(self):
-        EBCs = []
-        EBCs.append(Mesh.EssentialBC(nodeSet='all_boundary', field=0))
-        EBCs.append(Mesh.EssentialBC(nodeSet='all_boundary', field=1))
-        dofManager = Mesh.DofManager(self.mesh, self.UTarget.shape, EBCs)
+        ebcs = [FunctionSpace.EssentialBC(nodeSet='all_boundary', component=0),
+                FunctionSpace.EssentialBC(nodeSet='all_boundary', component=1)]
+        dofManager = FunctionSpace.DofManager(self.fs, self.UTarget.shape[1], ebcs)
         Ubc = dofManager.get_bc_values(self.UTarget)
         
         @jit
@@ -167,10 +165,9 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
 
 
     def test_dirichlet_patch_test_with_quadratic_elements_and_constant_jac_projection(self):
-        EBCs = []
-        EBCs.append(Mesh.EssentialBC(nodeSet='all_boundary', field=0))
-        EBCs.append(Mesh.EssentialBC(nodeSet='all_boundary', field=1))
-        dofManager = Mesh.DofManager(self.mesh, self.UTarget.shape, EBCs)
+        ebcs = [FunctionSpace.EssentialBC(nodeSet='all_boundary', component=0),
+                FunctionSpace.EssentialBC(nodeSet='all_boundary', component=1)]
+        dofManager = FunctionSpace.DofManager(self.fs, self.UTarget.shape[1], ebcs)
         Ubc = dofManager.get_bc_values(self.UTarget)
 
         masterForJ = Interpolants.make_master_tri_element(degree=0)

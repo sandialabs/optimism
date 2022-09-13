@@ -1,5 +1,6 @@
 import pathlib # to reach sample mesh file
 import sys
+import unittest
 
 from optimism.JaxConfig import *
 try:
@@ -10,11 +11,8 @@ except ImportError:
     
 from optimism import FunctionSpace
 from optimism.material import LinearElastic as MaterialModel
-from optimism import Mesh
-from optimism.Timer import Timer
 from optimism.EquationSolver import newton_solve
 from optimism import QuadratureRule
-from optimism import Surface
 from optimism.test import TestFixture
 from optimism import Mechanics
 
@@ -116,19 +114,19 @@ class TestMeshReadPatchTest(TestFixture.TestFixture):
         
     @TestFixture.unittest.skipIf(not haveNetCDF, skipMessage)        
     def test_dirichlet_patch_test(self):
-        EBCs = [Mesh.EssentialBC(nodeSet='left', field=0),
-                Mesh.EssentialBC(nodeSet='left', field=1),
-                Mesh.EssentialBC(nodeSet='bottom', field=0),
-                Mesh.EssentialBC(nodeSet='bottom', field=1),
-                Mesh.EssentialBC(nodeSet='right', field=0),
-                Mesh.EssentialBC(nodeSet='right', field=1),
-                Mesh.EssentialBC(nodeSet='top', field=0),
-                Mesh.EssentialBC(nodeSet='top', field=1)]
+        ebcs = [FunctionSpace.EssentialBC(nodeSet='left', component=0),
+                FunctionSpace.EssentialBC(nodeSet='left', component=1),
+                FunctionSpace.EssentialBC(nodeSet='bottom', component=0),
+                FunctionSpace.EssentialBC(nodeSet='bottom', component=1),
+                FunctionSpace.EssentialBC(nodeSet='right', component=0),
+                FunctionSpace.EssentialBC(nodeSet='right', component=1),
+                FunctionSpace.EssentialBC(nodeSet='top', component=0),
+                FunctionSpace.EssentialBC(nodeSet='top', component=1)]
 
         targetDispGrad = np.array([[0.1, -0.2],[0.4, -0.1]]) 
         U = self.mesh.coords@targetDispGrad.T
         
-        dofManager = Mesh.DofManager(self.mesh, U.shape, EBCs)
+        dofManager = FunctionSpace.DofManager(self.fs, dim=2, EssentialBCs=ebcs)
             
         # Uu is U_unconstrained
         Ubc = dofManager.get_bc_values(U)
@@ -151,4 +149,4 @@ class TestMeshReadPatchTest(TestFixture.TestFixture):
 
 
 if __name__ == '__main__':
-    TestFixture.unittest.main()
+    unittest.main()

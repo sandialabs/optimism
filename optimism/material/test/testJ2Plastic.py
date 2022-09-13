@@ -237,25 +237,21 @@ class PlasticityOnMesh(MeshFixture):
 
         materialModel = J2.create_material_model_functions(props)
 
-        quadRule = QuadratureRule.create_quadrature_rule_on_triangle(1)
+        quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
         fs = FunctionSpace.construct_function_space(mesh, quadRule)
         
         mechFuncs = Mechanics.create_mechanics_functions(fs,
                                                          "plane strain",
                                                          materialModel)
                 
-        EBCs = []
-        EBCs.append(Mesh.EssentialBC(nodeSet='all_boundary', field=0))
-        EBCs.append(Mesh.EssentialBC(nodeSet='all_boundary', field=1))
-        dofManager = Mesh.DofManager(mesh, U.shape, EBCs)
-
-        quadratureRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
-        fs = FunctionSpace.construct_function_space(mesh, quadratureRule)
+        EBCs = [FunctionSpace.EssentialBC(nodeSet='all_boundary', component=0),
+                FunctionSpace.EssentialBC(nodeSet='all_boundary', component=1)]
+        dofManager = FunctionSpace.DofManager(fs, 2, EBCs)
         
         Ubc = dofManager.get_bc_values(U)
 
         nElems = Mesh.num_elements(mesh)
-        nQpsPerElem = QuadratureRule.len(quadratureRule)
+        nQpsPerElem = QuadratureRule.len(quadRule)
         internalVariables = mechFuncs.compute_initial_state()
         p = Objective.Params(None,
                              internalVariables)

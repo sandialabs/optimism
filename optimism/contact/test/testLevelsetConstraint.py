@@ -38,21 +38,21 @@ class TestLevelsetContactConstraint(MeshFixture):
                                                       self.xRange, self.yRange,
                                                       lambda x : 1e-14*x)
         
-        EBCs = [Mesh.EssentialBC(nodeSet='left', field=0),
-                Mesh.EssentialBC(nodeSet='left', field=1),
-                Mesh.EssentialBC(nodeSet='right', field=0),
-                Mesh.EssentialBC(nodeSet='right', field=1)]
+        quadratureRule2d = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
+        fs = FunctionSpace.construct_function_space(self.mesh, quadratureRule2d)
         
-        self.dofManager = Mesh.DofManager(self.mesh, self.U.shape, EBCs)
+        EBCs = [FunctionSpace.EssentialBC(nodeSet='left', component=0),
+                FunctionSpace.EssentialBC(nodeSet='left', component=1),
+                FunctionSpace.EssentialBC(nodeSet='right', component=0),
+                FunctionSpace.EssentialBC(nodeSet='right', component=1)]
+        
+        self.dofManager = FunctionSpace.DofManager(fs, dim=2, EssentialBCs=EBCs)
         
         self.quadRule = QuadratureRule.create_quadrature_rule_1D(2)
         self.edges = self.mesh.sideSets['top']
 
         self.Uu = self.dofManager.get_unknown_values(self.U)
         self.Ubc = self.dofManager.get_bc_values(self.U)
-
-        quadratureRule2d = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
-        fs = FunctionSpace.construct_function_space(self.mesh, quadratureRule2d)
 
         self.mechFuncs = Mechanics.create_multi_block_mechanics_functions(fs,
                                                                           'plane strain',

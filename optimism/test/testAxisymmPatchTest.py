@@ -59,9 +59,9 @@ class AxisymmPatchTest(MeshFixture.MeshFixture):
         
         
     def test_dirichlet_patch_test(self):
-        EBCs = [Mesh.EssentialBC(nodeSet='bottom', field=1),
-                Mesh.EssentialBC(nodeSet='top', field=1)]
-        dofManager = Mesh.DofManager(self.mesh, self.U.shape, EBCs)
+        ebc = [FunctionSpace.EssentialBC(nodeSet='bottom', component=1),
+               FunctionSpace.EssentialBC(nodeSet='top', component=1)]
+        dofManager = FunctionSpace.DofManager(self.fs, dim=2, EssentialBCs=ebc)
 
         V = np.zeros(self.U.shape)
         V = V.at[self.mesh.nodeSets['top'],1].set(self.targetDispGrad[1,1])

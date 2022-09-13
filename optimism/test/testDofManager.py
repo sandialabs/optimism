@@ -1,5 +1,6 @@
 from optimism.JaxConfig import *
-from optimism import Mesh
+from optimism import FunctionSpace
+from optimism import QuadratureRule
 from optimism.test import MeshFixture
 
 
@@ -17,13 +18,14 @@ class DofManagerTest(MeshFixture.MeshFixture):
         self.mesh, _ = self.create_mesh_and_disp(self.Nx, self.Ny, xRange, yRange,
                                                  lambda x : 0*x)
 
-        Ebcs = [Mesh.EssentialBC(nodeSet='top', field=0),
-                Mesh.EssentialBC(nodeSet='right', field=1)]
+        quadRule = QuadratureRule.create_quadrature_rule_on_triangle(1)
+        fs = FunctionSpace.construct_function_space(self.mesh, quadRule)
+        ebcs = [FunctionSpace.EssentialBC(nodeSet='top', component=0),
+                FunctionSpace.EssentialBC(nodeSet='right', component=1)]
 
         self.nNodes = self.Nx*self.Ny
         self.nFields = 2
-        fieldShape = (self.nNodes, self.nFields)
-        self.dofManager = Mesh.DofManager(self.mesh, fieldShape, Ebcs)
+        self.dofManager = FunctionSpace.DofManager(fs, self.nFields, ebcs)
 
         self.nDof = self.nFields*self.nNodes
         U = np.zeros((self.nNodes, self.nFields))

@@ -1,4 +1,4 @@
-import pathlib # to reach sample mesh file
+import pathlib
 
 from optimism.JaxConfig import *
 from optimism import FunctionSpace
@@ -98,20 +98,20 @@ class TestMeshReadPatchTest(TestFixture.TestFixture):
 
         
     def test_dirichlet_patch_test(self):
-        EBCs = []
-        EBCs.append(Mesh.EssentialBC(nodeSet='left', field=0))
-        EBCs.append(Mesh.EssentialBC(nodeSet='left', field=1))
-        EBCs.append(Mesh.EssentialBC(nodeSet='bottom', field=0))
-        EBCs.append(Mesh.EssentialBC(nodeSet='bottom', field=1))
-        EBCs.append(Mesh.EssentialBC(nodeSet='right', field=0))
-        EBCs.append(Mesh.EssentialBC(nodeSet='right', field=1))
-        EBCs.append(Mesh.EssentialBC(nodeSet='top', field=0))
-        EBCs.append(Mesh.EssentialBC(nodeSet='top', field=1))
+        ebcs = [FunctionSpace.EssentialBC(nodeSet='left', component=0),
+                FunctionSpace.EssentialBC(nodeSet='left', component=1),
+                FunctionSpace.EssentialBC(nodeSet='bottom', component=0),
+                FunctionSpace.EssentialBC(nodeSet='bottom', component=1),
+                FunctionSpace.EssentialBC(nodeSet='right', component=0),
+                FunctionSpace.EssentialBC(nodeSet='right', component=1),
+                FunctionSpace.EssentialBC(nodeSet='top', component=0),
+                FunctionSpace.EssentialBC(nodeSet='top', component=1)]
 
         targetDispGrad = np.array([[0.1, -0.2],[0.4, -0.1]]) 
         U = self.mesh.coords@targetDispGrad.T
+        fieldDim = U.shape[1]
         
-        dofManager = Mesh.DofManager(self.mesh, U.shape, EBCs)
+        dofManager = FunctionSpace.DofManager(self.fs, fieldDim, ebcs)
             
         # Uu is U_unconstrained
         Ubc = dofManager.get_bc_values(U)
@@ -134,12 +134,11 @@ class TestMeshReadPatchTest(TestFixture.TestFixture):
 
 
     def test_neumann_patch_test(self):
-        EBCs = []
-        EBCs.append(Mesh.EssentialBC(nodeSet='left', field=0))
-        EBCs.append(Mesh.EssentialBC(nodeSet='bottom', field=1))
+        ebcs = [FunctionSpace.EssentialBC(nodeSet='left', component=0),
+                FunctionSpace.EssentialBC(nodeSet='bottom', component=1)]
 
         U = np.zeros(self.mesh.coords.shape)
-        dofManager = Mesh.DofManager(self.mesh, U.shape, EBCs)
+        dofManager = FunctionSpace.DofManager(self.fs, dim=2, EssentialBCs=ebcs)
         Ubc = dofManager.get_bc_values(U)
         
         sigma11 = 1.0
