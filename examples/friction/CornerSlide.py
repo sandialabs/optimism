@@ -12,8 +12,7 @@ from optimism import QuadratureRule
 from optimism import Mesh
 from optimism import TractionBC
 
-from optimism.Mesh import EssentialBC
-from optimism.Mesh import DofManager
+from optimism.FunctionSpace import EssentialBC, DofManager
 from optimism.contact import PenaltyContact
 from optimism.contact import Friction
 from optimism.contact import Levelset
@@ -58,8 +57,13 @@ class CornerSlide(MeshFixture):
         
         self.edges = np.vstack((self.mesh.sideSets['left'], self.mesh.sideSets['bottom']))
         
-        EBCs = []
-        self.dofManager = DofManager(self.mesh, self.U.shape, EBCs)
+        triQuadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
+        fs = FunctionSpace.construct_function_space(self.mesh,
+                                                    triQuadRule)
+        
+        ebcs = []
+        self.dofManager = DofManager(fs, self.U.shape[1], ebcs)
+        
         self.quadRule = QuadratureRule.create_quadrature_rule_1D(2)
 
         self.Ubc = self.dofManager.get_bc_values(self.U)
@@ -69,11 +73,6 @@ class CornerSlide(MeshFixture):
                                               self.mesh,
                                               self.quadRule,
                                               self.edges)
-        
-
-        triQuadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
-        fs = FunctionSpace.construct_function_space(self.mesh,
-                                                    triQuadRule)
 
         self.mechFuncs = Mechanics.create_mechanics_functions(fs,
                                                               'plane strain',
