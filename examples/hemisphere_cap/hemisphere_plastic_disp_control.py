@@ -8,8 +8,7 @@ from optimism import Interpolants
 from optimism.material import J2Plastic as MatModel
 from optimism import Mechanics
 from optimism import Mesh
-from optimism.Mesh import EssentialBC
-from optimism.Mesh import DofManager
+from optimism.FunctionSpace import EssentialBC, DofManager
 from optimism import Objective
 from optimism import SparseMatrixAssembler
 from optimism import Surface
@@ -28,14 +27,15 @@ class TractionArch():
         self.mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(mesh,
                                                                     order=2,
                                                                     createNodeSetsFromSideSets=True)
-        EBCs = [EssentialBC(nodeSet='axis', field=0),
-                EssentialBC(nodeSet='rim', field=0),
-                EssentialBC(nodeSet='rim', field=1),
-                EssentialBC(nodeSet='push', field=1)]
-        self.dofManager = DofManager(self.mesh, self.mesh.coords.shape, EBCs)
-       
+        
         quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=3)
         self.fs = FunctionSpace.construct_function_space(self.mesh, quadRule)
+        
+        ebcs = [EssentialBC(nodeSet='axis', component=0),
+                EssentialBC(nodeSet='rim', component=0),
+                EssentialBC(nodeSet='rim', component=1),
+                EssentialBC(nodeSet='push', component=1)]
+        self.dofManager = DofManager(self.fs, self.mesh.coords.shape[1], ebcs)
 
         kappa = 10.0
         nu = 0.3
