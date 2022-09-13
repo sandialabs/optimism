@@ -229,7 +229,7 @@ def create_multi_block_mechanics_functions(functionSpace, mode2D, materialModels
             output_lagrangian = strain_energy_density_to_lagrangian_density(compute_output_energy_density)
             output_constitutive = value_and_grad(output_lagrangian, 1)
             elemIds = fs.mesh.blocks[blockKey]
-            blockEnergyDensities, blockStresses = FunctionSpace.evaluate_on_block(fs, U, stateVariables, output_constitutive, elemIds, modify_element_gradient=moodify_element_gradient)
+            blockEnergyDensities, blockStresses = FunctionSpace.evaluate_on_block(fs, U, stateVariables, output_constitutive, elemIds, modify_element_gradient=modify_element_gradient)
             energy_densities = energy_densities.at[elemIds].set(blockEnergyDensities)
             stresses = stresses.at[elemIds].set(blockStresses)
         return energy_densities, stresses
