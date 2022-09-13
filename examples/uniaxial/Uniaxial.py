@@ -5,7 +5,6 @@ from matplotlib import pyplot as plt
 
 from optimism import EquationSolver as EqSolver
 from optimism import FunctionSpace
-from optimism import Interpolants
 from optimism.material import J2Plastic as Material
 #from optimism.material import Neohookean
 from optimism import Mechanics
@@ -42,12 +41,11 @@ class Uniaxial:
         quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2*(pOrder-1))
         self.fs = FunctionSpace.construct_function_space(self.mesh, quadRule)
         
-        EBCs = [Mesh.EssentialBC(nodeSet='left', field=0),
-                Mesh.EssentialBC(nodeSet='right', field=0),
-                Mesh.EssentialBC(nodeSet='bottom', field=1)]
+        ebcs = [FunctionSpace.EssentialBC(nodeSet='left', component=0),
+                FunctionSpace.EssentialBC(nodeSet='right', component=0),
+                FunctionSpace.EssentialBC(nodeSet='bottom', component=1)]
 
-        self.fieldShape = self.mesh.coords.shape
-        self.dofManager = Mesh.DofManager(self.mesh, self.fieldShape, EBCs)
+        self.dofManager = FunctionSpace.DofManager(self.fs, dim=2, EssentialBCs=ebcs)
 
         E = 10.0
         nu = 0.25
@@ -98,7 +96,7 @@ class Uniaxial:
     def get_ubcs(self, p):
         endDisp = p[0]
         EbcIndex = (self.mesh.nodeSets['right'],0)
-        V = np.zeros(self.fieldShape).at[EbcIndex].set(endDisp)
+        V = np.zeros_like(self.mesh.coords).at[EbcIndex].set(endDisp)
         return self.dofManager.get_bc_values(V)
 
         

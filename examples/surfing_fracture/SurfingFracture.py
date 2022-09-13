@@ -12,7 +12,6 @@ from optimism import BoundConstrainedSolver
 from optimism import AlSolver
 from optimism import FunctionSpace
 from optimism import Mesh
-from optimism.Mesh import DofManager
 from optimism import Objective
 from optimism import QuadratureRule
 from optimism import ReadMesh
@@ -150,24 +149,23 @@ class SurfingProblem:
         else:
             self.mesh = ReadMesh.read_json_mesh('surfingMesh.json')
 
+        quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2)
+        self.nqp = QuadratureRule.len(quadRule)
+        self.fs = FunctionSpace.construct_function_space(self.mesh, quadRule)
+
         self.crackInc=5e-3
         self.KIc = np.sqrt(Gc*E/(1.-nu**2))
         self.loadSteps = 4
-        
+
         # translation of K_I field origin
-        EBCs = [Mesh.EssentialBC(nodeSet='external', field=0),
-                Mesh.EssentialBC(nodeSet='external', field=1),
-                Mesh.EssentialBC(nodeSet='ysymm', field=1),
-                Mesh.EssentialBC(nodeSet='precrack', field=2),
-                Mesh.EssentialBC(nodeSet='top', field=2)]
+        ebcs = [FunctionSpace.EssentialBC(nodeSet='external', component=0),
+                FunctionSpace.EssentialBC(nodeSet='external', component=1),
+                FunctionSpace.EssentialBC(nodeSet='ysymm', component=1),
+                FunctionSpace.EssentialBC(nodeSet='precrack', component=2),
+                FunctionSpace.EssentialBC(nodeSet='top', component=2)]
 
-        nNodes = self.mesh.coords.shape[0]
-        self.fieldShape = (nNodes, 3)
-        self.dofManager = DofManager(self.mesh, self.fieldShape, EBCs)
-
-        quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2)
-        self.fs = FunctionSpace.construct_function_space(self.mesh, quadRule)
-        self.nqp = QuadratureRule.len(quadRule)
+        dim = 3 # 2 displacement components + 1 phase
+        self.dofManager = FunctionSpace.DofManager(self.fs, dim, ebcs)
 
         materialModel = MatModel.create_material_model_functions(props)
         self.bvpFunctions =  PhaseField.create_phasefield_functions(self.fs,
@@ -177,7 +175,8 @@ class SurfingProblem:
         self.crackLengthHistory = []
         self.bcOriginHistory = []
         self.JHistory = []
-                
+        
+        self.fieldShape = Mesh.num_nodes(self.mesh), dim
         UIdsFull = self.dofManager.dofToUnknown.reshape(self.fieldShape)
 
         XIds = UIdsFull[self.dofManager.isUnknown[:,0],0]
