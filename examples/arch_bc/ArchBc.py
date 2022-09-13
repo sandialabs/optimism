@@ -1,3 +1,5 @@
+import jax
+import jax.numpy as np
 from matplotlib import pyplot as plt
 
 from optimism import EquationSolver as EqSolver
@@ -6,8 +8,8 @@ from optimism import Interpolants
 from optimism.material import Neohookean as MatModel
 from optimism import Mechanics
 from optimism import Mesh
-from optimism.Mesh import EssentialBC
-from optimism.Mesh import DofManager
+from optimism.FunctionSpace import EssentialBC
+from optimism.FunctionSpace import DofManager
 from optimism import Objective
 from optimism import SparseMatrixAssembler
 from optimism import QuadratureRule
@@ -25,6 +27,7 @@ class ContactArch(MeshFixture):
         self.initialBallLoc = self.archRadius + self.w + self.ballRadius
         N = 5
         M = 65
+        dim = 2
         
         mesh, _ = \
             self.create_arch_mesh_disp_and_edges(N, M,
@@ -33,15 +36,15 @@ class ContactArch(MeshFixture):
         nodeSets = Mesh.create_nodesets_from_sidesets(mesh)
         self.mesh = Mesh.mesh_with_nodesets(mesh, nodeSets)
         
-        EBCs = [EssentialBC(nodeSet='left', field=0),
-                EssentialBC(nodeSet='left', field=1),
-                EssentialBC(nodeSet='right', field=0),
-                EssentialBC(nodeSet='right', field=1),
-                EssentialBC(nodeSet='push', field=1)]
-        self.dofManager = DofManager(self.mesh, self.mesh.coords.shape, EBCs)
-
         quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2)
         self.fs = FunctionSpace.construct_function_space(self.mesh, quadRule)
+        
+        ebcs = [EssentialBC(nodeSet='left', component=0),
+                EssentialBC(nodeSet='left', component=1),
+                EssentialBC(nodeSet='right', component=0),
+                EssentialBC(nodeSet='right', component=1),
+                EssentialBC(nodeSet='push', component=1)]
+        self.dofManager = DofManager(self.fs, dim, ebcs)
 
         kappa = 10.0
         nu = 0.3
@@ -59,7 +62,7 @@ class ContactArch(MeshFixture):
             U = self.dofManager.create_field(Uu, Ubc)
             return self.bvpFuncs.compute_strain_energy(U, internalVariables)
         
-        self.compute_bc_reactions = jit(value_and_grad(compute_energy_from_bcs, 1))
+        self.compute_bc_reactions = jax.jit(jax.value_and_grad(compute_energy_from_bcs, 1))
         
         self.trSettings = EqSolver.get_settings()
         

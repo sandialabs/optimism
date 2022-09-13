@@ -110,17 +110,17 @@ class ContactArch(MeshFixture):
         self.nEdges23 = self.e32.shape[0]
         self.nEdges34 = self.e43.shape[0]
         
-        EBCs = [EssentialBC(nodeSet='bottom1', field=0),
-                EssentialBC(nodeSet='bottom1', field=1),
-                EssentialBC(nodeSet='top4', field=0),
-                EssentialBC(nodeSet='top4', field=1)]
-        
-        self.dofManager = DofManager(self.mesh, self.U.shape, EBCs)
-        self.quadRule = QuadratureRule.create_quadrature_rule_1D(4)
-
         triQuadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
         fs = FunctionSpace.construct_function_space(self.mesh,
                                                     triQuadRule)
+        
+        ebcs = [EssentialBC(nodeSet='bottom1', component=0),
+                EssentialBC(nodeSet='bottom1', component=1),
+                EssentialBC(nodeSet='top4', component=0),
+                EssentialBC(nodeSet='top4', component=1)]
+        self.dofManager = DofManager(fs, self.U.shape[1], ebcs)
+
+        self.quadRule = QuadratureRule.create_quadrature_rule_1D(4)
         
         self.mechFuncs = Mechanics.create_multi_block_mechanics_functions(fs,
                                                                           'plane strain',

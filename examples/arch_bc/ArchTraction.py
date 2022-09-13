@@ -1,3 +1,5 @@
+import jax
+import jax.numpy as np
 from matplotlib import pyplot as plt
 
 from optimism import EquationSolver as EqSolver
@@ -7,8 +9,8 @@ from optimism import Interpolants
 from optimism.material import Neohookean as MatModel
 from optimism import Mechanics
 from optimism import Mesh
-from optimism.Mesh import EssentialBC
-from optimism.Mesh import DofManager
+from optimism.FunctionSpace import EssentialBC
+from optimism.FunctionSpace import DofManager
 from optimism import Objective
 from optimism import SparseMatrixAssembler
 from optimism import QuadratureRule
@@ -44,18 +46,18 @@ class TractionArch(MeshFixture):
         nodeSets = Mesh.create_nodesets_from_sidesets(mesh)
         self.mesh = Mesh.mesh_with_nodesets(mesh, nodeSets)
         
-        EBCs = [EssentialBC(nodeSet='left', field=0),
-                EssentialBC(nodeSet='left', field=1),
-                EssentialBC(nodeSet='right', field=0),
-                EssentialBC(nodeSet='right', field=1)]
-        self.dofManager = DofManager(self.mesh, self.mesh.coords.shape, EBCs)
+        quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2)
+        self.fs = FunctionSpace.construct_function_space(self.mesh, quadRule)
+        
+        ebcs = [EssentialBC(nodeSet='left', component=0),
+                EssentialBC(nodeSet='left', component=1),
+                EssentialBC(nodeSet='right', component=0),
+                EssentialBC(nodeSet='right', component=1)]
+        self.dofManager = DofManager(self.fs, dim=self.mesh.coords.shape[1], EssentialBCs=ebcs)
 
         self.lineQuadRule = QuadratureRule.create_quadrature_rule_1D(degree=2)
         self.pushArea = (np.pi*self.archRadius/M)*self.mesh.sideSets['push'].shape[0]
         
-        quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2)
-        self.fs = FunctionSpace.construct_function_space(self.mesh, quadRule)
-
         kappa = 10.0
         nu = 0.3
         E = 3*kappa*(1 - 2*nu)
@@ -76,7 +78,7 @@ class TractionArch(MeshFixture):
             loadPotential = TractionBC.compute_traction_potential_energy(self.mesh, U, self.lineQuadRule, self.mesh.sideSets['push'], lambda X: np.array([0.0, -F/self.pushArea]))
             return strainEnergy + loadPotential
         
-        self.compute_bc_reactions = jit(grad(compute_energy_from_bcs, 1))
+        self.compute_bc_reactions = jax.jit(jax.grad(compute_energy_from_bcs, 1))
         
         self.trSettings = EqSolver.get_settings(max_trust_iters=400, t1=0.4, t2=1.5, eta1=1e-8, eta2=0.2, eta3=0.8, over_iters=100)
         
