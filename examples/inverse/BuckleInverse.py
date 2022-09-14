@@ -21,8 +21,7 @@ from optimism import TractionBC
 
 from optimism.inverse import TopOpt
 from optimism.inverse import NonlinearSolve
-from optimism.Mesh import EssentialBC
-from optimism.Mesh import DofManager
+from optimism.FunctionSpace import EssentialBC, DofManager
 from optimism.Timer import Timer
 from optimism import Objective
 from jax.experimental import optimizers
@@ -58,21 +57,29 @@ class Buckle:
 
         self.U = np.zeros(self.mesh.coords.shape)
         
-        EBCs = [EssentialBC(nodeSet=bottom, field=0),
-                EssentialBC(nodeSet=bottom, field=1)]
+        EBCs = [EssentialBC(nodeSet=bottom, component=0),
+                EssentialBC(nodeSet=bottom, component=1)]
         
         if constrainXOnTop:
-            EBCs.append(EssentialBC(nodeSet=top, field=0))
+            EBCs.append(EssentialBC(nodeSet=top, component=0))
 
         if not self.useTraction:
-            EBCs.append(EssentialBC(nodeSet=top, field=1))
+            EBCs.append(EssentialBC(nodeSet=top, component=1))
+
+        # We need a function space to create the DofManager, so we'll
+        # make a dummy function space now that we don't use later. We will
+        # construct a new function space in the energy function so that it is
+        # sensitive to the node coordinate changes, which are the design parameters.
+        # We can keep the same DofManager object between design iterations, since 
+        # we never change which nodes have essential boundary conditions.
+        self.triQuadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
+        fs = FunctionSpace.construct_function_space(self.mesh, self.triQuadRule)
+        self.dofManager = DofManager(fs, self.mesh.coords.shape[1], EBCs)
         
-        self.dofManager = DofManager(self.mesh, self.mesh.coords.shape, EBCs)
         self.quadRule = QuadratureRule.create_quadrature_rule_1D(2)
 
         self.Uu = self.dofManager.get_unknown_values(self.U)
 
-        self.triQuadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
 
         
     def energy_func(self, Uu, p):

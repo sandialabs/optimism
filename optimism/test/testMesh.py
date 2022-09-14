@@ -5,8 +5,6 @@ from optimism.JaxConfig import *
 from optimism.test import MeshFixture
 from optimism import Mesh
 from optimism import Interpolants
-#from optimism.Mesh import EssentialBC
-#from optimism.Mesh import DofManager
 
 #from matplotlib import pyplot as plt
 
@@ -33,11 +31,6 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
         
         for key in self.mesh.sideSets:
             self.assertArrayEqual(np.sort(self.mesh.nodeSets[key]), nodeSets[key])
-
-            
-    #
-    # TODO: test DofManager operations          
-    #
 
     
     def test_edge_connectivities(self):

@@ -18,8 +18,7 @@ from optimism import QuadratureRule
 from optimism import TractionBC
 
 from optimism.inverse import NonlinearSolve
-from optimism.Mesh import EssentialBC
-from optimism.Mesh import DofManager
+from optimism.FunctionSpace import EssentialBC, DofManager
 from optimism.Timer import Timer
 from optimism import Objective
 from jax.experimental import optimizers
@@ -77,9 +76,15 @@ class Buckle(MeshFixture):
                 EssentialBC(nodeSet='right', field=0),
                 EssentialBC(nodeSet='right', field=1)]
         
-        self.dofManager = DofManager(self.mesh, self.mesh.coords.shape, EBCs)
-        
+        # We need a function space to create the DofManager, so we'll
+        # make a dummy function space now that we don't use later. We will
+        # construct a new function space in the energy function so that it is
+        # sensitive to the node coordinate changes, which are the design parameters.
+        # We can keep the same DofManager object between design iterations, since 
+        # we never change which nodes have essential boundary conditions.
         self.triQuadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
+        fs = FunctionSpace.construct_function_space(self.mesh, self.triQuadRule)
+        self.dofManager = DofManager(fs, self.mesh.coords.shape[1], EBCs)
 
         self.U = np.zeros(self.mesh.coords.shape)
         self.Uu = self.dofManager.get_unknown_values(self.U)

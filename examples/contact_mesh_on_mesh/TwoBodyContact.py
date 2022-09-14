@@ -1,12 +1,13 @@
 from matplotlib import pyplot as plt
+import jax
 from jax import numpy as np
 
 from optimism import EquationSolver as EqSolver
 from optimism import Mesh
 from optimism import Mechanics
 from optimism import FunctionSpace
-from optimism.Mesh import EssentialBC
-from optimism.Mesh import DofManager
+from optimism.FunctionSpace import EssentialBC
+from optimism.FunctionSpace import DofManager
 from optimism import Objective
 from optimism.ConstrainedObjective import ConstrainedObjective
 from optimism.ConstrainedObjective import ConstrainedQuasiObjective
@@ -91,7 +92,7 @@ def get_quadrature_points(edges, mesh, U, p, quadRule):
         qCoords = QuadratureRule.eval_at_iso_points(quadRule.xigauss, endCoords)    
         return qCoords
     
-    return vmap(edge_coords, (0,None,None,None))(edges, mesh, mesh.coords, U)
+    return jax.vmap(edge_coords, (0,None,None,None))(edges, mesh, mesh.coords, U)
 
 
 def get_contact_points_and_field(edges, mesh, U, p, quadRule, smoothingDistance):

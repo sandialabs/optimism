@@ -11,8 +11,8 @@ from optimism.material import Neohookean
 from optimism import Mesh
 from optimism import Mechanics
 
-from optimism.Mesh import EssentialBC
-from optimism.Mesh import DofManager
+from optimism.FunctionSpace import EssentialBC
+from optimism.FunctionSpace import DofManager
 from optimism.contact import PenaltyContact
 from optimism.contact import Levelset
 from optimism.Timer import Timer
@@ -60,18 +60,18 @@ class Sliding(MeshFixture):
 
         self.edges = self.mesh.sideSets['top']
         
-        EBCs = []
-        EBCs.append(EssentialBC(nodeSet='left', field=0))
-        EBCs.append(EssentialBC(nodeSet='left', field=1))
-        EBCs.append(EssentialBC(nodeSet='right', field=0))
-        EBCs.append(EssentialBC(nodeSet='right', field=1))
-        
-        self.dofManager = DofManager(self.mesh, self.U.shape, EBCs)
-        self.quadRule = QuadratureRule.create_quadrature_rule_1D(2)
-
         triQuadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
         fs = FunctionSpace.construct_function_space(self.mesh,
                                                     triQuadRule)
+        
+        ebcs = [EssentialBC(nodeSet='left', component=0),
+                EssentialBC(nodeSet='left', component=1),
+                EssentialBC(nodeSet='right', component=0),
+                EssentialBC(nodeSet='right', component=1)]
+        self.dofManager = DofManager(fs, dim=self.U.shape[1], EssentialBCs=ebcs)
+        
+        # surface quadrature rule
+        self.quadRule = QuadratureRule.create_quadrature_rule_1D(2)
         
         self.mechFuncs = Mechanics.create_mechanics_functions(fs,
                                                               'plane strain',

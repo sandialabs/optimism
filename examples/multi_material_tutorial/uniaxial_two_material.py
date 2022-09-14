@@ -3,7 +3,6 @@ import numpy as onp # as is "old numpy"
 from optimism.JaxConfig import *
 from optimism import EquationSolver
 from optimism import FunctionSpace
-from optimism import Interpolants
 from optimism.material import J2Plastic
 from optimism.material import Neohookean
 from optimism import Mechanics
@@ -47,14 +46,18 @@ nodeSets = {'left': np.flatnonzero(mesh.coords[:,0] < xRange[0] + nodeTol),
 
 mesh = Mesh.mesh_with_nodesets(mesh, nodeSets)
 
+# create the function space
+order = 2*mesh.masterElement.degree
+quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2*(order - 1))
+fs = FunctionSpace.construct_function_space(mesh, quadRule)
+
 # set the essential boundary conditions and create the a DofManager to
 # handle the indexing between unknowns and degrees of freedom.
-EBCs = [Mesh.EssentialBC(nodeSet='left', field=0),
-        Mesh.EssentialBC(nodeSet='bottom', field=1),
-        Mesh.EssentialBC(nodeSet='top', field = 1)]
+ebcs = [FunctionSpace.EssentialBC(nodeSet='left', component=0),
+        FunctionSpace.EssentialBC(nodeSet='bottom', component=1),
+        FunctionSpace.EssentialBC(nodeSet='top', component=1)]
 
-fieldShape = mesh.coords.shape
-dofManager = Mesh.DofManager(mesh, fieldShape, EBCs)
+dofManager = FunctionSpace.DofManager(fs, dim=2, EssentialBCs=ebcs)
 
 # write blocks and bcs to paraview output to check things are correct
 writer = VTKWriter.VTKWriter(mesh, baseFileName='check_problem_setup')
@@ -69,10 +72,6 @@ writer.add_nodal_field(name='bcs', nodalData=bcs, fieldType=VTKWriter.VTKFieldTy
     
 writer.write()
 
-# create the function space
-order = 2*mesh.masterElement.degree
-quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2*(order - 1))
-fs = FunctionSpace.construct_function_space(mesh, quadRule)
 
 # create the material models
 ESoft = 5.0
@@ -101,7 +100,7 @@ mechanicsFunctions = Mechanics.create_multi_block_mechanics_functions(fs, mode2D
 def get_ubcs(p):
     appliedDisp = p[0]
     EbcIndex = (mesh.nodeSets['top'], 1)
-    V = np.zeros(fieldShape).at[EbcIndex].set(appliedDisp)
+    V = np.zeros_like(mesh.coords).at[EbcIndex].set(appliedDisp)
     return dofManager.get_bc_values(V)
 
 # helper function to go from unknowns to full DoF array
@@ -130,7 +129,7 @@ solverSettings = EquationSolver.get_settings(max_cumulative_cg_iters=100,
 precondStrategy = Objective.PrecondStrategy(assemble_sparse_preconditioner_matrix)
 
 # initialize unknown displacements to zero
-Uu = dofManager.get_unknown_values(np.zeros(fieldShape))
+Uu = np.zeros(dofManager.get_unknown_size())
 
 # set initial values of parameters
 appliedDisp = 0.0

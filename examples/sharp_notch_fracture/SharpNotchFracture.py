@@ -8,7 +8,6 @@ from optimism import BoundConstrainedObjective
 from optimism.ConstrainedObjective import ConstrainedObjective
 from optimism import EquationSolver as EqSolver
 from optimism import Mesh
-from optimism.Mesh import DofManager
 from optimism import FunctionSpace
 from optimism.phasefield import PhaseField
 import optimism.phasefield.PhaseFieldThreshold as Model
@@ -62,19 +61,19 @@ class SharpNotchProblem:
         quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2)
         self.fs = FunctionSpace.construct_function_space(self.mesh, quadRule)
         
-        EBCs = [Mesh.EssentialBC(nodeSet='top', field=0),
-                Mesh.EssentialBC(nodeSet='top', field=1),
-                Mesh.EssentialBC(nodeSet='bottom_symmetry', field=1)]
+        ebcs = [FunctionSpace.EssentialBC(nodeSet='top', component=0),
+                FunctionSpace.EssentialBC(nodeSet='top', component=1),
+                FunctionSpace.EssentialBC(nodeSet='bottom_symmetry', component=1)]
        
-        self.fieldShape = (self.mesh.coords.shape[0], 3)
-        self.dofManager = DofManager(self.mesh, self.fieldShape, EBCs)
+        dim = 3 # 3 = 2 displacement components + 1 scalar phase
+        self.dofManager = FunctionSpace.DofManager(self.fs, dim, EssentialBCs=ebcs)
 
         materialModel = Model.create_material_model_functions(props)
 
         self.bvpFunctions = PhaseField.create_phasefield_functions(self.fs,
                                                                    "plane strain",
                                                                    materialModel)
-
+        self.fieldShape = Mesh.num_nodes(self.mesh), dim
         UIdsFull = self.dofManager.dofToUnknown.reshape(self.fieldShape)
         self.phaseIds = UIdsFull[self.dofManager.isUnknown[:,2],2]
         

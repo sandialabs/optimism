@@ -9,7 +9,6 @@ from optimism import BoundConstrainedObjective
 from optimism import EquationSolver as EqSolver
 from optimism import EquationSolverSubspace as EqSolverSubspace
 from optimism import FunctionSpace
-from optimism import Interpolants
 from optimism.phasefield import PhaseField
 from optimism.phasefield import PhaseFieldLorentzPlastic as MatModel
 #from optimism.phasefield import PhaseFieldThreshold as MatModel
@@ -76,7 +75,6 @@ class AxisymmetricTensionFracture:
         mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(mesh, order=pOrder, useBubbleElement=True, createNodeSetsFromSideSets=True)
         self.mesh = Mesh.mesh_with_coords(mesh, mesh.coords*1e3)
 
-        
         quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2*pOrder+1)
         self.fs = FunctionSpace.construct_function_space(self.mesh, quadRule, mode2D='axisymmetric')
 
@@ -85,15 +83,15 @@ class AxisymmetricTensionFracture:
         exact = np.sum(self.fs.vols.ravel())
         print("row sum volume = ", vol, "exact = ", exact)
         
-        EBCs = [Mesh.EssentialBC(nodeSet='axis', field=0),
-                Mesh.EssentialBC(nodeSet='bot', field=1),
-                Mesh.EssentialBC(nodeSet='top', field=1),
-                Mesh.EssentialBC(nodeSet='bot', field=2),
-                Mesh.EssentialBC(nodeSet='top', field=2)]
-                #Mesh.EssentialBC(nodeSet='axis', field=2)]
+        ebcs = [FunctionSpace.EssentialBC(nodeSet='axis', component=0),
+                FunctionSpace.EssentialBC(nodeSet='bot', component=1),
+                FunctionSpace.EssentialBC(nodeSet='top', component=1),
+                FunctionSpace.EssentialBC(nodeSet='bot', component=2),
+                FunctionSpace.EssentialBC(nodeSet='top', component=2)]
+                #FunctionSpace.EssentialBC(nodeSet='axis', component=2)]
 
-        self.fieldShape = (self.mesh.coords.shape[0], 3)
-        self.dofManager = Mesh.DofManager(self.mesh, self.fieldShape, EBCs)
+        self.fieldShape = Mesh.num_nodes(self.mesh), 3
+        self.dofManager = FunctionSpace.DofManager(self.fs, self.fieldShape[1], ebcs)
 
         materialModel = MatModel.create_material_model_functions(props)
 

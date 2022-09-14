@@ -1,6 +1,5 @@
 from jax import numpy as np
 
-from optimism.JaxConfig import *
 from optimism import EquationSolver
 from optimism import FunctionSpace
 #from optimism.material import LinearElastic as Material
@@ -48,11 +47,11 @@ class UniaxialDynamic:
         quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2*(pOrder-1))
         self.fs = FunctionSpace.construct_function_space(self.mesh, quadRule)
         
-        EBCs = [Mesh.EssentialBC(nodeSet='left', field=0),
-                Mesh.EssentialBC(nodeSet='bottom', field=1)]
+        ebcs = [FunctionSpace.EssentialBC(nodeSet='left', component=0),
+                FunctionSpace.EssentialBC(nodeSet='bottom', component=1)]
 
         self.fieldShape = self.mesh.coords.shape
-        self.dofManager = Mesh.DofManager(self.mesh, self.fieldShape, EBCs)
+        self.dofManager = FunctionSpace.DofManager(self.fs, dim=2, EssentialBCs=ebcs)
 
         props = {'version': 'coupled',
                  'elastic modulus': E,

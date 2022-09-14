@@ -59,7 +59,7 @@ class ContactArch(MeshFixture):
                                                  setNamePostFix='2')
 
         R = -np.identity(2)
-        coords2 = vmap(lambda x: R@x)(mesh2.coords)
+        coords2 = jax.vmap(lambda x: R@x)(mesh2.coords)
         coords2 = coords2.at[:,1].add(self.initialTopDisp)
         mesh2 = Mesh.mesh_with_coords(mesh2, coords2)
 
@@ -68,21 +68,21 @@ class ContactArch(MeshFixture):
         self.edges1 = self.mesh.sideSets['top1']
         self.edges2 = self.mesh.sideSets['top2']
         
-        EBCs = [EssentialBC(nodeSet='left1', field=0),
-                EssentialBC(nodeSet='left1', field=1),
-                EssentialBC(nodeSet='right1', field=0),
-                EssentialBC(nodeSet='right1', field=1),
-                EssentialBC(nodeSet='left2', field=0),
-                EssentialBC(nodeSet='left2', field=1),
-                EssentialBC(nodeSet='right2', field=0),
-                EssentialBC(nodeSet='right2', field=1)]
-        
-        self.dofManager = DofManager(self.mesh, self.U.shape, EBCs)
-        self.quadRule = QuadratureRule.create_quadrature_rule_1D(4)
-
         triQuadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
         fs = FunctionSpace.construct_function_space(self.mesh,
                                                     triQuadRule)
+        
+        ebcs = [EssentialBC(nodeSet='left1', component=0),
+                EssentialBC(nodeSet='left1', component=1),
+                EssentialBC(nodeSet='right1', component=0),
+                EssentialBC(nodeSet='right1', component=1),
+                EssentialBC(nodeSet='left2', component=0),
+                EssentialBC(nodeSet='left2', component=1),
+                EssentialBC(nodeSet='right2', component=0),
+                EssentialBC(nodeSet='right2', component=1)]
+        
+        self.dofManager = DofManager(fs, self.U.shape[1], ebcs)
+        self.quadRule = QuadratureRule.create_quadrature_rule_1D(4)
         
         self.mechFuncs = Mechanics.create_mechanics_functions(fs,
                                                               'plane strain',

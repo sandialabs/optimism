@@ -1,4 +1,7 @@
 from TwoBodyContact import *
+
+from functools import partial
+
 from optimism.material import Neohookean as Material
 from optimism.contact import Levelset
 from optimism.contact import PenaltyContact
@@ -80,21 +83,21 @@ class ContactArch(MeshFixture):
                                       yLoc=self.sphereCenter,
                                       R=self.sphereRadius)
         
-        EBCs = [EssentialBC(nodeSet='left1', field=0),
-                EssentialBC(nodeSet='left1', field=1),
-                EssentialBC(nodeSet='right1', field=0),
-                EssentialBC(nodeSet='right1', field=1),
-                EssentialBC(nodeSet='left2', field=0),
-                EssentialBC(nodeSet='left2', field=1),
-                EssentialBC(nodeSet='right2', field=0),
-                EssentialBC(nodeSet='right2', field=1)]
-        
-        self.dofManager = DofManager(self.mesh, self.U.shape, EBCs)
-        self.quadRule = QuadratureRule.create_quadrature_rule_1D(4)
-
         triQuadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
         fs = FunctionSpace.construct_function_space(self.mesh,
                                                     triQuadRule)
+        
+        ebcs = [EssentialBC(nodeSet='left1', component=0),
+                EssentialBC(nodeSet='left1', component=1),
+                EssentialBC(nodeSet='right1', component=0),
+                EssentialBC(nodeSet='right1', component=1),
+                EssentialBC(nodeSet='left2', component=0),
+                EssentialBC(nodeSet='left2', component=1),
+                EssentialBC(nodeSet='right2', component=0),
+                EssentialBC(nodeSet='right2', component=1)]
+        
+        self.dofManager = DofManager(fs, self.U.shape[1], ebcs)
+        self.quadRule = QuadratureRule.create_quadrature_rule_1D(4)
         
         self.mechFuncs = Mechanics.create_mechanics_functions(fs,
                                                               'plane strain',
@@ -166,7 +169,7 @@ class ContactArch(MeshFixture):
 
                 
                 def filter_edge_neighbors(eneighbors, resident):
-                    isNeighbor = vmap(is_another_neighbor, (0,None))(eneighbors, resident) #[is_another_neighbor(q, resident) for q in eneighbors]
+                    isNeighbor = jax.vmap(is_another_neighbor, (0,None))(eneighbors, resident) #[is_another_neighbor(q, resident) for q in eneighbors]
                     return eneighbors[np.where(isNeighbor)]
                 
                 selfInteractionList = np.array( [filter_edge_neighbors(eneighbors, self.selfContactEdges[e]) for e, eneighbors in enumerate(selfInteractionList) ] )

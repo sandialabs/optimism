@@ -42,6 +42,8 @@ class DynamicsFixture(MeshFixture.MeshFixture):
         quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=quadPrecision)
         self.fs = FunctionSpace.construct_function_space(self.mesh, quadRule)
         self.fieldShape = self.mesh.coords.shape
+        ebcs = [FunctionSpace.EssentialBC(nodeSet='bottom', component=1)]
+        self.dofManager =  FunctionSpace.DofManager(self.fs, self.fieldShape[1], ebcs)
 
         props = {'elastic modulus': E,
                  'poisson ratio': nu,
@@ -60,9 +62,7 @@ class DynamicsFixture(MeshFixture.MeshFixture):
         
         # using an elastic model, so we can neglect internal var updating
         self.internalVariables = self.dynamicsFunctions.compute_initial_state()
-        
-        EBCs = [Mesh.EssentialBC(nodeSet='bottom', field=1)]
-        self.dofManager =  Mesh.DofManager(self.mesh, self.fieldShape, EBCs)
+
 
     def test_potential(self):
         key = jax.random.PRNGKey(1)
