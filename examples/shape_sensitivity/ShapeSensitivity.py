@@ -21,12 +21,11 @@ order = 2*mesh.masterElement.degree
 quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2*(order - 1))
 fs = FunctionSpace.construct_function_space(mesh, quadRule)
 
-ebcs = [Mesh.EssentialBC(nodeSet='external', field=0),
-        Mesh.EssentialBC(nodeSet='external', field=1),
-        Mesh.EssentialBC(nodeSet='ysymm', field=1)]
+ebcs = [FunctionSpace.EssentialBC(nodeSet='external', component=0),
+        FunctionSpace.EssentialBC(nodeSet='external', component=1),
+        FunctionSpace.EssentialBC(nodeSet='ysymm', component=1)]
 
-fieldShape = Mesh.num_nodes(mesh), 2
-essentialBCManager = Mesh.DofManager(mesh, fieldShape, ebcs)
+essentialBCManager = FunctionSpace.DofManager(fs, dim=2, EssentialBCs=ebcs)
 
 E = 1.0
 nu = 0.25
@@ -71,7 +70,7 @@ def assemble_sparse_preconditioner_matrix(Uu, p):
     return SparseMatrixAssembler.assemble_sparse_stiffness_matrix(
         elementStiffnesses, mesh.conns, essentialBCManager)
 
-def write_output(U, p, step):
+def write_output(U, p, S, step):
     vtkFilename = "crack_mode_1-" + str(step).zfill(3)
     writer = VTKWriter.VTKWriter(mesh, baseFileName=vtkFilename)
     
@@ -90,8 +89,28 @@ def write_output(U, p, step):
     
     writer.add_cell_field("strain_energy_density", cellEnergyDensities, VTKWriter.VTKFieldType.SCALARS)
     writer.add_cell_field("stress", cellStresses, VTKWriter.VTKFieldType.TENSORS)
+    
+    writer.add_nodal_field("config_forces", nodalData=S, fieldType=VTKWriter.VTKFieldType.VECTORS)
+    
+    # double the configurational force to account for half-symmetric model
+    J = -S[mesh.nodeSets['crack_tip'], 0].item() * 2
+    print('Configurational force on crack tip:', J)
+    K = p[0]
+    print('Applied energy release rate:', K**2 / (E/(1 - nu**2)))
+    
     writer.write()
 
+def qoi(Wu, Uu, p, mesh):
+    W = essentialBCManager.create_field(Wu)
+    coords = mesh.coords + W
+    qoiMesh = Mesh.mesh_with_coords(mesh, coords)
+    qoiFS = FunctionSpace.construct_function_space(qoiMesh, quadRule)
+    qoiSolidMechanics = Mechanics.create_mechanics_functions(qoiFS, "plane strain", material)
+    internalVariables = p[1]
+    U = create_field(Uu, p)
+    return qoiSolidMechanics.compute_strain_energy(U, internalVariables)
+    
+sensit = jax.value_and_grad(qoi, 0)
 
 solverSettings = EquationSolver.get_settings(max_cumulative_cg_iters=100,
                                              max_trust_iters=100,
@@ -99,20 +118,27 @@ solverSettings = EquationSolver.get_settings(max_cumulative_cg_iters=100,
 
 precondStrategy = Objective.PrecondStrategy(assemble_sparse_preconditioner_matrix)
 
-U = np.zeros_like(mesh.coords)
-Uu = essentialBCManager.get_unknown_values(U)
-appliedK = 0.0
-state = solidMechanics.compute_initial_state()
+def run():
+    U = np.zeros_like(mesh.coords)
+    Uu = essentialBCManager.get_unknown_values(U)
+    appliedK = 0.0
+    state = solidMechanics.compute_initial_state()
 
-p = Objective.Params(appliedK, state)
-objective = Objective.Objective(potential_energy, Uu, p, precondStrategy)
+    p = Objective.Params(appliedK, state)
+    objective = Objective.Objective(potential_energy, Uu, p, precondStrategy)
 
-for i in range(1):
-    appliedK += 1.0
-    p = Objective.param_index_update(p, 0, appliedK)
+    for i in range(1):
+        appliedK += 1.0
+        p = Objective.param_index_update(p, 0, appliedK)
 
-    Uu = EquationSolver.nonlinear_equation_solve(objective, Uu, p, solverSettings)
+        Uu = EquationSolver.nonlinear_equation_solve(objective, Uu, p, solverSettings)
 
-    U = create_field(Uu, p)
-    write_output(U, p, i)
+        
+        Wu = np.zeros_like(Uu)
+        _, configForcesOnUnknowns = sensit(Wu, Uu, p, mesh)
+        U = create_field(Uu, p)
+        configForces = essentialBCManager.create_field(configForcesOnUnknowns)
+        write_output(U, p, configForces, i)
 
+if __name__ == "__main__":
+    run()
