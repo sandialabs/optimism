@@ -1,0 +1,58 @@
+## /collab/usr/gapps/cubit/linux64.16.02/bin/clarox
+## Cubit Version 16.02.3
+## Cubit Build 269eeac
+## Revised Thu Mar 3 15:30:18 2022 -0700
+## Running 09/14/2022 10:37:50 AM
+## Command Options:
+
+# {L = 1.0}
+# {H = 0.5}
+# {a = 0.25}
+# {filename="crack_domain.g"}
+
+undo on
+
+create surface rectangle width {L} height {H} zplane
+
+# ensure there is a node at the crack tip
+split curve 3 distance {a} from vertex 3
+
+# move domain so that origin is at crack tip
+move Surface 1  x {0.5*L-a} y {0.5*H} include_merged 
+
+block 1 surface all
+block 1 element type TRI3
+surface 1 scheme triadvance
+
+mesh surface 1
+
+nodeset 1 add curve 4
+nodeset 1 name "right"
+nodeset 2 add curve 1
+nodeset 2 name "top"
+nodeset 3 add curve 2
+nodeset 3 name "left"
+nodeset 4 add curve 6
+nodeset 4 name "ysymm"
+nodeset 5 add curve 4 1 2
+nodeset 5 name "external"
+nodeset 6 add curve 5
+nodeset 6 name "crack"
+nodeset 7 add vertex 5
+nodeset 7 name "crack_tip"
+
+sideset 1 add curve 4
+sideset 1 name "right"
+sideset 2 add curve 1
+sideset 2 name "top"
+sideset 3 add curve 2
+sideset 3 name "left"
+sideset 4 add curve 6
+sideset 4 name "ysymm"
+sideset 5 add curve 4 1 2
+sideset 5 name "external"
+sideset 6 add curve 5
+sideset 6 name "crack"
+
+set exodus netcdf4 on
+export mesh "crack_domain.g" dimension 2 overwrite
