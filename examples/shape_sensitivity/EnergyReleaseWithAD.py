@@ -110,7 +110,7 @@ def qoi(Wu, Uu, p, mesh):
     U = create_field(Uu, p)
     return qoiSolidMechanics.compute_strain_energy(U, internalVariables)
     
-sensit = jax.value_and_grad(qoi, 0)
+sensit = jax.jit(jax.value_and_grad(qoi, 0))
 
 solverSettings = EquationSolver.get_settings(max_cumulative_cg_iters=100,
                                              max_trust_iters=100,
