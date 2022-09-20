@@ -4,7 +4,8 @@ from scipy import special
 
 
 MasterElement = namedtuple('MasterElement',
-                           ['degree', 'coordinates', 'vertexNodes', 'faceNodes', 'interiorNodes'])
+                           ['degree', 'coordinates', 'vertexNodes', 'faceNodes',
+                            'interiorNodes', 'shapes', 'shapeGradients'])
 
 
 MasterBubbleElement = namedtuple('MasterBubbleElement',
@@ -17,20 +18,59 @@ def make_master_elements(degree):
     return master, master1d
 
 
-def make_master_line_element(degree):
+def make_master_line_element(degree, quadrature):
     """Gauss-Lobatto Interpolation points on the unit interval.
     """
-    
+
+    xn = get_lobatto_nodes_1d(degree)
+    vertexPoints = onp.array([0, degree], dtype=onp.int32)
+    interiorPoints = onp.arange(1, degree, dtype=onp.int32)
+    shape, dshape = shape1d(degree, xn, quadrature.xigauss)
+    return MasterElement(int(degree), xn, vertexPoints, None, interiorPoints, shape, dshape)
+
+
+def get_lobatto_nodes_1d(degree):
     p = onp.polynomial.Legendre.basis(degree, domain=[0.0, 1.0])
     dp = p.deriv()
     xInterior = dp.roots()
     xn = onp.hstack(([0.0], xInterior, [1.0]))
-    vertexPoints = onp.array([0, degree], dtype=onp.int32)
-    interiorPoints = onp.arange(1, degree, dtype=onp.int32)
-    return MasterElement(int(degree), xn, vertexPoints, None, interiorPoints)
+    return xn
 
 
-def make_master_tri_element(degree):
+def shape1d(degree, nodalPoints, evaluationPoints):
+    """Evaluate shape functions and derivatives at points in the master element.
+
+    Args:
+      master1d: 1D MasterElement to evaluate the shape function data on
+      evaluationPoints: Array of points in the master element domain at
+        which to evaluate the shape functions and derivatives.
+
+    Returns:
+      Shape function values and shape function derivatives at ``evaluationPoints``,
+      in a tuple (``shape``, ``dshape``).
+      shapes: [nNodes, nEvalPoints]
+      dshapes: [nNodes, nEvalPoints]
+    """
+
+    A,_ = vander1d(nodalPoints, degree)
+    nf, nfx = vander1d(evaluationPoints, degree)
+    return onp.linalg.solve(A.T, nf.T), onp.linalg.solve(A.T, nfx.T)
+
+
+def vander1d(x, degree):
+    A = onp.zeros((x.shape[0], degree + 1))
+    dA = onp.zeros((x.shape[0], degree + 1))
+    domain = [0.0, 1.0]
+    for i in range(degree + 1):
+        p = onp.polynomial.Legendre.basis(i, domain=domain) 
+        p *= onp.sqrt(2.0*i + 1.0) # keep polynomial orthonormal
+        A[:, i] = p(x)
+        dp = p.deriv()
+        dA[:, i] = dp(x)
+    return A, dA
+
+
+def make_master_tri_element(degree, quadratureRule):
     """Interpolation points on the triangle that are Lobatto points on the edges.
     Points have threefold rotational symmetry and low Lebesgue constants.
     
@@ -53,7 +93,7 @@ def make_master_tri_element(degree):
        9  7  4   0
     """
 
-    lobattoPoints = make_master_line_element(degree).coordinates
+    lobattoPoints = get_lobatto_nodes_1d(degree)
     nPoints = int((degree + 1)*(degree + 2)/2)
     points = onp.zeros((nPoints, 2))
     point = 0
@@ -74,80 +114,9 @@ def make_master_tri_element(degree):
     interiorPoints = [i for i in range(nPoints) if i not in facePoints.ravel()]
     interiorPoints = onp.array(interiorPoints, dtype=onp.int32)
     
-    return MasterElement(int(degree), points, vertexPoints, facePoints, interiorPoints)
-
-
-# deprecate
-# use vander1d
-def make_vandermonde_1D(x, degree):
-    # shift to bi-unit interval convention of scipy
-    z = 2.0*x - 1.0
-
-    A = []
-    for i in range(degree + 1):
-        P = legendre(i)
-        P = np.array(P.c)
-        # re-scale back to [0,1]
-        P *= np.sqrt(2.0*i + 1.0)
-        Pval = np.polyval(P, z)
-        A.append(Pval)
-
-    return np.array(A).T
-
-def vander1d(x, degree):
-    A = onp.zeros((x.shape[0], degree + 1))
-    dA = onp.zeros((x.shape[0], degree + 1))
-    domain = [0.0, 1.0]
-    for i in range(degree + 1):
-        p = onp.polynomial.Legendre.basis(i, domain=domain) 
-        p *= onp.sqrt(2.0*i + 1.0) # keep polynomial orthonormal
-        A[:, i] = p(x)
-        dp = p.deriv()
-        dA[:, i] = dp(x)
-    return A, dA
-        
-
-def shape1d(master1d, evaluationPoints):
-    """Evaluate shape functions and derivatives at points in the master element.
+    shape, dshape = shape2d(degree, points, quadratureRule.xigauss)
     
-    Args:
-      master1d: 1D MasterElement to evaluate the shape function data on
-      evaluationPoints: Array of points in the master element domain at
-        which to evaluate the shape functions and derivatives.
-    
-    Returns:
-      Shape function values and shape function derivatives at ``evaluationPoints``,
-      in a tuple (``shape``, ``dshape``).
-      shapes: [nNodes, nEvalPoints]
-      dshapes: [nNodes, nEvalPoints]
-    """
-    
-    A,_ = vander1d(master1d.coordinates, master1d.degree)
-    nf, nfx = vander1d(evaluationPoints, master1d.degree)
-    return onp.linalg.solve(A.T, nf.T), onp.linalg.solve(A.T, nfx.T)
-    
-
-def compute_1D_shape_function_values(nodalPoints, evaluationPoints, degree):
-    """Evalute 1D shape functions at points in the master element.
-    
-    shapes: [nNodes, nEvalPoints]
-    """
-    A = make_vandermonde_1D(nodalPoints, degree)
-    nf = make_vandermonde_1D(evaluationPoints, degree)
-    print("A=\n", A)
-    print("nf=\n", nf)
-    return solve(A.T, nf.T) 
-
-
-compute_1D_shape_function_derivative_values = jacfwd(compute_1D_shape_function_values, 1)
-
-
-def compute_shapes_1D(nodalPoints, evaluationPoints, degree):
-    return vmap(make_1D_shape_function_values, (None, 0, None))(nodalPoints, evaluationPoints, degree)
-
-
-def compute_dshapes_1D(nodalPoints, evaluationPoints, degree):
-    return vmap(make_1D_shape_function_derivative_values, (None, 0, None))(nodalPoints, evaluationPoints, degree)
+    return MasterElement(int(degree), points, vertexPoints, facePoints, interiorPoints, shape, dshape)
 
 
 def pascal_triangle_monomials(degree):
@@ -160,44 +129,6 @@ def pascal_triangle_monomials(degree):
         q += monomialIndices
     return onp.column_stack((q,p))
 
-
-def compute_vandermonde_tri(x, degree):
-    nNodes = (degree+1)*(degree+2)//2
-    pq = pascal_triangle_monomials(degree)
-
-    # It's easier to process if the input arrays
-    # always have the same shape
-    # If a 1D array is given (a single point),
-    # convert to the equivalent 2D array
-    x = x.reshape(-1,2)
-    
-    # switch to bi-unit triangle (-1,-1)--(1,-1)--(-1,1)
-    z = 2.0*x - 1.0
-
-    # now map onto bi-unit square
-    def map_from_tri_to_square(point):
-        singularPoint = np.array([-1.0, 1.0])
-        pointIsSingular = np.array_equal(point, singularPoint)
-        point = np.where(pointIsSingular, np.array([0.0, 0.0]), point)
-        newPoint = np.where(pointIsSingular,
-                            np.array([-1.0, 1.0]),
-                            np.array([2.0*(1.0 + point[0])/(1.0 - point[1]) - 1.0, point[1]]))
-        return newPoint
-    E = vmap(map_from_tri_to_square)(z)
-    
-    A = np.zeros((x.shape[0], nNodes))
-    for i in range(nNodes):
-        PP = legendre(pq[i,0])
-        PP = np.array(PP.c) # convert from scipy polynomial to devicearray
-        QP = jacobi(pq[i,1], 2*pq[i,0] + 1.0, 0)
-        QP = np.array(QP.c)
-        for j in range(pq[i,0]):
-            QP = np.polymul(np.array([-0.5,0.5]),QP)
-        pVal = np.polyval(PP, E[:,0])
-        qVal = np.polyval(QP, E[:,1])
-        weight = np.sqrt( (2*pq[i,0]+1) * 2*(pq[i,0]+pq[i,1]+1))
-        A = A.at[:,i].set(weight*pVal*qVal)
-    return np.array(A)
 
 def vander2d(x, degree):
     nNodes = (degree+1)*(degree+2)//2
@@ -261,17 +192,17 @@ def vander2d(x, degree):
         # derivatives
         dp = p.deriv()
         dq = q.deriv()
-        Ax[:, i] = weight*dp(E[:, 0])*q(E[:, 1])*dE[:, 0]
-        Ay[:, i] = weight*(dp(E[:, 0])*q(E[:, 1])*dE[:, 1] + 
-                           p(E[:, 0])*dq(E[:, 1]))
+        Ax[:, i] = 2*weight*dp(E[:, 0])*q(E[:, 1])*dE[:, 0]
+        Ay[:, i] = 2*weight*(dp(E[:, 0])*q(E[:, 1])*dE[:, 1]
+                             + p(E[:, 0])*dq(E[:, 1]))
         
     return A, Ax, Ay
 
-def shape2d(masterElement, evaluationPoints):
-    A, _, _ = vander2d(masterElement.coordinates, masterElement.degree)
-    nf, nfx, nfy = vander2d(evaluationPoints, masterElement.degree)
+def shape2d(degree, nodalPoints, evaluationPoints):
+    A, _, _ = vander2d(nodalPoints, degree)
+    nf, nfx, nfy = vander2d(evaluationPoints, degree)
     shapes = onp.linalg.solve(A.T, nf.T).T
-    dshapes = onp.zeros(shapes.shape + (2,))
+    dshapes = onp.zeros(shapes.shape + (2,)) # shape is (nQuadPoints, nNodes, 2)
     dshapes[:, :, 0] = onp.linalg.solve(A.T, nfx.T).T
     dshapes[:, :, 1] = onp.linalg.solve(A.T, nfy.T).T
     return shapes, dshapes
@@ -299,14 +230,6 @@ def _compute_shapes_on_tri(masterElement, evaluationPoints):
     A = compute_vandermonde_tri(masterElement.coordinates, masterElement.degree)
     nf = compute_vandermonde_tri(evaluationPoints, masterElement.degree)
     return solve(A.T, nf.T).T
-
-
-compute_dshape_on_tri = jacfwd(compute_shapes_on_tri, 1)
-
-
-def compute_shapeGrads_on_tri(masterElement, evaluationPoints):
-    f = lambda m,x: np.squeeze(compute_dshape_on_tri(m,x))
-    return vmap(f, (None,0))(masterElement, evaluationPoints)
 
 
 def make_master_tri_bubble_element(degree):
