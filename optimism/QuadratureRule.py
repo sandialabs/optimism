@@ -1,37 +1,43 @@
-from scipy.special import jacobi
-from numpy.polynomial.legendre import leggauss
-from jax.lax import switch
+from collections import namedtuple
+import math
+import numpy as onp
+import scipy.special
 
-from optimism.JaxConfig import *
+import jax.numpy as np
+from jax.lax import switch
 
 
 QuadratureRule = namedtuple('QuadratureRule', ['xigauss', 'wgauss'])
+QuadratureRule.__doc__ = """Quadrature rule points and weights.
+    A ``namedtuple`` containing ``xigauss``, a numpy array of the
+    coordinates of the sample points in the reference domain, and
+    ``wgauss``, a numpy array with the weights.
+    """
 
 def len(quadRule):
+    """Gets the number of points in a quadrature rule."""
     return quadRule.xigauss.shape[0]
 
+
 def create_quadrature_rule_1D(degree):
-    n = np.int32(np.ceil((degree + 1)/2))
-    P = jacobi(n, 0, 0)
-    P = np.array(P.c)
-    xi = np.real(np.sort(np.roots(P)))
-    
-    AValues = []
-    for i in range(n):
-        P = jacobi(i, 0, 0)
-        P = np.array(P.c)
-        AValues.append(np.polyval(P, xi))
-    A = np.array(AValues).reshape(n, n)
-    
-    rhs = np.array([2.0] + [0 for i in range(n-1)])
-    w = np.linalg.solve(A, rhs)
-    return QuadratureRule(0.5*(xi + 1.0), 0.5*w)
+    """Creates a Gauss-Legendre quadrature on the unit interval.
 
+    The rule can exactly integrate polynomials of degree up to 
+    ``degree``.
 
-def get_builtin_quadrature_rule_1D(degree):
-    n = np.int32(np.ceil((degree + 1)/2))
-    quadRule = leggauss(n)
-    return QuadratureRule(0.5*(quadRule[0] + 1.0), 0.5*quadRule[1])
+    Parameters
+    ----------
+    degree: Highest degree polynomial to be exactly integrated by the quadrature rule
+
+    Returns
+    -------
+    A ``QuadratureRule`` named tuple containing the quadrature point coordinates
+    and the weights.
+    """
+
+    n = math.ceil((degree + 1)/2)
+    xi, w = scipy.special.roots_sh_legendre(n)
+    return QuadratureRule(xi, w)
 
 
 def eval_at_iso_points(xigauss, field):
@@ -40,74 +46,91 @@ def eval_at_iso_points(xigauss, field):
 
 
 def create_quadrature_rule_on_triangle(degree):
+    """Creates a Gauss-Legendre quadrature on the unit triangle.
+
+    The rule can exactly integrate 2D polynomials up to the value of 
+    ``degree``. The domain is the triangle between the vertices
+    (0, 0)-(1, 0)-(0, 1). The rules here are guaranteed to be 
+    cyclically symmetric in triangular coordinates and to have strictly
+    positive weights.
+
+    Parameters
+    ----------
+    degree: Highest degree polynomial to be exactly integrated by the quadrature rule
+
+    Returns
+    -------
+    A ``QuadratureRule`` named tuple containing the quadrature point coordinates
+    and the weights.
+    """
     if degree <= 1:
-        xi = np.array([[3.33333333333333333E-01,  3.33333333333333333E-01]])
+        xi = onp.array([[3.33333333333333333E-01,  3.33333333333333333E-01]])
 
-        w  = np.array([ 5.00000000000000000E-01 ])
+        w  = onp.array([ 5.00000000000000000E-01 ])
     elif degree == 2:
-        xi = np.array([[6.66666666666666667E-01,  1.66666666666666667E-01], \
-                       [1.66666666666666667E-01,  6.66666666666666667E-01], \
-                       [1.66666666666666667E-01,  1.66666666666666667E-01]])
+        xi = onp.array([[6.66666666666666667E-01,  1.66666666666666667E-01],
+                        [1.66666666666666667E-01,  6.66666666666666667E-01],
+                        [1.66666666666666667E-01,  1.66666666666666667E-01]])
 
-        w  = np.array( [1.66666666666666666E-01,\
-                        1.66666666666666667E-01,\
-                        1.66666666666666667E-01] )
+        w  = onp.array([1.66666666666666666E-01,
+                        1.66666666666666667E-01,
+                        1.66666666666666667E-01])
     elif degree <= 4:
-        xi = np.array([[1.081030181680700E-01,  4.459484909159650E-01],\
-                       [4.459484909159650E-01,  1.081030181680700E-01],\
-                       [4.459484909159650E-01,  4.459484909159650E-01],\
-                       [8.168475729804590E-01,  9.157621350977100E-02],\
-                       [9.157621350977100E-02,  8.168475729804590E-01],\
-                       [9.157621350977100E-02,  9.157621350977100E-02]])
+        xi = onp.array([[1.081030181680700E-01,  4.459484909159650E-01],
+                        [4.459484909159650E-01,  1.081030181680700E-01],
+                        [4.459484909159650E-01,  4.459484909159650E-01],
+                        [8.168475729804590E-01,  9.157621350977100E-02],
+                        [9.157621350977100E-02,  8.168475729804590E-01],
+                        [9.157621350977100E-02,  9.157621350977100E-02]])
 
-        w  = np.array( [1.116907948390055E-01,\
-                        1.116907948390055E-01,\
-                        1.116907948390055E-01,\
-                        5.497587182766100E-02,\
-                        5.497587182766100E-02,\
-                        5.497587182766100E-02] )
+        w  = onp.array([1.116907948390055E-01,
+                        1.116907948390055E-01,
+                        1.116907948390055E-01,
+                        5.497587182766100E-02,
+                        5.497587182766100E-02,
+                        5.497587182766100E-02])
     elif degree <= 5:
-        xi = np.array([[3.33333333333333E-01,  3.33333333333333E-01], \
-                       [5.97158717897700E-02,  4.70142064105115E-01], \
-                       [4.70142064105115E-01,  5.97158717897700E-02], \
-                       [4.70142064105115E-01,  4.70142064105115E-01], \
-                       [7.97426985353087E-01,  1.01286507323456E-01], \
-                       [1.01286507323456E-01,  7.97426985353087E-01], \
-                       [1.01286507323456E-01,  1.01286507323456E-01]])
+        xi = onp.array([[3.33333333333333E-01,  3.33333333333333E-01],
+                        [5.97158717897700E-02,  4.70142064105115E-01],
+                        [4.70142064105115E-01,  5.97158717897700E-02],
+                        [4.70142064105115E-01,  4.70142064105115E-01],
+                        [7.97426985353087E-01,  1.01286507323456E-01],
+                        [1.01286507323456E-01,  7.97426985353087E-01],
+                        [1.01286507323456E-01,  1.01286507323456E-01]])
 
-        w = np.array( [1.12500000000000E-01, \
-                       6.61970763942530E-02, \
-                       6.61970763942530E-02, \
-                       6.61970763942530E-02, \
-                       6.29695902724135E-02, \
-                       6.29695902724135E-02, \
-                       6.29695902724135E-02] )
+        w = onp.array([1.12500000000000E-01,
+                       6.61970763942530E-02,
+                       6.61970763942530E-02,
+                       6.61970763942530E-02,
+                       6.29695902724135E-02,
+                       6.29695902724135E-02,
+                       6.29695902724135E-02])
     elif degree <= 6:
-        xi = np.array([[5.01426509658179E-01,  2.49286745170910E-01], \
-                       [2.49286745170910E-01,  5.01426509658179E-01], \
-                       [2.49286745170910E-01,  2.49286745170910E-01], \
-                       [8.73821971016996E-01,  6.30890144915020E-02], \
-                       [6.30890144915020E-02,  8.73821971016996E-01], \
-                       [6.30890144915020E-02,  6.30890144915020E-02], \
-                       [5.31450498448170E-02,  3.10352451033784E-01], \
-                       [6.36502499121399E-01,  5.31450498448170E-02], \
-                       [3.10352451033784E-01,  6.36502499121399E-01], \
-                       [5.31450498448170E-02,  6.36502499121399E-01], \
-                       [6.36502499121399E-01,  3.10352451033784E-01], \
-                       [3.10352451033784E-01,  5.31450498448170E-02]])
+        xi = onp.array([[5.01426509658179E-01,  2.49286745170910E-01],
+                        [2.49286745170910E-01,  5.01426509658179E-01],
+                        [2.49286745170910E-01,  2.49286745170910E-01],
+                        [8.73821971016996E-01,  6.30890144915020E-02],
+                        [6.30890144915020E-02,  8.73821971016996E-01],
+                        [6.30890144915020E-02,  6.30890144915020E-02],
+                        [5.31450498448170E-02,  3.10352451033784E-01],
+                        [6.36502499121399E-01,  5.31450498448170E-02],
+                        [3.10352451033784E-01,  6.36502499121399E-01],
+                        [5.31450498448170E-02,  6.36502499121399E-01],
+                        [6.36502499121399E-01,  3.10352451033784E-01],
+                        [3.10352451033784E-01,  5.31450498448170E-02]])
 
-        w = np.array( [5.83931378631895E-02, \
-                       5.83931378631895E-02, \
-                       5.83931378631895E-02, \
-                       2.54224531851035E-02, \
-                       2.54224531851035E-02, \
-                       2.54224531851035E-02, \
-                       4.14255378091870E-02, \
-                       4.14255378091870E-02, \
-                       4.14255378091870E-02, \
-                       4.14255378091870E-02, \
-                       4.14255378091870E-02, \
-                       4.14255378091870E-02] )
+        w = onp.array([5.83931378631895E-02,
+                       5.83931378631895E-02,
+                       5.83931378631895E-02,
+                       2.54224531851035E-02,
+                       2.54224531851035E-02,
+                       2.54224531851035E-02,
+                       4.14255378091870E-02,
+                       4.14255378091870E-02,
+                       4.14255378091870E-02,
+                       4.14255378091870E-02,
+                       4.14255378091870E-02,
+                       4.14255378091870E-02])
 
     return QuadratureRule(xi, w)
 
@@ -125,7 +148,7 @@ def create_padded_quadrature_rule_1D(degree):
       degree: degree of highest polynomial to be integrated exactly
     """
 
-    npts = np.int_(np.ceil((degree + 1)/2))
+    npts = np.ceil((degree + 1)/2).astype(int)
     xi,w = switch(npts,
                   [_gauss_quad_1D_1pt, _gauss_quad_1D_2pt, _gauss_quad_1D_3pt,
                    _gauss_quad_1D_4pt, _gauss_quad_1D_5pt],

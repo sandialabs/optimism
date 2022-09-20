@@ -1,8 +1,10 @@
 from scipy.special import binom
+import unittest
 
-from optimism.JaxConfig import *
+import jax.numpy as np
+
 from optimism import QuadratureRule
-from optimism.test.TestFixture import *
+from optimism.test import TestFixture
 
 
 def is_inside_triangle(point):
@@ -39,28 +41,27 @@ def are_positive_weights(QuadratureRuleFactory, degree):
     return np.all(qr.wgauss > 0)
 
     
-class TestQuadratureRules(TestFixture):
+class TestQuadratureRules(TestFixture.TestFixture):
     endpoints = (0.0, 1.0)     # better if the quadrature rule module provided this
     max_degree_2D = 6
     max_degree_1D = 25
 
 
     def test_1D_quadrature_weight_positivity(self):
-        QuadratureRuleFactory = QuadratureRule.get_builtin_quadrature_rule_1D
+        QuadratureRuleFactory = QuadratureRule.create_quadrature_rule_1D
         for degree in range(self.max_degree_1D + 1):
             self.assertTrue(are_positive_weights(QuadratureRuleFactory, degree))
 
 
     def test_1D_quadrature_points_in_domain(self):
         for degree in range(self.max_degree_1D + 1):
-            quadrature_rule = QuadratureRule.get_builtin_quadrature_rule_1D(degree)
+            quadrature_rule = QuadratureRule.create_quadrature_rule_1D(degree)
             self.assertTrue(are_inside_unit_interval(quadrature_rule.xigauss))
 
 
     def test_1D_quadrature_exactness(self):
         for degree in range(self.max_degree_1D + 1):
-            #qr = QuadratureRule.create_quadrature_rule_1D(degree) # also works
-            qr = QuadratureRule.get_builtin_quadrature_rule_1D(degree)
+            qr = QuadratureRule.create_quadrature_rule_1D(degree)
             for i in range(degree + 1):
                 map = lambda xi : map_affine_1D(xi, self.endpoints)
                 xVals = map(qr.xigauss)
