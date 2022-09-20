@@ -1,9 +1,6 @@
-from scipy.special import legendre, jacobi
-from scipy import special
-from jax.numpy.linalg import solve
+from collections import namedtuple
 import numpy as onp
-
-from optimism.JaxConfig import *
+from scipy import special
 
 
 MasterElement = namedtuple('MasterElement',
@@ -70,7 +67,7 @@ def make_master_tri_element(degree):
     vertexPoints = onp.array([0, degree, nPoints - 1], dtype=onp.int32)
 
     ii = onp.arange(degree + 1)
-    jj = onp.cumsum(np.flip(ii)) + ii
+    jj = onp.cumsum(onp.flip(ii)) + ii
     kk = onp.flip(jj) - ii
     facePoints = onp.array((ii,jj,kk), dtype=onp.int32)
 
@@ -81,7 +78,7 @@ def make_master_tri_element(degree):
 
 
 # deprecate
-# use vaner1d
+# use vander1d
 def make_vandermonde_1D(x, degree):
     # shift to bi-unit interval convention of scipy
     z = 2.0*x - 1.0
@@ -127,7 +124,7 @@ def shape1d(master1d, evaluationPoints):
     
     A,_ = vander1d(master1d.coordinates, master1d.degree)
     nf, nfx = vander1d(evaluationPoints, master1d.degree)
-    return solve(A.T, nf.T), solve(A.T, nfx.T)
+    return onp.linalg.solve(A.T, nf.T), onp.linalg.solve(A.T, nfx.T)
     
 
 def compute_1D_shape_function_values(nodalPoints, evaluationPoints, degree):
@@ -215,31 +212,24 @@ def vander2d(x, degree):
     # switch to bi-unit triangle (-1,-1)--(1,-1)--(-1,1)
     z = 2.0*x - 1.0
     
-    # now map onto bi-unit square
-    # def map_from_tri_to_square(point):
-    #     singularPoint = np.array([-1.0, 1.0])
-    #     pointIsSingular = np.array_equal(point, singularPoint)
-    #     point = np.where(pointIsSingular, np.array([0.0, 0.0]), point)
-    #     newPoint = np.where(pointIsSingular,
-    #                         np.array([-1.0, 1.0]),
-    #                         np.array([2.0*(1.0 + point[0])/(1.0 - point[1]) - 1.0, point[1]]))
-    #     return newPoint
-    # E = vmap(map_from_tri_to_square)(z)
-    
-    
     def map_from_tri_to_square(xi):
         small = 1e-12
+        # The mapping has a singularity at the vertex (-1, 1).
+        # Handle that point specially.
         indexSingular = xi[:, 1] > 1.0 - small
-        print(indexSingular)
         xiShifted = xi.copy()
         xiShifted[indexSingular, 1] = 1.0 - small
-        print('xiShift shape', xiShifted.shape)
         eta = onp.zeros_like(xi)
         eta[:, 0] = 2.0*(1.0 + xiShifted[:, 0])/(1.0 - xiShifted[:, 1]) - 1.0
         eta[:, 1] = xiShifted[:, 1]
         eta[indexSingular, 0] = -1.0
         eta[indexSingular, 1] = 1.0
         
+        # Jacobian of map. 
+        # Actually, deta is just the first row of the Jacobian.
+        # The second row is trivially [0, 1], so we don't compute it.
+        # We just use that fact directly in the derivative Vandermonde
+        # expressions.
         deta = onp.zeros_like(xi)
         deta[:, 0] = 2/(1 - xiShifted[:, 1])
         deta[:, 1] = 2*(1 + xiShifted[:, 0])/(1 - xiShifted[:, 1])**2
@@ -257,14 +247,14 @@ def vander2d(x, degree):
         # SciPy's polynomials use the deprecated poly1d type
         # of NumPy. To convert to the modern Polynomial type,
         # we need to reverse the order of the coefficients.
-        qPoly1d = jacobi(pq[i, 1], 2*pq[i, 0] + 1, 0)
+        qPoly1d = special.jacobi(pq[i, 1], 2*pq[i, 0] + 1, 0)
         q = onp.polynomial.Polynomial(qPoly1d.coef[::-1])
         
         for j in range(pq[i, 0]):
             q *= N1D
         
         # orthonormality weight
-        weight = np.sqrt((2*pq[i,0] + 1) * 2*(pq[i, 0] + pq[i, 1] + 1))
+        weight = onp.sqrt((2*pq[i,0] + 1) * 2*(pq[i, 0] + pq[i, 1] + 1))
         
         A[:, i] = weight*p(E[:, 0])*q(E[:, 1])
         
@@ -280,10 +270,10 @@ def vander2d(x, degree):
 def shape2d(masterElement, evaluationPoints):
     A, _, _ = vander2d(masterElement.coordinates, masterElement.degree)
     nf, nfx, nfy = vander2d(evaluationPoints, masterElement.degree)
-    shapes = solve(A.T, nf.T).T
+    shapes = onp.linalg.solve(A.T, nf.T).T
     dshapes = onp.zeros(shapes.shape + (2,))
-    dshapes[:, :, 0] = solve(A.T, nfx.T).T
-    dshapes[:, :, 1] = solve(A.T, nfy.T).T
+    dshapes[:, :, 0] = onp.linalg.solve(A.T, nfx.T).T
+    dshapes[:, :, 1] = onp.linalg.solve(A.T, nfy.T).T
     return shapes, dshapes
 
 def compute_shapes_on_tri(masterElement, evaluationPoints):
