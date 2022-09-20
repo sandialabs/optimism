@@ -3,30 +3,32 @@ import numpy as onp
 from scipy import special
 
 
-MasterElement = namedtuple('MasterElement',
-                           ['degree', 'coordinates', 'vertexNodes', 'faceNodes',
-                            'interiorNodes', 'shapes', 'shapeGradients'])
+NodalBasis = namedtuple('NodalBasis',
+                        ['degree', 'coordinates', 'vertexNodes', 'faceNodes', 'interiorNodes'])
 
 
 MasterBubbleElement = namedtuple('MasterBubbleElement',
                                  ['degree', 'coordinates', 'vertexNodes', 'faceNodes', 'interiorNodes', 'baseMaster', 'baseMasterNodes', 'enrichmentMaster', 'enrichmentMasterNodes'])
 
-
-def make_master_elements(degree):
-    master = make_master_tri_element(degree)
-    master1d = make_master_line_element(degree)
-    return master, master1d
+MasterElement = namedtuple('MasterElement',
+                           ['degree', 'coordinates', 'vertexNodes', 'faceNodes', 
+                            'interiorNodes', 'shapes', 'shapeGradients', 'quadratureRule'])
 
 
-def make_master_line_element(degree, quadrature):
+def make_nodal_basis(degree):
+    basis = make_nodal_basis_2d(degree)
+    basis1d = make_nodal_basis_1d(degree)
+    return basis, basis1d
+
+
+def make_nodal_basis_1d(degree):
     """Gauss-Lobatto Interpolation points on the unit interval.
     """
 
     xn = get_lobatto_nodes_1d(degree)
     vertexPoints = onp.array([0, degree], dtype=onp.int32)
     interiorPoints = onp.arange(1, degree, dtype=onp.int32)
-    shape, dshape = shape1d(degree, xn, quadrature.xigauss)
-    return MasterElement(int(degree), xn, vertexPoints, None, interiorPoints, shape, dshape)
+    return NodalBasis(int(degree), xn, vertexPoints, None, interiorPoints)
 
 
 def get_lobatto_nodes_1d(degree):
@@ -35,6 +37,13 @@ def get_lobatto_nodes_1d(degree):
     xInterior = dp.roots()
     xn = onp.hstack(([0.0], xInterior, [1.0]))
     return xn
+
+
+def make_master_line_element(nodalBasis, quadratureRule):
+    shape, dshape = shape1d(nodalBasis.degree, nodalBasis.coordinates, quadratureRule.xigauss)
+    return MasterElement(nodalBasis.degree, nodalBasis.coordinates, nodalBasis.vertexNodes, 
+                         nodalBasis.faceNodes, nodalBasis.interiorNodes, shape, dshape, 
+                         quadratureRule)
 
 
 def shape1d(degree, nodalPoints, evaluationPoints):
@@ -70,7 +79,7 @@ def vander1d(x, degree):
     return A, dA
 
 
-def make_master_tri_element(degree, quadratureRule):
+def make_nodal_basis_2d(degree):
     """Interpolation points on the triangle that are Lobatto points on the edges.
     Points have threefold rotational symmetry and low Lebesgue constants.
     
@@ -114,9 +123,14 @@ def make_master_tri_element(degree, quadratureRule):
     interiorPoints = [i for i in range(nPoints) if i not in facePoints.ravel()]
     interiorPoints = onp.array(interiorPoints, dtype=onp.int32)
     
-    shape, dshape = shape2d(degree, points, quadratureRule.xigauss)
-    
-    return MasterElement(int(degree), points, vertexPoints, facePoints, interiorPoints, shape, dshape)
+    return NodalBasis(int(degree), points, vertexPoints, facePoints, interiorPoints)
+
+
+def make_master_tri_element(nodalBasis, quadratureRule):
+    shape, dshape = shape2d(nodalBasis.degree, nodalBasis.coordinates, quadratureRule.xigauss)
+    return MasterElement(nodalBasis.degree, nodalBasis.coordinates, nodalBasis.vertexNodes, 
+                         nodalBasis.faceNodes, nodalBasis.interiorNodes, shape, dshape, 
+                         quadratureRule)
 
 
 def pascal_triangle_monomials(degree):

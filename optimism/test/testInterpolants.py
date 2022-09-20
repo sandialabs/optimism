@@ -23,8 +23,10 @@ class TestInterpolants(TestFixture.TestFixture):
         self.qr = QuadratureRule.create_quadrature_rule_on_triangle(degree=maxDegree)
         self.nQPts = QuadratureRule.len(self.qr)
         for degree in range(1, maxDegree + 1):
-            self.masters1d.append(Interpolants.make_master_line_element(degree, self.qr1d))
-            self.mastersTri.append(Interpolants.make_master_tri_element(degree, self.qr))
+            basis1d = Interpolants.make_nodal_basis_1d(degree)
+            basis = Interpolants.make_nodal_basis_2d(degree)
+            self.masters1d.append(Interpolants.make_master_line_element(basis1d, self.qr1d))
+            self.mastersTri.append(Interpolants.make_master_tri_element(basis, self.qr))
 
 
     def test_1D_interpolant_points_in_element(self):
