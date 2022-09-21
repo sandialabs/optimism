@@ -1,7 +1,8 @@
-import numpy as onp
 import unittest
 
-from optimism.JaxConfig import *
+import jax
+import jax.numpy as np
+
 from optimism import FunctionSpace
 from optimism import Interpolants
 from optimism import Mesh
@@ -36,7 +37,7 @@ class TestFunctionSpaceFixture(TestFixture.TestFixture):
                                                        self.masterElem,
                                                        quadRule)
         def f(u, gradu, state, X): return 0.5*u*u
-        compute_mass = hessian(lambda U: FunctionSpace.integrate_element(U, self.coords, stateVar, shape, shapeGrad, vol, self.conn, f, modify_element_gradient=FunctionSpace.default_modify_element_gradient))
+        compute_mass = jax.hessian(lambda U: FunctionSpace.integrate_element(U, self.coords, stateVar, shape, shapeGrad, vol, self.conn, f, modify_element_gradient=FunctionSpace.default_modify_element_gradient))
         M = compute_mass(UNodal)
         area = 0.5*np.cross(self.coords[1,:] - self.coords[0,:],
                             self.coords[2,:] - self.coords[0,:])
@@ -63,7 +64,7 @@ class TestFunctionSpaceFixture(TestFixture.TestFixture):
                                                        self.masterElem,
                                                        quadRule)
         def f(u, gradu, state, X): return 0.5*u*u
-        compute_mass = hessian(lambda U: FunctionSpace.integrate_element(U, self.coords, stateVar, shape, shapeGrad, vol, self.conn, f, modify_element_gradient=FunctionSpace.default_modify_element_gradient))
+        compute_mass = jax.hessian(lambda U: FunctionSpace.integrate_element(U, self.coords, stateVar, shape, shapeGrad, vol, self.conn, f, modify_element_gradient=FunctionSpace.default_modify_element_gradient))
         M = compute_mass(UNodal)
         area = 0.5*np.cross(self.coords[1,:] - self.coords[0,:],
                             self.coords[2,:] - self.coords[0,:])
@@ -238,13 +239,13 @@ class TestFunctionSpaceMultiQuadPointFixture(MeshFixture.MeshFixture):
         
         
     def test_jit_on_integration(self):
-        integrate_jit = jit(FunctionSpace.integrate_over_block, static_argnums=(3,))
+        integrate_jit = jax.jit(FunctionSpace.integrate_over_block, static_argnums=(3,))
         I = integrate_jit(self.fs, self.U, self.state, lambda u, gradu, state, X: 1.0, self.mesh.blocks['block'])
         self.assertNear(I, 1.0, 14)
 
         
     def test_jit_and_jacrev_on_integration(self):
-        F = jit(jacrev(FunctionSpace.integrate_over_block, 1), static_argnums=(3,))
+        F = jax.jit(jax.jacrev(FunctionSpace.integrate_over_block, 1), static_argnums=(3,))
         dI = F(self.fs, self.U, self.state, lambda u, gradu, state, X: 0.5*np.tensordot(gradu, gradu),
                self.mesh.blocks['block'])
         nNodes = self.mesh.coords.shape[0]
@@ -276,7 +277,7 @@ class ParameterizationTestSuite(MeshFixture.MeshFixture):
         def centroid(v):
             return np.average(v, axis=0)
 
-        xc = vmap(lambda conn, coords: centroid(coords[conn, :]), (0, None))(self.mesh.conns, self.mesh.coords)
+        xc = jax.vmap(lambda conn, coords: centroid(coords[conn, :]), (0, None))(self.mesh.conns, self.mesh.coords)
         weights = np.ones(Mesh.num_elements(self.mesh), dtype=np.float64)
         weights = weights.at[xc[:,0] < self.xRange[1]/2].set(2.0)
         f = FunctionSpace.integrate_over_block(self.fs, self.U, self.state, lambda u, dudx, q, x, p: p, self.mesh.blocks['block'], weights)
