@@ -13,18 +13,43 @@ FunctionSpace = namedtuple('FunctionSpace', ['shapes', 'vols', 'shapeGrads', 'me
 
 EssentialBC = namedtuple('EssentialBC', ['nodeSet', 'component'])
 
+
+def construct_function_space_from_master_element(mesh, masterElement, mode2D='cartesian'):
+    shapes = vmap(lambda elConns, elShape: elShape, (0, None))(mesh.conns, masterElement.shapes)
+
+    shapeGrads = vmap(map_element_shape_grads, (None, 0, None))(mesh.coords, mesh.conns, masterElement)
+
+    vols = vmap(compute_element_volumes, (None, 0, None))(mesh.coords, mesh.conns, masterElement)
+
+    return FunctionSpace(shapes, vols, shapeGrads, mesh, masterElement.quadratureRule)
+
+
+def map_element_shape_grads(coordField, nodeOrdinals, masterElement):
+    Xn = coordField.take(nodeOrdinals,0)
+    v = Xn[masterElement.vertexNodes]
+    J = np.column_stack((v[0] - v[2], v[1] - v[2]))
+    return vmap(lambda dN: solve(J.T, dN.T).T)(masterElement.shapeGradients) 
+
+
+def compute_element_volumes(coordField, nodeOrdinals, masterElement):
+    Xn = coordField.take(nodeOrdinals,0)
+    v = Xn[masterElement.vertexNodes]
+    jac = np.cross(v[1] - v[0], v[2] - v[0])
+    return jac*masterElement.quadratureRule.wgauss
+
+
 def construct_function_space(mesh, quadratureRule, mode2D='cartesian'):
     shapes = vmap(compute_shape_values_on_element,
-                  (None, 0, None, None))(mesh.coords, mesh.conns, mesh.masterElement, quadratureRule.xigauss)
+                  (None, 0, None, None))(mesh.coords, mesh.conns, mesh.nodalBasis, quadratureRule.xigauss)
 
-    shapeGrads = compute_shape_grads(mesh.coords, mesh.conns, mesh.masterElement, quadratureRule)
+    shapeGrads = compute_shape_grads(mesh.coords, mesh.conns, mesh.nodalBasis, quadratureRule)
     
     if mode2D == 'cartesian':
         vols = vmap(compute_volumes_on_element,
-                    (None, 0, None, None))(mesh.coords, mesh.conns, mesh.masterElement, quadratureRule)
+                    (None, 0, None, None))(mesh.coords, mesh.conns, mesh.nodalBasis, quadratureRule)
     elif mode2D == 'axisymmetric':
         vols = vmap(compute_axisymmetric_volumes_on_element,
-                    (None, 0, 0, None, None))(mesh.coords, mesh.conns, shapes, mesh.masterElement, quadratureRule)        
+                    (None, 0, 0, None, None))(mesh.coords, mesh.conns, shapes, mesh.nodalBasis, quadratureRule)        
     return FunctionSpace(shapes, vols, shapeGrads, mesh, quadratureRule)
 
 

@@ -71,13 +71,13 @@ class VTKWriter:
         # Legacy vtk can only plot linear and quadratic elements.
         # We will plot quadratic elements as is, and
         # all other elements will be converted to linear
-        if mesh.masterElement.degree==2:
+        if mesh.nodalBasis.degree==2:
             self.outputNodes = np.arange(mesh.coords.shape[0])
             self.elConn = np.array([0, 2, 5, 1, 4, 3], dtype=np.int_)
             self.vtkCellType = 22
         else:
             self.outputNodes = mesh.simplexNodesOrdinals
-            self.elConn = mesh.masterElement.vertexNodes
+            self.elConn = mesh.nodalBasis.vertexNodes
             self.vtkCellType = 5
         
         
