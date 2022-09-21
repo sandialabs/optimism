@@ -23,14 +23,11 @@ def construct_function_space_from_master_element(mesh, masterElement, mode2D='ca
 
     shapeGrads = jax.vmap(map_element_shape_grads, (None, 0, None))(mesh.coords, mesh.conns, masterElement)
 
-    vols = jax.vmap(compute_element_volumes, (None, 0, None))(mesh.coords, mesh.conns, masterElement)
-
-    # if mode2D == 'cartesian':
-    #     vols = jax.vmap(compute_volumes_on_element,
-    #                 (None, 0, None, None))(mesh.coords, mesh.conns, mesh.nodalBasis, quadratureRule)
-    # elif mode2D == 'axisymmetric':
-    #     vols = jax.vmap(compute_axisymmetric_volumes_on_element,
-    #                 (None, 0, 0, None, None))(mesh.coords, mesh.conns, shapes, mesh.nodalBasis, quadratureRule)
+    if mode2D == 'cartesian':
+        el_vols = compute_element_volumes
+    elif mode2D == 'axisymmetric':
+        el_vols = compute_element_volumes_axisymmetric
+    vols = jax.vmap(el_vols, (None, 0, None))(mesh.coords, mesh.conns, masterElement)
 
     return FunctionSpace(shapes, vols, shapeGrads, mesh, masterElement.quadratureRule)
 
@@ -48,11 +45,12 @@ def compute_element_volumes(coordField, nodeOrdinals, masterElement):
     jac = np.cross(v[1] - v[0], v[2] - v[0])
     return jac*masterElement.quadratureRule.wgauss
 
-# def compute_axisymmetric_volumes_on_element(coordField, nodeOrdinals, elemShapes, master, quadRule):
-#     vols = compute_volumes_on_element(coordField, nodeOrdinals, master, quadRule)
-#     Xn = coordField.take(nodeOrdinals,0)
-#     Rs = elemShapes@Xn[:,0]
-#     return 2*np.pi*Rs*vols
+
+def compute_element_volumes_axisymmetric(coordField, nodeOrdinals, masterElement):
+    vols = compute_element_volumes(coordField, nodeOrdinals, masterElement)
+    Xn = coordField.take(nodeOrdinals,0)
+    Rs = masterElement.shapes@Xn[:,0]
+    return 2*np.pi*Rs*vols
 
 
 # only supports cartesian and linear shape functions on tris, single integration point per element
