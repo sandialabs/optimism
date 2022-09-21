@@ -13,6 +13,10 @@ FunctionSpace = namedtuple('FunctionSpace', ['shapes', 'vols', 'shapeGrads', 'me
 
 EssentialBC = namedtuple('EssentialBC', ['nodeSet', 'component'])
 
+def construct_function_space(mesh, quadratureRule, mode2D='cartesian'):
+    masterElement = Interpolants.make_master_tri_element(mesh.nodalBasis, quadratureRule)
+    return construct_function_space_from_master_element(mesh, masterElement, mode2D)
+
 
 def construct_function_space_from_master_element(mesh, masterElement, mode2D='cartesian'):
     shapes = jax.vmap(lambda elConns, elShape: elShape, (0, None))(mesh.conns, masterElement.shapes)
@@ -21,6 +25,13 @@ def construct_function_space_from_master_element(mesh, masterElement, mode2D='ca
 
     vols = jax.vmap(compute_element_volumes, (None, 0, None))(mesh.coords, mesh.conns, masterElement)
 
+    # if mode2D == 'cartesian':
+    #     vols = jax.vmap(compute_volumes_on_element,
+    #                 (None, 0, None, None))(mesh.coords, mesh.conns, mesh.nodalBasis, quadratureRule)
+    # elif mode2D == 'axisymmetric':
+    #     vols = jax.vmap(compute_axisymmetric_volumes_on_element,
+    #                 (None, 0, 0, None, None))(mesh.coords, mesh.conns, shapes, mesh.nodalBasis, quadratureRule)
+
     return FunctionSpace(shapes, vols, shapeGrads, mesh, masterElement.quadratureRule)
 
 
@@ -28,7 +39,7 @@ def map_element_shape_grads(coordField, nodeOrdinals, masterElement):
     Xn = coordField.take(nodeOrdinals,0)
     v = Xn[masterElement.vertexNodes]
     J = np.column_stack((v[0] - v[2], v[1] - v[2]))
-    return jax.vmap(lambda dN: solve(J.T, dN.T).T)(masterElement.shapeGradients) 
+    return jax.vmap(lambda dN: solve(J.T, dN.T).T)(masterElement.shapeGradients)
 
 
 def compute_element_volumes(coordField, nodeOrdinals, masterElement):
@@ -37,20 +48,11 @@ def compute_element_volumes(coordField, nodeOrdinals, masterElement):
     jac = np.cross(v[1] - v[0], v[2] - v[0])
     return jac*masterElement.quadratureRule.wgauss
 
-
-def construct_function_space(mesh, quadratureRule, mode2D='cartesian'):
-    shapes = jax.vmap(compute_shape_values_on_element,
-                  (None, 0, None, None))(mesh.coords, mesh.conns, mesh.nodalBasis, quadratureRule.xigauss)
-
-    shapeGrads = compute_shape_grads(mesh.coords, mesh.conns, mesh.nodalBasis, quadratureRule)
-    
-    if mode2D == 'cartesian':
-        vols = jax.vmap(compute_volumes_on_element,
-                    (None, 0, None, None))(mesh.coords, mesh.conns, mesh.nodalBasis, quadratureRule)
-    elif mode2D == 'axisymmetric':
-        vols = jax.vmap(compute_axisymmetric_volumes_on_element,
-                    (None, 0, 0, None, None))(mesh.coords, mesh.conns, shapes, mesh.nodalBasis, quadratureRule)        
-    return FunctionSpace(shapes, vols, shapeGrads, mesh, quadratureRule)
+# def compute_axisymmetric_volumes_on_element(coordField, nodeOrdinals, elemShapes, master, quadRule):
+#     vols = compute_volumes_on_element(coordField, nodeOrdinals, master, quadRule)
+#     Xn = coordField.take(nodeOrdinals,0)
+#     Rs = elemShapes@Xn[:,0]
+#     return 2*np.pi*Rs*vols
 
 
 # only supports cartesian and linear shape functions on tris, single integration point per element
@@ -217,38 +219,6 @@ def evaluate_on_element(U, coords, elemStates, elemShapes, elemShapeGrads, elemV
     vmapArgs = 0, 0, 0, 0, *tuple(None for p in params)
     fVals = jax.vmap(kernelFunc, vmapArgs)(elemVals, elemGrads, elemStates, elemXs, *params)
     return fVals
-
-
-def compute_shape_values_on_element(coordField, nodeOrdinals, master, evalPoints):
-    return Interpolants.compute_shapes_on_tri(master, evalPoints)
-
-
-def compute_volumes_on_element(coordField, nodeOrdinals, master, quadRule):
-    Xn = coordField.take(nodeOrdinals,0)
-    v = Xn[master.vertexNodes]
-    jac = np.cross(v[1] - v[0], v[2] - v[0])
-    return jac*quadRule.wgauss
-
-
-def compute_axisymmetric_volumes_on_element(coordField, nodeOrdinals, elemShapes, master, quadRule):
-    vols = compute_volumes_on_element(coordField, nodeOrdinals, master, quadRule)
-    Xn = coordField.take(nodeOrdinals,0)
-    Rs = elemShapes@Xn[:,0]
-    return 2*np.pi*Rs*vols
-
-
-
-def compute_shape_grads(coordField, conns, master, quadRule):
-    masterShapeGrads = Interpolants.compute_shapeGrads_on_tri(master, quadRule.xigauss)
-    return jax.vmap(compute_element_shape_grads,
-                (None,0,None,None))(coordField, conns, master, masterShapeGrads)
-
-
-def compute_element_shape_grads(coordField, nodeOrdinals, master, masterShapeGrads):
-    Xn = coordField.take(nodeOrdinals,0)
-    v = Xn[master.vertexNodes]
-    J = np.column_stack((v[0] - v[2], v[1] - v[2]))
-    return jax.vmap(lambda dN: solve(J.T, dN.T).T)(masterShapeGrads)   
 
 
 def project_quadrature_field_to_element_field(functionSpace, quadField):
