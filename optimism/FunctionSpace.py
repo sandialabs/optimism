@@ -15,40 +15,40 @@ EssentialBC = namedtuple('EssentialBC', ['nodeSet', 'component'])
 
 
 def construct_function_space(mesh, quadratureRule, mode2D='cartesian'):
-    shapeOnRef = Interpolants.compute_shapes(mesh.nodalBasis, quadratureRule.xigauss)
-    return construct_function_space_from_reference_element(mesh, shapeOnRef, quadratureRule, mode2D)
+    shapeOnRef = Interpolants.compute_shapes(mesh.parentElement, quadratureRule.xigauss)
+    return construct_function_space_from_parent_element(mesh, shapeOnRef, quadratureRule, mode2D)
 
 
-def construct_function_space_from_reference_element(mesh, shapeOnRef, quadratureRule, mode2D='cartesian'):
+def construct_function_space_from_parent_element(mesh, shapeOnRef, quadratureRule, mode2D='cartesian'):
     shapes = jax.vmap(lambda elConns, elShape: elShape, (0, None))(mesh.conns, shapeOnRef.values)
 
-    shapeGrads = jax.vmap(map_element_shape_grads, (None, 0, None, None))(mesh.coords, mesh.conns, mesh.nodalBasis, shapeOnRef.gradients)
+    shapeGrads = jax.vmap(map_element_shape_grads, (None, 0, None, None))(mesh.coords, mesh.conns, mesh.parentElement, shapeOnRef.gradients)
 
     if mode2D == 'cartesian':
         el_vols = compute_element_volumes
     elif mode2D == 'axisymmetric':
         el_vols = compute_element_volumes_axisymmetric
-    vols = jax.vmap(el_vols, (None, 0, None, 0, None))(mesh.coords, mesh.conns, mesh.nodalBasis, shapes, quadratureRule.wgauss)
+    vols = jax.vmap(el_vols, (None, 0, None, 0, None))(mesh.coords, mesh.conns, mesh.parentElement, shapes, quadratureRule.wgauss)
 
     return FunctionSpace(shapes, vols, shapeGrads, mesh, quadratureRule)
 
 
-def map_element_shape_grads(coordField, nodeOrdinals, nodalBasis, shapeGradients):
+def map_element_shape_grads(coordField, nodeOrdinals, parentElement, shapeGradients):
     Xn = coordField.take(nodeOrdinals,0)
-    v = Xn[nodalBasis.vertexNodes]
+    v = Xn[parentElement.vertexNodes]
     J = np.column_stack((v[0] - v[2], v[1] - v[2]))
     return jax.vmap(lambda dN: solve(J.T, dN.T).T)(shapeGradients)
 
 
-def compute_element_volumes(coordField, nodeOrdinals, nodalBasis, shapes, weights):
+def compute_element_volumes(coordField, nodeOrdinals, parentElement, shapes, weights):
     Xn = coordField.take(nodeOrdinals,0)
-    v = Xn[nodalBasis.vertexNodes]
+    v = Xn[parentElement.vertexNodes]
     jac = np.cross(v[1] - v[0], v[2] - v[0])
     return jac*weights
 
 
-def compute_element_volumes_axisymmetric(coordField, nodeOrdinals, nodalBasis, shapes, weights):
-    vols = compute_element_volumes(coordField, nodeOrdinals, nodalBasis, shapes, weights)
+def compute_element_volumes_axisymmetric(coordField, nodeOrdinals, parentElement, shapes, weights):
+    vols = compute_element_volumes(coordField, nodeOrdinals, parentElement, shapes, weights)
     Xn = coordField.take(nodeOrdinals,0)
     Rs = shapes@Xn[:,0]
     return 2*np.pi*Rs*vols
