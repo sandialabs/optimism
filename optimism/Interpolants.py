@@ -2,7 +2,6 @@ from collections import namedtuple
 import numpy as onp
 from scipy import special
 
-import jax
 import jax.numpy as np
 
 
@@ -38,7 +37,7 @@ def make_nodal_basis_1d(degree):
     xn = get_lobatto_nodes_1d(degree)
     vertexPoints = np.array([0, degree], dtype=np.int32)
     interiorPoints = np.arange(1, degree, dtype=np.int32)
-    return NodalBasis(int(degree), LINE_ELEMENT, xn, vertexPoints, None, interiorPoints)
+    return NodalBasis(LINE_ELEMENT, int(degree), xn, vertexPoints, None, interiorPoints)
 
 
 def get_lobatto_nodes_1d(degree):
@@ -135,7 +134,7 @@ def make_nodal_basis_2d(degree):
     interiorPoints = [i for i in range(nPoints) if i not in facePoints.ravel()]
     interiorPoints = np.array(interiorPoints, dtype=np.int32)
     
-    return NodalBasis(int(degree), TRIANGLE_ELEMENT, points, vertexPoints, facePoints, interiorPoints)
+    return NodalBasis(TRIANGLE_ELEMENT, int(degree), points, vertexPoints, facePoints, interiorPoints)
 
 
 def make_master_tri_element(nodalBasis, quadratureRule):
