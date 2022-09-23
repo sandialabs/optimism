@@ -44,7 +44,7 @@ def get_lobatto_nodes_1d(degree):
     p = onp.polynomial.Legendre.basis(degree, domain=[0.0, 1.0])
     dp = p.deriv()
     xInterior = dp.roots()
-    xn = onp.hstack(([0.0], xInterior, [1.0]))
+    xn = np.hstack(([0.0], xInterior, [1.0]))
     return xn
 
 
@@ -78,6 +78,7 @@ def shape1d(degree, nodalPoints, evaluationPoints):
 
 
 def vander1d(x, degree):
+    x = onp.asarray(x)
     A = onp.zeros((x.shape[0], degree + 1))
     dA = onp.zeros((x.shape[0], degree + 1))
     domain = [0.0, 1.0]
@@ -123,6 +124,7 @@ def make_nodal_basis_2d(degree):
             points[point, 0] = (1.0 + 2.0*lobattoPoints[k] - lobattoPoints[j] - lobattoPoints[i])/3.0
             points[point, 1] = (1.0 + 2.0*lobattoPoints[j] - lobattoPoints[i] - lobattoPoints[k])/3.0
             point += 1
+    points = np.asarray(points)
 
     vertexPoints = np.array([0, degree, nPoints - 1], dtype=np.int32)
 
@@ -156,6 +158,7 @@ def pascal_triangle_monomials(degree):
 
 
 def vander2d(x, degree):
+    x = onp.asarray(x)
     nNodes = (degree+1)*(degree+2)//2
     pq = pascal_triangle_monomials(degree)
 
@@ -224,14 +227,13 @@ def vander2d(x, degree):
     return A, Ax, Ay
 
 def shape2d(degree, nodalPoints, evaluationPoints):
-    evaluationPoints = onp.asarray(evaluationPoints)
     A, _, _ = vander2d(nodalPoints, degree)
     nf, nfx, nfy = vander2d(evaluationPoints, degree)
     shapes = onp.linalg.solve(A.T, nf.T).T
     dshapes = onp.zeros(shapes.shape + (2,)) # shape is (nQuadPoints, nNodes, 2)
     dshapes[:, :, 0] = onp.linalg.solve(A.T, nfx.T).T
     dshapes[:, :, 1] = onp.linalg.solve(A.T, nfy.T).T
-    return ShapeFunctions(shapes, dshapes)
+    return ShapeFunctions(np.asarray(shapes), np.asarray(dshapes))
 
 
 def compute_shapes(nodalBasis, evaluationPoints):
@@ -271,39 +273,61 @@ def _compute_shapes_on_tri(masterElement, evaluationPoints):
     return solve(A.T, nf.T).T
 
 
-def make_master_tri_bubble_element(degree):
-    baseMaster = make_master_tri_element(degree)
-    bubbleMaster = make_master_tri_element(degree + 1)
+def make_nodal_basis_2d_with_bubble(degree):
+    baseMaster = make_nodal_basis_2d(degree)
+    bubbleMaster = make_nodal_basis_2d(degree + 1)
 
-    nPointsBase = num_nodes(baseMaster) - baseMaster.interiorNodes.size
-    nPointsBubble = bubbleMaster.interiorNodes.shape[0]
-    nPoints = nPointsBase + nPointsBubble
+    nNodesFromBase = num_nodes(baseMaster) - baseMaster.interiorNodes.size
+    nBubbleNodes = bubbleMaster.interiorNodes.shape[0]
+    nNodes = nNodesFromBase + nBubbleNodes
 
-    nNodesBase = num_nodes(baseMaster)
-    baseNonInteriorNodes = np.full(nNodesBase, True).at[baseMaster.interiorNodes].set(False)
+    retainedBaseNodes = onp.full(num_nodes(baseMaster), True)
+    retainedBaseNodes[baseMaster.interiorNodes] = False
 
-    coords = np.zeros((nPoints,2)).at[:nPointsBase].set(baseMaster.coordinates[baseNonInteriorNodes])
-    coords = coords.at[nPointsBase:].set(bubbleMaster.coordinates[bubbleMaster.interiorNodes])
+    coords = onp.zeros((nNodes, 2))
+    coords[:nNodesFromBase] = baseMaster.coordinates[retainedBaseNodes]
+    coords[nNodesFromBase:] = bubbleMaster.coordinates[bubbleMaster.interiorNodes]
 
-    vertexNodes = np.array([0, degree , nPointsBase - 1], dtype=int)
+    vertexNodes = np.array([0, degree , nNodesFromBase - 1], dtype=np.int32)
 
-    ii = np.arange(degree + 1)
-    jj = np.array([i for i in range(degree, 3*degree, 2)] + [nPointsBase - 1], dtype=int)
-    kk = np.array([i for i in reversed(range(degree + 1, nPointsBase, 2))] + [0], dtype=int)
-    faceNodes = np.array((ii,jj,kk), dtype=int)
+    ii = onp.arange(degree + 1)
+    jj = onp.array([i for i in range(degree, 3*degree, 2)] + [nNodesFromBase - 1])
+    kk = onp.array([i for i in reversed(range(degree + 1, nNodesFromBase, 2))] + [0])
+    faceNodes = np.array((ii,jj,kk), dtype=np.int32)
 
-    interiorNodes =  np.arange(nPointsBase, nPointsBase + nPointsBubble)
+    interiorNodes =  np.arange(nNodesFromBase, nNodesFromBase + nBubbleNodes, dtype=np.int32)
 
-    baseMasterNodes = np.setdiff1d(np.arange(num_nodes(baseMaster)),
-                                   baseMaster.interiorNodes,
-                                   assume_unique=True)
+    return NodalBasis(TRIANGLE_ELEMENT_WITH_BUBBLE, degree, coords, vertexNodes,
+                      faceNodes, interiorNodes)
 
-    bubbleMasterNodes = bubbleMaster.interiorNodes
 
-    return MasterBubbleElement(degree, coords, vertexNodes, faceNodes,
-                               interiorNodes, baseMaster, baseMasterNodes,
-                               bubbleMaster, bubbleMasterNodes)
+def shape2dBubble(refElement, evaluationPoints):
+    # base shape function values at eval points
+    baseElement = make_nodal_basis_2d(refElement.degree)
+    baseShapes, baseShapeGrads = shape2d(baseElement.degree, baseElement.coordinates, evaluationPoints)
+    nodesFromBase = np.setdiff1d(np.arange(num_nodes(baseElement)),
+                                 baseElement.interiorNodes,
+                                 assume_unique=True)
+    baseShapes = baseShapes[:, nodesFromBase]
+    baseShapeGrads = baseShapeGrads[:, nodesFromBase, :]
 
+    # base shape functions at bubble nodes
+    bubbleElement = make_nodal_basis_2d(refElement.degree + 1)
+    baseShapesAtBubbleNodes, _ = shape2d(baseElement.degree, baseElement.coordinates, bubbleElement.coordinates[bubbleElement.interiorNodes])
+    baseShapesAtBubbleNodes = baseShapesAtBubbleNodes[:, nodesFromBase]
+
+    # bubble function values at eval points
+    bubbleShapes, bubbleShapeGrads = shape2d(bubbleElement.degree, bubbleElement.coordinates, evaluationPoints)
+    bubbleShapes = bubbleShapes[:, refElement.interiorNodes]
+    bubbleShapeGrads = bubbleShapeGrads[:, refElement.interiorNodes, :]
+
+    baseShapes = baseShapes - bubbleShapes@baseShapesAtBubbleNodes
+    shapes = np.hstack((baseShapes, bubbleShapes))
+
+    baseShapeGrads = baseShapeGrads - np.einsum('qai,ab->qbi', bubbleShapeGrads, baseShapesAtBubbleNodes)
+    dshapes = np.hstack((baseShapeGrads, bubbleShapeGrads))
+
+    return shapes, dshapes
 
 def _compute_shapes_on_bubble_tri(master, evaluationPoints):
     # base shape function values at eval points
