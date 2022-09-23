@@ -1,8 +1,9 @@
 import os
+import warnings
 
-from optimism.JaxConfig import *
+import jax.numpy as np
+
 from optimism.VTKWriter import VTKWriter, VTKFieldType, VTKDataType
-from optimism import Interpolants
 from optimism import Mesh
 from optimism.test import MeshFixture
 
@@ -43,9 +44,9 @@ class TestVTKWriter(MeshFixture.MeshFixture):
         self.assertTrue(os.path.exists(self.baseFileName + '.vtk'))
 
 
-    @MeshFixture.unittest.expectedFailure
     def test_vtk_no_warning_for_inconsistent_sizes(self):
-        with self.assertWarns():
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
             self.writer.write()
 
 
@@ -91,11 +92,11 @@ class TestVTKWriterHigherOrder(MeshFixture.MeshFixture):
         self.assertTrue(os.path.exists(self.baseFileName + '.vtk'))
 
         
-    @MeshFixture.unittest.expectedFailure
     def test_vtk_writer_no_inconsistent_sizes_with_quadratic_elements(self):
         mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(self.simplexMesh, order=2)
         self.make_high_order_writer_with_fields(mesh)
-        with self.assertWarns():
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
             self.writer.write()
 
 
@@ -106,11 +107,11 @@ class TestVTKWriterHigherOrder(MeshFixture.MeshFixture):
         self.assertTrue(os.path.exists(self.baseFileName + '.vtk'))
 
         
-    @MeshFixture.unittest.expectedFailure
     def test_vtk_writer_no_inconsistent_sizes_with_cubic_elements(self):
         mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(self.simplexMesh, order=3)
         self.make_high_order_writer_with_fields(mesh)
-        with self.assertWarns():
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
             self.writer.write()
 
     
