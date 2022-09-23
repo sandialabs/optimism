@@ -25,14 +25,12 @@ class TestFunctionSpaceFixture(TestFixture.TestFixture):
         UNodal = np.ones(3) # value of U doesn't matter
         quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2)
         stateVar = None
-        masterElement = Interpolants.make_master_tri_element(self.nodalBasis, quadRule)
-        shape = masterElement.shapes
-        shapeGrad = np.zeros((quadRule.xigauss.shape[0],
-                              self.coords.shape[0],
-                              2)) # shapeGrads not used for mass
+        shape, shapeGrad = Interpolants.compute_shapes(self.nodalBasis, quadRule.xigauss)
         vol = FunctionSpace.compute_element_volumes(self.coords,
                                                     self.conn,
-                                                    masterElement)
+                                                    self.nodalBasis,
+                                                    shape,
+                                                    quadRule.wgauss)
         def f(u, gradu, state, X): return 0.5*u*u
         compute_mass = jax.hessian(lambda U: FunctionSpace.integrate_element(U, self.coords, stateVar, shape, shapeGrad, vol, self.conn, f, modify_element_gradient=FunctionSpace.default_modify_element_gradient))
         M = compute_mass(UNodal)
@@ -48,15 +46,12 @@ class TestFunctionSpaceFixture(TestFixture.TestFixture):
         UNodal = np.ones(3) # value of U doesn't matter
         quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
         stateVar = None
-        masterElement = Interpolants.make_master_tri_element(self.nodalBasis, quadRule)
-        shape = masterElement.shapes
-        shapeGrad = np.zeros((quadRule.xigauss.shape[0],
-                              self.coords.shape[0],
-                              2)) # shapeGrads not used for mass
-
+        shape, shapeGrad = Interpolants.compute_shapes(self.nodalBasis, quadRule.xigauss)
         vol = FunctionSpace.compute_element_volumes(self.coords,
                                                     self.conn,
-                                                    masterElement)
+                                                    self.nodalBasis,
+                                                    shape,
+                                                    quadRule.wgauss)
         def f(u, gradu, state, X): return 0.5*u*u
         compute_mass = jax.hessian(lambda U: FunctionSpace.integrate_element(U, self.coords, stateVar, shape, shapeGrad, vol, self.conn, f, modify_element_gradient=FunctionSpace.default_modify_element_gradient))
         M = compute_mass(UNodal)

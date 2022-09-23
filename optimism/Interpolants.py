@@ -2,9 +2,12 @@ from collections import namedtuple
 import numpy as onp
 from scipy import special
 
+import jax
+import jax.numpy as np
+
 
 NodalBasis = namedtuple('NodalBasis',
-                        ['degree', 'coordinates', 'vertexNodes', 'faceNodes', 'interiorNodes'])
+                        ['elementType', 'degree', 'coordinates', 'vertexNodes', 'faceNodes', 'interiorNodes'])
 
 
 MasterBubbleElement = namedtuple('MasterBubbleElement',
@@ -13,6 +16,13 @@ MasterBubbleElement = namedtuple('MasterBubbleElement',
 MasterElement = namedtuple('MasterElement',
                            ['degree', 'coordinates', 'vertexNodes', 'faceNodes', 
                             'interiorNodes', 'shapes', 'shapeGradients', 'quadratureRule'])
+
+ShapeFunctions = namedtuple('ShapeFunctions', ['values', 'gradients'])
+
+# element types
+LINE_ELEMENT = 0
+TRIANGLE_ELEMENT = 1
+TRIANGLE_ELEMENT_WITH_BUBBLE = 2
 
 
 def make_nodal_basis(degree):
@@ -26,9 +36,9 @@ def make_nodal_basis_1d(degree):
     """
 
     xn = get_lobatto_nodes_1d(degree)
-    vertexPoints = onp.array([0, degree], dtype=onp.int32)
-    interiorPoints = onp.arange(1, degree, dtype=onp.int32)
-    return NodalBasis(int(degree), xn, vertexPoints, None, interiorPoints)
+    vertexPoints = np.array([0, degree], dtype=np.int32)
+    interiorPoints = np.arange(1, degree, dtype=np.int32)
+    return NodalBasis(int(degree), LINE_ELEMENT, xn, vertexPoints, None, interiorPoints)
 
 
 def get_lobatto_nodes_1d(degree):
@@ -63,7 +73,9 @@ def shape1d(degree, nodalPoints, evaluationPoints):
 
     A,_ = vander1d(nodalPoints, degree)
     nf, nfx = vander1d(evaluationPoints, degree)
-    return onp.linalg.solve(A.T, nf.T), onp.linalg.solve(A.T, nfx.T)
+    shape = onp.linalg.solve(A.T, nf.T)
+    dshape = onp.linalg.solve(A.T, nfx.T)
+    return ShapeFunctions(shape, dshape) 
 
 
 def vander1d(x, degree):
@@ -113,17 +125,17 @@ def make_nodal_basis_2d(degree):
             points[point, 1] = (1.0 + 2.0*lobattoPoints[j] - lobattoPoints[i] - lobattoPoints[k])/3.0
             point += 1
 
-    vertexPoints = onp.array([0, degree, nPoints - 1], dtype=onp.int32)
+    vertexPoints = np.array([0, degree, nPoints - 1], dtype=np.int32)
 
     ii = onp.arange(degree + 1)
     jj = onp.cumsum(onp.flip(ii)) + ii
     kk = onp.flip(jj) - ii
-    facePoints = onp.array((ii,jj,kk), dtype=onp.int32)
+    facePoints = np.array((ii,jj,kk), dtype=np.int32)
 
     interiorPoints = [i for i in range(nPoints) if i not in facePoints.ravel()]
-    interiorPoints = onp.array(interiorPoints, dtype=onp.int32)
+    interiorPoints = np.array(interiorPoints, dtype=np.int32)
     
-    return NodalBasis(int(degree), points, vertexPoints, facePoints, interiorPoints)
+    return NodalBasis(int(degree), TRIANGLE_ELEMENT, points, vertexPoints, facePoints, interiorPoints)
 
 
 def make_master_tri_element(nodalBasis, quadratureRule):
@@ -213,13 +225,27 @@ def vander2d(x, degree):
     return A, Ax, Ay
 
 def shape2d(degree, nodalPoints, evaluationPoints):
+    evaluationPoints = onp.asarray(evaluationPoints)
     A, _, _ = vander2d(nodalPoints, degree)
     nf, nfx, nfy = vander2d(evaluationPoints, degree)
     shapes = onp.linalg.solve(A.T, nf.T).T
     dshapes = onp.zeros(shapes.shape + (2,)) # shape is (nQuadPoints, nNodes, 2)
     dshapes[:, :, 0] = onp.linalg.solve(A.T, nfx.T).T
     dshapes[:, :, 1] = onp.linalg.solve(A.T, nfy.T).T
-    return shapes, dshapes
+    return ShapeFunctions(shapes, dshapes)
+
+
+def compute_shapes(nodalBasis, evaluationPoints):
+    if nodalBasis.elementType == LINE_ELEMENT:
+        f = shape1d
+    elif nodalBasis.elementType == TRIANGLE_ELEMENT:
+        f = shape2d
+    elif nodalBasis.elementType == TRIANGLE_ELEMENT_WITH_BUBBLE:
+        f = _compute_shapes_on_bubble_tri
+    else:
+        raise ValueError('Unknown element type.')
+    
+    return f(nodalBasis.degree, nodalBasis.coordinates, evaluationPoints)
 
 def compute_shapes_on_tri(masterElement, evaluationPoints):
     # BT: The fake polymorphism here is not satisfying or
