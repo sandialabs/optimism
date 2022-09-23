@@ -5,7 +5,7 @@ from scipy import special
 import jax.numpy as np
 
 
-NodalBasis = namedtuple('NodalBasis',
+ParentElement = namedtuple('NodalBasis',
                         ['elementType', 'degree', 'coordinates', 'vertexNodes', 'faceNodes', 'interiorNodes'])
 
 
@@ -24,20 +24,20 @@ TRIANGLE_ELEMENT = 1
 TRIANGLE_ELEMENT_WITH_BUBBLE = 2
 
 
-def make_nodal_basis(degree):
-    basis = make_nodal_basis_2d(degree)
-    basis1d = make_nodal_basis_1d(degree)
+def make_parent_elements(degree):
+    basis = make_parent_element_2d(degree)
+    basis1d = make_parent_element_1d(degree)
     return basis, basis1d
 
 
-def make_nodal_basis_1d(degree):
+def make_parent_element_1d(degree):
     """Gauss-Lobatto Interpolation points on the unit interval.
     """
 
     xn = get_lobatto_nodes_1d(degree)
     vertexPoints = np.array([0, degree], dtype=np.int32)
     interiorPoints = np.arange(1, degree, dtype=np.int32)
-    return NodalBasis(LINE_ELEMENT, int(degree), xn, vertexPoints, None, interiorPoints)
+    return ParentElement(LINE_ELEMENT, int(degree), xn, vertexPoints, None, interiorPoints)
 
 
 def get_lobatto_nodes_1d(degree):
@@ -91,7 +91,7 @@ def vander1d(x, degree):
     return A, dA
 
 
-def make_nodal_basis_2d(degree):
+def make_parent_element_2d(degree):
     """Interpolation points on the triangle that are Lobatto points on the edges.
     Points have threefold rotational symmetry and low Lebesgue constants.
     
@@ -136,7 +136,7 @@ def make_nodal_basis_2d(degree):
     interiorPoints = [i for i in range(nPoints) if i not in facePoints.ravel()]
     interiorPoints = np.array(interiorPoints, dtype=np.int32)
     
-    return NodalBasis(TRIANGLE_ELEMENT, int(degree), points, vertexPoints, facePoints, interiorPoints)
+    return ParentElement(TRIANGLE_ELEMENT, int(degree), points, vertexPoints, facePoints, interiorPoints)
 
 
 def make_master_tri_element(nodalBasis, quadratureRule):
@@ -238,15 +238,14 @@ def shape2d(degree, nodalPoints, evaluationPoints):
 
 def compute_shapes(nodalBasis, evaluationPoints):
     if nodalBasis.elementType == LINE_ELEMENT:
-        f = shape1d
+        return shape1d(nodalBasis.degree, nodalBasis.coordinates, evaluationPoints)
     elif nodalBasis.elementType == TRIANGLE_ELEMENT:
-        f = shape2d
+        return shape2d(nodalBasis.degree, nodalBasis.coordinates, evaluationPoints)
     elif nodalBasis.elementType == TRIANGLE_ELEMENT_WITH_BUBBLE:
-        f = _compute_shapes_on_bubble_tri
+        return shape2dBubble(nodalBasis, evaluationPoints)
     else:
         raise ValueError('Unknown element type.')
-    
-    return f(nodalBasis.degree, nodalBasis.coordinates, evaluationPoints)
+
 
 def compute_shapes_on_tri(masterElement, evaluationPoints):
     # BT: The fake polymorphism here is not satisfying or
@@ -297,13 +296,13 @@ def make_nodal_basis_2d_with_bubble(degree):
 
     interiorNodes =  np.arange(nNodesFromBase, nNodesFromBase + nBubbleNodes, dtype=np.int32)
 
-    return NodalBasis(TRIANGLE_ELEMENT_WITH_BUBBLE, degree, coords, vertexNodes,
+    return ParentElement(TRIANGLE_ELEMENT_WITH_BUBBLE, degree, coords, vertexNodes,
                       faceNodes, interiorNodes)
 
 
 def shape2dBubble(refElement, evaluationPoints):
     # base shape function values at eval points
-    baseElement = make_nodal_basis_2d(refElement.degree)
+    baseElement = make_parent_element_2d(refElement.degree)
     baseShapes, baseShapeGrads = shape2d(baseElement.degree, baseElement.coordinates, evaluationPoints)
     nodesFromBase = np.setdiff1d(np.arange(num_nodes(baseElement)),
                                  baseElement.interiorNodes,

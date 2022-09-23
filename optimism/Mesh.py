@@ -31,7 +31,7 @@ def create_structured_mesh_data(Nx, Ny, xExtent, yExtent):
 
 
 def construct_mesh_from_basic_data(coords, conns, blocks, nodeSets=None, sideSets=None):
-    basis, basis1d = Interpolants.make_nodal_basis(degree=1)
+    basis, basis1d = Interpolants.make_parent_elements(degree=1)
     vertexNodes = np.arange(coords.shape[0])
     return Mesh(coords, conns, vertexNodes,
                 basis, basis1d, blocks, nodeSets, sideSets)
@@ -191,13 +191,13 @@ def create_edges(conns):
 def create_higher_order_mesh_from_simplex_mesh(mesh, order, useBubbleElement=False, copyNodeSets=False, createNodeSetsFromSideSets=False):
     if order==1: return mesh
 
-    basis1d = Interpolants.make_nodal_basis_1d(order)
+    basis1d = Interpolants.make_parent_element_1d(order)
     
     if useBubbleElement:
         # this is broken, need to fix with new NodalBasis class
         basis = Interpolants.make_master_tri_bubble_element(order)
     else:
-        basis = Interpolants.make_nodal_basis_2d(order)
+        basis = Interpolants.make_parent_element_2d(order)
 
     conns = np.zeros((num_elements(mesh), basis.coordinates.shape[0]), dtype=np.int_)
 

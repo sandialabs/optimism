@@ -18,7 +18,7 @@ class TestFunctionSpaceFixture(TestFixture.TestFixture):
                                 [-2.2743905 ,  4.53892   ],
                                 [ 2.0868123 ,  0.68486094]])
         self.conn = np.arange(0, 3)
-        self.nodalBasis = Interpolants.make_nodal_basis_2d(degree=1)
+        self.nodalBasis = Interpolants.make_parent_element_2d(degree=1)
 
 
     def test_mass_matrix_exactly_integrated(self):
