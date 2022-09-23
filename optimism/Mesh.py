@@ -1,11 +1,10 @@
 import numpy as onp
 from optimism.JaxConfig import *
 from optimism import Interpolants
-from optimism import TensorMath
 
 
 Mesh = namedtuple('Mesh', ['coords','conns','simplexNodesOrdinals',
-                           'nodalBasis', 'nodalBasis1d', 'blocks',
+                           'parentElement', 'parentElement1d', 'blocks',
                            'nodeSets', 'sideSets'],
                   defaults=(None,None,None))
 
@@ -31,10 +30,10 @@ def create_structured_mesh_data(Nx, Ny, xExtent, yExtent):
 
 
 def construct_mesh_from_basic_data(coords, conns, blocks, nodeSets=None, sideSets=None):
-    basis, basis1d = Interpolants.make_parent_elements(degree=1)
+    element, element1d = Interpolants.make_parent_elements(degree=1)
     vertexNodes = np.arange(coords.shape[0])
     return Mesh(coords, conns, vertexNodes,
-                basis, basis1d, blocks, nodeSets, sideSets)
+                element, element1d, blocks, nodeSets, sideSets)
 
 
 def construct_structured_mesh(Nx, Ny, xExtent, yExtent, elementOrder=1, useBubbleElement=False):
@@ -95,8 +94,8 @@ def combine_mesh(m1, m2):
     mesh2,disp2 = m2
 
     # Only handle 2 linear element meshes
-    assert mesh1.nodalBasis.degree == 1
-    assert mesh2.nodalBasis.degree == 1
+    assert mesh1.parentElement.degree == 1
+    assert mesh2.parentElement.degree == 1
 
     numNodes1 = mesh1.coords.shape[0]
     numElems1 = num_elements(mesh1)
@@ -118,26 +117,26 @@ def combine_mesh(m1, m2):
     blocks = combine_blocks(mesh1.blocks, mesh2.blocks, numElems1)
         
     return Mesh(coords, conns, simplexNodeOrdinals,
-                mesh1.nodalBasis, mesh1.nodalBasis1d, blocks,
+                mesh1.parentElement, mesh1.parentElement1d, blocks,
                 nodeSets, sideSets), disp
 
 
 def mesh_with_coords(mesh, coords):
     return Mesh(coords, mesh.conns,mesh.simplexNodesOrdinals,
-                mesh.nodalBasis, mesh.nodalBasis1d, mesh.blocks, mesh.nodeSets, mesh.sideSets)
+                mesh.parentElement, mesh.parentElement1d, mesh.blocks, mesh.nodeSets, mesh.sideSets)
 
 
 def mesh_with_nodesets(mesh, nodeSets):
     return Mesh(mesh.coords, mesh.conns,
                 mesh.simplexNodesOrdinals,
-                mesh.nodalBasis, mesh.nodalBasis1d,
+                mesh.parentElement, mesh.parentElement1d,
                 mesh.blocks, nodeSets, mesh.sideSets)
 
 
 def mesh_with_blocks(mesh, blocks):
     return Mesh(mesh.coords, mesh.conns,
                 mesh.simplexNodesOrdinals,
-                mesh.nodalBasis, mesh.nodalBasis1d,
+                mesh.parentElement, mesh.parentElement1d,
                 blocks, mesh.nodeSets, mesh.sideSets)
 
 def create_edges(conns):
@@ -191,11 +190,10 @@ def create_edges(conns):
 def create_higher_order_mesh_from_simplex_mesh(mesh, order, useBubbleElement=False, copyNodeSets=False, createNodeSetsFromSideSets=False):
     if order==1: return mesh
 
-    basis1d = Interpolants.make_parent_element_1d(order)
+    parentElement1d = Interpolants.make_parent_element_1d(order)
     
     if useBubbleElement:
-        # this is broken, need to fix with new NodalBasis class
-        basis = Interpolants.make_master_tri_bubble_element(order)
+        basis = Interpolants.make_parent_element_2d_with_bubble(order)
     else:
         basis = Interpolants.make_parent_element_2d(order)
 
@@ -209,23 +207,23 @@ def create_higher_order_mesh_from_simplex_mesh(mesh, order, useBubbleElement=Fal
 
     # step 2/3: mid-edge nodes (excluding vertices)
     edgeConns, edges = create_edges(mesh.conns)
-    A = np.column_stack((1.0-basis1d.coordinates[basis1d.interiorNodes],
-                         basis1d.coordinates[basis1d.interiorNodes]))
+    A = np.column_stack((1.0-parentElement1d.coordinates[parentElement1d.interiorNodes],
+                         parentElement1d.coordinates[parentElement1d.interiorNodes]))
     edgeCoords = vmap(lambda edgeConn: np.dot(A, mesh.coords[edgeConn,:]))(edgeConns)
 
-    nNodesPerEdge = basis1d.interiorNodes.size
+    nNodesPerEdge = parentElement1d.interiorNodes.size
     for e, edge in enumerate(edges):
         edgeNodeOrdinals = nodeOrdinalOffset + np.arange(e*nNodesPerEdge,(e+1)*nNodesPerEdge)
         
         elemLeft = edge[0]
         sideLeft = edge[1]
-        edgeMasterNodes = basis.faceNodes[sideLeft][basis1d.interiorNodes]
+        edgeMasterNodes = basis.faceNodes[sideLeft][parentElement1d.interiorNodes]
         conns = conns.at[elemLeft, edgeMasterNodes].set(edgeNodeOrdinals)
 
         elemRight = edge[2]
         if elemRight >= 0:
             sideRight = edge[3]
-            edgeMasterNodes = basis.faceNodes[sideRight][basis1d.interiorNodes]
+            edgeMasterNodes = basis.faceNodes[sideRight][parentElement1d.interiorNodes]
             conns = conns.at[elemRight, edgeMasterNodes].set(np.flip(edgeNodeOrdinals))
 
     nEdges = edges.shape[0]
@@ -256,7 +254,7 @@ def create_higher_order_mesh_from_simplex_mesh(mesh, order, useBubbleElement=Fal
     nodeSets = mesh.nodeSets if copyNodeSets else None
 
     newMesh = Mesh(coords, conns, simplexNodesOrdinals, basis,
-                   basis1d, mesh.blocks, nodeSets, mesh.sideSets)
+                   parentElement1d, mesh.blocks, nodeSets, mesh.sideSets)
     
     if createNodeSetsFromSideSets:
         nodeSets = create_nodesets_from_sidesets(newMesh)
@@ -266,13 +264,12 @@ def create_higher_order_mesh_from_simplex_mesh(mesh, order, useBubbleElement=Fal
 
 
 def create_nodesets_from_sidesets(mesh):
-    basis = mesh.nodalBasis
     nodeSets = {}
 
     def get_nodes_from_edge(edge):
         elemOrdinal = edge[0]
         sideOrdinal = edge[1]
-        return mesh.conns[elemOrdinal,basis.faceNodes[sideOrdinal,:]]
+        return mesh.conns[elemOrdinal, mesh.parentElement.faceNodes[sideOrdinal,:]]
     
     for setName, sideSet in mesh.sideSets.items():
         nodes = vmap(get_nodes_from_edge)(sideSet)
