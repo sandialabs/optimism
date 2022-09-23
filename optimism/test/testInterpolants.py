@@ -149,18 +149,16 @@ class TestInterpolants(TestFixture.TestFixture):
             expected0 = onp.polynomial.polynomial.polyval2d(x[:,0], x[:,1], DPoly)
 
             self.assertArrayNear(expected0, dfInterpolated[:,0], 14)
-            
+
             direction = 1
             DPoly = onp.polynomial.polynomial.polyder(poly, 1, scl=1, axis=direction)
             expected1 = onp.polynomial.polynomial.polyval2d(x[:,0], x[:,1], DPoly)
 
             self.assertArrayNear(expected1, dfInterpolated[:,1], 14)
 
-            
-        
-    def no_test_plot_interpolants_tri(self):
+    def no_test_plot_high_order_nodes(self):
         degree = 10
-        nodeScheme = Interpolants.make_master_tri_element(degree)
+        nodeScheme = Interpolants.make_parent_element_2d(degree)
         p = nodeScheme.coordinates
         fig = plt.figure()
         plt.scatter(p[:,0], p[:,1])
@@ -168,40 +166,67 @@ class TestInterpolants(TestFixture.TestFixture):
         plt.show()
 
 
-    def generate_random_points_in_triangle(self, npts):
-        key = jax.random.PRNGKey(2)
-        x = jax.random.uniform(key, (npts,))
-        y = jax.numpy.zeros(npts)
-        for i in range(npts):
-            key,subkey = jax.random.split(key)
-            y = y.at[i].set(jax.random.uniform(subkey, minval=0.0, maxval=1.0-x[i]))
+class TestBubbleInterpolants(TestInterpolants):
+    def setUp(self):
+        maxDegree = 5
+        self.elements = []
+        self.qr = QuadratureRule.create_quadrature_rule_on_triangle(degree=maxDegree)
+        self.nQPts = QuadratureRule.len(self.qr)
+        for degree in range(2, maxDegree + 1):
+            self.elements.append(Interpolants.make_parent_element_2d_with_bubble(degree))
 
-        points = jax.numpy.column_stack((x,y))
-        return  onp.asarray(points)
+    def test_bubble_interpolation(self):
+        x = generate_random_points_in_triangle(1)
+        for element in self.elements:
+            with self.subTest(i=element.degree):
+                degree = element.degree
+                polyCoeffs = onp.fliplr(onp.triu(onp.ones((degree+1,degree+1))))
+                expected = onp.polynomial.polynomial.polyval2d(x[:,0], x[:,1], polyCoeffs)
 
+                shape, _ = Interpolants.shape2dBubble(element, x)
+                fn = onp.polynomial.polynomial.polyval2d(element.coordinates[:,0],
+                                                         element.coordinates[:,1],
+                                                         polyCoeffs)
+                fInterpolated = onp.dot(shape, fn)
+                self.assertArrayNear(expected, fInterpolated, 14)
 
-# class TestBubbleInterpolants(TestInterpolants):
-#     def setUp(self):
-#         maxDegree = 3
-#         self.masters1d = []
-#         self.mastersTri = []
-#         for degree in range(2, maxDegree + 1):
-#             self.masters1d.append(Interpolants.make_master_line_element(degree))
-#             self.mastersTri.append(Interpolants.make_master_tri_bubble_element(degree))
+    def test_bubble_grad_interpolation(self):
+        x = generate_random_points_in_triangle(1)
+        for element in self.elements:
+            degree = element.degree
+            poly = onp.fliplr(onp.triu(onp.ones((degree+1,degree+1))))
 
+            _, dShape = Interpolants.shape2dBubble(element, x)
+            fn = onp.polynomial.polynomial.polyval2d(element.coordinates[:,0],
+                                                     element.coordinates[:,1],
+                                                     poly)
+            dfInterpolated = onp.einsum('qai,a->qi',dShape, fn)
 
-#     def no_test_plot_shape_functions(self):
-#         s = self.generate_random_points_in_triangle(500)
-#         shape = Interpolants.compute_shapes_on_bubble_tri(self.mastersTri[1], s)
-#         unit = np.sum(shape, axis=1)
-#         print(np.max(unit), np.min(unit))
+            # exact x derivative
+            direction = 0
+            DPoly = onp.polynomial.polynomial.polyder(poly, 1, scl=1, axis=direction)
+            expected0 = onp.polynomial.polynomial.polyval2d(x[:,0], x[:,1], DPoly)
 
-#         for i in range(Interpolants.num_nodes(self.mastersTri[1])):
-#             ax = plt.figure().add_subplot(projection='3d')
-#             ax.scatter(s[:,0], s[:,1], shape[:,i])
+            self.assertArrayNear(expected0, dfInterpolated[:,0], 13)
 
-#         plt.show()
+            direction = 1
+            DPoly = onp.polynomial.polynomial.polyder(poly, 1, scl=1, axis=direction)
+            expected1 = onp.polynomial.polynomial.polyval2d(x[:,0], x[:,1], DPoly)
 
+            self.assertArrayNear(expected1, dfInterpolated[:,1], 14)
+
+    def no_test_plot_shape_functions(self):
+        i = 1
+        print('degree=', self.elements[i].degree)
+
+        x = generate_random_points_in_triangle(500)
+        shape, _ = Interpolants.shape2dBubble(self.elements[i], x)
+
+        for i in range(Interpolants.num_nodes(self.elements[i])):
+            ax = plt.figure().add_subplot(projection='3d')
+            ax.stem(x[:,0], x[:,1], shape[:,i])
+
+        plt.show()
 
 if __name__ == '__main__':
     unittest.main()

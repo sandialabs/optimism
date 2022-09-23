@@ -272,20 +272,20 @@ def _compute_shapes_on_tri(masterElement, evaluationPoints):
     return solve(A.T, nf.T).T
 
 
-def make_nodal_basis_2d_with_bubble(degree):
-    baseMaster = make_nodal_basis_2d(degree)
-    bubbleMaster = make_nodal_basis_2d(degree + 1)
+def make_parent_element_2d_with_bubble(degree):
+    baseMaster = make_parent_element_2d(degree)
+    bubbleMaster = make_parent_element_2d(degree + 1)
 
     nNodesFromBase = num_nodes(baseMaster) - baseMaster.interiorNodes.size
     nBubbleNodes = bubbleMaster.interiorNodes.shape[0]
     nNodes = nNodesFromBase + nBubbleNodes
 
-    retainedBaseNodes = onp.full(num_nodes(baseMaster), True)
-    retainedBaseNodes[baseMaster.interiorNodes] = False
+    retainedBaseNodes = np.full(num_nodes(baseMaster), True)
+    retainedBaseNodes = retainedBaseNodes.at[baseMaster.interiorNodes].set(False)
 
-    coords = onp.zeros((nNodes, 2))
-    coords[:nNodesFromBase] = baseMaster.coordinates[retainedBaseNodes]
-    coords[nNodesFromBase:] = bubbleMaster.coordinates[bubbleMaster.interiorNodes]
+    coords = np.zeros((nNodes, 2))
+    coords = coords.at[:nNodesFromBase].set(baseMaster.coordinates[retainedBaseNodes])
+    coords = coords.at[nNodesFromBase:].set(bubbleMaster.coordinates[bubbleMaster.interiorNodes])
 
     vertexNodes = np.array([0, degree , nNodesFromBase - 1], dtype=np.int32)
 
@@ -311,14 +311,14 @@ def shape2dBubble(refElement, evaluationPoints):
     baseShapeGrads = baseShapeGrads[:, nodesFromBase, :]
 
     # base shape functions at bubble nodes
-    bubbleElement = make_nodal_basis_2d(refElement.degree + 1)
+    bubbleElement = make_parent_element_2d(refElement.degree + 1)
     baseShapesAtBubbleNodes, _ = shape2d(baseElement.degree, baseElement.coordinates, bubbleElement.coordinates[bubbleElement.interiorNodes])
     baseShapesAtBubbleNodes = baseShapesAtBubbleNodes[:, nodesFromBase]
 
     # bubble function values at eval points
     bubbleShapes, bubbleShapeGrads = shape2d(bubbleElement.degree, bubbleElement.coordinates, evaluationPoints)
-    bubbleShapes = bubbleShapes[:, refElement.interiorNodes]
-    bubbleShapeGrads = bubbleShapeGrads[:, refElement.interiorNodes, :]
+    bubbleShapes = bubbleShapes[:, bubbleElement.interiorNodes]
+    bubbleShapeGrads = bubbleShapeGrads[:, bubbleElement.interiorNodes, :]
 
     baseShapes = baseShapes - bubbleShapes@baseShapesAtBubbleNodes
     shapes = np.hstack((baseShapes, bubbleShapes))
