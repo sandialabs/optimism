@@ -251,7 +251,7 @@ def make_parent_element_2d_with_bubble(degree):
     interiorNodes =  np.arange(nNodesFromBase, nNodesFromBase + nBubbleNodes, dtype=np.int32)
 
     return ParentElement(TRIANGLE_ELEMENT_WITH_BUBBLE, degree, coords, vertexNodes,
-                      faceNodes, interiorNodes)
+                         faceNodes, interiorNodes)
 
 
 def shape2dBubble(refElement, evaluationPoints):
@@ -280,7 +280,7 @@ def shape2dBubble(refElement, evaluationPoints):
     baseShapeGrads = baseShapeGrads - np.einsum('qai,ab->qbi', bubbleShapeGrads, baseShapesAtBubbleNodes)
     dshapes = np.hstack((baseShapeGrads, bubbleShapeGrads))
 
-    return shapes, dshapes
+    return ShapeFunctions(shapes, dshapes)
 
 
 def num_nodes(master):
