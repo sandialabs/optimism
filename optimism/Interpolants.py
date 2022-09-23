@@ -215,13 +215,13 @@ def shape2d(degree, nodalPoints, evaluationPoints):
     return ShapeFunctions(np.asarray(shapes), np.asarray(dshapes))
 
 
-def compute_shapes(nodalBasis, evaluationPoints):
-    if nodalBasis.elementType == LINE_ELEMENT:
-        return shape1d(nodalBasis.degree, nodalBasis.coordinates, evaluationPoints)
-    elif nodalBasis.elementType == TRIANGLE_ELEMENT:
-        return shape2d(nodalBasis.degree, nodalBasis.coordinates, evaluationPoints)
-    elif nodalBasis.elementType == TRIANGLE_ELEMENT_WITH_BUBBLE:
-        return shape2dBubble(nodalBasis, evaluationPoints)
+def compute_shapes(parentElement, evaluationPoints):
+    if parentElement.elementType == LINE_ELEMENT:
+        return shape1d(parentElement.degree, parentElement.coordinates, evaluationPoints)
+    elif parentElement.elementType == TRIANGLE_ELEMENT:
+        return shape2d(parentElement.degree, parentElement.coordinates, evaluationPoints)
+    elif parentElement.elementType == TRIANGLE_ELEMENT_WITH_BUBBLE:
+        return shape2dBubble(parentElement, evaluationPoints)
     else:
         raise ValueError('Unknown element type.')
 
