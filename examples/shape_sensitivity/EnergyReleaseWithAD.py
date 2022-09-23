@@ -1,7 +1,8 @@
 import jax
 import jax.numpy as np
 
-from optimism import EquationSolver, Interpolants
+from optimism import EquationSolver
+from optimism import Interpolants
 from optimism import FunctionSpace
 from optimism.material import LinearElastic
 from optimism import Mechanics
@@ -17,10 +18,10 @@ mesh = ReadExodusMesh.read_exodus_mesh('crack_domain.g')
 
 kFieldXOffset = mesh.coords[mesh.nodeSets['crack_tip'], 0]
 
-order = 2*mesh.nodalBasis.degree
+order = 2*mesh.parentElement.degree
 quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2*(order - 1))
-masterElement = Interpolants.make_master_tri_element(mesh.nodalBasis, quadRule)
-fs = FunctionSpace.construct_function_space_from_master_element(mesh, masterElement)
+shapeData = Interpolants.compute_shapes(mesh.parentElement, quadRule.xigauss)
+fs = FunctionSpace.construct_function_space_from_parent_element(mesh, shapeData, quadRule)
 
 ebcs = [FunctionSpace.EssentialBC(nodeSet='external', component=0),
         FunctionSpace.EssentialBC(nodeSet='external', component=1),
@@ -105,7 +106,7 @@ def qoi(Wu, Uu, p, mesh):
     W = essentialBCManager.create_field(Wu)
     coords = mesh.coords + W
     qoiMesh = Mesh.mesh_with_coords(mesh, coords)
-    qoiFS = FunctionSpace.construct_function_space_from_master_element(qoiMesh, masterElement)
+    qoiFS = FunctionSpace.construct_function_space_from_parent_element(qoiMesh, shapeData, quadRule)
     qoiSolidMechanics = Mechanics.create_mechanics_functions(qoiFS, "plane strain", material)
     internalVariables = p[1]
     U = create_field(Uu, p)
