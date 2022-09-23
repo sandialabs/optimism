@@ -8,14 +8,6 @@ import jax.numpy as np
 ParentElement = namedtuple('NodalBasis',
                         ['elementType', 'degree', 'coordinates', 'vertexNodes', 'faceNodes', 'interiorNodes'])
 
-
-MasterBubbleElement = namedtuple('MasterBubbleElement',
-                                 ['degree', 'coordinates', 'vertexNodes', 'faceNodes', 'interiorNodes', 'baseMaster', 'baseMasterNodes', 'enrichmentMaster', 'enrichmentMasterNodes'])
-
-MasterElement = namedtuple('MasterElement',
-                           ['degree', 'coordinates', 'vertexNodes', 'faceNodes', 
-                            'interiorNodes', 'shapes', 'shapeGradients', 'quadratureRule'])
-
 ShapeFunctions = namedtuple('ShapeFunctions', ['values', 'gradients'])
 
 # element types
@@ -46,13 +38,6 @@ def get_lobatto_nodes_1d(degree):
     xInterior = dp.roots()
     xn = np.hstack(([0.0], xInterior, [1.0]))
     return xn
-
-
-def make_master_line_element(nodalBasis, quadratureRule):
-    shape, dshape = shape1d(nodalBasis.degree, nodalBasis.coordinates, quadratureRule.xigauss)
-    return MasterElement(nodalBasis.degree, nodalBasis.coordinates, nodalBasis.vertexNodes, 
-                         nodalBasis.faceNodes, nodalBasis.interiorNodes, shape, dshape, 
-                         quadratureRule)
 
 
 def shape1d(degree, nodalPoints, evaluationPoints):
@@ -139,13 +124,6 @@ def make_parent_element_2d(degree):
     return ParentElement(TRIANGLE_ELEMENT, int(degree), points, vertexPoints, facePoints, interiorPoints)
 
 
-def make_master_tri_element(nodalBasis, quadratureRule):
-    shape, dshape = shape2d(nodalBasis.degree, nodalBasis.coordinates, quadratureRule.xigauss)
-    return MasterElement(nodalBasis.degree, nodalBasis.coordinates, nodalBasis.vertexNodes, 
-                         nodalBasis.faceNodes, nodalBasis.interiorNodes, shape, dshape, 
-                         quadratureRule)
-
-
 def pascal_triangle_monomials(degree):
     p = []
     q = []
@@ -226,6 +204,7 @@ def vander2d(x, degree):
         
     return A, Ax, Ay
 
+
 def shape2d(degree, nodalPoints, evaluationPoints):
     A, _, _ = vander2d(nodalPoints, degree)
     nf, nfx, nfy = vander2d(evaluationPoints, degree)
@@ -245,31 +224,6 @@ def compute_shapes(nodalBasis, evaluationPoints):
         return shape2dBubble(nodalBasis, evaluationPoints)
     else:
         raise ValueError('Unknown element type.')
-
-
-def compute_shapes_on_tri(masterElement, evaluationPoints):
-    # BT: The fake polymorphism here is not satisfying or
-    # extensible. We could probably make the master
-    # elements into classes. We just want to be sure
-    # we're ok with them being types that can't be
-    # registered in jax.
-    
-    if type(masterElement) == MasterElement:
-        shapes =  _compute_shapes_on_tri(masterElement,
-                                         evaluationPoints)
-    elif type(masterElement) == MasterBubbleElement:
-        shapes = _compute_shapes_on_bubble_tri(masterElement,
-                                               evaluationPoints)
-    else:
-        raise TypeError('Unrecognized master element type')
-
-    return shapes
-
-
-def _compute_shapes_on_tri(masterElement, evaluationPoints):
-    A = compute_vandermonde_tri(masterElement.coordinates, masterElement.degree)
-    nf = compute_vandermonde_tri(evaluationPoints, masterElement.degree)
-    return solve(A.T, nf.T).T
 
 
 def make_parent_element_2d_with_bubble(degree):
@@ -327,27 +281,6 @@ def shape2dBubble(refElement, evaluationPoints):
     dshapes = np.hstack((baseShapeGrads, bubbleShapeGrads))
 
     return shapes, dshapes
-
-def _compute_shapes_on_bubble_tri(master, evaluationPoints):
-    # base shape function values at eval points
-    baseMaster = master.baseMaster
-    baseShapes = _compute_shapes_on_tri(baseMaster,
-                                        evaluationPoints)
-    baseShapes = baseShapes[:,master.baseMasterNodes]
-
-    # base shape functions at bubble nodes
-    baseShapesAtBubbleNodes = _compute_shapes_on_tri(baseMaster,
-                                                     master.coordinates[master.interiorNodes])
-    baseShapesAtBubbleNodes = baseShapesAtBubbleNodes[:,master.baseMasterNodes]
-
-    # bubble function values at eval points
-    enrichmentMaster = master.enrichmentMaster
-    bubbleShapes = _compute_shapes_on_tri(enrichmentMaster,
-                                          evaluationPoints)
-    bubbleShapes = bubbleShapes[:,master.enrichmentMasterNodes]
-
-    return np.hstack((baseShapes - bubbleShapes@baseShapesAtBubbleNodes,
-                      bubbleShapes))
 
 
 def num_nodes(master):

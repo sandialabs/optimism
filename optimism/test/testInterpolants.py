@@ -117,7 +117,7 @@ class TestInterpolants(TestFixture.TestFixture):
 
 
     def test_interpolation(self):
-        x = self.generate_random_points_in_triangle(1)
+        x = generate_random_points_in_triangle(1)
         for element in self.elements:
             degree = element.degree
             polyCoeffs = onp.fliplr(onp.triu(onp.ones((degree+1,degree+1))))
@@ -132,7 +132,7 @@ class TestInterpolants(TestFixture.TestFixture):
 
 
     def test_grad_interpolation(self):
-        x = self.generate_random_points_in_triangle(1)
+        x = generate_random_points_in_triangle(1)
         for element in self.elements:
             degree = element.degree
             poly = onp.fliplr(onp.triu(onp.ones((degree+1,degree+1))))
@@ -166,7 +166,7 @@ class TestInterpolants(TestFixture.TestFixture):
         plt.show()
 
 
-class TestBubbleInterpolants(TestInterpolants):
+class TestBubbleInterpolants:
     def setUp(self):
         maxDegree = 5
         self.elements = []
