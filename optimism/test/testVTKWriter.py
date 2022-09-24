@@ -1,4 +1,5 @@
 import os
+import unittest
 import warnings
 
 import jax.numpy as np
@@ -117,4 +118,4 @@ class TestVTKWriterHigherOrder(MeshFixture.MeshFixture):
     
 
 if __name__ == '__main__':
-    MeshFixture.unittest.main()
+    unittest.main()
