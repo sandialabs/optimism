@@ -18,8 +18,7 @@ mesh = ReadExodusMesh.read_exodus_mesh('crack_domain.g')
 
 kFieldXOffset = mesh.coords[mesh.nodeSets['crack_tip'], 0]
 
-order = 2*mesh.parentElement.degree
-quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2*(order - 1))
+quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2*(mesh.parentElement.degree - 1))
 shapeData = Interpolants.compute_shapes(mesh.parentElement, quadRule.xigauss)
 fs = FunctionSpace.construct_function_space_from_parent_element(mesh, shapeData, quadRule)
 
