@@ -1,6 +1,8 @@
-import numpy as onp
+import unittest
 
-from optimism.JaxConfig import *
+import jax
+import jax.numpy as np
+
 from optimism import FunctionSpace
 from optimism import Interpolants
 from optimism import Mechanics
@@ -30,11 +32,11 @@ class TestVolumeAverage(MeshFixture.MeshFixture):
                                               self.mesh.coords[:,0]) )
         self.UWithQuadraticJ = np.column_stack((0.1*self.mesh.coords[:,0]**2, 0.3*self.mesh.coords[:,1]**2))
 
-        masterJConstant = Interpolants.make_master_tri_element(degree=0)
-        masterJLinear = Interpolants.make_master_tri_element(degree=1)
+        elementJConstant = Interpolants.make_parent_element_2d(degree=0)
+        elementJLinear = Interpolants.make_parent_element_2d(degree=1)
 
-        self.shapesJConstant = Interpolants.compute_shapes_on_tri(masterJConstant, quadRule.xigauss)
-        self.shapesJLinear = Interpolants.compute_shapes_on_tri(masterJLinear, quadRule.xigauss)
+        self.shapesJConstant, self.shapeGradsJConstant = Interpolants.shape2d(elementJConstant.degree, elementJConstant.coordinates, quadRule.xigauss)
+        self.shapesJLinear, self.shapeGradsJLinear = Interpolants.shape2d(elementJLinear.degree, elementJLinear.coordinates, quadRule.xigauss)
 
         
     def test_constant_J_projection_exact_for_constant_J_field(self):
@@ -42,7 +44,7 @@ class TestVolumeAverage(MeshFixture.MeshFixture):
         defGrads = dispGrads + np.identity(2)
         Js = np.linalg.det(defGrads)
         
-        projectedDispGrads = vmap(Mechanics.volume_average_J_gradient_transformation, (0,0,None))(dispGrads, self.fs.vols, self.shapesJConstant)
+        projectedDispGrads = jax.vmap(Mechanics.volume_average_J_gradient_transformation, (0,0,None))(dispGrads, self.fs.vols, self.shapesJConstant)
         projectedDefGrads = projectedDispGrads + np.identity(2)
         JBars = np.linalg.det(projectedDefGrads)
 
@@ -58,7 +60,7 @@ class TestVolumeAverage(MeshFixture.MeshFixture):
         defGrads = dispGrads + np.identity(2)
         Js = np.linalg.det(defGrads)
         
-        projectedDispGrads = vmap(Mechanics.volume_average_J_gradient_transformation, (0,0,None))(dispGrads, self.fs.vols, self.shapesJLinear)
+        projectedDispGrads = jax.vmap(Mechanics.volume_average_J_gradient_transformation, (0,0,None))(dispGrads, self.fs.vols, self.shapesJLinear)
         projectedDefGrads = projectedDispGrads + np.identity(2)
         JBars = np.linalg.det(projectedDefGrads)
         
@@ -70,7 +72,7 @@ class TestVolumeAverage(MeshFixture.MeshFixture):
         defGrads = dispGrads + np.identity(2)
         Js = np.linalg.det(defGrads)
         
-        projectedDispGrads = vmap(Mechanics.volume_average_J_gradient_transformation, (0,0,None))(dispGrads, self.fs.vols, self.shapesJConstant)
+        projectedDispGrads = jax.vmap(Mechanics.volume_average_J_gradient_transformation, (0,0,None))(dispGrads, self.fs.vols, self.shapesJConstant)
         projectedDefGrads = projectedDispGrads + np.identity(2)
         JBars = np.linalg.det(projectedDefGrads)
 
@@ -83,7 +85,7 @@ class TestVolumeAverage(MeshFixture.MeshFixture):
         defGrads = dispGrads + np.identity(2)
         Js = np.linalg.det(defGrads)
         
-        projectedDispGrads = vmap(Mechanics.volume_average_J_gradient_transformation, (0,0,None))(dispGrads, self.fs.vols, self.shapesJLinear)
+        projectedDispGrads = jax.vmap(Mechanics.volume_average_J_gradient_transformation, (0,0,None))(dispGrads, self.fs.vols, self.shapesJLinear)
         projectedDefGrads = projectedDispGrads + np.identity(2)
         JBars = np.linalg.det(projectedDefGrads)
         
@@ -95,7 +97,7 @@ class TestVolumeAverage(MeshFixture.MeshFixture):
         defGrads = dispGrads + np.identity(2)
         Js = np.linalg.det(defGrads)
         
-        projectedDispGrads = vmap(Mechanics.volume_average_J_gradient_transformation, (0,0,None))(dispGrads, self.fs.vols, self.shapesJLinear)
+        projectedDispGrads = jax.vmap(Mechanics.volume_average_J_gradient_transformation, (0,0,None))(dispGrads, self.fs.vols, self.shapesJLinear)
         projectedDefGrads = projectedDispGrads + np.identity(2)
         JBars = np.linalg.det(projectedDefGrads)
 
@@ -105,4 +107,4 @@ class TestVolumeAverage(MeshFixture.MeshFixture):
         
 
 if __name__ == '__main__':
-    MeshFixture.unittest.main()
+    unittest.main()
