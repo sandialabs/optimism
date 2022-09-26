@@ -148,13 +148,13 @@ class TestInterpolants(TestFixture.TestFixture):
             DPoly = onp.polynomial.polynomial.polyder(poly, 1, scl=1, axis=direction)
             expected0 = onp.polynomial.polynomial.polyval2d(x[:,0], x[:,1], DPoly)
 
-            self.assertArrayNear(expected0, dfInterpolated[:,0], 14)
+            self.assertArrayNear(expected0, dfInterpolated[:,0], 13)
 
             direction = 1
             DPoly = onp.polynomial.polynomial.polyder(poly, 1, scl=1, axis=direction)
             expected1 = onp.polynomial.polynomial.polyval2d(x[:,0], x[:,1], DPoly)
 
-            self.assertArrayNear(expected1, dfInterpolated[:,1], 14)
+            self.assertArrayNear(expected1, dfInterpolated[:,1], 13)
 
     def no_test_plot_high_order_nodes(self):
         degree = 10
