@@ -1,9 +1,8 @@
-import jax
 import unittest
-from scipy.sparse import linalg
-import numpy as onp
 
-from optimism.JaxConfig import *
+import jax
+import jax.numpy as np
+
 from optimism import EquationSolver
 from optimism import FunctionSpace
 from optimism import Mechanics
@@ -38,7 +37,7 @@ class DynamicsFixture(MeshFixture.MeshFixture):
         mesh, _ = self.create_mesh_and_disp(N, M, xRange, yRange, lambda X: 0*X)
         self.mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(mesh, order=2, createNodeSetsFromSideSets=True)
 
-        quadPrecision = 2*(self.mesh.masterElement.degree - 1)
+        quadPrecision = 2*(self.mesh.parentElement.degree - 1)
         quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=quadPrecision)
         self.fs = FunctionSpace.construct_function_space(self.mesh, quadRule)
         self.fieldShape = self.mesh.coords.shape
