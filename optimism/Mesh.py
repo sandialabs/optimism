@@ -7,6 +7,25 @@ Mesh = namedtuple('Mesh', ['coords','conns','simplexNodesOrdinals',
                            'parentElement', 'parentElement1d', 'blocks',
                            'nodeSets', 'sideSets'],
                   defaults=(None,None,None))
+Mesh.__doc__ = \
+    """Triangle mesh representing a domain.
+
+    Attributes:
+        coords: Coordinates of the nodes, shape ``(nNodes, nDim)``.
+        conns: Nodal connectivity table of the elements.
+        simplexNodesOrdinals: Indices of the nodes that are vertices.
+        parentElement: A ``ParentElement`` that is the element type in
+            parametric space. A mesh can contain only 1 element type.
+        parentElement1d:
+        blocks: A dictionary mapping element block names to the indices of the
+            elements in the block.
+        nodeSets: A dictionary mapping node set names to the indices of the
+            nodes.
+        sideSets: A dictionary mapping side set names to the edges. The
+            edge data structure is a tuple of the element index and the local
+            number of the edge within that element. For example, triangle
+            elements will have edge 0, 1, or 2 for this entry.
+    """
 
 
 def create_structured_mesh_data(Nx, Ny, xExtent, yExtent):

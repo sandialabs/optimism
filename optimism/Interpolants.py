@@ -7,8 +7,40 @@ import jax.numpy as np
 
 ParentElement = namedtuple('NodalBasis',
                         ['elementType', 'degree', 'coordinates', 'vertexNodes', 'faceNodes', 'interiorNodes'])
+ParentElement.__doc__ = \
+    """Finite element on reference domain.
+
+    Attributes:
+        elementType: integer indiacting the element type. The magic numbers are
+            defined in the ``Interpolants`` module.
+        degree: Highest degree complete polynomial the element is capable of
+            exactly representing.
+        coordinates: Locations of the nodes in parameteric coordinates. Rows
+            are nodes, columns are x and y.
+        vertexNodes: Indices of vertices in the ``coordinates`` array.
+        faceNodes: Indices of the nodes on each triangle face in the
+            ``coordinates`` array. For example, ``faceNodes[0]`` gives the
+            indices of the nodes on the face between vertex 0 and vertex 1.
+            This is empty for line elements.
+        interiorNodes: Indices of nodes that are not on the boundary of the
+            element.
+    """
 
 ShapeFunctions = namedtuple('ShapeFunctions', ['values', 'gradients'])
+ShapeFunctions.__doc__ = \
+    """Shape functions and shape function gradients (in the parametric space).
+
+    Attributes:
+        values: Values of the shape functions at a discrete set of points.
+            Shape is ``(nPts, nNodes)``, where ``nPts`` is the number of
+            points at which the shame functinos are evaluated, and ``nNodes``
+            is the number of nodes in the element (which is equal to the
+            number of shape functions).
+        gradients: Values of the parametric gradients of the shape functions.
+            Shape is ``(nPts, nDim, nNodes)``, where ``nDim`` is the number
+            of spatial dimensions. Line elements are an exception, which
+            have shape ``(nPts, nNdodes)``.
+    """
 
 # element types
 LINE_ELEMENT = 0
@@ -17,6 +49,7 @@ TRIANGLE_ELEMENT_WITH_BUBBLE = 2
 
 
 def make_parent_elements(degree):
+    """Returns a triangle element and the corresponding line element."""
     basis = make_parent_element_2d(degree)
     basis1d = make_parent_element_1d(degree)
     return basis, basis1d

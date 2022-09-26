@@ -10,16 +10,85 @@ from optimism import Mesh
 
 
 FunctionSpace = namedtuple('FunctionSpace', ['shapes', 'vols', 'shapeGrads', 'mesh', 'quadratureRule'])
+FunctionSpace.__doc__ = \
+    """Data needed for calculus on functions in the discrete function space.
+
+    In describing the shape of the attributes, ``ne`` is the number of
+    elements in the mesh, ``nqpe`` is the number of quadrature points per
+    element, ``npe`` is the number of nodes per element, and ``nd`` is the
+    spatial dimension of the domain.
+
+    Attributes:
+        shapes: Shape function values on each element, shape (ne, nqpe, npe)
+        vols: Volume attributed to each quadrature point. That is, the
+            quadrature weight (on the parameteric element domain) multiplied by
+            the Jacobian determinant of the map from the parent element to the
+            element in the domain. Shape (ne, nqpe).
+        shapeGrads: Derivatives of the shape functions with respect to the
+            spatial coordinates of the domain. Shape (ne, nqpe, npe, nd).
+        mesh: The ``Mesh`` object of the domain.
+        quadratureRule: The ``QuadratureRule`` on which to sample the shape
+            functions.
+    """
 
 EssentialBC = namedtuple('EssentialBC', ['nodeSet', 'component'])
 
 
 def construct_function_space(mesh, quadratureRule, mode2D='cartesian'):
+    """Construct a discrete function space.
+
+    Parameters
+    ----------
+    mesh: The mesh of the domain.
+    quadratureRule: The quadrature rule to be used for integrating on the
+        domain.
+    mode2D: A string indicating how the 2D domain is interpreted for
+        integration. Valid values are ``cartesian`` and ``axisymmetric``.
+        Axisymetric mode will include the factor of 2*pi*r in the ``vols``
+        attribute.
+
+    Returns
+    -------
+    The ``FunctionSpace`` object.
+    """
+
     shapeOnRef = Interpolants.compute_shapes(mesh.parentElement, quadratureRule.xigauss)
     return construct_function_space_from_parent_element(mesh, shapeOnRef, quadratureRule, mode2D)
 
 
 def construct_function_space_from_parent_element(mesh, shapeOnRef, quadratureRule, mode2D='cartesian'):
+    """Construct a function space with precomputed shape function data on the parent element.
+
+    This version of the function space constructor is Jax-transformable,
+    and in particular can be jitted. The computation of the shape function
+    values and derivatives on the parent element is not transformable in
+    general. However, the mapping of the shape function data to the elements in
+    the mesh is transformable. One can precompute the parent element shape
+    functions once and for all, and then use this special factory function to
+    construct the function space and avoid the non-transformable part of the
+    operation. The primary use case is for shape sensitivities: the coordinates
+    of the mesh change, and we want Jax to pick up the sensitivities of the
+    shape function derivatives in space to the coordinate changes
+    (which occurs through the mapping from the parent element to the spatial
+    domain).
+
+    Parameters
+    ----------
+    mesh: The mesh of the domain.
+    shapeOnRef: A tuple of the shape function values and gradients on the
+        parent element, evaluated at the quadrature points. The caller must
+        take care to ensure the shape functions are evaluated at the same
+        points as contained in the ``quadratureRule`` parameter.
+    quadratureRule: The quadrature rule to be used for integrating on the
+        domain.
+    mode2D: A string indicating how the 2D domain is interpreted for
+        integration. See the default factory function for details.
+
+    Returns
+    -------
+    The ``FunctionSpace`` object.
+    """
+
     shapes = jax.vmap(lambda elConns, elShape: elShape, (0, None))(mesh.conns, shapeOnRef.values)
 
     shapeGrads = jax.vmap(map_element_shape_grads, (None, 0, None, None))(mesh.coords, mesh.conns, mesh.parentElement, shapeOnRef.gradients)
@@ -54,6 +123,10 @@ def compute_element_volumes_axisymmetric(coordField, nodeOrdinals, parentElement
     return 2*np.pi*Rs*vols
 
 
+# This kind of function space is now deprecated (09/26/22). Its main purpose was to be
+# jax transformable for use in shape optimization. The ``construct_function_space_from_parent_element``
+# factory function should now be used instead.
+#
 # only supports cartesian and linear shape functions on tris, single integration point per element
 def construct_weighted_function_space(mesh, quadratureRule, quadratureWeights=1.0):
     
