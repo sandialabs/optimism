@@ -1,33 +1,132 @@
-from jax.scipy.linalg import solve
-from jax.lax import scan
+from collections import namedtuple
 import numpy as onp
 
-from optimism.JaxConfig import *
+import jax
+import jax.numpy as np
+from jax.scipy.linalg import solve
+
 from optimism import Interpolants
 from optimism import Mesh
-from optimism import QuadratureRule
-from optimism.TensorMath import tensor_2D_to_3D
 
 
 FunctionSpace = namedtuple('FunctionSpace', ['shapes', 'vols', 'shapeGrads', 'mesh', 'quadratureRule'])
+FunctionSpace.__doc__ = \
+    """Data needed for calculus on functions in the discrete function space.
+
+    In describing the shape of the attributes, ``ne`` is the number of
+    elements in the mesh, ``nqpe`` is the number of quadrature points per
+    element, ``npe`` is the number of nodes per element, and ``nd`` is the
+    spatial dimension of the domain.
+
+    Attributes:
+        shapes: Shape function values on each element, shape (ne, nqpe, npe)
+        vols: Volume attributed to each quadrature point. That is, the
+            quadrature weight (on the parameteric element domain) multiplied by
+            the Jacobian determinant of the map from the parent element to the
+            element in the domain. Shape (ne, nqpe).
+        shapeGrads: Derivatives of the shape functions with respect to the
+            spatial coordinates of the domain. Shape (ne, nqpe, npe, nd).
+        mesh: The ``Mesh`` object of the domain.
+        quadratureRule: The ``QuadratureRule`` on which to sample the shape
+            functions.
+    """
 
 EssentialBC = namedtuple('EssentialBC', ['nodeSet', 'component'])
 
-def construct_function_space(mesh, quadratureRule, mode2D='cartesian'):
-    shapes = vmap(compute_shape_values_on_element,
-                  (None, 0, None, None))(mesh.coords, mesh.conns, mesh.masterElement, quadratureRule.xigauss)
 
-    shapeGrads = compute_shape_grads(mesh.coords, mesh.conns, mesh.masterElement, quadratureRule)
-    
+def construct_function_space(mesh, quadratureRule, mode2D='cartesian'):
+    """Construct a discrete function space.
+
+    Parameters
+    ----------
+    mesh: The mesh of the domain.
+    quadratureRule: The quadrature rule to be used for integrating on the
+        domain.
+    mode2D: A string indicating how the 2D domain is interpreted for
+        integration. Valid values are ``cartesian`` and ``axisymmetric``.
+        Axisymetric mode will include the factor of 2*pi*r in the ``vols``
+        attribute.
+
+    Returns
+    -------
+    The ``FunctionSpace`` object.
+    """
+
+    shapeOnRef = Interpolants.compute_shapes(mesh.parentElement, quadratureRule.xigauss)
+    return construct_function_space_from_parent_element(mesh, shapeOnRef, quadratureRule, mode2D)
+
+
+def construct_function_space_from_parent_element(mesh, shapeOnRef, quadratureRule, mode2D='cartesian'):
+    """Construct a function space with precomputed shape function data on the parent element.
+
+    This version of the function space constructor is Jax-transformable,
+    and in particular can be jitted. The computation of the shape function
+    values and derivatives on the parent element is not transformable in
+    general. However, the mapping of the shape function data to the elements in
+    the mesh is transformable. One can precompute the parent element shape
+    functions once and for all, and then use this special factory function to
+    construct the function space and avoid the non-transformable part of the
+    operation. The primary use case is for shape sensitivities: the coordinates
+    of the mesh change, and we want Jax to pick up the sensitivities of the
+    shape function derivatives in space to the coordinate changes
+    (which occurs through the mapping from the parent element to the spatial
+    domain).
+
+    Parameters
+    ----------
+    mesh: The mesh of the domain.
+    shapeOnRef: A tuple of the shape function values and gradients on the
+        parent element, evaluated at the quadrature points. The caller must
+        take care to ensure the shape functions are evaluated at the same
+        points as contained in the ``quadratureRule`` parameter.
+    quadratureRule: The quadrature rule to be used for integrating on the
+        domain.
+    mode2D: A string indicating how the 2D domain is interpreted for
+        integration. See the default factory function for details.
+
+    Returns
+    -------
+    The ``FunctionSpace`` object.
+    """
+
+    shapes = jax.vmap(lambda elConns, elShape: elShape, (0, None))(mesh.conns, shapeOnRef.values)
+
+    shapeGrads = jax.vmap(map_element_shape_grads, (None, 0, None, None))(mesh.coords, mesh.conns, mesh.parentElement, shapeOnRef.gradients)
+
     if mode2D == 'cartesian':
-        vols = vmap(compute_volumes_on_element,
-                    (None, 0, None, None))(mesh.coords, mesh.conns, mesh.masterElement, quadratureRule)
+        el_vols = compute_element_volumes
     elif mode2D == 'axisymmetric':
-        vols = vmap(compute_axisymmetric_volumes_on_element,
-                    (None, 0, 0, None, None))(mesh.coords, mesh.conns, shapes, mesh.masterElement, quadratureRule)        
+        el_vols = compute_element_volumes_axisymmetric
+    vols = jax.vmap(el_vols, (None, 0, None, 0, None))(mesh.coords, mesh.conns, mesh.parentElement, shapes, quadratureRule.wgauss)
+
     return FunctionSpace(shapes, vols, shapeGrads, mesh, quadratureRule)
 
 
+def map_element_shape_grads(coordField, nodeOrdinals, parentElement, shapeGradients):
+    Xn = coordField.take(nodeOrdinals,0)
+    v = Xn[parentElement.vertexNodes]
+    J = np.column_stack((v[0] - v[2], v[1] - v[2]))
+    return jax.vmap(lambda dN: solve(J.T, dN.T).T)(shapeGradients)
+
+
+def compute_element_volumes(coordField, nodeOrdinals, parentElement, shapes, weights):
+    Xn = coordField.take(nodeOrdinals,0)
+    v = Xn[parentElement.vertexNodes]
+    jac = np.cross(v[1] - v[0], v[2] - v[0])
+    return jac*weights
+
+
+def compute_element_volumes_axisymmetric(coordField, nodeOrdinals, parentElement, shapes, weights):
+    vols = compute_element_volumes(coordField, nodeOrdinals, parentElement, shapes, weights)
+    Xn = coordField.take(nodeOrdinals,0)
+    Rs = shapes@Xn[:,0]
+    return 2*np.pi*Rs*vols
+
+
+# This kind of function space is now deprecated (09/26/22). Its main purpose was to be
+# jax transformable for use in shape optimization. The ``construct_function_space_from_parent_element``
+# factory function should now be used instead.
+#
 # only supports cartesian and linear shape functions on tris, single integration point per element
 def construct_weighted_function_space(mesh, quadratureRule, quadratureWeights=1.0):
     
@@ -60,8 +159,8 @@ def construct_weighted_function_space(mesh, quadratureRule, quadratureWeights=1.
     
     shapes = np.ones( (mesh.conns.shape[0], 1, 3) )
 
-    vols = vmap(compute_elem_volume, (None, 0))(mesh.coords, mesh.conns)
-    shapeGrads = vmap(compute_elem_linear_shape_gradient, (None, 0, 0))(mesh.coords, vols, mesh.conns)
+    vols = jax.vmap(compute_elem_volume, (None, 0))(mesh.coords, mesh.conns)
+    shapeGrads = jax.vmap(compute_elem_linear_shape_gradient, (None, 0, 0))(mesh.coords, vols, mesh.conns)
     
     vols = np.reshape( vols, (vols.shape[0], 1) )
     vols = vols * quadratureWeights
@@ -74,11 +173,11 @@ def default_modify_element_gradient(elemGrads, elemShapes, elemVols, elemNodalDi
 
 
 def compute_field_gradient(functionSpace, nodalField, modify_element_gradient=default_modify_element_gradient):
-    return vmap(compute_element_field_gradient, (None,None,0,0,0,0,None))(nodalField, functionSpace.mesh.coords, functionSpace.shapes, functionSpace.shapeGrads, functionSpace.vols, functionSpace.mesh.conns, modify_element_gradient)
+    return jax.vmap(compute_element_field_gradient, (None,None,0,0,0,0,None))(nodalField, functionSpace.mesh.coords, functionSpace.shapes, functionSpace.shapeGrads, functionSpace.vols, functionSpace.mesh.conns, modify_element_gradient)
 
 
 def interpolate_to_points(functionSpace, nodalField):
-    return vmap(interpolate_to_element_points, (None, 0, 0))(nodalField, functionSpace.shapes, functionSpace.mesh.conns)
+    return jax.vmap(interpolate_to_element_points, (None, 0, 0))(nodalField, functionSpace.shapes, functionSpace.mesh.conns)
 
 
 def integrate_over_block(functionSpace, U, stateVars, func, block,
@@ -135,7 +234,7 @@ def evaluate_on_block(functionSpace, U, stateVars, func, block,
       density functional ``func`` at every quadrature point in the block.
     """
     fs = functionSpace
-    compute_elem_values = vmap(evaluate_on_element, (None, None, 0, 0, 0, 0, 0, None, None, *tuple(0 for p in params)))
+    compute_elem_values = jax.vmap(evaluate_on_element, (None, None, 0, 0, 0, 0, 0, None, None, *tuple(0 for p in params)))
     
     blockValues = compute_elem_values(U, fs.mesh.coords, stateVars[block], fs.shapes[block],
                                       fs.shapeGrads[block], fs.vols[block],
@@ -147,17 +246,17 @@ def integrate_element_from_local_field(elemNodalField, elemNodalCoords, elemStat
     """Integrate over element with element nodal field as input.
     This allows element residuals and element stiffness matrices to computed.
     """
-    elemVals = vmap(interpolate_to_point, (None,0))(elemNodalField, elemShapes)
-    elemGrads = vmap(compute_quadrature_point_field_gradient, (None,0))(elemNodalField, elemShapeGrads)
+    elemVals = jax.vmap(interpolate_to_point, (None,0))(elemNodalField, elemShapes)
+    elemGrads = jax.vmap(compute_quadrature_point_field_gradient, (None,0))(elemNodalField, elemShapeGrads)
     elemGrads = modify_element_gradient(elemGrads, elemShapes, elemVols, elemNodalField, elemNodalCoords)
-    elemPoints = vmap(interpolate_to_point, (None,0))(elemNodalCoords, elemShapes)
-    fVals = vmap(func)(elemVals, elemGrads, elemStates, elemPoints)
+    elemPoints = jax.vmap(interpolate_to_point, (None,0))(elemNodalCoords, elemShapes)
+    fVals = jax.vmap(func)(elemVals, elemGrads, elemStates, elemPoints)
     return np.dot(fVals, elemVols)
 
 
 def compute_element_field_gradient(U, coords, elemShapes, elemShapeGrads, elemVols, elemConnectivity, modify_element_gradient):
     elemNodalDisps = U[elemConnectivity]
-    elemGrads = vmap(compute_quadrature_point_field_gradient, (None, 0))(elemNodalDisps, elemShapeGrads)
+    elemGrads = jax.vmap(compute_quadrature_point_field_gradient, (None, 0))(elemNodalDisps, elemShapeGrads)
     elemNodalCoords = coords[elemConnectivity]
     elemGrads = modify_element_gradient(elemGrads, elemShapes, elemVols, elemNodalDisps, elemNodalCoords)
     return elemGrads
@@ -174,14 +273,14 @@ def interpolate_to_point(elementNodalValues, shape):
 
 def interpolate_to_element_points(U, elemShapes, elemConnectivity):
     elemU = U[elemConnectivity]
-    return vmap(interpolate_to_point, (None, 0))(elemU, elemShapes)
+    return jax.vmap(interpolate_to_point, (None, 0))(elemU, elemShapes)
 
 
 def integrate_element(U, coords, elemStates, elemShapes, elemShapeGrads, elemVols, elemConn, func, modify_element_gradient):
     elemVals = interpolate_to_element_points(U, elemShapes, elemConn)
     elemGrads = compute_element_field_gradient(U, coords, elemShapes, elemShapeGrads, elemVols, elemConn, modify_element_gradient)
     elemXs = interpolate_to_element_points(coords, elemShapes, elemConn)
-    fVals = vmap(func)(elemVals, elemGrads, elemStates, elemXs)
+    fVals = jax.vmap(func)(elemVals, elemGrads, elemStates, elemXs)
     return np.dot(fVals, elemVols)
 
 
@@ -190,44 +289,12 @@ def evaluate_on_element(U, coords, elemStates, elemShapes, elemShapeGrads, elemV
     elemGrads = compute_element_field_gradient(U, coords, elemShapes, elemShapeGrads, elemVols, elemConn, modify_element_gradient)
     elemXs = interpolate_to_element_points(coords, elemShapes, elemConn)
     vmapArgs = 0, 0, 0, 0, *tuple(None for p in params)
-    fVals = vmap(kernelFunc, vmapArgs)(elemVals, elemGrads, elemStates, elemXs, *params)
+    fVals = jax.vmap(kernelFunc, vmapArgs)(elemVals, elemGrads, elemStates, elemXs, *params)
     return fVals
 
 
-def compute_shape_values_on_element(coordField, nodeOrdinals, master, evalPoints):
-    return Interpolants.compute_shapes_on_tri(master, evalPoints)
-
-
-def compute_volumes_on_element(coordField, nodeOrdinals, master, quadRule):
-    Xn = coordField.take(nodeOrdinals,0)
-    v = Xn[master.vertexNodes]
-    jac = np.cross(v[1] - v[0], v[2] - v[0])
-    return jac*quadRule.wgauss
-
-
-def compute_axisymmetric_volumes_on_element(coordField, nodeOrdinals, elemShapes, master, quadRule):
-    vols = compute_volumes_on_element(coordField, nodeOrdinals, master, quadRule)
-    Xn = coordField.take(nodeOrdinals,0)
-    Rs = elemShapes@Xn[:,0]
-    return 2*np.pi*Rs*vols
-
-
-
-def compute_shape_grads(coordField, conns, master, quadRule):
-    masterShapeGrads = Interpolants.compute_shapeGrads_on_tri(master, quadRule.xigauss)
-    return vmap(compute_element_shape_grads,
-                (None,0,None,None))(coordField, conns, master, masterShapeGrads)
-
-
-def compute_element_shape_grads(coordField, nodeOrdinals, master, masterShapeGrads):
-    Xn = coordField.take(nodeOrdinals,0)
-    v = Xn[master.vertexNodes]
-    J = np.column_stack((v[0] - v[2], v[1] - v[2]))
-    return vmap(lambda dN: solve(J.T, dN.T).T)(masterShapeGrads)   
-
-
 def project_quadrature_field_to_element_field(functionSpace, quadField):
-    return vmap(average_quadrature_field_over_element)(quadField, functionSpace.vols)
+    return jax.vmap(average_quadrature_field_over_element)(quadField, functionSpace.vols)
 
 
 def average_quadrature_field_over_element(elemQPData, vols):

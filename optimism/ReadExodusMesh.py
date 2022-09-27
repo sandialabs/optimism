@@ -16,16 +16,16 @@ def read_exodus_mesh(fileName):
 
         elementType = _read_element_type(exData).lower()
         if elementType == "tri3" or elementType == "tri":
-            masterElement, masterLineElement = Interpolants.make_master_elements(degree = 1)
+            basis, basis1d = Interpolants.make_parent_elements(degree = 1)
             simplexNodesOrdinals = np.arange(coords.shape[0])
         elif elementType == "tri6":
-            masterElement, masterLineElement = Interpolants.make_master_elements(degree = 2)
+            basis, basis1d = Interpolants.make_parent_elements(degree = 2)
             simplexNodesOrdinals = _get_vertex_nodes_from_exodus_tri6_mesh(conns)
             conns = conns[:, exodusToNativeTri6NodeOrder]
         else:
             raise
 
-        return Mesh.Mesh(coords, conns, simplexNodesOrdinals, masterElement, masterLineElement,
+        return Mesh.Mesh(coords, conns, simplexNodesOrdinals, basis, basis1d,
                          blocks, nodeSets, sideSets)
         
         

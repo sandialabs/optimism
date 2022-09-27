@@ -23,7 +23,6 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
 
 
     def test_create_nodesets_from_sidesets(self):
-        master = Interpolants.make_master_tri_element(1)
         nodeSets = Mesh.create_nodesets_from_sidesets(self.mesh)
 
         # this test relies on the fact that matching nodesets
@@ -132,7 +131,7 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
         # check that all triangles are valid:
         # compute inradius of each triangle and of the sub-triangle of the mid-edge nodes
         # Both should be nonzero, and parent inradius should be 2x sub-triangle inradius
-        master = newMesh.masterElement
+        master = newMesh.parentElement
         for t in newMesh.conns:
             elCoords = newMesh.coords[t, :]
             parentCoords = elCoords[master.vertexNodes, :]

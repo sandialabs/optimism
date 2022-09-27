@@ -1,49 +1,115 @@
-from scipy.special import legendre, jacobi
-from jax.numpy.linalg import solve
+from collections import namedtuple
 import numpy as onp
+from scipy import special
 
-from optimism.JaxConfig import *
-
-
-MasterElement = namedtuple('MasterElement',
-                           ['degree', 'coordinates', 'vertexNodes', 'faceNodes', 'interiorNodes'])
+import jax.numpy as np
 
 
-MasterBubbleElement = namedtuple('MasterBubbleElement',
-                                 ['degree', 'coordinates', 'vertexNodes', 'faceNodes', 'interiorNodes', 'baseMaster', 'baseMasterNodes', 'enrichmentMaster', 'enrichmentMasterNodes'])
+ParentElement = namedtuple('NodalBasis',
+                        ['elementType', 'degree', 'coordinates', 'vertexNodes', 'faceNodes', 'interiorNodes'])
+ParentElement.__doc__ = \
+    """Finite element on reference domain.
+
+    Attributes:
+        elementType: integer indiacting the element type. The magic numbers are
+            defined in the ``Interpolants`` module.
+        degree: Highest degree complete polynomial the element is capable of
+            exactly representing.
+        coordinates: Locations of the nodes in parameteric coordinates. Rows
+            are nodes, columns are x and y.
+        vertexNodes: Indices of vertices in the ``coordinates`` array.
+        faceNodes: Indices of the nodes on each triangle face in the
+            ``coordinates`` array. For example, ``faceNodes[0]`` gives the
+            indices of the nodes on the face between vertex 0 and vertex 1.
+            This is empty for line elements.
+        interiorNodes: Indices of nodes that are not on the boundary of the
+            element.
+    """
+
+ShapeFunctions = namedtuple('ShapeFunctions', ['values', 'gradients'])
+ShapeFunctions.__doc__ = \
+    """Shape functions and shape function gradients (in the parametric space).
+
+    Attributes:
+        values: Values of the shape functions at a discrete set of points.
+            Shape is ``(nPts, nNodes)``, where ``nPts`` is the number of
+            points at which the shame functinos are evaluated, and ``nNodes``
+            is the number of nodes in the element (which is equal to the
+            number of shape functions).
+        gradients: Values of the parametric gradients of the shape functions.
+            Shape is ``(nPts, nDim, nNodes)``, where ``nDim`` is the number
+            of spatial dimensions. Line elements are an exception, which
+            have shape ``(nPts, nNdodes)``.
+    """
+
+# element types
+LINE_ELEMENT = 0
+TRIANGLE_ELEMENT = 1
+TRIANGLE_ELEMENT_WITH_BUBBLE = 2
 
 
-def make_master_elements(degree):
-    master = make_master_tri_element(degree)
-    master1d = make_master_line_element(degree)
-    return master, master1d
+def make_parent_elements(degree):
+    """Returns a triangle element and the corresponding line element."""
+    basis = make_parent_element_2d(degree)
+    basis1d = make_parent_element_1d(degree)
+    return basis, basis1d
 
 
-def make_master_line_element(degree):
+def make_parent_element_1d(degree):
     """Gauss-Lobatto Interpolation points on the unit interval.
     """
-    # define on standard [-1, 1]
-    xInterior = np.array([])
-    if degree == 0:
-        xn = np.array([0.0])
-        vertexPoints = np.array([], dtype=np.int32)
-        interiorPoints = np.array([1], dtype=np.int32)
-    else:
-        P = legendre(degree)
-        P = np.array(P.c) # convert to jax deviceArray
-        DP = np.polyder(P)
-        xInterior = np.real(np.sort(np.roots(DP)))
-        xn = np.hstack( (np.array([-1.0]), xInterior, np.array([1.0])) )
-        vertexPoints = np.array([0, degree], dtype=np.int32)
-        interiorPoints = np.arange(1, degree)
 
-    #  shift to [0, 1]
-    xn = 0.5*(xn + 1.0)
-    
-    return MasterElement(degree, xn, vertexPoints, None, interiorPoints)
+    xn = get_lobatto_nodes_1d(degree)
+    vertexPoints = np.array([0, degree], dtype=np.int32)
+    interiorPoints = np.arange(1, degree, dtype=np.int32)
+    return ParentElement(LINE_ELEMENT, int(degree), xn, vertexPoints, None, interiorPoints)
 
 
-def make_master_tri_element(degree):
+def get_lobatto_nodes_1d(degree):
+    p = onp.polynomial.Legendre.basis(degree, domain=[0.0, 1.0])
+    dp = p.deriv()
+    xInterior = dp.roots()
+    xn = np.hstack(([0.0], xInterior, [1.0]))
+    return xn
+
+
+def shape1d(degree, nodalPoints, evaluationPoints):
+    """Evaluate shape functions and derivatives at points in the master element.
+
+    Args:
+      master1d: 1D MasterElement to evaluate the shape function data on
+      evaluationPoints: Array of points in the master element domain at
+        which to evaluate the shape functions and derivatives.
+
+    Returns:
+      Shape function values and shape function derivatives at ``evaluationPoints``,
+      in a tuple (``shape``, ``dshape``).
+      shapes: [nNodes, nEvalPoints]
+      dshapes: [nNodes, nEvalPoints]
+    """
+
+    A,_ = vander1d(nodalPoints, degree)
+    nf, nfx = vander1d(evaluationPoints, degree)
+    shape = onp.linalg.solve(A.T, nf.T)
+    dshape = onp.linalg.solve(A.T, nfx.T)
+    return ShapeFunctions(shape, dshape) 
+
+
+def vander1d(x, degree):
+    x = onp.asarray(x)
+    A = onp.zeros((x.shape[0], degree + 1))
+    dA = onp.zeros((x.shape[0], degree + 1))
+    domain = [0.0, 1.0]
+    for i in range(degree + 1):
+        p = onp.polynomial.Legendre.basis(i, domain=domain) 
+        p *= onp.sqrt(2.0*i + 1.0) # keep polynomial orthonormal
+        A[:, i] = p(x)
+        dp = p.deriv()
+        dA[:, i] = dp(x)
+    return A, dA
+
+
+def make_parent_element_2d(degree):
     """Interpolation points on the triangle that are Lobatto points on the edges.
     Points have threefold rotational symmetry and low Lebesgue constants.
     
@@ -66,86 +132,44 @@ def make_master_tri_element(degree):
        9  7  4   0
     """
 
-    if degree == 0:
-        points = np.array([1.0, 1.0])/3.0
-        vertexPoints = np.array([0], dtype=np.int32)
-        facePoints = np.array([[0],[0],[0]], dtype=np.int32)
-        interiorPoints = np.array([0], dtype=np.int32)
-    else:
-        lobattoPoints = make_master_line_element(degree).coordinates
-        nPoints = int((degree + 1)*(degree + 2)/2)
-        points = np.zeros((nPoints, 2))
-        point = 0
-        for i in range(degree):
-            for j in range(degree + 1 - i):
-                k = degree - i - j
-                points = points.at[ (point,0) ].set( (1.0 + 2.0*lobattoPoints[k] - lobattoPoints[j] - lobattoPoints[i])/3.0 )
-                points = points.at[ (point,1) ].set( (1.0 + 2.0*lobattoPoints[j] - lobattoPoints[i] - lobattoPoints[k])/3.0 )
-                point += 1
+    lobattoPoints = get_lobatto_nodes_1d(degree)
+    nPoints = int((degree + 1)*(degree + 2)/2)
+    points = onp.zeros((nPoints, 2))
+    point = 0
+    for i in range(degree):
+        for j in range(degree + 1 - i):
+            k = degree - i - j
+            points[point, 0] = (1.0 + 2.0*lobattoPoints[k] - lobattoPoints[j] - lobattoPoints[i])/3.0
+            points[point, 1] = (1.0 + 2.0*lobattoPoints[j] - lobattoPoints[i] - lobattoPoints[k])/3.0
+            point += 1
+    points = np.asarray(points)
+
+    vertexPoints = np.array([0, degree, nPoints - 1], dtype=np.int32)
+
+    ii = onp.arange(degree + 1)
+    jj = onp.cumsum(onp.flip(ii)) + ii
+    kk = onp.flip(jj) - ii
+    facePoints = np.array((ii,jj,kk), dtype=np.int32)
+
+    interiorPoints = [i for i in range(nPoints) if i not in facePoints.ravel()]
+    interiorPoints = np.array(interiorPoints, dtype=np.int32)
     
-        vertexPoints = np.array([0, degree, nPoints - 1], dtype=int)
-
-        ii = np.arange(degree + 1)
-        jj = np.cumsum(np.flip(ii)) + ii
-        kk = np.flip(jj) - ii
-        facePoints = np.array((ii,jj,kk), dtype=int)
-
-        interiorPoints = [i for i in range(nPoints) if i not in facePoints.ravel()]
-        interiorPoints = np.array(interiorPoints, dtype=int)
-    
-    return MasterElement(degree, points, vertexPoints, facePoints, interiorPoints)
-    
-    
-def make_vandermonde_1D(x, degree):
-    # shift to bi-unit interval convention of scipy
-    z = 2.0*x - 1.0
-
-    A = []
-    for i in range(degree + 1):
-        P = legendre(i)
-        P = np.array(P.c)
-        # re-scale back to [0,1]
-        P *= np.sqrt(2.0*i + 1.0)
-        Pval = np.polyval(P, z)
-        A.append(Pval)
-
-    return np.array(A).T
-
-
-def compute_1D_shape_function_values(nodalPoints, evaluationPoints, degree):
-    """Evalute 1D shape functions at points in the master element.
-    
-    shapes: [nNodes, nEvalPoints]
-    """
-    A = make_vandermonde_1D(nodalPoints, degree)
-    nf = make_vandermonde_1D(evaluationPoints, degree)
-    return solve(A.T, nf.T) 
-
-
-compute_1D_shape_function_derivative_values = jacfwd(compute_1D_shape_function_values, 1)
-
-
-def compute_shapes_1D(nodalPoints, evaluationPoints, degree):
-    return vmap(make_1D_shape_function_values, (None, 0, None))(nodalPoints, evaluationPoints, degree)
-
-
-def compute_dshapes_1D(nodalPoints, evaluationPoints, degree):
-    return vmap(make_1D_shape_function_derivative_values, (None, 0, None))(nodalPoints, evaluationPoints, degree)
+    return ParentElement(TRIANGLE_ELEMENT, int(degree), points, vertexPoints, facePoints, interiorPoints)
 
 
 def pascal_triangle_monomials(degree):
     p = []
     q = []
     for i in range(1, degree + 2):
-        monomialIndices = [j for j in range(i)]
+        monomialIndices = list(range(i))
         p += monomialIndices
         monomialIndices.reverse()
         q += monomialIndices
-    return np.column_stack((q,p))
+    return onp.column_stack((q,p))
 
 
-def compute_vandermonde_tri(x, degree):
-    assert np.issubdtype(type(degree), np.integer)
+def vander2d(x, degree):
+    x = onp.asarray(x)
     nNodes = (degree+1)*(degree+2)//2
     pq = pascal_triangle_monomials(degree)
 
@@ -157,120 +181,139 @@ def compute_vandermonde_tri(x, degree):
     
     # switch to bi-unit triangle (-1,-1)--(1,-1)--(-1,1)
     z = 2.0*x - 1.0
-
-    # now map onto bi-unit square
-    def map_from_tri_to_square(point):
-        singularPoint = np.array([-1.0, 1.0])
-        pointIsSingular = np.array_equal(point, singularPoint)
-        point = np.where(pointIsSingular, np.array([0.0, 0.0]), point)
-        newPoint = np.where(pointIsSingular,
-                            np.array([-1.0, 1.0]),
-                            np.array([2.0*(1.0 + point[0])/(1.0 - point[1]) - 1.0, point[1]]))
-        return newPoint
-    E = vmap(map_from_tri_to_square)(z)
     
-    A = np.zeros((x.shape[0], nNodes))
+    def map_from_tri_to_square(xi):
+        small = 1e-12
+        # The mapping has a singularity at the vertex (-1, 1).
+        # Handle that point specially.
+        indexSingular = xi[:, 1] > 1.0 - small
+        xiShifted = xi.copy()
+        xiShifted[indexSingular, 1] = 1.0 - small
+        eta = onp.zeros_like(xi)
+        eta[:, 0] = 2.0*(1.0 + xiShifted[:, 0])/(1.0 - xiShifted[:, 1]) - 1.0
+        eta[:, 1] = xiShifted[:, 1]
+        eta[indexSingular, 0] = -1.0
+        eta[indexSingular, 1] = 1.0
+        
+        # Jacobian of map. 
+        # Actually, deta is just the first row of the Jacobian.
+        # The second row is trivially [0, 1], so we don't compute it.
+        # We just use that fact directly in the derivative Vandermonde
+        # expressions.
+        deta = onp.zeros_like(xi)
+        deta[:, 0] = 2/(1 - xiShifted[:, 1])
+        deta[:, 1] = 2*(1 + xiShifted[:, 0])/(1 - xiShifted[:, 1])**2
+        return eta, deta
+    
+    E, dE = map_from_tri_to_square(onp.asarray(z))
+    
+    A = onp.zeros((x.shape[0], nNodes))
+    Ax = A.copy()
+    Ay = A.copy()
+    N1D = onp.polynomial.Polynomial([0.5, -0.5])
     for i in range(nNodes):
-        PP = legendre(pq[i,0])
-        PP = np.array(PP.c) # convert from scipy polynomial to devicearray
-        QP = jacobi(pq[i,1], 2*pq[i,0] + 1.0, 0)
-        QP = np.array(QP.c)
-        for j in range(pq[i,0]):
-            QP = np.polymul(np.array([-0.5,0.5]),QP)
-        pVal = np.polyval(PP, E[:,0])
-        qVal = np.polyval(QP, E[:,1])
-        weight = np.sqrt( (2*pq[i,0]+1) * 2*(pq[i,0]+pq[i,1]+1))
-        A = A.at[:,i].set(weight*pVal*qVal)
-    return np.array(A)
+        p = onp.polynomial.Legendre.basis(pq[i, 0])
+        
+        # SciPy's polynomials use the deprecated poly1d type
+        # of NumPy. To convert to the modern Polynomial type,
+        # we need to reverse the order of the coefficients.
+        qPoly1d = special.jacobi(pq[i, 1], 2*pq[i, 0] + 1, 0)
+        q = onp.polynomial.Polynomial(qPoly1d.coef[::-1])
+        
+        for j in range(pq[i, 0]):
+            q *= N1D
+        
+        # orthonormality weight
+        weight = onp.sqrt((2*pq[i,0] + 1) * 2*(pq[i, 0] + pq[i, 1] + 1))
+        
+        A[:, i] = weight*p(E[:, 0])*q(E[:, 1])
+        
+        # derivatives
+        dp = p.deriv()
+        dq = q.deriv()
+        Ax[:, i] = 2*weight*dp(E[:, 0])*q(E[:, 1])*dE[:, 0]
+        Ay[:, i] = 2*weight*(dp(E[:, 0])*q(E[:, 1])*dE[:, 1]
+                             + p(E[:, 0])*dq(E[:, 1]))
+        
+    return A, Ax, Ay
 
 
-def compute_shapes_on_tri(masterElement, evaluationPoints):
-    # BT: The fake polymorphism here is not satisfying or
-    # extensible. We could probably make the master
-    # elements into classes. We just want to be sure
-    # we're ok with them being types that can't be
-    # registered in jax.
-    
-    if type(masterElement) == MasterElement:
-        shapes =  _compute_shapes_on_tri(masterElement,
-                                         evaluationPoints)
-    elif type(masterElement) == MasterBubbleElement:
-        shapes = _compute_shapes_on_bubble_tri(masterElement,
-                                               evaluationPoints)
+def shape2d(degree, nodalPoints, evaluationPoints):
+    A, _, _ = vander2d(nodalPoints, degree)
+    nf, nfx, nfy = vander2d(evaluationPoints, degree)
+    shapes = onp.linalg.solve(A.T, nf.T).T
+    dshapes = onp.zeros(shapes.shape + (2,)) # shape is (nQuadPoints, nNodes, 2)
+    dshapes[:, :, 0] = onp.linalg.solve(A.T, nfx.T).T
+    dshapes[:, :, 1] = onp.linalg.solve(A.T, nfy.T).T
+    return ShapeFunctions(np.asarray(shapes), np.asarray(dshapes))
+
+
+def compute_shapes(parentElement, evaluationPoints):
+    if parentElement.elementType == LINE_ELEMENT:
+        return shape1d(parentElement.degree, parentElement.coordinates, evaluationPoints)
+    elif parentElement.elementType == TRIANGLE_ELEMENT:
+        return shape2d(parentElement.degree, parentElement.coordinates, evaluationPoints)
+    elif parentElement.elementType == TRIANGLE_ELEMENT_WITH_BUBBLE:
+        return shape2dBubble(parentElement, evaluationPoints)
     else:
-        raise TypeError('Unrecognized master element type')
-
-    return shapes
+        raise ValueError('Unknown element type.')
 
 
-def _compute_shapes_on_tri(masterElement, evaluationPoints):
-    A = compute_vandermonde_tri(masterElement.coordinates, masterElement.degree)
-    nf = compute_vandermonde_tri(evaluationPoints, masterElement.degree)
-    return solve(A.T, nf.T).T
+def make_parent_element_2d_with_bubble(degree):
+    baseMaster = make_parent_element_2d(degree)
+    bubbleMaster = make_parent_element_2d(degree + 1)
+
+    nNodesFromBase = num_nodes(baseMaster) - baseMaster.interiorNodes.size
+    nBubbleNodes = bubbleMaster.interiorNodes.shape[0]
+    nNodes = nNodesFromBase + nBubbleNodes
+
+    retainedBaseNodes = np.full(num_nodes(baseMaster), True)
+    retainedBaseNodes = retainedBaseNodes.at[baseMaster.interiorNodes].set(False)
+
+    coords = np.zeros((nNodes, 2))
+    coords = coords.at[:nNodesFromBase].set(baseMaster.coordinates[retainedBaseNodes])
+    coords = coords.at[nNodesFromBase:].set(bubbleMaster.coordinates[bubbleMaster.interiorNodes])
+
+    vertexNodes = np.array([0, degree , nNodesFromBase - 1], dtype=np.int32)
+
+    ii = onp.arange(degree + 1)
+    jj = onp.array([i for i in range(degree, 3*degree, 2)] + [nNodesFromBase - 1])
+    kk = onp.array([i for i in reversed(range(degree + 1, nNodesFromBase, 2))] + [0])
+    faceNodes = np.array((ii,jj,kk), dtype=np.int32)
+
+    interiorNodes =  np.arange(nNodesFromBase, nNodesFromBase + nBubbleNodes, dtype=np.int32)
+
+    return ParentElement(TRIANGLE_ELEMENT_WITH_BUBBLE, degree, coords, vertexNodes,
+                         faceNodes, interiorNodes)
 
 
-compute_dshape_on_tri = jacfwd(compute_shapes_on_tri, 1)
-
-
-def compute_shapeGrads_on_tri(masterElement, evaluationPoints):
-    f = lambda m,x: np.squeeze(compute_dshape_on_tri(m,x))
-    return vmap(f, (None,0))(masterElement, evaluationPoints)
-
-
-def make_master_tri_bubble_element(degree):
-    baseMaster = make_master_tri_element(degree)
-    bubbleMaster = make_master_tri_element(degree + 1)
-
-    nPointsBase = num_nodes(baseMaster) - baseMaster.interiorNodes.size
-    nPointsBubble = bubbleMaster.interiorNodes.shape[0]
-    nPoints = nPointsBase + nPointsBubble
-
-    nNodesBase = num_nodes(baseMaster)
-    baseNonInteriorNodes = np.full(nNodesBase, True).at[baseMaster.interiorNodes].set(False)
-
-    coords = np.zeros((nPoints,2)).at[:nPointsBase].set(baseMaster.coordinates[baseNonInteriorNodes])
-    coords = coords.at[nPointsBase:].set(bubbleMaster.coordinates[bubbleMaster.interiorNodes])
-
-    vertexNodes = np.array([0, degree , nPointsBase - 1], dtype=int)
-
-    ii = np.arange(degree + 1)
-    jj = np.array([i for i in range(degree, 3*degree, 2)] + [nPointsBase - 1], dtype=int)
-    kk = np.array([i for i in reversed(range(degree + 1, nPointsBase, 2))] + [0], dtype=int)
-    faceNodes = np.array((ii,jj,kk), dtype=int)
-
-    interiorNodes =  np.arange(nPointsBase, nPointsBase + nPointsBubble)
-
-    baseMasterNodes = np.setdiff1d(np.arange(num_nodes(baseMaster)),
-                                   baseMaster.interiorNodes,
-                                   assume_unique=True)
-
-    bubbleMasterNodes = bubbleMaster.interiorNodes
-
-    return MasterBubbleElement(degree, coords, vertexNodes, faceNodes,
-                               interiorNodes, baseMaster, baseMasterNodes,
-                               bubbleMaster, bubbleMasterNodes)
-
-
-def _compute_shapes_on_bubble_tri(master, evaluationPoints):
+def shape2dBubble(refElement, evaluationPoints):
     # base shape function values at eval points
-    baseMaster = master.baseMaster
-    baseShapes = _compute_shapes_on_tri(baseMaster,
-                                        evaluationPoints)
-    baseShapes = baseShapes[:,master.baseMasterNodes]
+    baseElement = make_parent_element_2d(refElement.degree)
+    baseShapes, baseShapeGrads = shape2d(baseElement.degree, baseElement.coordinates, evaluationPoints)
+    nodesFromBase = np.setdiff1d(np.arange(num_nodes(baseElement)),
+                                 baseElement.interiorNodes,
+                                 assume_unique=True)
+    baseShapes = baseShapes[:, nodesFromBase]
+    baseShapeGrads = baseShapeGrads[:, nodesFromBase, :]
 
     # base shape functions at bubble nodes
-    baseShapesAtBubbleNodes = _compute_shapes_on_tri(baseMaster,
-                                                     master.coordinates[master.interiorNodes])
-    baseShapesAtBubbleNodes = baseShapesAtBubbleNodes[:,master.baseMasterNodes]
+    bubbleElement = make_parent_element_2d(refElement.degree + 1)
+    baseShapesAtBubbleNodes, _ = shape2d(baseElement.degree, baseElement.coordinates, bubbleElement.coordinates[bubbleElement.interiorNodes])
+    baseShapesAtBubbleNodes = baseShapesAtBubbleNodes[:, nodesFromBase]
 
     # bubble function values at eval points
-    enrichmentMaster = master.enrichmentMaster
-    bubbleShapes = _compute_shapes_on_tri(enrichmentMaster,
-                                          evaluationPoints)
-    bubbleShapes = bubbleShapes[:,master.enrichmentMasterNodes]
+    bubbleShapes, bubbleShapeGrads = shape2d(bubbleElement.degree, bubbleElement.coordinates, evaluationPoints)
+    bubbleShapes = bubbleShapes[:, bubbleElement.interiorNodes]
+    bubbleShapeGrads = bubbleShapeGrads[:, bubbleElement.interiorNodes, :]
 
-    return np.hstack((baseShapes - bubbleShapes@baseShapesAtBubbleNodes,
-                      bubbleShapes))
+    baseShapes = baseShapes - bubbleShapes@baseShapesAtBubbleNodes
+    shapes = np.hstack((baseShapes, bubbleShapes))
+
+    baseShapeGrads = baseShapeGrads - np.einsum('qai,ab->qbi', bubbleShapeGrads, baseShapesAtBubbleNodes)
+    dshapes = np.hstack((baseShapeGrads, bubbleShapeGrads))
+
+    return ShapeFunctions(shapes, dshapes)
 
 
 def num_nodes(master):
