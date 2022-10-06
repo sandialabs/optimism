@@ -244,10 +244,7 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
 
         quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
         self.fs = FunctionSpace.construct_function_space(self.mesh, quadRule)
-
-        ebcs = [FunctionSpace.EssentialBC(nodeSet='all_boundary', component=0),
-                FunctionSpace.EssentialBC(nodeSet='all_boundary', component=1)]
-        self.dofManager = FunctionSpace.DofManager(self.fs, dim=2, EssentialBCs=ebcs)
+        self.qr1d = QuadratureRule.create_padded_quadrature_rule_1D(degree=1)
 
         props = {'elastic modulus': E,
                  'poisson ratio': nu,
@@ -261,39 +258,33 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
 
         self.dynamics = Mechanics.create_dynamics_functions(self.fs, 'plane strain', materialModel, newmarkParams)
 
-
-    def energy(self, Uu, p):
-        t = p.time[0]
-        dt = t - p.time[1]
-        internalVariables = p[1]
-        Ubc = self.dofManager.get_bc_values(self.V*t)
-        UuPre = p.dynamic_data
-        UPre = self.dofManager.create_field(UuPre, Ubc)
-        U = self.dofManager.create_field(Uu, Ubc)
-        return self.dynamics.compute_algorithmic_energy(U, UPre, internalVariables, dt)
+        self.compute_stress = jax.jacfwd(materialModel.compute_energy_density)
 
 
     def test_patch_test(self):
         dt = 1.0
+        ebcs = [FunctionSpace.EssentialBC(nodeSet='all_boundary', component=0),
+        FunctionSpace.EssentialBC(nodeSet='all_boundary', component=1)]
+        dofManager = FunctionSpace.DofManager(self.fs, dim=2, EssentialBCs=ebcs)
 
         def energy(Uu, p):
             t = p.time[0]
             dt = t - p.time[1]
             internalVariables = p[1]
-            Ubc = self.dofManager.get_bc_values(self.V*t)
+            Ubc = dofManager.get_bc_values(self.V*t)
             UuPre = p.dynamic_data
-            UPre = self.dofManager.create_field(UuPre, Ubc)
-            U = self.dofManager.create_field(Uu, Ubc)
+            UPre = dofManager.create_field(UuPre, Ubc)
+            U = dofManager.create_field(Uu, Ubc)
             return self.dynamics.compute_algorithmic_energy(U, UPre, internalVariables, dt)
 
         # initial conditions
-        Vbc = self.dofManager.get_bc_values(self.V)
-        Vu = self.dofManager.get_unknown_values(self.V)
+        Vbc = dofManager.get_bc_values(self.V)
+        Vu = dofManager.get_unknown_values(self.V)
         Uu = np.zeros_like(Vu)
         Au = np.zeros_like(Vu)
         internals = self.dynamics.compute_initial_state()
         p = Objective.Params(None, internals, None, None, np.array([0.0, -dt]), Uu)
-        objective = Objective.Objective(self.energy, Uu, p)
+        objective = Objective.Objective(energy, Uu, p)
 
         for i in range(1, 4):
             print('--------------------')
@@ -318,8 +309,8 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
 
             UuCorrection = Uu - UuPredicted
             Vu, Au = self.dynamics.correct(UuCorrection, Vu, Au, dt)
-            U = self.dofManager.create_field(Uu, Vbc*t)
-            V = self.dofManager.create_field(Vu, Vbc)
+            U = dofManager.create_field(Uu, Vbc*t)
+            V = dofManager.create_field(Vu, Vbc)
             internals = self.dynamics.compute_updated_internal_variables(U, internals)
             objective.p = Objective.param_index_update(objective.p, 1, internals)
 
@@ -328,44 +319,9 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
             self.assertLess(error, 1e-14)
 
 
-
-class DynamicTractionPatchTest(MeshFixture.MeshFixture):
-    def setUp(self):
-        self.Nx = 7
-        self.Ny = 7
-        xRange = [0.,1.]
-        yRange = [0.,1.]
-
-        self.targetDispGradRate = np.array([[0.1, -0.2],
-                                            [0.4, -0.1]]) 
-
-        self.mesh, self.V = self.create_mesh_and_disp(self.Nx, self.Ny, xRange, yRange,
-                                                      lambda x : self.targetDispGradRate.dot(x))
-
-        quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
-        self.fs = FunctionSpace.construct_function_space(self.mesh, quadRule)
-
-        ebcs = []
-        self.dofManager = FunctionSpace.DofManager(self.fs, dim=2, EssentialBCs=ebcs)
-
-        props = {'elastic modulus': E,
-                 'poisson ratio': nu,
-                 'strain measure': 'linear',
-                 'density': 20.0}
-        # density chosen to make kinetic energy and strain energy comparable
-        # Want bugs in either to show up appreciably in error
-        materialModel = Material.create_material_model_functions(props)
-
-        newmarkParams = Mechanics.NewmarkParameters()
-
-        self.dynamics = Mechanics.create_dynamics_functions(self.fs, 'plane strain', materialModel, newmarkParams)
-
-        self.compute_stress = jax.jacrev(materialModel.compute_output_energy_density)
-
-        self.qr1d = QuadratureRule.create_quadrature_rule_1D(1)
-
-
     def test_traction_patch_test(self):
+        ebcs = []
+        dofManager = FunctionSpace.DofManager(self.fs, dim=2, EssentialBCs=ebcs)
 
         def traction(X, N, t):
             dispGrad = self.targetDispGradRate*t
@@ -379,8 +335,8 @@ class DynamicTractionPatchTest(MeshFixture.MeshFixture):
             dt = t - p.time[1]
             internalVariables = p[1]
             UuPre = p.dynamic_data
-            UPre = self.dofManager.create_field(UuPre)
-            U = self.dofManager.create_field(Uu)
+            UPre = dofManager.create_field(UuPre)
+            U = dofManager.create_field(Uu)
             loadPotential = TractionBC.compute_traction_potential_energy(
                 self.fs.mesh, U, self.qr1d, self.fs.mesh.sideSets["all_boundary"], traction, t)
             return self.dynamics.compute_algorithmic_energy(U, UPre, internalVariables, dt) + loadPotential
@@ -388,7 +344,7 @@ class DynamicTractionPatchTest(MeshFixture.MeshFixture):
         dt = 1.0
 
         # initial conditions
-        Vu = self.dofManager.get_unknown_values(self.V)
+        Vu = dofManager.get_unknown_values(self.V)
         Uu = np.zeros_like(Vu)
         Au = np.zeros_like(Vu)
         internals = self.dynamics.compute_initial_state()
@@ -419,15 +375,14 @@ class DynamicTractionPatchTest(MeshFixture.MeshFixture):
 
             UuCorrection = Uu - UuPredicted
             Vu, Au = self.dynamics.correct(UuCorrection, Vu, Au, dt)
-            U = self.dofManager.create_field(Uu)
-            V = self.dofManager.create_field(Vu)
+            U = dofManager.create_field(Uu)
+            V = dofManager.create_field(Vu)
             internals = self.dynamics.compute_updated_internal_variables(U, internals)
             objective.p = Objective.param_index_update(objective.p, 1, internals)
 
             UExact = np.dot(self.mesh.coords, t*self.targetDispGradRate.T)
             error = np.linalg.norm((U - UExact).ravel())/np.linalg.norm(UExact.ravel())
             self.assertLess(error, 1e-13)
-
 
 
 if __name__=="__main__":
