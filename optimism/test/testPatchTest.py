@@ -83,18 +83,16 @@ class PatchTest(MeshFixture.MeshFixture):
         dofManager = FunctionSpace.DofManager(self.fs, self.U.shape[1], ebcs)
         Ubc = dofManager.get_bc_values(self.U)
         
-        sigma11 = 1.0
-        sigma22 = 0.0
-        right_traction_func = lambda X: np.array([sigma11, 0.0])
-        top_traction_func = lambda X: np.array([0.0, sigma22])       
+        sigma = np.array([[1.0, 0.0], [0.0, 0.0]])
+        traction_func = lambda x, n, t: np.dot(sigma, n)     
         quadRule = QuadratureRule.create_quadrature_rule_1D(degree=2)
         
         @jax.jit
         def objective(Uu):
             U = dofManager.create_field(Uu, Ubc)
             internalPotential = self.compute_energy(U, self.internals)
-            loadPotential = TractionBC.compute_traction_potential_energy(self.mesh, U, quadRule, self.mesh.sideSets['right'], right_traction_func)
-            loadPotential += TractionBC.compute_traction_potential_energy(self.mesh, U, quadRule, self.mesh.sideSets['top'], top_traction_func)
+            loadPotential = TractionBC.compute_traction_potential_energy(self.mesh, U, quadRule, self.mesh.sideSets['right'], traction_func, time=0.0)
+            loadPotential += TractionBC.compute_traction_potential_energy(self.mesh, U, quadRule, self.mesh.sideSets['top'], traction_func, time=0.0)
             return internalPotential + loadPotential
         
         with Timer(name="NewtonSolve"):
@@ -105,8 +103,8 @@ class PatchTest(MeshFixture.MeshFixture):
         # exact solution
         modulus1 = (1.0 - nu**2)/E
         modulus2 = -nu*(1.0+nu)/E
-        UExact = np.column_stack( ((modulus1*sigma11 + modulus2*sigma22)*self.mesh.coords[:,0],
-                                   (modulus2*sigma11 + modulus1*sigma22)*self.mesh.coords[:,1]) )
+        UExact = np.column_stack( ((modulus1*sigma[0, 0] + modulus2*sigma[1, 1])*self.mesh.coords[:,0],
+                                   (modulus2*sigma[0, 0] + modulus1*sigma[1, 1])*self.mesh.coords[:,1]) )
         
         self.assertArrayNear(self.U, UExact, 14)
 
