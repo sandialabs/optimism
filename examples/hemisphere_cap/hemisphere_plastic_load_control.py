@@ -93,7 +93,8 @@ class TractionArch():
             internalVariables = p[1]
             strainEnergy = self.bvpFuncs.compute_strain_energy(U, internalVariables)
             F = p[0]
-            loadPotential = TractionBC.compute_traction_potential_energy(self.mesh, U, self.lineQuadRule, self.mesh.sideSets['push'], lambda X: np.array([0.0, -F/self.pushArea]))
+            loadPotential = TractionBC.compute_traction_potential_energy(self.mesh, U, self.lineQuadRule, self.mesh.sideSets['push'], 
+                                                                         lambda x, n, t: np.array([0.0, -F/self.pushArea]))
             return strainEnergy + loadPotential
         
         self.compute_bc_reactions = jax.jit(jax.grad(compute_energy_from_bcs, 1))
@@ -109,7 +110,8 @@ class TractionArch():
         internalVariables = p[1]
         strainEnergy = self.bvpFuncs.compute_strain_energy(U, internalVariables)
         F = p[0]
-        loadPotential = TractionBC.compute_traction_potential_energy(self.mesh, U, self.lineQuadRule, self.mesh.sideSets['push'], lambda X: np.array([0.0, -F/self.pushArea])*2*np.pi*X[0])
+        loadPotential = TractionBC.compute_traction_potential_energy(self.mesh, U, self.lineQuadRule, self.mesh.sideSets['push'], 
+                                                                     lambda x, n, t: np.array([0.0, -F/self.pushArea])*2*np.pi*x[0])
         return strainEnergy + loadPotential
 
     
