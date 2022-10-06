@@ -21,5 +21,5 @@ def compute_traction_potential_energy_on_edge(mesh, U, quadRule, edge, load, tim
     return -Surface.integrate_values(quadRule, edgeCoords, integrand)
 
 
-def compute_traction_potential_energy(mesh, U, quadRule, edges, load, time):
+def compute_traction_potential_energy(mesh, U, quadRule, edges, load, time=0.0):
     return np.sum( jax.vmap(compute_traction_potential_energy_on_edge, (None,None,None,0,None,None))(mesh, U, quadRule, edges, load, time) )
