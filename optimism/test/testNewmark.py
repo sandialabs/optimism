@@ -331,10 +331,9 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
         def energy(Uu, p):
             t = p.time[0]
             dt = t - p.time[1]
-            internalVariables = p[1]
-            UuPre = p.dynamic_data
-            UPre = dofManager.create_field(UuPre)
             U = dofManager.create_field(Uu)
+            UPre = p.dynamic_data
+            internalVariables = p[1]
             loadPotential = TractionBC.compute_traction_potential_energy(
                 self.fs.mesh, U, self.qr1d, self.fs.mesh.sideSets["all_boundary"], traction, t)
             return self.dynamics.compute_algorithmic_energy(U, UPre, internalVariables, dt) + loadPotential
@@ -342,12 +341,12 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
         dt = 1.0
 
         # initial conditions
-        Vu = dofManager.get_unknown_values(self.V)
-        Uu = np.zeros_like(Vu)
-        Au = np.zeros_like(Vu)
+        U = np.zeros_like(self.V)
+        V = self.V.copy()
+        A = np.zeros_like(self.V)
         internals = self.dynamics.compute_initial_state()
-        p = Objective.Params(None, internals, None, None, np.array([0.0, -dt]), Uu)
-        energy(Uu, p)
+        Uu = dofManager.get_unknown_values(U)
+        p = Objective.Params(None, internals, None, None, np.array([0.0, -dt]), U)
         objective = Objective.Objective(energy, Uu, p)
 
         for i in range(1, 4):
@@ -360,21 +359,20 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
 
             objective.p = Objective.param_index_update(objective.p, 4, np.array([t, tOld]))
 
-            UuPredicted, Vu = self.dynamics.predict(Uu, Vu, Au, dt)
-            objective.p = Objective.param_index_update(objective.p, 5, UuPredicted)
+            UPrediction, V = self.dynamics.predict(U, V, A, dt)
+            objective.p = Objective.param_index_update(objective.p, 5, UPrediction)
 
             # The predictor value is exact.
             # Choose a bad initial guess (zero) to force an actual solve.
             Uu = EquationSolver.nonlinear_equation_solve(objective,
-                                                        np.zeros_like(Uu),
-                                                        objective.p,
-                                                        trSettings,
-                                                        useWarmStart=False)
+                                                         dofManager.get_unknown_values(UPrediction),
+                                                         objective.p,
+                                                         trSettings,
+                                                         useWarmStart=False)
 
-            UuCorrection = Uu - UuPredicted
-            Vu, Au = self.dynamics.correct(UuCorrection, Vu, Au, dt)
             U = dofManager.create_field(Uu)
-            V = dofManager.create_field(Vu)
+            UCorrection = U - UPrediction
+            V, A = self.dynamics.correct(UCorrection, V, A, dt)
             internals = self.dynamics.compute_updated_internal_variables(U, internals)
             objective.p = Objective.param_index_update(objective.p, 1, internals)
 
