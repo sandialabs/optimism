@@ -113,7 +113,7 @@ class Buckle:
                                                                          U,
                                                                          self.quadRule,
                                                                          self.mesh.sideSets[topSide],
-                                                                         lambda x: np.array([0.0, p[0][0]]))
+                                                                         lambda x, n, t: np.array([0.0, p[0][0]]))
         #mechanicalEnergy = -compute_energy(Uu, p,
         #                                   self.mesh, self.dofManager,
         #                                   mechFuncs, self.quadRule, False)
@@ -301,7 +301,8 @@ def get_ubcs(p, mesh, dofManager, useTraction):
 def compute_energy(Uu, p, mesh, dofManager, mechFuncs, edgeQuadRule, useTraction):
     U = create_field(Uu, p, mesh, dofManager, useTraction)
     mechanicalEnergy = mechFuncs.compute_strain_energy(U, p[1])
-    tractionEnergy = TractionBC.compute_traction_potential_energy(mesh, U, edgeQuadRule, mesh.sideSets[topSide], lambda x: np.array([0.0, p[0][0]])) if useTraction else 0.
+    tractionEnergy = TractionBC.compute_traction_potential_energy(mesh, U, edgeQuadRule, mesh.sideSets[topSide], 
+                                                                  lambda x, n, t: np.array([0.0, p[0][0]])) if useTraction else 0.
     
     return mechanicalEnergy + tractionEnergy
 

@@ -10,8 +10,9 @@ from optimism import Mesh
 from optimism import Objective
 from optimism import QuadratureRule
 from optimism import SparseMatrixAssembler
+from optimism import TractionBC
 
-from optimism.material import LinearElastic as Material
+from optimism.material import Neohookean, LinearElastic
 from optimism.test import MeshFixture
 
 E = 10.0
@@ -46,7 +47,7 @@ class DynamicsFixture(MeshFixture.MeshFixture):
         props = {'elastic modulus': E,
                  'poisson ratio': nu,
                  'density': rho}
-        materialModel = Material.create_material_model_functions(props)
+        materialModel = LinearElastic.create_material_model_functions(props)
         newmarkParams = Mechanics.NewmarkParameters(gamma=0.5, beta=0.25)
 
         self.dynamicsFunctions = Mechanics.create_dynamics_functions(self.fs,
@@ -242,10 +243,7 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
 
         quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
         self.fs = FunctionSpace.construct_function_space(self.mesh, quadRule)
-
-        ebcs = [FunctionSpace.EssentialBC(nodeSet='all_boundary', component=0),
-                FunctionSpace.EssentialBC(nodeSet='all_boundary', component=1)]
-        self.dofManager = FunctionSpace.DofManager(self.fs, dim=2, EssentialBCs=ebcs)
+        self.qr1d = QuadratureRule.create_padded_quadrature_rule_1D(degree=1)
 
         props = {'elastic modulus': E,
                  'poisson ratio': nu,
@@ -253,34 +251,38 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
                  'density': 20.0}
         # density chosen to make kinetic energy and strain energy comparable
         # Want bugs in either to show up appreciably in error
-        materialModel = Material.create_material_model_functions(props)
+        materialModel = Neohookean.create_material_model_functions(props)
 
         newmarkParams = Mechanics.NewmarkParameters()
 
         self.dynamics = Mechanics.create_dynamics_functions(self.fs, 'plane strain', materialModel, newmarkParams)
 
-
-    def energy(self, Uu, p):
-        t = p.time[0]
-        dt = t - p.time[1]
-        internalVariables = p[1]
-        Ubc = self.dofManager.get_bc_values(self.V*t)
-        UuPre = p.dynamic_data
-        UPre = self.dofManager.create_field(UuPre, Ubc)
-        U = self.dofManager.create_field(Uu, Ubc)
-        return self.dynamics.compute_algorithmic_energy(U, UPre, internalVariables, dt)
+        self.compute_stress = jax.jacfwd(materialModel.compute_energy_density)
 
 
     def test_patch_test(self):
         dt = 1.0
+        ebcs = [FunctionSpace.EssentialBC(nodeSet='all_boundary', component=0),
+        FunctionSpace.EssentialBC(nodeSet='all_boundary', component=1)]
+        dofManager = FunctionSpace.DofManager(self.fs, dim=2, EssentialBCs=ebcs)
+
+        def energy(Uu, p):
+            t = p.time[0]
+            dt = t - p.time[1]
+            Ubc = dofManager.get_bc_values(self.V*t)
+            U = dofManager.create_field(Uu, Ubc)
+            UPre = p.dynamic_data
+            internalVariables = p[1]
+            return self.dynamics.compute_algorithmic_energy(U, UPre, internalVariables, dt)
+
         # initial conditions
-        Vbc = self.dofManager.get_bc_values(self.V)
-        Vu = self.dofManager.get_unknown_values(self.V)
-        Uu = np.zeros_like(Vu)
-        Au = np.zeros_like(Vu)
+        V = self.V.copy()
+        A = np.zeros_like(V)
+        U = np.zeros_like(V)
+        Uu = dofManager.get_unknown_values(U)
         internals = self.dynamics.compute_initial_state()
-        p = Objective.Params(None, internals, None, None, np.array([0.0, -dt]), Uu)
-        objective = Objective.Objective(self.energy, Uu, p)
+        p = Objective.Params(None, internals, None, None, np.array([0.0, -dt]), U)
+        objective = Objective.Objective(energy, Uu, p)
 
         for i in range(1, 4):
             print('--------------------')
@@ -292,27 +294,90 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
 
             objective.p = Objective.param_index_update(objective.p, 4, np.array([t, tOld]))
 
-            UuPredicted, Vu = self.dynamics.predict(Uu, Vu, Au, dt)
-            objective.p = Objective.param_index_update(objective.p, 5, UuPredicted)
+            UPrediction, V = self.dynamics.predict(U, V, A, dt)
+            objective.p = Objective.param_index_update(objective.p, 5, UPrediction)
 
             # The predictor value is exact.
             # Choose a bad initial guess (zero) to force an actual solve.
             Uu = EquationSolver.nonlinear_equation_solve(objective,
-                                                         np.zeros_like(Uu),
+                                                         dofManager.get_unknown_values(UPrediction),
                                                          objective.p,
                                                          trSettings,
                                                          useWarmStart=False)
 
-            UuCorrection = Uu - UuPredicted
-            Vu, Au = self.dynamics.correct(UuCorrection, Vu, Au, dt)
-            U = self.dofManager.create_field(Uu, Vbc*t)
-            V = self.dofManager.create_field(Vu, Vbc)
+            U = dofManager.create_field(Uu, dofManager.get_bc_values(V*t))
+            UCorrection = U - UPrediction
+            V, A = self.dynamics.correct(UCorrection, V, A, dt)
             internals = self.dynamics.compute_updated_internal_variables(U, internals)
             objective.p = Objective.param_index_update(objective.p, 1, internals)
 
             UExact = np.dot(self.mesh.coords, t*self.targetDispGradRate.T)
             error = np.linalg.norm((U - UExact).ravel())/np.linalg.norm(UExact.ravel())
             self.assertLess(error, 1e-14)
+
+
+    def test_traction_patch_test(self):
+        ebcs = []
+        dofManager = FunctionSpace.DofManager(self.fs, dim=2, EssentialBCs=ebcs)
+
+        def traction(X, N, t):
+            dispGrad = self.targetDispGradRate*t
+            dispGrad3D = np.zeros((3,3)).at[:2, :2].set(dispGrad)
+            q = np.array([0.0])
+            P = self.compute_stress(dispGrad3D, q)[:2, :2]
+            return np.dot(P, N)
+
+        def energy(Uu, p):
+            t = p.time[0]
+            dt = t - p.time[1]
+            U = dofManager.create_field(Uu)
+            UPre = p.dynamic_data
+            internalVariables = p[1]
+            loadPotential = TractionBC.compute_traction_potential_energy(
+                self.fs.mesh, U, self.qr1d, self.fs.mesh.sideSets["all_boundary"], traction, t)
+            return self.dynamics.compute_algorithmic_energy(U, UPre, internalVariables, dt) + loadPotential
+
+        dt = 1.0
+
+        # initial conditions
+        U = np.zeros_like(self.V)
+        V = self.V.copy()
+        A = np.zeros_like(self.V)
+        internals = self.dynamics.compute_initial_state()
+        Uu = dofManager.get_unknown_values(U)
+        p = Objective.Params(None, internals, None, None, np.array([0.0, -dt]), U)
+        objective = Objective.Objective(energy, Uu, p)
+
+        for i in range(1, 4):
+            print('--------------------')
+            print('LOAD STEP ', i)
+
+            tOld = objective.p.time[0]
+            t = tOld + dt
+            print('\ttime = ', t, '\tdt = ', dt)
+
+            objective.p = Objective.param_index_update(objective.p, 4, np.array([t, tOld]))
+
+            UPrediction, V = self.dynamics.predict(U, V, A, dt)
+            objective.p = Objective.param_index_update(objective.p, 5, UPrediction)
+
+            # The predictor value is exact.
+            # Choose a bad initial guess (zero) to force an actual solve.
+            Uu = EquationSolver.nonlinear_equation_solve(objective,
+                                                         dofManager.get_unknown_values(UPrediction),
+                                                         objective.p,
+                                                         trSettings,
+                                                         useWarmStart=False)
+
+            U = dofManager.create_field(Uu)
+            UCorrection = U - UPrediction
+            V, A = self.dynamics.correct(UCorrection, V, A, dt)
+            internals = self.dynamics.compute_updated_internal_variables(U, internals)
+            objective.p = Objective.param_index_update(objective.p, 1, internals)
+
+            UExact = np.dot(self.mesh.coords, t*self.targetDispGradRate.T)
+            error = np.linalg.norm((U - UExact).ravel())/np.linalg.norm(UExact.ravel())
+            self.assertLess(error, 1e-13)
 
 
 if __name__=="__main__":
