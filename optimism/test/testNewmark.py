@@ -10,10 +10,9 @@ from optimism import Mesh
 from optimism import Objective
 from optimism import QuadratureRule
 from optimism import SparseMatrixAssembler
-from optimism import Surface
 from optimism import TractionBC
 
-from optimism.material import Neohookean as Material
+from optimism.material import Neohookean, LinearElastic
 from optimism.test import MeshFixture
 
 E = 10.0
@@ -48,7 +47,7 @@ class DynamicsFixture(MeshFixture.MeshFixture):
         props = {'elastic modulus': E,
                  'poisson ratio': nu,
                  'density': rho}
-        materialModel = Material.create_material_model_functions(props)
+        materialModel = LinearElastic.create_material_model_functions(props)
         newmarkParams = Mechanics.NewmarkParameters(gamma=0.5, beta=0.25)
 
         self.dynamicsFunctions = Mechanics.create_dynamics_functions(self.fs,
@@ -252,7 +251,7 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
                  'density': 20.0}
         # density chosen to make kinetic energy and strain energy comparable
         # Want bugs in either to show up appreciably in error
-        materialModel = Material.create_material_model_functions(props)
+        materialModel = Neohookean.create_material_model_functions(props)
 
         newmarkParams = Mechanics.NewmarkParameters()
 
