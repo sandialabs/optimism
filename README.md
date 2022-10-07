@@ -1,5 +1,7 @@
 # OptimiSM: Computational solid mechanics made easy with Jax
 
+![Continuous integration](https://github.com/sandialabs/optimism/actions/workflows/ci-build.yml/badge.svg)
+
 ## What is OptimiSM?
 
 OptimiSM is a library for posing and solving problems in solid
