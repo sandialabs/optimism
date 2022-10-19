@@ -1,5 +1,5 @@
 import unittest
-import scipy.spatial.transform.rotation as rotation
+from scipy.spatial.transform import Rotation
 
 from optimism.test.TestFixture import TestFixture
 from optimism.JaxConfig import *
@@ -9,10 +9,7 @@ from jax.test_util import check_grads
 from jax.scipy import linalg
 
 
-def random_rotation():
-    a=rotation.Rotation.random(1, random_state=41)
-    return np.array(a.as_matrix()[0])
-
+R = Rotation.random(random_state=41).as_matrix()
 
 def numerical_grad(f):
     def lam(A):
@@ -69,7 +66,6 @@ class TensorMathFixture(TestFixture):
 
     @unittest.expectedFailure
     def test_log_sqrt_hessian_on_double_degenerate_eigenvalues(self):
-        R = random_rotation()
         eigvals = np.array([2., 0.5, 2.])
         C = R@np.diag(eigvals)@R.T
         check_grads(jacrev(TensorMath.log_sqrt), (C,), order=1, modes=['fwd'], rtol=1e-9, atol=1e-9, eps=1e-5)
@@ -105,7 +101,6 @@ class TensorMathFixture(TestFixture):
     def test_log_sqrt_double_eigs(self):
         val1 = 2.0
         val2 = 0.5
-        R = random_rotation()
         C = R@np.diag(np.array([val1, val2, val1]))@R.T
 
         logSqrt1 = np.log(np.sqrt(val1))
@@ -129,7 +124,6 @@ class TensorMathFixture(TestFixture):
     def test_log_sqrt_squared_grad_double_eigs(self):
         val1 = 2.0
         val2 = 0.5
-        R = random_rotation()
         C = R@np.diag(np.array([val1, val2, val1]))@R.T
 
         def log_squared(A):
@@ -165,7 +159,6 @@ class TensorMathFixture(TestFixture):
         m = 0.25
         val1 = 2.1
         val2 = 0.6
-        R = random_rotation()
         C = R@np.diag(np.array([val1, val2, val1]))@R.T
 
         powVal1 = np.power(val1, m)
@@ -191,7 +184,6 @@ class TensorMathFixture(TestFixture):
     def test_pow_squared_grad_double_eigs(self):
         val1 = 2.0
         val2 = 0.5
-        R = random_rotation()
         C = R@np.diag(np.array([val1, val2, val1]))@R.T
 
         def pow_squared(A):
@@ -240,7 +232,6 @@ class TensorMathFixture(TestFixture):
 
 
     def test_sqrtm_on_degenerate_eigenvalues(self):
-        R = random_rotation()
         C = R@np.diag(np.array([2., 0.5, 2]))@R.T
         sqrtC = TensorMath.sqrtm(C)
         shouldBeC = np.dot(sqrtC, sqrtC)
@@ -273,7 +264,6 @@ class TensorMathFixture(TestFixture):
 
 
     def test_logm_iss_on_double_degenerate_eigenvalues(self):
-        R = random_rotation()
         eigvals = np.array([2., 0.5, 2.])
         C = R@np.diag(eigvals)@R.T
         logC = TensorMath.logm_iss(C)
@@ -311,14 +301,12 @@ class TensorMathFixture(TestFixture):
 
 
     def test_logm_iss_hessian_on_double_degenerate_eigenvalues(self):
-        R = random_rotation()
         eigvals = np.array([2., 0.5, 2.])
         C = R@np.diag(eigvals)@R.T
         check_grads(jacrev(TensorMath.logm_iss), (C,), order=1, modes=['fwd'], rtol=1e-9, atol=1e-9, eps=1e-5)
 
 
     def test_logm_iss_derivatives_on_double_degenerate_eigenvalues(self):
-        R = random_rotation()
         eigvals = np.array([2., 0.5, 2.])
         C = R@np.diag(eigvals)@R.T
         check_grads(TensorMath.logm_iss, (C,), order=1, modes=['fwd'])
