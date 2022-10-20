@@ -1,13 +1,13 @@
 import unittest
 from scipy.spatial.transform import Rotation
 
-from optimism.test.TestFixture import TestFixture
-from optimism.JaxConfig import *
-from optimism import TensorMath
-from jax import custom_jvp, random
+import jax
+from jax import numpy as np
 from jax.test_util import check_grads
 from jax.scipy import linalg
 
+from optimism.test.TestFixture import TestFixture
+from optimism import TensorMath
 
 R = Rotation.random(random_state=41).as_matrix()
 
@@ -27,17 +27,17 @@ def numerical_grad(f):
 
 
 def generate_n_random_symmetric_matrices(n, minval=0.0, maxval=1.0):
-    key = random.PRNGKey(0)
-    As = random.uniform(key, (n,3,3), minval=minval, maxval=maxval)
-    return vmap(lambda A: np.dot(A.T,A), (0,))(As)
+    key = jax.random.PRNGKey(0)
+    As = jax.random.uniform(key, (n,3,3), minval=minval, maxval=maxval)
+    return jax.vmap(lambda A: np.dot(A.T,A), (0,))(As)
 
 
 class TensorMathFixture(TestFixture):
 
     def setUp(self):
         self.log_squared = lambda A: np.tensordot(TensorMath.log_sqrt(A), TensorMath.log_sqrt(A))
-        self.sqrtm_jit = jit(TensorMath.sqrtm)
-        self.logm_iss_jit = jit(TensorMath.logm_iss)
+        self.sqrtm_jit = jax.jit(TensorMath.sqrtm)
+        self.logm_iss_jit = jax.jit(TensorMath.logm_iss)
         
 
     def test_log_sqrt_tensor_jvp_0(self):
@@ -68,12 +68,12 @@ class TensorMathFixture(TestFixture):
     def test_log_sqrt_hessian_on_double_degenerate_eigenvalues(self):
         eigvals = np.array([2., 0.5, 2.])
         C = R@np.diag(eigvals)@R.T
-        check_grads(jacrev(TensorMath.log_sqrt), (C,), order=1, modes=['fwd'], rtol=1e-9, atol=1e-9, eps=1e-5)
+        check_grads(jax.jacrev(TensorMath.log_sqrt), (C,), order=1, modes=['fwd'], rtol=1e-9, atol=1e-9, eps=1e-5)
 
 
     def test_eigen_sym33_non_unit(self):
-        key = random.PRNGKey(0)
-        F = random.uniform(key, (3,3), minval=1e-8, maxval=10.0)
+        key = jax.random.PRNGKey(0)
+        F = jax.random.uniform(key, (3,3), minval=1e-8, maxval=10.0)
         C = F.T@F
         d,vecs = TensorMath.eigen_sym33_unit(C)
         self.assertArrayNear(C, vecs@np.diag(d)@vecs.T, 13)
@@ -133,8 +133,8 @@ class TensorMathFixture(TestFixture):
 
         
     def test_log_sqrt_squared_grad_rand(self):
-        key = random.PRNGKey(0)
-        F = random.uniform(key, (3,3), minval=1e-8, maxval=10.0)
+        key = jax.random.PRNGKey(0)
+        F = jax.random.uniform(key, (3,3), minval=1e-8, maxval=10.0)
         C = F.T@F
 
         def log_squared(A):
@@ -194,8 +194,8 @@ class TensorMathFixture(TestFixture):
 
 
     def test_pow_squared_grad_rand(self):
-        key = random.PRNGKey(0)
-        F = random.uniform(key, (3,3), minval=1e-8, maxval=10.0)
+        key = jax.random.PRNGKey(0)
+        F = jax.random.uniform(key, (3,3), minval=1e-8, maxval=10.0)
         C = F.T@F
 
         def pow_squared(A):
@@ -216,8 +216,8 @@ class TensorMathFixture(TestFixture):
 
     def test_sqrtm(self):
         mats = generate_n_random_symmetric_matrices(100)
-        sqrtMats = vmap(self.sqrtm_jit, (0,))(mats)
-        shouldBeMats = vmap(lambda A: np.dot(A,A), (0,))(sqrtMats)
+        sqrtMats = jax.vmap(self.sqrtm_jit, (0,))(mats)
+        shouldBeMats = jax.vmap(lambda A: np.dot(A,A), (0,))(sqrtMats)
         self.assertArrayNear(shouldBeMats, mats, 10)
 
 
@@ -240,8 +240,8 @@ class TensorMathFixture(TestFixture):
 
 
     def test_sqrtm_on_10x10(self):
-        key = random.PRNGKey(0)
-        F = random.uniform(key, (10,10), minval=1e-8, maxval=10.0)
+        key = jax.random.PRNGKey(0)
+        F = jax.random.uniform(key, (10,10), minval=1e-8, maxval=10.0)
         C = F.T@F
         sqrtC = TensorMath.sqrtm(C)
         shouldBeC = np.dot(sqrtC,sqrtC)
@@ -249,15 +249,15 @@ class TensorMathFixture(TestFixture):
 
 
     def test_sqrtm_derivatives_on_10x10(self):
-        key = random.PRNGKey(0)
-        F = random.uniform(key, (10,10), minval=1e-8, maxval=10.0)
+        key = jax.random.PRNGKey(0)
+        F = jax.random.uniform(key, (10,10), minval=1e-8, maxval=10.0)
         C = F.T@F
         check_grads(TensorMath.sqrtm, (C,), order=1, modes=["fwd", "rev"])
 
 
     def test_logm_iss_on_matrix_near_identity(self):
-        key = random.PRNGKey(0)
-        id_perturbation = 1.0 + random.uniform(key, (3,), minval=1e-8, maxval=0.01)
+        key = jax.random.PRNGKey(0)
+        id_perturbation = 1.0 + jax.random.uniform(key, (3,), minval=1e-8, maxval=0.01)
         A = np.diag(id_perturbation)
         logA = TensorMath.logm_iss(A)
         self.assertArrayNear(logA, np.diag(np.log(id_perturbation)), 12)
@@ -285,8 +285,8 @@ class TensorMathFixture(TestFixture):
 
     def test_logm_iss_on_full_3x3s(self):
         mats = generate_n_random_symmetric_matrices(1000)
-        logMats = vmap(self.logm_iss_jit, (0,))(mats)
-        shouldBeMats = vmap(lambda A: linalg.expm(A), (0,))(logMats)
+        logMats = jax.vmap(self.logm_iss_jit, (0,))(mats)
+        shouldBeMats = jax.vmap(lambda A: linalg.expm(A), (0,))(logMats)
         self.assertArrayNear(shouldBeMats, mats, 7)      
 
         
@@ -303,7 +303,7 @@ class TensorMathFixture(TestFixture):
     def test_logm_iss_hessian_on_double_degenerate_eigenvalues(self):
         eigvals = np.array([2., 0.5, 2.])
         C = R@np.diag(eigvals)@R.T
-        check_grads(jacrev(TensorMath.logm_iss), (C,), order=1, modes=['fwd'], rtol=1e-9, atol=1e-9, eps=1e-5)
+        check_grads(jax.jacrev(TensorMath.logm_iss), (C,), order=1, modes=['fwd'], rtol=1e-9, atol=1e-9, eps=1e-5)
 
 
     def test_logm_iss_derivatives_on_double_degenerate_eigenvalues(self):
@@ -320,8 +320,8 @@ class TensorMathFixture(TestFixture):
 
 
     def test_logm_iss_on_10x10(self):
-        key = random.PRNGKey(0)
-        F = random.uniform(key, (10,10), minval=1e-8, maxval=10.0)
+        key = jax.random.PRNGKey(0)
+        F = jax.random.uniform(key, (10,10), minval=1e-8, maxval=10.0)
         C = F.T@F
         logC = TensorMath.logm_iss(C)
         logCSpectral = TensorMath.logh(C)
