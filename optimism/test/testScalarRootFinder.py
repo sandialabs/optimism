@@ -1,8 +1,10 @@
 from sys import float_info
+
+import jax
+import jax.numpy as np
 from scipy.optimize import minimize_scalar, root_scalar # for comparison
 from scipy.optimize import OptimizeResult
 
-from optimism.JaxConfig import *
 from optimism import ScalarRootFind
 from optimism.test import TestFixture
 
@@ -36,7 +38,7 @@ class ScalarRootFindTestFixture(TestFixture.TestFixture):
 
         
     def test_find_root_with_jit(self):
-        rtsafe_jit = jit(ScalarRootFind.find_root, static_argnums=(0,3))
+        rtsafe_jit = jax.jit(ScalarRootFind.find_root, static_argnums=(0,3))
         rootBracket = np.array([float_info.epsilon, 100.0])
         root = rtsafe_jit(f, self.rootGuess, rootBracket, self.settings)
         self.assertNear(root, self.rootExpected, 13)
@@ -63,7 +65,7 @@ class ScalarRootFindTestFixture(TestFixture.TestFixture):
         root = cube_root(4.0)
         self.assertNear(root, self.rootExpected, 13)
 
-        df = jacfwd(cube_root)
+        df = jax.jacfwd(cube_root)
         x = 3.0
         self.assertNear(df(x), x**(-2/3)/3, 13)
 
@@ -85,7 +87,7 @@ class ScalarRootFindTestFixture(TestFixture.TestFixture):
             return ScalarRootFind.find_root(lambda x: myfunc(x, a), 8.0,
                                             rootBracket, self.settings)
         x = np.array([1.0, 4.0, 9.0, 16.0])
-        F = jit(vmap(my_sqrt, 0))
+        F = jax.jit(jax.vmap(my_sqrt, 0))
         expectedRoots = np.array([1.0, 2.0, 3.0, 4.0])
         self.assertArrayNear(F(x), expectedRoots, 12)
 
