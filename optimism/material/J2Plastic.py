@@ -1,12 +1,12 @@
-from jax.lax import while_loop
-from jax import custom_jvp
+import jax
+import jax.numpy as np
+from jax.scipy.linalg import solve, expm
 
-from optimism.JaxConfig import *
 from optimism.material.MaterialModel import MaterialModel
 from optimism.material import Hardening
 from optimism import TensorMath
 from optimism import ScalarRootFind
-from jax.scipy.linalg import solve, expm
+
 
 # props
 PROPS_E     = 0
@@ -138,10 +138,10 @@ def energy_density_generic(elStrain, state, props, hardening_model, doUpdate):
 
         isYielding = trialStress - flowStress > 3*props[PROPS_MU]*TOL
 
-        stateInc = lax.cond(isYielding,
-                            lambda e: update_state(e, state, state, props, hardening_model),
-                            lambda e: np.zeros(NUM_STATE_VARS),
-                            elStrain)
+        stateInc = jax.lax.cond(isYielding,
+                                lambda e: update_state(e, state, state, props, hardening_model),
+                                lambda e: np.zeros(NUM_STATE_VARS),
+                                elStrain)
     else:
         stateInc = np.zeros(NUM_STATE_VARS)
     
@@ -162,10 +162,10 @@ def compute_state_increment(elasticTrialStrain, stateOld, props, hardening_model
 
     isYielding = trialStress - flowStress > 3*props[PROPS_MU]*TOL
 
-    stateInc = lax.cond(isYielding,
-                        lambda e: update_state(e, stateOld, stateOld, props, hardening_model),
-                        lambda e: np.zeros(NUM_STATE_VARS),
-                        elasticTrialStrain)
+    stateInc = jax.lax.cond(isYielding,
+                            lambda e: update_state(e, stateOld, stateOld, props, hardening_model),
+                            lambda e: np.zeros(NUM_STATE_VARS),
+                            elasticTrialStrain)
     
     return stateInc
 
@@ -206,7 +206,7 @@ def incremental_potential(elasticTrialStrain, eqps, eqpsOld, props, hardening_mo
         hardening_model[ENERGY_DENSITY](eqps)
 
 
-r = jacfwd(incremental_potential, 1)
+r = jax.jacfwd(incremental_potential, 1)
 
 
 def update_state(elasticTrialStrain, stateOld, stateNewGuess, props, hardening_model):
