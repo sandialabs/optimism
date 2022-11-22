@@ -3,7 +3,7 @@ from collections import namedtuple
 import jax
 import jax.numpy as np
 
-SolutionInfo = namedtuple('SolutionInfo', ['converged', 'iterations', 'function_calls'])
+SolutionInfo = namedtuple('SolutionInfo', ['converged', 'iterations', 'function_calls', 'residual_norm', 'correction_norm'])
 
 Settings = namedtuple('Settings', ['max_iters', 'x_tol', 'r_tol'])
 
@@ -58,7 +58,7 @@ def find_root(f, x0, bracket, settings):
         root is not bracketed, `nan` is returned.
     """
     return jax.lax.custom_root(f, x0, lambda F, X0: rtsafe_(F, X0, bracket, settings),
-                               lambda g, y: y/g(1.0))
+                               lambda g, y: y/g(1.0), has_aux=True)
 
 
 def rtsafe_(f, x0, bracket, settings):
@@ -68,6 +68,7 @@ def rtsafe_(f, x0, bracket, settings):
 
     max_iters = settings.max_iters
     x_tol = settings.x_tol
+    r_tol = settings.r_tol
 
     f_and_fprime = jax.value_and_grad(f)
 
@@ -129,17 +130,17 @@ def rtsafe_(f, x0, bracket, settings):
                              lambda rt, lo, hi: (lo, rt),
                              root, xl, xh)
         i += 1
-        converged = converged | (np.abs(dx) < x_tol) # absolute tolerance
+        converged = converged | (np.abs(dx) < x_tol) | (np.abs(F) < r_tol)
         return root, dx, dxOld, F, DF, xl, xh, converged, i
 
-    x, _, _, _, _, _, _, converged, iters = jax.lax.while_loop(cond,
-                                                               loop_body,
-                                                               (x0, dx, dxOld, F, DF, xl, xh, converged, 0))
+    x, dx, _, F, _, _, _, converged, iters = jax.lax.while_loop(cond,
+                                                                loop_body,
+                                                                (x0, dx, dxOld, F, DF, xl, xh, converged, 0))
 
     x = np.where(converged, x, np.nan)
     
-    return x#, SolutionInfo(converged=converged, function_calls=functionCalls,
-             #              iterations=iters)
+    return x, SolutionInfo(converged=converged, function_calls=functionCalls,
+                           iterations=iters, residual_norm=np.abs(F), correction_norm=np.abs(dx))
 
 
 def bisection_step(x, xl, xh, df, f):

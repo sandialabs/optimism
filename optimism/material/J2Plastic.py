@@ -218,10 +218,10 @@ def update_state(elasticTrialStrain, stateOld, stateNewGuess, props, hardening_m
     lb = eqpsOld
     trialMises = 2 * props[PROPS_MU] * np.tensordot(TensorMath.dev(elasticTrialStrain), N)
     ub = eqpsOld + (trialMises - hardening_model.compute_flow_stress(eqpsOld))/(3.0*props[PROPS_MU])
-    eqps = ScalarRootFind.find_root(lambda e: r(elasticTrialStrain, e, eqpsOld, props, hardening_model),
-                                    eqpsGuess,
-                                    np.array([lb, ub]),
-                                    settings)
+    eqps, _ = ScalarRootFind.find_root(lambda e: r(elasticTrialStrain, e, eqpsOld, props, hardening_model),
+                                       eqpsGuess,
+                                       np.array([lb, ub]),
+                                       settings)
     DeltaEqps = eqps - eqpsOld
     DeltaPlasticStrain = DeltaEqps*N
     return np.hstack( (DeltaEqps, DeltaPlasticStrain.ravel()) )
