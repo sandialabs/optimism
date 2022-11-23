@@ -126,19 +126,7 @@ def compute_state_new_seth_hill(dispGrad, stateOld, props, hardening_model):
 
 
 def _energy_density(elStrain, state, props, hardening_model):
-    eqps = state[EQPS]
-    N = compute_flow_direction(elStrain)
-    trialStress = 2 * props[PROPS_MU] * np.tensordot(TensorMath.dev(elStrain), N)
-    flowStress = hardening_model[FLOW_STRESS](eqps)
-
-    # The tolerance on the yield check is the same as that in the nonlinear solve.
-    # This ensures that we take the elastic branch if the state vars are updated.
-    isYielding = trialStress - flowStress > _TOLERANCE*props[PROPS_Y0]
-
-    stateInc = jax.lax.cond(isYielding,
-                            lambda e: update_state(e, state, state, props, hardening_model),
-                            lambda e: np.zeros(NUM_STATE_VARS),
-                            elStrain)
+    stateInc = compute_state_increment(elStrain, state, props, hardening_model)
     
     eqpsNew = state[EQPS] + stateInc[EQPS]
     elasticStrainNew = elStrain - stateInc[PLASTIC_DISTORTION].reshape((3,3))
@@ -148,19 +136,21 @@ def _energy_density(elStrain, state, props, hardening_model):
     return W
 
 
-def compute_state_increment(elasticTrialStrain, stateOld, props, hardening_model):
-    eqpsOld = stateOld[EQPS]
-    N = compute_flow_direction(elasticTrialStrain)
-    trialStress = 2 * props[PROPS_MU] * np.tensordot(TensorMath.dev(elasticTrialStrain), N)
-    flowStress = hardening_model[FLOW_STRESS](eqpsOld)
+def compute_state_increment(elasticStrain, state, props, hardening_model):
+    eqps = state[EQPS]
+    N = compute_flow_direction(elasticStrain)
+    trialStress = 2 * props[PROPS_MU] * np.tensordot(TensorMath.dev(elasticStrain), N)
+    flowStress = hardening_model[FLOW_STRESS](eqps)
 
+    # The tolerance on the yield check is the same as that in the nonlinear solve.
+    # This ensures that we take the elastic branch if the state vars are updated.
     isYielding = trialStress - flowStress > _TOLERANCE*props[PROPS_Y0]
 
     stateInc = jax.lax.cond(isYielding,
-                            lambda e: update_state(e, stateOld, stateOld, props, hardening_model),
+                            lambda e: update_state(e, state, state, props, hardening_model),
                             lambda e: np.zeros(NUM_STATE_VARS),
-                            elasticTrialStrain)
-    
+                            elasticStrain)
+
     return stateInc
 
 
