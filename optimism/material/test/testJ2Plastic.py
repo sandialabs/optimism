@@ -173,6 +173,42 @@ class GradOfPlasticityModelFixture(TestFixture):
         self.assertNear( stressHistory[-1], stressNewExp, 11 )
         self.assertArrayNear(eqpsHistory, eqpsExp, 12)
 
+
+class J2UpdateFixture(TestFixture):
+    def setUp(self):
+        E = 100.0
+        poisson = 0.321
+        Y0 = 0.3*E
+        eps0 = Y0/E
+        n = 4
+
+        self.props = {'elastic modulus': E,
+                      'poisson ratio': poisson,
+                      'yield strength': Y0,
+                      'hardening model': 'power law',
+                      'hardening exponent': n,
+                      'reference plastic strain': eps0}
+
+        materialModel = J2.create_material_model_functions(self.props)
+
+        self.compute_state_new = jax.jit(materialModel.compute_state_new)
+        self.compute_initial_state = materialModel.compute_initial_state
+
+    def test_update_only_happens_once(self):
+        key = jax.random.PRNGKey(0)
+
+        # get 10,000 random displacement gradients
+        dispGrads = jax.random.uniform(key, (10000, 3, 3))
+
+        # get 10,000 copies of the initial state
+        states = np.tile(self.compute_initial_state(), (10000, 1))
+
+        states_new = jax.vmap(self.compute_state_new)(dispGrads, states)
+
+        states_should_be_unchanged = jax.vmap(self.compute_state_new)(dispGrads, states_new)
+        self.assertArrayEqual(states_new, states_should_be_unchanged)
+
+
 class J2PlasticUniaxial(TestFixture):
 
     def setUp(self):
