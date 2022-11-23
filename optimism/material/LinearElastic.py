@@ -58,10 +58,8 @@ def _linear_elastic_energy_density(strain, internalVariables, props):
     return 0.5*kappa*traceStrain**2 + mu*np.tensordot(strainDev,strainDev)
 
 
-def make_initial_state(shape=(1,)):
-    dummy = 0.0
-    pointState = np.array([dummy])
-    return np.tile(pointState, shape)
+def make_initial_state():
+    return np.array([0.0])
 
 
 def _compute_state_new(strain, internalVariables, props):

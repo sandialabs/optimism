@@ -67,8 +67,8 @@ def _adagio_neohookean(dispGrad, internalVariables, props):
     return Wdev + Wvol
 
 
-def make_initial_state(shape=(1,)):
-    return np.zeros(shape)
+def make_initial_state():
+    return np.array([0.0])
 
 
 def _compute_state_new(dispGrad, internalVars, props):

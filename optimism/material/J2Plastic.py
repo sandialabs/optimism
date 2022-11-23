@@ -92,8 +92,7 @@ def make_properties(E, nu, Y0):
 def make_initial_state_finite_deformations(shape=(1,)):
     eqps = 0.0
     Fp = np.identity(3)
-    pointState = np.hstack((eqps, Fp.ravel()))
-    return np.tile(pointState, shape)
+    return np.hstack((eqps, Fp.ravel()))
 
 
 def make_initial_state_small_deformations(shape=(1,)):

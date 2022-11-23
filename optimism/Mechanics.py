@@ -161,7 +161,8 @@ def _compute_initial_state_multi_block(fs, blockModels):
     
     for blockKey in blockModels:
         elemIds = fs.mesh.blocks[blockKey]
-        blockInitialState = blockModels[blockKey].compute_initial_state( (elemIds.size, numQuadPoints, 1) )
+        state = blockModels[blockKey].compute_initial_state()
+        blockInitialState = np.tile(state, (elemIds.size, numQuadPoints, 1))
         initialState = initialState.at[elemIds, :, :blockInitialState.shape[2]].set(blockInitialState)
 
     return initialState
@@ -287,7 +288,8 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel, pressurePro
 
     
     def compute_initial_state():
-        return materialModel.compute_initial_state((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule), 1))
+        shape = Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule), 1
+        return np.tile(materialModel.compute_initial_state(), shape)
 
     return MechanicsFunctions(compute_strain_energy, jit(compute_updated_internal_variables), jit(compute_element_stiffnesses), jit(compute_output_energy_densities_and_stresses), compute_initial_state)
 
@@ -399,7 +401,8 @@ def create_dynamics_functions(functionSpace, mode2D, materialModel, newmarkParam
         return _compute_strain_energy(functionSpace, U, stateVariables, materialModel.compute_energy_density, modify_element_gradient)
 
     def compute_initial_state():
-        return materialModel.compute_initial_state((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule), 1))
+        shape = Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule), 1
+        return np.tile(materialModel.compute_initial_state(), shape)
 
     def compute_element_masses():
         V = np.zeros_like(fs.mesh.coords)
