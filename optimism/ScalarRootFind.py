@@ -8,7 +8,7 @@ SolutionInfo = namedtuple('SolutionInfo', ['converged', 'iterations', 'function_
 Settings = namedtuple('Settings', ['max_iters', 'x_tol', 'r_tol'])
 
 
-def get_settings(max_iters=50, x_tol=1e-13, r_tol=1e-10):
+def get_settings(max_iters=50, x_tol=1e-13, r_tol=0):
     """Get numerical settings for the root finder.
 
     Parameters
