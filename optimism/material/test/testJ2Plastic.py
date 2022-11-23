@@ -201,7 +201,7 @@ class J2PlasticUniaxial(TestFixture):
 
         maxTime = 20.0
 
-        uniaxial = MaterialUniaxialSimulator.run(self.mat, constant_true_strain_rate, maxTime, steps=100)
+        uniaxial = MaterialUniaxialSimulator.run(self.mat, constant_true_strain_rate, maxTime, steps=10)
 
         logStrainHistory = np.log(1.0 + uniaxial.strainHistory[:,0,0])
         yieldStrain = self.Y0/self.E
