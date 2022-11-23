@@ -225,7 +225,7 @@ def create_multi_block_mechanics_functions(functionSpace, mode2D, materialModels
         energy_densities = np.zeros((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule)))
         stresses = np.zeros((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule), 3, 3))
         for blockKey in materialModels:
-            compute_output_energy_density = materialModels[blockKey].compute_output_energy_density
+            compute_output_energy_density = materialModels[blockKey].compute_energy_density
             output_lagrangian = strain_energy_density_to_lagrangian_density(compute_output_energy_density)
             output_constitutive = value_and_grad(output_lagrangian, 1)
             elemIds = fs.mesh.blocks[blockKey]
@@ -277,10 +277,8 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel, pressurePro
     def compute_element_stiffnesses(U, stateVariables):
         return _compute_element_stiffnesses(U, stateVariables, fs, materialModel.compute_energy_density, modify_element_gradient)
 
-    
-    compute_output_energy_density = materialModel.compute_output_energy_density
 
-    output_lagrangian = strain_energy_density_to_lagrangian_density(compute_output_energy_density)
+    output_lagrangian = strain_energy_density_to_lagrangian_density(materialModel.compute_energy_density)
     output_constitutive = value_and_grad(output_lagrangian, 1)
 
     
@@ -388,8 +386,7 @@ def create_dynamics_functions(functionSpace, mode2D, materialModel, newmarkParam
             functionSpace, U, UPredicted, stateVariables, materialModel.density, dt, 
             newmarkParameters.beta, materialModel.compute_energy_density, modify_element_gradient)
 
-    compute_output_energy_density = materialModel.compute_output_energy_density
-    output_lagrangian = strain_energy_density_to_lagrangian_density(compute_output_energy_density)
+    output_lagrangian = strain_energy_density_to_lagrangian_density(materialModel.compute_energy_density)
     output_constitutive = value_and_grad(output_lagrangian, 1)
     def compute_output_potential_densities_and_stresses(U, stateVariables):
         return FunctionSpace.evaluate_on_block(fs, U, stateVariables, output_constitutive, slice(None), modify_element_gradient=modify_element_gradient)

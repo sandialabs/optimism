@@ -30,7 +30,6 @@ def create_material_model_functions(properties):
     density = properties.get('density')
 
     return MaterialModel(strain_energy,
-                         strain_energy,
                          make_initial_state,
                          compute_state_new,
                          density)
