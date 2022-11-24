@@ -59,7 +59,7 @@ def _linear_elastic_energy_density(strain, internalVariables, props):
 
 
 def make_initial_state():
-    return np.array([0.0])
+    return np.array([])
 
 
 def _compute_state_new(strain, internalVariables, props):
