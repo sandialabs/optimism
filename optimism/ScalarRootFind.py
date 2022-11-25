@@ -1,13 +1,14 @@
-from optimism.JaxConfig import *
+from collections import namedtuple
 
-from jax.lax import custom_root
+import jax
+import jax.numpy as np
 
-SolutionInfo = namedtuple('SolutionInfo', ['converged', 'iterations', 'function_calls'])
+SolutionInfo = namedtuple('SolutionInfo', ['converged', 'iterations', 'function_calls', 'residual_norm', 'correction_norm'])
 
-Settings = namedtuple('Settings', ['max_iters', 'x_tol'])
+Settings = namedtuple('Settings', ['max_iters', 'x_tol', 'r_tol'])
 
 
-def get_settings(max_iters=50, x_tol=1e-13):
+def get_settings(max_iters=50, x_tol=1e-13, r_tol=0):
     """Get numerical settings for the root finder.
 
     Parameters
@@ -18,12 +19,14 @@ def get_settings(max_iters=50, x_tol=1e-13):
         Tolerance on independent variable for convergence. The root finder will
         terminate when the independent variable changes by less than `x_tol` in
         an iteration.
+    r_tol : real
+        Tolerance on absolute value of residual for convergence.
 
     Returns
     =======
     settings : A Settings object, which can be used in `find_root`.
     """
-    return Settings(max_iters, x_tol)
+    return Settings(max_iters, x_tol, r_tol)
 
 
 def find_root(f, x0, bracket, settings):
@@ -54,8 +57,8 @@ def find_root(f, x0, bracket, settings):
         Argument of f such that f(x) = 0 (within provided tolerance). If the
         root is not bracketed, `nan` is returned.
     """
-    return custom_root(f, x0, lambda F, X0: rtsafe_(F, X0, bracket, settings),
-                       lambda g, y: y/g(1.0))
+    return jax.lax.custom_root(f, x0, lambda F, X0: rtsafe_(F, X0, bracket, settings),
+                               lambda g, y: y/g(1.0), has_aux=True)
 
 
 def rtsafe_(f, x0, bracket, settings):
@@ -65,8 +68,9 @@ def rtsafe_(f, x0, bracket, settings):
 
     max_iters = settings.max_iters
     x_tol = settings.x_tol
+    r_tol = settings.r_tol
 
-    f_and_fprime = value_and_grad(f)
+    f_and_fprime = jax.value_and_grad(f)
 
     converged = False
 
@@ -88,10 +92,10 @@ def rtsafe_(f, x0, bracket, settings):
     converged = np.where(rightBracketIsSolution, True, converged)
 
     # ORIENT THE SEARCH SO THAT F(XL) < 0.
-    xl, xh = lax.cond(fl < 0,
-                      lambda b: (b[0], b[1]),
-                      lambda b: (b[1], b[0]),
-                      bracket)
+    xl, xh = jax.lax.cond(fl < 0,
+                          lambda b: (b[0], b[1]),
+                          lambda b: (b[1], b[0]),
+                          bracket)
 
     # INITIALIZE THE GUESS FOR THE ROOT, THE ''STEP SIZE
     # BEFORE LAST'', AND THE LAST STEP
@@ -113,30 +117,30 @@ def rtsafe_(f, x0, bracket, settings):
         newtonOutOfRange = ((root - xh)*DF - F) * ((root - xl)*DF - F) > 0
         newtonDecreasingSlowly = np.abs(2.*F) > np.abs(dxOld*DF)
         dxOld = dx
-        root, dx, converged = lax.cond(newtonOutOfRange | newtonDecreasingSlowly,
-                                       bisection_step,
-                                       newton_step,
-                                       root, xl, xh, DF, F)
+        root, dx, converged = jax.lax.cond(newtonOutOfRange | newtonDecreasingSlowly,
+                                           bisection_step,
+                                           newton_step,
+                                           root, xl, xh, DF, F)
 
         F, DF = f_and_fprime(root)
 
         # MAINTAIN THE BRACKET ON THE ROOT
-        xl,xh = lax.cond(F < 0,
-                         lambda rt, lo, hi: (rt, hi),
-                         lambda rt, lo, hi: (lo, rt),
-                         root, xl, xh)
+        xl,xh = jax.lax.cond(F < 0,
+                             lambda rt, lo, hi: (rt, hi),
+                             lambda rt, lo, hi: (lo, rt),
+                             root, xl, xh)
         i += 1
-        converged = converged | (np.abs(dx) < x_tol) # absolute tolerance
+        converged = converged | (np.abs(dx) < x_tol) | (np.abs(F) < r_tol)
         return root, dx, dxOld, F, DF, xl, xh, converged, i
 
-    x, _, _, _, _, _, _, converged, iters = while_loop(cond,
-                                                       loop_body,
-                                                       (x0, dx, dxOld, F, DF, xl, xh, converged, 0))
+    x, dx, _, F, _, _, _, converged, iters = jax.lax.while_loop(cond,
+                                                                loop_body,
+                                                                (x0, dx, dxOld, F, DF, xl, xh, converged, 0))
 
     x = np.where(converged, x, np.nan)
     
-    return x#, SolutionInfo(converged=converged, function_calls=functionCalls,
-             #              iterations=iters)
+    return x, SolutionInfo(converged=converged, function_calls=functionCalls,
+                           iterations=iters, residual_norm=np.abs(F), correction_norm=np.abs(dx))
 
 
 def bisection_step(x, xl, xh, df, f):

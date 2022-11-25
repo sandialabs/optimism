@@ -30,7 +30,6 @@ def create_material_model_functions(properties):
     density = properties.get('density')
 
     return MaterialModel(strain_energy,
-                         strain_energy,
                          make_initial_state,
                          compute_state_new,
                          density)
@@ -68,8 +67,8 @@ def _adagio_neohookean(dispGrad, internalVariables, props):
     return Wdev + Wvol
 
 
-def make_initial_state(shape=(1,)):
-    return np.zeros(shape)
+def make_initial_state():
+    return np.array([])
 
 
 def _compute_state_new(dispGrad, internalVars, props):

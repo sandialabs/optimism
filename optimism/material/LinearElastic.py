@@ -38,7 +38,6 @@ def create_material_model_functions(properties):
     density = properties.get('density')
 
     return MaterialModel(compute_energy_density = strain_energy,
-                         compute_output_energy_density = strain_energy,
                          compute_initial_state = make_initial_state,
                          compute_state_new = compute_state_new,
                          density = density)
@@ -59,10 +58,8 @@ def _linear_elastic_energy_density(strain, internalVariables, props):
     return 0.5*kappa*traceStrain**2 + mu*np.tensordot(strainDev,strainDev)
 
 
-def make_initial_state(shape=(1,)):
-    dummy = 0.0
-    pointState = np.array([dummy])
-    return np.tile(pointState, shape)
+def make_initial_state():
+    return np.array([])
 
 
 def _compute_state_new(strain, internalVariables, props):

@@ -1,8 +1,10 @@
 import unittest
-from matplotlib import pyplot as plt
-from jax.scipy.linalg import expm
 
-from optimism.JaxConfig import *
+import jax
+import jax.numpy as np
+from jax.scipy import linalg
+from matplotlib import pyplot as plt
+
 from optimism import EquationSolver as EqSolver
 from optimism import FunctionSpace
 from optimism.material import J2Plastic as J2
@@ -11,7 +13,6 @@ from optimism import Mechanics
 from optimism import Mesh
 from optimism import Objective
 from optimism import QuadratureRule
-from optimism import TensorMath
 from optimism.test.TestFixture import TestFixture
 from optimism.test.MeshFixture import MeshFixture
 
@@ -20,7 +21,7 @@ plotting=False
 
 
 def make_disp_grad_from_strain(strain):
-    return expm(strain) - np.identity(3)
+    return linalg.expm(strain) - np.identity(3)
         
 
 class GradOfPlasticityModelFixture(TestFixture):
@@ -39,10 +40,10 @@ class GradOfPlasticityModelFixture(TestFixture):
 
         materialModel = J2.create_material_model_functions(self.props)
 
-        self.energy_density = materialModel.compute_energy_density
-        self.stress_func = grad(self.energy_density, 0)
+        self.energy_density = jax.jit(materialModel.compute_energy_density)
+        self.stress_func = jax.jit(jax.grad(self.energy_density, 0))
         self.compute_state_new = materialModel.compute_state_new
-        self.tangents_func = hessian(self.energy_density)
+        self.tangents_func = jax.hessian(self.energy_density)
         self.compute_initial_state = materialModel.compute_initial_state
         
     def test_zero_point(self):
@@ -172,6 +173,42 @@ class GradOfPlasticityModelFixture(TestFixture):
         self.assertNear( stressHistory[-1], stressNewExp, 11 )
         self.assertArrayNear(eqpsHistory, eqpsExp, 12)
 
+
+class J2UpdateFixture(TestFixture):
+    def setUp(self):
+        E = 100.0
+        poisson = 0.321
+        Y0 = 0.3*E
+        eps0 = Y0/E
+        n = 4
+
+        self.props = {'elastic modulus': E,
+                      'poisson ratio': poisson,
+                      'yield strength': Y0,
+                      'hardening model': 'power law',
+                      'hardening exponent': n,
+                      'reference plastic strain': eps0}
+
+        materialModel = J2.create_material_model_functions(self.props)
+
+        self.compute_state_new = jax.jit(materialModel.compute_state_new)
+        self.compute_initial_state = materialModel.compute_initial_state
+
+    def test_update_only_happens_once(self):
+        key = jax.random.PRNGKey(0)
+
+        # get 10,000 random displacement gradients
+        dispGrads = jax.random.uniform(key, (10000, 3, 3))
+
+        # get 10,000 copies of the initial state
+        states = np.tile(self.compute_initial_state(), (10000, 1))
+
+        states_new = jax.vmap(self.compute_state_new)(dispGrads, states)
+
+        states_should_be_unchanged = jax.vmap(self.compute_state_new)(dispGrads, states_new)
+        self.assertArrayEqual(states_new, states_should_be_unchanged)
+
+
 class J2PlasticUniaxial(TestFixture):
 
     def setUp(self):
@@ -200,7 +237,7 @@ class J2PlasticUniaxial(TestFixture):
 
         maxTime = 20.0
 
-        uniaxial = MaterialUniaxialSimulator.run(self.mat, constant_true_strain_rate, maxTime, steps=100)
+        uniaxial = MaterialUniaxialSimulator.run(self.mat, constant_true_strain_rate, maxTime, steps=10)
 
         logStrainHistory = np.log(1.0 + uniaxial.strainHistory[:,0,0])
         yieldStrain = self.Y0/self.E
@@ -210,7 +247,7 @@ class J2PlasticUniaxial(TestFixture):
 
         # convert Piola stress output to Kirchhoff stress
         I = np.identity(3)
-        kirchhoffStressHistory = vmap(lambda H, P: P@(H + I).T)(uniaxial.strainHistory, uniaxial.stressHistory)
+        kirchhoffStressHistory = jax.vmap(lambda H, P: P@(H + I).T)(uniaxial.strainHistory, uniaxial.stressHistory)
 
         self.assertArrayNear(kirchhoffStressHistory[:,0,0], exact, 2)
 
