@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "optimism"
+version = "0.0.1"
+description = "Rapid development platform for solid mechanics research using optimization tools"
+license = {file = "LICENSE"}
+readme = "README.md"
+requires-python = ">=3.7"
+authors = [
+    {name = "Michael Tupek"},
+    {name = "Brandon Talamini", email = "talamini1@llnl.gov"}
+]
+dependencies = [
+    "jax",
+    "jaxlib",
+    "matplotlib",
+    "netcdf4",
+    "scipy"
+]
+
+[project.optional-dependencies]
+doc = [
+    "sphinx"
+]
+sparse = [
+    "scikit-sparse"
+]
+test = [
+    "pytest",
+    "pytest-cov"
+]
+
+[project.urls]
+homepage = "https://github.com/sandialabs/optimism"
+# add below once docs is set up
+# documentation = "https://whatever-the-webpage-is.com"
