@@ -1,4 +1,5 @@
-from optimism.JaxConfig import *
+import jax.numpy as np
+
 from optimism.material.MaterialModel import MaterialModel
 
 
