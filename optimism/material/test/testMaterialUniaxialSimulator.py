@@ -1,6 +1,7 @@
 import unittest
 
-from optimism.JaxConfig import *
+import jax.numpy as np
+
 from optimism.material import MaterialUniaxialSimulator
 from optimism.material import LinearElastic
 from optimism.test.TestFixture import TestFixture
