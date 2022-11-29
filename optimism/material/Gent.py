@@ -39,8 +39,8 @@ def _gent_3D_energy_density(dispGrad, internalVariables, props):
     Wdev = -0.5 * (props[PROPS_MU] * props[PROPS_JM]) * np.log(1. - (I1_bar - 3.) / props[PROPS_JM])
     return Wdev + Wvol
 
-def make_initial_state(shape=(1,)):
-    return np.zeros(shape)
+def make_initial_state():
+    return np.array([])
 
 
 def _compute_state_new(dispGrad, internalVars, props):
