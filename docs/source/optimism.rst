@@ -1,0 +1,4 @@
+Optimism
+========
+
+.. automodule:: optimism

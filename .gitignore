@@ -20,4 +20,4 @@ venv/
 .vscode/
 
 # documentation build directory
-doc/build/
+docs/build/
