@@ -18,3 +18,6 @@ venv/
 # IDE files
 .idea/
 .vscode/
+
+# documentation build directory
+doc/build/
