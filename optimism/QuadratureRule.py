@@ -1,4 +1,3 @@
-from collections import namedtuple
 import math
 import numpy as onp
 import scipy.special
@@ -6,33 +5,40 @@ import scipy.special
 import jax.numpy as np
 from jax.lax import switch
 
+from typing import NamedTuple
 
-QuadratureRule = namedtuple('QuadratureRule', ['xigauss', 'wgauss'])
-QuadratureRule.__doc__ = """Quadrature rule points and weights.
+
+class QuadratureRule(NamedTuple):
+    """
+    Quadrature rule points and weights.
     A ``namedtuple`` containing ``xigauss``, a numpy array of the
     coordinates of the sample points in the reference domain, and
-    ``wgauss``, a numpy array with the weights.
-    """
+    ``wgauss``, a numpy array with the weights
 
-def len(quadRule):
-    """Gets the number of points in a quadrature rule."""
+    :param xigauss: numpy array of the sample points in the reference domain
+    :param wgauss: numpy array of weights
+    """
+    xigauss: onp.ndarray
+    wgauss: onp.ndarray
+
+
+def len(quadRule: QuadratureRule) -> float:
+    """
+    Gets the number of points in a quadrature rule.
+    :param quadRule: the input quadrature rule
+    :return: the number of points in the input quadrature rule
+    """
     return quadRule.xigauss.shape[0]
 
 
-def create_quadrature_rule_1D(degree):
-    """Creates a Gauss-Legendre quadrature on the unit interval.
+def create_quadrature_rule_1D(degree: int) -> QuadratureRule:
+    """
+    Creates a Gauss-Legendre quadrature on the unit interval.
+    The rule can exactly integrate polynomials of degree up to ``degree``.
 
-    The rule can exactly integrate polynomials of degree up to 
-    ``degree``.
-
-    Parameters
-    ----------
-    degree: Highest degree polynomial to be exactly integrated by the quadrature rule
-
-    Returns
-    -------
-    A ``QuadratureRule`` named tuple containing the quadrature point coordinates
-    and the weights.
+    :param degree: Highest degree polynomial to be exactly integrated by the quadrature rule
+    :return: A ``QuadratureRule`` named tuple containing the quadrature point coordinates
+             and the weights.
     """
 
     n = math.ceil((degree + 1)/2)
@@ -40,13 +46,15 @@ def create_quadrature_rule_1D(degree):
     return QuadratureRule(xi, w)
 
 
+# TODO add documentation for this method (although it is self-explanatory)
 def eval_at_iso_points(xigauss, field):
     fields = np.array([field[0,:] + (field[1,:]-field[0,:]) * xi for xi in xigauss])
     return fields
 
 
-def create_quadrature_rule_on_triangle(degree):
-    """Creates a Gauss-Legendre quadrature on the unit triangle.
+def create_quadrature_rule_on_triangle(degree: int) -> QuadratureRule:
+    """
+    Creates a Gauss-Legendre quadrature on the unit triangle.
 
     The rule can exactly integrate 2D polynomials up to the value of 
     ``degree``. The domain is the triangle between the vertices
@@ -54,14 +62,10 @@ def create_quadrature_rule_on_triangle(degree):
     cyclically symmetric in triangular coordinates and to have strictly
     positive weights.
 
-    Parameters
-    ----------
-    degree: Highest degree polynomial to be exactly integrated by the quadrature rule
+    :param degree: Highest degree polynomial to be exactly integrated by the quadrature rule
 
-    Returns
-    -------
-    A ``QuadratureRule`` named tuple containing the quadrature point coordinates
-    and the weights.
+    :return: A ``QuadratureRule`` named tuple containing the quadrature point coordinates
+             and the weights.
     """
     if degree <= 1:
         xi = onp.array([[3.33333333333333333E-01,  3.33333333333333333E-01]])
@@ -135,8 +139,9 @@ def create_quadrature_rule_on_triangle(degree):
     return QuadratureRule(xi, w)
 
 
-def create_padded_quadrature_rule_1D(degree):
-    """Creates 1D Gauss quadrature rule data that are padded to maintain a 
+def create_padded_quadrature_rule_1D(degree: int) -> QuadratureRule:
+    """
+    Creates 1D Gauss quadrature rule data that are padded to maintain a 
     uniform size, which makes this function jit-able. 
 
     This function is inteded to be used only when jit compilation of calls to the
@@ -144,8 +149,10 @@ def create_padded_quadrature_rule_1D(degree):
     rules. The standard rules do not contain extra 0s for padding, which makes 
     them more efficient when  used repeatedly (such as in the global energy).
 
-    Args:
-      degree: degree of highest polynomial to be integrated exactly
+    :param degree: Highest degree polynomial to be exactly integrated by the quadrature rule
+
+    :return: A ``QuadratureRule`` named tuple containing the quadrature point coordinates
+             and the weights.
     """
 
     npts = np.ceil((degree + 1)/2).astype(int)
