@@ -33,12 +33,6 @@ class VoceHardeningTestFixture(TestFixture):
         self.assertAlmostEqual(Y, Y0, 12)
 
 
-    def test_voce_hardening_handles_negative_eqps(self):
-        eqps = -1.0
-        Wp = self.plasticEnergy(eqps)
-        self.assertTrue(np.isinf(Wp))
-
-
     def test_voce_hardening_saturates_to_correct_value(self):
         eqps = 15.0*self.eps0
         Y = self.flowStrength(eqps)
@@ -67,12 +61,6 @@ class PowerLawHardeningTestFixture(TestFixture):
     def test_power_law_hardening_yield_strength(self):
         Y = self.flowStrength(0.0)
         self.assertAlmostEqual(Y, Y0, 12)
-
-
-    def test_power_law_hardening_handles_negative_eqps(self):
-        eqps = -1.0
-        Wp = self.plasticEnergy(eqps)
-        self.assertTrue(np.isinf(Wp))
 
 
     def test_power_law_strength_increases(self):

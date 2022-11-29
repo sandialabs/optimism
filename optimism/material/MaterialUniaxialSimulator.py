@@ -47,7 +47,7 @@ def run(materialModel, strain_history, maxTime, steps=10):
     timePoints = np.linspace(0.0, maxTime, num=steps)
     uniaxialStrainHistory = strain_history(timePoints)
     energy_density = materialModel.compute_energy_density
-    converged_energy_density_and_stress = jit(value_and_grad(materialModel.compute_output_energy_density))
+    converged_energy_density_and_stress = jit(value_and_grad(materialModel.compute_energy_density))
     update = jit(materialModel.compute_state_new)
         
     def obj_func(freeStrains, p):

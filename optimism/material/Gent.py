@@ -1,4 +1,5 @@
-from optimism.JaxConfig import *
+import jax.numpy as np
+
 from optimism.material.MaterialModel import MaterialModel
 
 
@@ -23,7 +24,6 @@ def create_material_functions(properties):
     density = properties.get('density')
 
     return MaterialModel(strain_energy,
-                         strain_energy,
                          make_initial_state,
                          compute_state_new,
                          density)
@@ -39,8 +39,8 @@ def _gent_3D_energy_density(dispGrad, internalVariables, props):
     Wdev = -0.5 * (props[PROPS_MU] * props[PROPS_JM]) * np.log(1. - (I1_bar - 3.) / props[PROPS_JM])
     return Wdev + Wvol
 
-def make_initial_state(shape=(1,)):
-    return np.zeros(shape)
+def make_initial_state():
+    return np.array([])
 
 
 def _compute_state_new(dispGrad, internalVars, props):
