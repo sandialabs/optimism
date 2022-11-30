@@ -1,4 +1,3 @@
-from collections import namedtuple
 import numpy as onp
 
 import jax
@@ -7,49 +6,60 @@ from jax.scipy.linalg import solve
 
 from optimism import Interpolants
 from optimism import Mesh
+from optimism import QuadratureRule
+
+from typing import NamedTuple
 
 
-FunctionSpace = namedtuple('FunctionSpace', ['shapes', 'vols', 'shapeGrads', 'mesh', 'quadratureRule'])
-FunctionSpace.__doc__ = \
-    """Data needed for calculus on functions in the discrete function space.
+class FunctionSpace(NamedTuple):
+    """
+    Data needed for calculus on functions in the discrete function space.
 
     In describing the shape of the attributes, ``ne`` is the number of
     elements in the mesh, ``nqpe`` is the number of quadrature points per
     element, ``npe`` is the number of nodes per element, and ``nd`` is the
     spatial dimension of the domain.
 
-    Attributes:
-        shapes: Shape function values on each element, shape (ne, nqpe, npe)
-        vols: Volume attributed to each quadrature point. That is, the
-            quadrature weight (on the parameteric element domain) multiplied by
-            the Jacobian determinant of the map from the parent element to the
-            element in the domain. Shape (ne, nqpe).
-        shapeGrads: Derivatives of the shape functions with respect to the
-            spatial coordinates of the domain. Shape (ne, nqpe, npe, nd).
-        mesh: The ``Mesh`` object of the domain.
-        quadratureRule: The ``QuadratureRule`` on which to sample the shape
-            functions.
+    :param shapes: Shape function values on each element, shape (ne, nqpe, npe)
+    :param vols: Volume attributed to each quadrature point. That is, the
+                 quadrature weight (on the parameteric element domain) multiplied by
+                 the Jacobian determinant of the map from the parent element to the
+                 element in the domain. Shape (ne, nqpe).
+    :param shapeGrads: Derivatives of the shape functions with respect to the
+                       spatial coordinates of the domain. Shape (ne, nqpe, npe, nd).
+    :param mesh: The ``Mesh`` object of the domain.
+    :param quaratureRule: The ``QuadratureRule`` on which to sample the shape functions.
     """
+    shapes: np.ndarray
+    vols: np.ndarray
+    shapeGrads: np.ndarray
+    mesh: any
+    quadratureRule: any
+    # Below doesn't work for whatever reason. Some errors are thrown which
+    # is interesting
+    #
+    # mesh: Mesh
+    # quadratureRule: QuadratureRule
 
-EssentialBC = namedtuple('EssentialBC', ['nodeSet', 'component'])
+
+# EssentialBC = namedtuple('EssentialBC', ['nodeSet', 'component'])
+class EssentialBC(NamedTuple):
+    nodeSet: any
+    component: any
 
 
 def construct_function_space(mesh, quadratureRule, mode2D='cartesian'):
-    """Construct a discrete function space.
+    """
+    Construct a discrete function space
 
-    Parameters
-    ----------
-    mesh: The mesh of the domain.
-    quadratureRule: The quadrature rule to be used for integrating on the
-        domain.
-    mode2D: A string indicating how the 2D domain is interpreted for
+    :param mesh: the mesh of the domain
+    :param quaratureRule: The quadrature rule to be used for 
+        integrating on the domain.
+    :param mode2D: A string indicating how the 2D domain is interpreted for
         integration. Valid values are ``cartesian`` and ``axisymmetric``.
         Axisymetric mode will include the factor of 2*pi*r in the ``vols``
         attribute.
-
-    Returns
-    -------
-    The ``FunctionSpace`` object.
+    :return: The ``FunctionSpace`` object
     """
 
     shapeOnRef = Interpolants.compute_shapes(mesh.parentElement, quadratureRule.xigauss)
@@ -57,7 +67,8 @@ def construct_function_space(mesh, quadratureRule, mode2D='cartesian'):
 
 
 def construct_function_space_from_parent_element(mesh, shapeOnRef, quadratureRule, mode2D='cartesian'):
-    """Construct a function space with precomputed shape function data on the parent element.
+    """
+    Construct a function space with precomputed shape function data on the parent element.
 
     This version of the function space constructor is Jax-transformable,
     and in particular can be jitted. The computation of the shape function
@@ -72,21 +83,17 @@ def construct_function_space_from_parent_element(mesh, shapeOnRef, quadratureRul
     (which occurs through the mapping from the parent element to the spatial
     domain).
 
-    Parameters
-    ----------
-    mesh: The mesh of the domain.
-    shapeOnRef: A tuple of the shape function values and gradients on the
+    :param mesh: The mesh of the domain.
+    :param shapeOnRef: A tuple of the shape function values and gradients on the
         parent element, evaluated at the quadrature points. The caller must
         take care to ensure the shape functions are evaluated at the same
         points as contained in the ``quadratureRule`` parameter.
-    quadratureRule: The quadrature rule to be used for integrating on the
+    :param quadratureRule: The quadrature rule to be used for integrating on the
         domain.
-    mode2D: A string indicating how the 2D domain is interpreted for
+    :param mode2D: A string indicating how the 2D domain is interpreted for
         integration. See the default factory function for details.
 
-    Returns
-    -------
-    The ``FunctionSpace`` object.
+    :return: The ``FunctionSpace`` object.
     """
 
     shapes = jax.vmap(lambda elConns, elShape: elShape, (0, None))(mesh.conns, shapeOnRef.values)

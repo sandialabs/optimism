@@ -27,12 +27,13 @@ def get_best_overlap_vector(mesh, edge, listOfEdges):
 
 
 # coarse search
+# THIS GUY SEEMS TO BE DOING NOTHING
+# LIKELY NEED TO DELETE BUT I COMMENTED OUT FOR NOW...
+# def test_contact_search(self):
+#     sideA = self.mesh.sideSets['right1']
+#     sideB = self.mesh.sideSets['left2']
 
-def test_contact_search(self):
-    sideA = self.mesh.sideSets['right1']
-    sideB = self.mesh.sideSets['left2']
-
-    closeEdgesinAForSidesInB = get_close_edge_list(sideA, sideB, self.mesh, self.disp, 0.15)
+#     closeEdgesinAForSidesInB = get_close_edge_list(sideA, sideB, self.mesh, self.disp, 0.15)
 
 
 class TwoBodyContactFixture(MeshFixture):
