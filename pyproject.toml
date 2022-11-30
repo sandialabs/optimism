@@ -22,7 +22,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-doc = [
+docs = [
     "sphinx"
 ]
 sparse = [
@@ -30,7 +30,8 @@ sparse = [
 ]
 test = [
     "pytest",
-    "pytest-cov"
+    "pytest-cov",
+    "pytest-xdist"
 ]
 
 [project.urls]
