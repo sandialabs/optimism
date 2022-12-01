@@ -47,7 +47,7 @@ nodeSets = {'left': np.flatnonzero(mesh.coords[:,0] < xRange[0] + nodeTol),
 mesh = Mesh.mesh_with_nodesets(mesh, nodeSets)
 
 # create the function space
-order = 2*mesh.masterElement.degree
+order = 2*mesh.parentElement.degree
 quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2*(order - 1))
 fs = FunctionSpace.construct_function_space(mesh, quadRule)
 
