@@ -254,7 +254,7 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel, pressurePro
     elif mode2D == 'axisymmetric':
         grad_2D_to_3D = axisymmetric_element_gradient_transformation
     else:
-        raise
+        raise ValueError('Supproted values are 1. plane strain 2. axisymmetric.')
 
     modify_element_gradient = grad_2D_to_3D
     if pressureProjectionDegree is not None:
