@@ -1,0 +1,18 @@
+[Mesh]
+type = "ExodusMesh"
+file = "pad.g"
+
+[QuadratureRule.Cell]
+degree = 1
+
+[FunctionSpace]
+mode2D = "cartesian"
+EssentialBoundaryConditions = [
+    {nodeset="nset_pad_bottom", component=0},
+    {nodeset="nset_pad_bottom", component=1},
+    {nodeset="nset_pad_top",    component=0},
+    {nodeset="nset_pad_top",    component=1},
+]
+
+
+

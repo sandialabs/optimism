@@ -1,0 +1,102 @@
+reset
+
+#filament_diameter = {filament_diameter = 0.410                                         }
+#spacing                  = {spacing                 = (.7 + 1.) * filament_diameter     }
+#layer_height          = {layer_height          = 0.386                                          }
+#filament_length     = {filament_length     = filament_diameter + 4 * spacing}
+
+
+
+
+# layer 1
+create surface rectangle width {filament_length} height {filament_diameter} zplane
+move surface 1 x {filament_length / 2} y {filament_diameter / 2}
+
+# layer 2
+create surface circle radius {filament_diameter / 2} zplane
+move surface 2 x {filament_diameter  / 2} y {filament_diameter / 2}
+move surface 2 y {layer_height}
+
+create surface circle radius {filament_diameter / 2} zplane
+move surface 3 x {filament_diameter  / 2} y {filament_diameter / 2}
+move surface 3 y {layer_height}
+move surface 3 x {spacing}
+
+create surface circle radius {filament_diameter / 2} zplane
+move surface 4 x {filament_diameter  / 2} y {filament_diameter / 2}
+move surface 4 y {layer_height}
+move surface 4 x {2 * spacing}
+
+create surface circle radius {filament_diameter / 2} zplane
+move surface 5 x {filament_diameter  / 2} y {filament_diameter / 2}
+move surface 5 y {layer_height}
+move surface 5 x {3 * spacing}
+
+create surface circle radius {filament_diameter / 2} zplane
+move surface 6 x {filament_diameter  / 2} y {filament_diameter / 2}
+move surface 6 y {layer_height}
+move surface 6 x {4 * spacing}
+
+# layer 3
+create surface rectangle width {filament_length} height {filament_diameter} zplane
+move surface 7 x {filament_length / 2} y {filament_diameter / 2}
+move surface 7 y {2 * layer_height}
+
+# layer 4
+create surface circle radius {filament_diameter / 2} zplane
+move surface 8 x {filament_diameter  / 2} y {filament_diameter / 2}
+move surface 8 y {3 * layer_height}
+
+create surface circle radius {filament_diameter / 2} zplane
+move surface 9 x {filament_diameter  / 2} y {filament_diameter / 2}
+move surface 9 y {3 * layer_height}
+move surface 9 x {spacing}
+
+create surface circle radius {filament_diameter / 2} zplane
+move surface 10 x {filament_diameter  / 2} y {filament_diameter / 2}
+move surface 10 y {3 * layer_height}
+move surface 10 x {2 * spacing}
+
+create surface circle radius {filament_diameter / 2} zplane
+move surface 11 x {filament_diameter  / 2} y {filament_diameter / 2}
+move surface 11 y {3 * layer_height}
+move surface 11 x {3 * spacing}
+
+create surface circle radius {filament_diameter / 2} zplane
+move surface 12 x {filament_diameter  / 2} y {filament_diameter / 2}
+move surface 12 y {3 * layer_height}
+move surface 12 x {4 * spacing}
+
+# layer 3
+create surface rectangle width {filament_length} height {filament_diameter} zplane
+move surface 13 x {filament_length / 2} y {filament_diameter / 2}
+move surface 13 y {4 * layer_height}
+
+# unite all surfaces
+unite body all
+
+# mesh
+surface 14 scheme trimesh
+surface 14 size {filament_diameter / 5}
+mesh surface 14
+
+# blocks
+block 1 add surface 14
+block 1 element type tri6
+
+# sidesets
+
+sideset 3 add curve 3
+sideset 3 name "sset_pad_bottom"
+nodeset 3 add curve in sideset 3
+nodeset 3 name "nset_pad_bottom"
+
+sideset 4 add curve 19
+sideset 4 name "sset_pad_top"
+nodeset 4 add curve in sideset 4
+nodeset 4 name "nset_pad_top"
+
+export genesis "pad.g" overwrite
+
+
+

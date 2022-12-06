@@ -1,0 +1,65 @@
+reset
+
+#filament_diameter = {filament_diameter = 0.410                                         }
+#spacing                  = {spacing                 = (.7 + 1.) * filament_diameter     }
+#layer_height          = {layer_height          = 0.386                                          }
+#filament_length     = {filament_length     = filament_diameter + 1 * spacing}
+
+
+
+
+# layer 1
+create surface rectangle width {filament_length} height {filament_diameter} zplane
+move surface 1 x {filament_length / 2} y {filament_diameter / 2}
+
+# layer 2
+create surface circle radius {filament_diameter / 2} zplane
+move surface 2 x {filament_diameter  / 2} y {filament_diameter / 2}
+move surface 2 y {layer_height}
+
+create surface circle radius {filament_diameter / 2} zplane
+move surface 3 x {filament_diameter  / 2} y {filament_diameter / 2}
+move surface 3 y {layer_height}
+move surface 3 x {spacing}
+
+# layer 3
+create surface rectangle width {filament_length} height {filament_diameter} zplane
+move surface 4 x {filament_length / 2} y {filament_diameter / 2}
+move surface 4 y {2 * layer_height}
+
+# unite all surfaces
+unite body all
+
+# mesh
+surface 5 scheme trimesh
+surface 5 size {filament_diameter / 5}
+mesh surface 5
+
+# blocks
+block 1 add surface 5
+block 1 element type tri6
+
+# node sets for bcs
+nodeset 1 add curve 3
+nodeset 1 name "nset_bottom"
+
+#nodeset 2 add curve 7
+#nodeset 2 name "nset_top"
+
+nodeset 2 add curve 7
+nodeset 2 name "nset_top"
+
+# sidesets for contact
+sideset 1 add curve 11
+sideset 1 name "sset_inner_top"
+
+sideset 2 add curve 12
+sideset 2 name "sset_inner_right"
+
+sideset 3 add curve 13
+sideset 3 name "sset_inner_bottom"
+
+sideset 4 add curve 14
+sideset 4 name "sset_inner_left"
+
+export genesis "pad_unit_cell.g" overwrite
