@@ -145,7 +145,7 @@ def compute_state_increment(elasticStrain, state, dt, props, hardening_model):
     isYielding = trialStress - flowStress > _TOLERANCE*props[PROPS_Y0]
 
     stateInc = jax.lax.cond(isYielding,
-                            lambda e: update_state(e, state, state, dt, props, hardening_model),
+                            lambda e: update_state(e, state, dt, props, hardening_model),
                             lambda e: np.zeros(NUM_STATE_VARS),
                             elasticStrain)
 
@@ -191,15 +191,17 @@ def incremental_potential(elasticTrialStrain, eqps, eqpsOld, dt, props, hardenin
 r = jax.jacfwd(incremental_potential, 1)
 
 
-def update_state(elasticTrialStrain, stateOld, stateNewGuess, dt, props, hardening_model):
+def update_state(elasticTrialStrain, stateOld, dt, props, hardening_model):
     settings = ScalarRootFind.get_settings(x_tol=0, r_tol=_TOLERANCE*props[PROPS_Y0])
     eqpsOld = stateOld[EQPS]
-    eqpsGuess = stateNewGuess[EQPS]
 
     N = compute_flow_direction(elasticTrialStrain)
     lb = eqpsOld
     trialMises = 2 * props[PROPS_MU] * np.tensordot(TensorMath.dev(elasticTrialStrain), N)
     ub = eqpsOld + (trialMises - hardening_model.compute_flow_stress(eqpsOld, eqpsOld, dt))/(3.0*props[PROPS_MU])
+    # Avoid the initial guess eqpsGuess = eqpsOld, because the power law rate sensitivity has an infinte slope
+    # in this case.
+    eqpsGuess = 0.5*(lb + ub)
     eqps, _ = ScalarRootFind.find_root(lambda e: r(elasticTrialStrain, e, eqpsOld, dt, props, hardening_model),
                                        eqpsGuess,
                                        np.array([lb, ub]),
