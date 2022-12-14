@@ -52,9 +52,11 @@ class ScalarRootFindTestFixture(TestFixture.TestFixture):
         self.assertTrue(np.isnan(root))
 
         
-    def test_find_root_converges_with_terrible_guess(self):
-        rootBracket = np.array([float_info.epsilon, 200.0])
-        root, status = ScalarRootFind.find_root(f, 199.0, rootBracket, self.settings)
+    def test_find_root_converges_on_hard_function(self):
+        g = lambda x: np.sin(x) + x
+        rootBracket = np.array([-3.0, 20.0])
+        x0 = 19.0
+        root, status = ScalarRootFind.find_root(f, x0, rootBracket, self.settings)
         self.assertTrue(status.converged)
         self.assertNear(root, self.rootExpected, 13)
 
@@ -62,7 +64,7 @@ class ScalarRootFindTestFixture(TestFixture.TestFixture):
     def test_root_find_is_differentiable(self):
         myfunc = lambda x, a: x**3 - a
         def cube_root(a):
-            rootBracket = np.array([float_info.epsilon, 100.0])
+            rootBracket = np.array([float_info.epsilon, a])
             root, _ = ScalarRootFind.find_root(lambda x: myfunc(x, a), 8.0, rootBracket, 
                                                self.settings)
             return root
@@ -78,7 +80,7 @@ class ScalarRootFindTestFixture(TestFixture.TestFixture):
     def test_find_root_with_forced_bisection_step(self):
         myfunc = lambda x, a: x**2 - a
         def my_sqrt(a):
-            rootBracket = np.array([float_info.epsilon, 100.0])
+            rootBracket = np.array([float_info.epsilon, a])
             root, _ = ScalarRootFind.find_root(lambda x: myfunc(x, a), 8.0,
                                                rootBracket, self.settings)
             return root
@@ -90,7 +92,7 @@ class ScalarRootFindTestFixture(TestFixture.TestFixture):
     def test_root_find_with_vmap_and_jit(self):
         myfunc = lambda x, a: x**2 - a
         def my_sqrt(a):
-            rootBracket = np.array([float_info.epsilon, 100.0])
+            rootBracket = np.array([float_info.epsilon, a])
             root, _ = ScalarRootFind.find_root(lambda x: myfunc(x, a), 8.0,
                                                rootBracket, self.settings)
             return root

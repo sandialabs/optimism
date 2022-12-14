@@ -78,11 +78,18 @@ def rtsafe_(f, x0, bracket, settings):
     fh = f(bracket[1])
     functionCalls = 2
 
+    # Fix initial guess if outside bracket.
+    # Must do this before the steps that change the initial guess
+    # as a means to exit early (ie, root bracketing check and 
+    # testing bracket values as solutions).
+    x0 = np.clip(x0, bracket[0], bracket[1])
+
     # check that root is bracketed
     x0 = np.where(fl*fh < 0.0,
                   x0,
                   np.nan)
 
+    # Check if either bracket is a root
     leftBracketIsSolution = (fl == 0.0)
     x0 = np.where(leftBracketIsSolution, bracket[0], x0)
     converged = np.where(leftBracketIsSolution, True, converged)
@@ -97,9 +104,7 @@ def rtsafe_(f, x0, bracket, settings):
                           lambda b: (b[1], b[0]),
                           bracket)
 
-    # INITIALIZE THE GUESS FOR THE ROOT, THE ''STEP SIZE
-    # BEFORE LAST'', AND THE LAST STEP
-    x0 = np.clip(x0, np.min(bracket), np.max(bracket))
+    # INITIALIZE THE ''STEP SIZE BEFORE LAST'', AND THE LAST STEP
     dxOld = np.abs(bracket[1] - bracket[0])
     dx = dxOld
 
@@ -138,7 +143,7 @@ def rtsafe_(f, x0, bracket, settings):
                                                                 (x0, dx, dxOld, F, DF, xl, xh, converged, 0))
 
     x = np.where(converged, x, np.nan)
-    
+
     return x, SolutionInfo(converged=converged, function_calls=functionCalls,
                            iterations=iters, residual_norm=np.abs(F), correction_norm=np.abs(dx))
 
