@@ -55,5 +55,39 @@ class RateSensitivityFixture(TestFixture):
         self.assertEqual(flowStress, Y0)
 
 
+from optimism.material import J2Plastic
+
+class RateSentivityInsideJ2(TestFixture):
+    def test_kinetic_potential_works_inside_J2(self):
+        E = 1.0
+        nu = 0.3
+
+        Y0 = 1e-4
+        H = E / 50
+
+        S = Y0
+        m = 2.0
+        epsDot0 = 0.1
+
+        props = {"elastic modulus": E,
+                 "poisson ratio": nu,
+                 "yield strength": Y0,
+                 "hardening model": "linear",
+                 "hardening modulus": H,
+                 "rate sensitivity": "power law",
+                 "rate sensitivity stress": S,
+                 "rate sensitivity exponent": m,
+                 "reference plastic strain rate": epsDot0}
+
+        material = J2Plastic.create_material_model_functions(props)
+
+        key = jax.random.PRNGKey(0)
+        dispGrad = jax.random.uniform(key, (3, 3))
+        internalState = material.compute_initial_state()
+        dt = 1.0
+        W = material.compute_energy_density(dispGrad, internalState, dt)
+        self.assertGreater(W, 0.0)
+
+
 if __name__ == "__main__":
     unittest.main()
