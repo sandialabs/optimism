@@ -45,6 +45,7 @@ def run(materialModel, strain_history, maxTime, steps=10):
     UniaxialOutput: named tuple of constitutive output
     """
     timePoints = np.linspace(0.0, maxTime, num=steps)
+    dt = timePoints[1] - timePoints[0]
     uniaxialStrainHistory = strain_history(timePoints)
     energy_density = materialModel.compute_energy_density
     converged_energy_density_and_stress = jit(value_and_grad(materialModel.compute_energy_density))
@@ -52,9 +53,10 @@ def run(materialModel, strain_history, maxTime, steps=10):
         
     def obj_func(freeStrains, p):
         strain = makeStrainTensor_(freeStrains, p)
-        return energy_density(strain, p[1])
+        return energy_density(strain, p[1], dt)
 
-    solverSettings = EqSolver.get_settings()
+    uniaxialTolerance=1e-3
+    solverSettings = EqSolver.get_settings(tol=uniaxialTolerance)
     internalVariables =  materialModel.compute_initial_state()
     freeStrains = np.zeros(2)
         
@@ -67,12 +69,14 @@ def run(materialModel, strain_history, maxTime, steps=10):
     energyHistory = []
     internalVariableHistory = []
     for i in range(steps):
+        print('---------------------------')
+        print(f'Step {i}')
         p = Objective.param_index_update(p, 0, uniaxialStrainHistory[i])
 
         freeStrains = EqSolver.nonlinear_equation_solve(o, freeStrains, p, solverSettings, useWarmStart=True)
         strain = makeStrainTensor_(freeStrains, p)
-        internalVariables = update(strain, internalVariables)
-        energyDensity,stress = converged_energy_density_and_stress(strain, internalVariables)
+        internalVariables = update(strain, internalVariables, dt)
+        energyDensity,stress = converged_energy_density_and_stress(strain, internalVariables, dt)
         p = Objective.param_index_update(p, 1, internalVariables)
         o.p = p
 
