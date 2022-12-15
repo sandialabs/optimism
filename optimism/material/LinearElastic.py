@@ -1,4 +1,5 @@
-from optimism.JaxConfig import *
+import jax.numpy as np
+
 from optimism.material.MaterialModel import MaterialModel
 from optimism import TensorMath
 
@@ -9,7 +10,7 @@ PROPS_MU    = 2
 PROPS_KAPPA = 3
 
 
-def create_material_model_functions(properties):
+def create_material_model(properties):
     props = _make_properties(properties['elastic modulus'],
                              properties['poisson ratio'])
 
@@ -27,13 +28,11 @@ def create_material_model_functions(properties):
     else:
         raise ValueError('Unrecognized strain measure')
     
-    def strain_energy(dispGrad, internalVars):
+    def strain_energy(dispGrad, internalVars, dt):
+        del internalVars
+        del dt
         strain = _strain(dispGrad)
-        return _linear_elastic_energy_density(strain, internalVars, props)
-
-    def compute_state_new(dispGrad, internalVars):
-        strain = _strain(dispGrad)
-        return _compute_state_new(strain, internalVars, props)
+        return _linear_elastic_energy_density(strain, props)
 
     density = properties.get('density')
 
@@ -49,7 +48,7 @@ def _make_properties(E, nu):
     return np.array([E, nu, mu, kappa])
 
 
-def _linear_elastic_energy_density(strain, internalVariables, props):
+def _linear_elastic_energy_density(strain, props):
     traceStrain = np.trace(strain)
     dil = 1.0/3.0 * traceStrain
     strainDev = strain - dil*np.identity(3)
@@ -62,8 +61,10 @@ def make_initial_state():
     return np.array([])
 
 
-def _compute_state_new(strain, internalVariables, props):
-    return internalVariables
+def compute_state_new(dispGrad, internalVars, dt):
+    del dispGrad
+    del dt
+    return internalVars
 
 
 def green_lagrange_strain(dispGrad):
