@@ -34,3 +34,9 @@ jobs:
       - name: unit test
         run: |
           python -m unittest discover -vb
+      - name: pytest
+        run: |
+          pip install -e ".[sparse,test]"
+          python -m pytest --cov=optimism -Wignore
+          # we can also add the flag -n auto for parallel testing
+          
