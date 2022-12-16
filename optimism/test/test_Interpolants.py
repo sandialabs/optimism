@@ -166,7 +166,7 @@ class TestInterpolants(TestFixture.TestFixture):
         plt.show()
 
 
-class TestBubbleInterpolants:
+class TestBubbleInterpolants(TestFixture.TestFixture):
     def setUp(self):
         maxDegree = 5
         self.elements = []
