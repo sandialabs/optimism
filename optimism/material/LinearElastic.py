@@ -10,7 +10,7 @@ PROPS_MU    = 2
 PROPS_KAPPA = 3
 
 
-def create_material_model(properties):
+def create_material_model_functions(properties):
     props = _make_properties(properties['elastic modulus'],
                              properties['poisson ratio'])
 

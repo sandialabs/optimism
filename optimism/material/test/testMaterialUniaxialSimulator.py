@@ -16,7 +16,7 @@ class MaterialUniaxialSimulatorFixture(TestFixture):
         properties = {"elastic modulus": E,
                       "poisson ratio": nu,
                       "strain measure": "logarithmic"}
-        material = LinearElastic.create_material_model(properties)
+        material = LinearElastic.create_material_model_functions(properties)
         engineering_strain_rate = 1e-3
 
         def strain_history(t):

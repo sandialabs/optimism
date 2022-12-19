@@ -16,7 +16,7 @@ class TestLinearElasticMaterial(TestFixture.TestFixture):
                       "poisson ratio": self.nu,
                       "strain measure": "logarithmic"}
         
-        self.material = LinearElastic.create_material_model(properties)
+        self.material = LinearElastic.create_material_model_functions(properties)
         
         self.internalVariables = self.material.compute_initial_state()
         self.dt = 0.0
