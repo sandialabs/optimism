@@ -7,9 +7,11 @@ setuptools.setup(
     author_email='talamini1@llnl.gov', # todo: make an email list
     install_requires=['jax',
                       'jaxlib',
-                      'scipy',
                       'matplotlib', # this is not strictly necessary
-                      'netcdf4'],
+                      'netcdf4',
+                      'pyyaml',
+                      'scipy'
+    ],
     #tests_require=[], # could put chex and pytest here
     extras_require={'sparse': ['scikit-sparse'],
                     'test': ['pytest', 'pytest-cov', 'pytest-xdist']},

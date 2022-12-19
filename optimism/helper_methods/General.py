@@ -4,11 +4,13 @@ from optimism import Mesh
 from optimism import QuadratureRule
 from optimism import ReadExodusMesh
 
+from typing import List
 from typing import Union
 
 
 class MeshTypeError(Exception): pass
 class MeshOptionsError(Exception): pass
+class EssentialBCError(AssertionError): pass
 
 
 def setup_mesh(mesh_type: str, mesh_options: Union[None, dict]) -> Mesh.Mesh:
@@ -22,7 +24,7 @@ def setup_mesh(mesh_type: str, mesh_options: Union[None, dict]) -> Mesh.Mesh:
                 print('    xExtent = %s' % mesh_options['xExtent'])
                 print('    yExtent = %s' % mesh_options['yExtent'])
                 mesh = Mesh.construct_structured_mesh(mesh_options['Nx'], mesh_options['Ny'],
-                                                    mesh_options['xExtent'], mesh_options['yExtent'])
+                                                      mesh_options['xExtent'], mesh_options['yExtent'])
             except (IndexError, KeyError, TypeError):
                 print('\n\n')
                 print('Error parsing structured mesh inputs')
@@ -47,14 +49,31 @@ def setup_mesh(mesh_type: str, mesh_options: Union[None, dict]) -> Mesh.Mesh:
                 raise MeshOptionsError
         else:
             raise MeshTypeError
-        print('Setup mesh.\n')
     except ValueError:
         print('Mesh type needs to be "structured mesh" or "exodus mesh"')
+    print('Setup mesh.\n')
     return mesh
 
 
-def setup_essential_boundary_conditions():
-    pass
+def setup_essential_boundary_conditions(bc_inputs: List[dict]) -> List[FunctionSpace.EssentialBC]:
+    print('Setting up essential boundary conditions...')
+    bcs = []
+    # loop over bcs
+    for n, bc in enumerate(bc_inputs):
+        try:
+            assert 'nodeset name' in bc.keys()
+            assert 'component' in bc.keys()
+            print('    Nodeset name = %s' % bc['nodeset name'])
+            print('    Component    = %s' % bc['component'])
+            if n < len(bc_inputs) - 1: print()
+            bcs.append(FunctionSpace.EssentialBC(bc['nodeset name'], int(bc['component'])))
+        except AssertionError:
+            print('\n\n')
+            print('Error in bc %s' % bc)
+            raise EssentialBCError
+
+    print('Setup essential boundary conditions\n')
+    return bcs
 
 
 def setup_quadrature_rules():

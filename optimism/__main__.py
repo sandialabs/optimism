@@ -1,10 +1,12 @@
 import argparse
 
+from optimism.helper_methods.General import setup_essential_boundary_conditions
 from optimism.helper_methods.General import setup_mesh
 from optimism.helper_methods.Parser import parse_yaml_input_file
 
 
 class MeshInputBlockError(Exception): pass
+class EssentialBCBlockError(Exception): pass
 
 
 # TODO make some pretty print stuff
@@ -31,4 +33,15 @@ except KeyError:
     print('Error in input file mesh block.')
     print('Correct syntax is\n\nmesh:\n  type:    <mesh_type>\n  options: <dict_of_options>\n')
     raise MeshInputBlockError
+
+# setup bcs
+
+try:
+    bcs = setup_essential_boundary_conditions(inputs['essential boundary conditions'])
+except (AssertionError, KeyError, TypeError, ValueError):
+    print('Error in input file essential boundary condition block.')
+    print('Correct syntax is\n\nessential boundary conditions:\n  - nodeset name: <str>\n    component:    <int>')
+    print('  - nodeset name: <str>\n    component:    <int>\n...\n\n')
+    raise EssentialBCBlockError
+
 
