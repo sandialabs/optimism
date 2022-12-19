@@ -73,7 +73,7 @@ def create_material_model_functions(properties):
             compute_initial_state = make_initial_state_small_deformations
         
     def compute_state_new_function(dispGrad, state, dt):
-            return compute_state_new_func(dispGrad, state, dt, props, hardeningModel)
+        return compute_state_new_func(dispGrad, state, dt, props, hardeningModel)
 
     density = properties.get('density')
 

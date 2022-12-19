@@ -188,6 +188,7 @@ def integrate_over_block(functionSpace, U, stateVars, dt, func, block,
       functionSpace: Function space object to do the integration with.
       U: The vector of dofs for the primal field in the functional.
       stateVars: Internal state variable array.
+      dt: Current time increment
       func: Lagrangian density function to integrate, Must have the signature
         ``func(u, dudx, q, x, *params) -> scalar``, where ``u`` is the primal field, ``q`` is the
         value of the internal variables, ``x`` is the current point coordinates, and ``*params`` is
@@ -217,6 +218,7 @@ def evaluate_on_block(functionSpace, U, stateVars, dt, func, block,
       functionSpace: Function space object to do the evaluation with.
       U: The vector of dofs for the primal field in the functional.
       stateVars: Internal state variable array.
+      dt: Current time increment
       func: Lagrangian density function to evaluate, Must have the signature
         ``func(u, dudx, q, x, *params) -> scalar``, where ``u`` is the primal field, ``q`` is the
         value of the internal variables, ``x`` is the current point coordinates, and ``*params`` is
@@ -242,7 +244,7 @@ def evaluate_on_block(functionSpace, U, stateVars, dt, func, block,
     return blockValues
 
 
-def integrate_element_from_local_field(elemNodalField, elemNodalCoords, elemStates, elemShapes, elemShapeGrads, elemVols, func, modify_element_gradient=default_modify_element_gradient):
+def integrate_element_from_local_field(elemNodalField, elemNodalCoords, elemStates, dt, elemShapes, elemShapeGrads, elemVols, func, modify_element_gradient=default_modify_element_gradient):
     """Integrate over element with element nodal field as input.
     This allows element residuals and element stiffness matrices to computed.
     """
@@ -250,7 +252,7 @@ def integrate_element_from_local_field(elemNodalField, elemNodalCoords, elemStat
     elemGrads = jax.vmap(compute_quadrature_point_field_gradient, (None,0))(elemNodalField, elemShapeGrads)
     elemGrads = modify_element_gradient(elemGrads, elemShapes, elemVols, elemNodalField, elemNodalCoords)
     elemPoints = jax.vmap(interpolate_to_point, (None,0))(elemNodalCoords, elemShapes)
-    fVals = jax.vmap(func)(elemVals, elemGrads, elemStates, elemPoints)
+    fVals = jax.vmap(func, (0, 0, 0, 0, None))(elemVals, elemGrads, elemStates, elemPoints, dt)
     return np.dot(fVals, elemVols)
 
 
