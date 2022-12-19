@@ -60,7 +60,7 @@ def setup_mesh(mesh_type: str, mesh_options: Union[None, dict]) -> Mesh.Mesh:
             raise MeshTypeError
     except ValueError:
         print('Mesh type needs to be "structured mesh" or "exodus mesh"')
-    print('Setup mesh.\n')
+    print('Finished setting up mesh.\n')
     return mesh
 
 
@@ -81,7 +81,7 @@ def setup_essential_boundary_conditions(bc_inputs: List[dict]) -> List[FunctionS
             print('Error in bc %s' % bc)
             raise EssentialBCError
 
-    print('Setup essential boundary conditions.\n')
+    print('Finished setting up essential boundary conditions.\n')
     return bcs
 
 
@@ -104,7 +104,7 @@ def setup_quadrature_rules(quadrature_inputs: dict) -> dict:
             n = n + 1
         except AssertionError:
             raise QuadratureError
-    print('Setup quadrature rules.\n')
+    print('Finished setting up quadrature rules.\n')
     return quad_rules
 
 
@@ -117,7 +117,7 @@ def setup_function_space(
     print('    Quadrature rule = %s' % f_space_inputs['quadrature rule'])
     f_space = FunctionSpace.\
         construct_function_space(mesh, quad_rules[f_space_inputs['quadrature rule']].cell_quadrature_rule)
-    print('Setup function spaces.\n')
+    print('Finished setting up function spaces.\n')
     return f_space
 
 
@@ -126,27 +126,42 @@ def setup_dof_manager(function_space: FunctionSpace.FunctionSpace,
                       dim: Optional[int] = 2) -> FunctionSpace.DofManager:
     print('Setting up dof manager...')
     dof_manager = FunctionSpace.DofManager(function_space, dim, essential_bcs)
-    print('Setup dof manager.\n')
+    print('Finished setting up dof manager.\n')
     return dof_manager
 
 
-def setup_material_models(mat_model_inputs: dict) -> List:
+def setup_material_models(mat_model_inputs: dict) -> dict:
     print('Setting up material models...')
     mat_models = {}
     n = 0
     for key, val in mat_model_inputs.items():
         assert 'model name' in val.keys()
         assert 'model properties' in val.keys()
-        print('    Name = %s' % key)
+        print('    Name       = %s' % key)
         print('    Model name = %s' % val['model name'])
+        print('    Model properties:')
         for sub_key, sub_val in val['model properties'].items():
-            print('    %s = %s' % (sub_key, sub_val))
+            print('        %s = %s' % (sub_key, sub_val))
         if n < len(mat_model_inputs) - 1: print()
         mat_models[key] = MaterialModelFactory.\
             material_model_factory(val['model name'], val['model properties'])
         n = n + 1
-    print('Setup material models.\n')
+    print('Finished setting up material models.\n')
     return mat_models
+
+
+def setup_blocks(block_inputs: dict, mat_models: dict) -> dict:
+    print('Setting up blocks...')
+    return_dict = {}
+    for n, block in enumerate(block_inputs):
+        assert 'block name' in block.keys()
+        assert 'material model' in block.keys()
+        print('    Block name     = %s' % block['block name'])
+        print('    Material model = %s' % block['material model'])
+        if n < len(block_inputs) - 1: print()
+        return_dict[block['block name']] = mat_models[block['material model']]
+    print('Finished setting up blocks.\n')
+    return return_dict
 
 
 def setup_post_processor():

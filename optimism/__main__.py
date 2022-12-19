@@ -1,11 +1,14 @@
 import argparse
 
+from optimism.helper_methods.General import setup_blocks
 from optimism.helper_methods.General import setup_dof_manager
 from optimism.helper_methods.General import setup_essential_boundary_conditions
 from optimism.helper_methods.General import setup_function_space
 from optimism.helper_methods.General import setup_material_models
 from optimism.helper_methods.General import setup_mesh
 from optimism.helper_methods.General import setup_quadrature_rules
+
+from optimism.helper_methods.Mechanics import setup_mechanics_functions
 
 from optimism.helper_methods.Parser import dump_input_file
 from optimism.helper_methods.Parser import parse_yaml_input_file
@@ -15,6 +18,7 @@ class MeshInputBlockError(Exception): pass
 class EssentialBCBlockError(Exception): pass
 class QuadratureBlockError(Exception): pass
 class FunctionSpaceBlockError(Exception): pass
+class PhysicsError(Exception): pass
 
 
 # TODO make some pretty print stuff, add authors, and emails, etc.
@@ -74,11 +78,29 @@ except KeyError:
     print('Correct syntax is:\n\nfunction space:\n  quadrature rule: <str>\n\n')
     raise FunctionSpaceBlockError
 
+# TODO likely need some more error checking below
+
 # setup dof manager
 dof_manager = setup_dof_manager(f_space, bcs, dim=2)
 
 # setting up material models
 mat_models = setup_material_models(inputs['material models'])
+
+# parse blocks: this simply switches out some names
+if 'blocks' in inputs.keys():
+    mat_models = setup_blocks(inputs['blocks'], mat_models)
+else:
+    print('WARNING: No block section. Each block must have a unique material model in this mode!')
+    print('WARNING: The material model names should match block names in this mode!\n')
+
+# now switch on physics type
+if inputs['physics'] == 'mechanics':
+    # TODO currently only supported plane strain mode!
+    # TODO make this parametric when you're not so lazy
+    mech_functions = setup_mechanics_functions(f_space, mat_models)
+else:
+    print('Unsupported physics mode "%s"!' % inputs['physics'])
+    raise PhysicsError
 
 print('######################################################################')
 print('# END OPTIMISM LOGGING')

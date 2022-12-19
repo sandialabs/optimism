@@ -1,7 +1,15 @@
+# Geometry section of input deck
+#
 mesh:
   type: exodus mesh
   options:
     file: multi_material.g 
+
+blocks:
+  - block name: soft
+    material model: soft material
+  - block name: hard
+    material model: hard material
 
 essential boundary conditions:
   - nodeset name: left
@@ -11,24 +19,25 @@ essential boundary conditions:
   - nodeset name: top
     component: 0
 
+# Interpolation section of input deck
+#
 quadrature rules:
   quad rule 1:
     cell degree: 2
-    edge degree: 2
-  quad rule 2:
-    cell degree: 1
     edge degree: 2
 
 function space:
   quadrature rule: quad rule 1
 
+# Material models
+#
 material models:
-  soft material:
+  soft material: 
     model name: Neohookean
     model properties:
       elastic modulus: 5.0
       poisson ratio: 0.25
-  hard material:
+  hard material: 
     model name: J2Plastic
     model properties:
       elastic modulus: 10.0
@@ -37,8 +46,13 @@ material models:
       hardening model: linear
       hardening modulus: 0.1
 
-blocks:
-  - block name: soft
-    material model: soft material
-  - block name: hard
-    material model: hard material
+# Mechanics
+#
+physics: mechanics
+time integration: static
+
+
+# Post-processor
+#
+# postprocessor:
+#  output file base name: output
