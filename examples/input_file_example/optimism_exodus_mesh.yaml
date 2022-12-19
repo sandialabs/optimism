@@ -1,0 +1,44 @@
+mesh:
+  type: exodus mesh
+  options:
+    file: multi_material.g 
+
+essential boundary conditions:
+  - nodeset name: left
+    component: 0
+  - nodeset name: bottom
+    component: 1
+  - nodeset name: top
+    component: 0
+
+quadrature rules:
+  quad rule 1:
+    cell degree: 2
+    edge degree: 2
+  quad rule 2:
+    cell degree: 1
+    edge degree: 2
+
+function space:
+  quadrature rule: quad rule 1
+
+material models:
+  soft material:
+    model name: Neohookean
+    model properties:
+      elastic modulus: 5.0
+      poisson ratio: 0.25
+  hard material:
+    model name: J2Plastic
+    model properties:
+      elastic modulus: 10.0
+      poisson ratio: 0.25
+      yield strength: 0.1
+      hardening model: linear
+      hardening modulus: 0.1
+
+blocks:
+  - block name: soft
+    material model: soft material
+  - block name: hard
+    material model: hard material

@@ -1,0 +1,34 @@
+reset
+
+#W = {W = 0.1}
+#L  = {L = 1.0}
+
+create surface rectangle width {W / 2} height {L} zplane 
+create surface rectangle width {W / 2} height {L} zplane 
+
+move surface 1 x {W / 4} y {L / 2}
+move surface 2 x {3 * W / 4} y {L / 2}
+
+imprint volume 1 2
+
+surface 1 2 scheme trimesh
+surface 1 2 size {W / 5}
+mesh surface 1 2
+
+block 1 add surface 1
+block 2 add surface 2
+block 1 name "soft"
+block 2 name "hard"
+block 1 2 element type tri6
+
+nodeset 1 add curve 1 5
+nodeset 2 add curve 2
+nodeset 3 add curve 3 7 
+nodeset 4 add curve 8
+
+nodeset 1 name "top"
+nodeset 2 name "left"
+nodeset 3 name "bottom"
+nodeset 4 name "right"
+
+export genesis "multi_material.g" overwrite

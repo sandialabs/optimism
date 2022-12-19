@@ -3,6 +3,7 @@ import argparse
 from optimism.helper_methods.General import setup_dof_manager
 from optimism.helper_methods.General import setup_essential_boundary_conditions
 from optimism.helper_methods.General import setup_function_space
+from optimism.helper_methods.General import setup_material_models
 from optimism.helper_methods.General import setup_mesh
 from optimism.helper_methods.General import setup_quadrature_rules
 
@@ -69,12 +70,15 @@ except (AttributeError, AssertionError, KeyError):
 try:
     f_space = setup_function_space(inputs['function space'], mesh, quad_rules)
 except KeyError:
-    print('Error in input file functions pace block.')
-    print('Correct syntax is:\n\nfunctions pace:\n  quadrature rule: <str>\n\n')
+    print('Error in input file function space block.')
+    print('Correct syntax is:\n\nfunction space:\n  quadrature rule: <str>\n\n')
     raise FunctionSpaceBlockError
 
 # setup dof manager
 dof_manager = setup_dof_manager(f_space, bcs, dim=2)
+
+# setting up material models
+mat_models = setup_material_models(inputs['material models'])
 
 print('######################################################################')
 print('# END OPTIMISM LOGGING')

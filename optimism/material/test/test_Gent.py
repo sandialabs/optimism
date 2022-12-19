@@ -19,7 +19,7 @@ class TestGentMaterial(TestFixture.TestFixture):
                       "shear modulus": self.mu,
                       "Jm parameter": self.Jm}
         
-        self.material = Gent.create_material_functions(properties)
+        self.material = Gent.create_material_model_functions(properties)
         
         self.internalVariables = self.material.compute_initial_state()
 

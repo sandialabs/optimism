@@ -8,7 +8,7 @@ PROPS_MU    = 1
 PROPS_JM    = 2
 
 
-def create_material_functions(properties):
+def create_material_model_functions(properties):
     props = _make_properties(properties['bulk modulus'],
                              properties['shear modulus'],
                              properties['Jm parameter'])

@@ -3,9 +3,11 @@ from optimism import FunctionSpace
 from optimism import Mesh
 from optimism import QuadratureRule
 from optimism import ReadExodusMesh
+from optimism.material import MaterialModelFactory
 
 from typing import List
-from typing import Tuple
+from typing import NamedTuple
+from typing import Optional
 from typing import Union
 
 
@@ -13,6 +15,11 @@ class MeshTypeError(Exception): pass
 class MeshOptionsError(Exception): pass
 class EssentialBCError(AssertionError): pass
 class QuadratureError(AssertionError): pass
+
+
+class QuadratureRulesContainer(NamedTuple):
+    cell_quadrature_rule: QuadratureRule.QuadratureRule
+    edge_quadrature_rule: QuadratureRule.QuadratureRule
 
 
 def setup_mesh(mesh_type: str, mesh_options: Union[None, dict]) -> Mesh.Mesh:
@@ -74,32 +81,72 @@ def setup_essential_boundary_conditions(bc_inputs: List[dict]) -> List[FunctionS
             print('Error in bc %s' % bc)
             raise EssentialBCError
 
-    print('Setup essential boundary conditions\n')
+    print('Setup essential boundary conditions.\n')
     return bcs
 
 
-def setup_quadrature_rules(quadrature_inputs: dict) -> Tuple[QuadratureRule.QuadratureRule, QuadratureRule.QuadratureRule]:
+def setup_quadrature_rules(quadrature_inputs: dict) -> dict:
     print('Setting up quadrature rules...')
-    try:
-        assert 'cell degree' in quadrature_inputs.keys()
-        assert 'edge degree' in quadrature_inputs.keys()
-        print('    Cell degree = %s' % quadrature_inputs['cell degree'])
-        print('    Edge degree = %s' % quadrature_inputs['edge degree'])
-        cell_degree = quadrature_inputs['cell degree']
-        edge_degree = quadrature_inputs['edge degree']
-    except AssertionError:
-        raise QuadratureError
-    cell_q_rule = QuadratureRule.create_quadrature_rule_on_triangle(cell_degree)
-    edge_q_rule = QuadratureRule.create_quadrature_rule_1D(edge_degree)
+    quad_rules = {}
+    n = 0
+    for key, val in quadrature_inputs.items():
+        try:
+            assert 'cell degree' in val.keys()
+            assert 'edge degree' in val.keys()
+            print('    Name        = %s' % key)
+            print('    Cell degree = %s' % val['cell degree'])
+            print('    Edge degree = %s' % val['edge degree'])
+            if n < len(quadrature_inputs) - 1: print()
+            quad_rules[key] = QuadratureRulesContainer(
+                QuadratureRule.create_quadrature_rule_on_triangle(val['cell degree']),
+                QuadratureRule.create_quadrature_rule_1D(val['edge degree'])
+            )
+            n = n + 1
+        except AssertionError:
+            raise QuadratureError
     print('Setup quadrature rules.\n')
-    return cell_q_rule, edge_q_rule
+    return quad_rules
 
 
-def setup_function_spaces():
+def setup_function_space(
+    f_space_inputs: dict, 
+    mesh: Mesh.Mesh, 
+    quad_rules: dict) -> FunctionSpace.FunctionSpace:
+    
     print('Setting up function spaces...')
-
-
+    print('    Quadrature rule = %s' % f_space_inputs['quadrature rule'])
+    f_space = FunctionSpace.\
+        construct_function_space(mesh, quad_rules[f_space_inputs['quadrature rule']].cell_quadrature_rule)
     print('Setup function spaces.\n')
+    return f_space
+
+
+def setup_dof_manager(function_space: FunctionSpace.FunctionSpace,
+                      essential_bcs: List[FunctionSpace.EssentialBC],
+                      dim: Optional[int] = 2) -> FunctionSpace.DofManager:
+    print('Setting up dof manager...')
+    dof_manager = FunctionSpace.DofManager(function_space, dim, essential_bcs)
+    print('Setup dof manager.\n')
+    return dof_manager
+
+
+def setup_material_models(mat_model_inputs: dict) -> List:
+    print('Setting up material models...')
+    mat_models = {}
+    n = 0
+    for key, val in mat_model_inputs.items():
+        assert 'model name' in val.keys()
+        assert 'model properties' in val.keys()
+        print('    Name = %s' % key)
+        print('    Model name = %s' % val['model name'])
+        for sub_key, sub_val in val['model properties'].items():
+            print('    %s = %s' % (sub_key, sub_val))
+        if n < len(mat_model_inputs) - 1: print()
+        mat_models[key] = MaterialModelFactory.\
+            material_model_factory(val['model name'], val['model properties'])
+        n = n + 1
+    print('Setup material models.\n')
+    return mat_models
 
 
 def setup_post_processor():
