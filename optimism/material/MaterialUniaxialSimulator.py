@@ -1,7 +1,9 @@
 from collections import namedtuple
 import numpy as onp
 
-from optimism.JaxConfig import *
+import jax
+import jax.numpy as np
+
 from optimism import EquationSolver as EqSolver
 from optimism import Objective
 from optimism import TensorMath
@@ -48,8 +50,8 @@ def run(materialModel, strain_history, maxTime, steps=10):
     dt = timePoints[1] - timePoints[0]
     uniaxialStrainHistory = strain_history(timePoints)
     energy_density = materialModel.compute_energy_density
-    converged_energy_density_and_stress = jit(value_and_grad(materialModel.compute_energy_density))
-    update = jit(materialModel.compute_state_new)
+    converged_energy_density_and_stress = jax.jit(jax.value_and_grad(materialModel.compute_energy_density))
+    update = jax.jit(materialModel.compute_state_new)
         
     def obj_func(freeStrains, p):
         strain = makeStrainTensor_(freeStrains, p)
@@ -65,7 +67,6 @@ def run(materialModel, strain_history, maxTime, steps=10):
 
     strainHistory = []
     stressHistory = []
-    kirchhoffStressHistory = []
     energyHistory = []
     internalVariableHistory = []
     for i in range(steps):
