@@ -15,5 +15,12 @@ def dump_input_file(input_file: str) -> None:
     with open(input_file, 'r') as f:
         lines = f.readlines()
 
+    print('######################################################################')
+    print('# BEGIN INPUT FILE DUMP')
+    print('######################################################################\n')
     for line in lines:
         print(re.sub('\n', '', line))
+    print()
+    print('######################################################################')
+    print('# END INPUT FILE DUMP')
+    print('######################################################################\n')

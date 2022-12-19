@@ -18,3 +18,10 @@ venv/
 # IDE files
 .idea/
 .vscode/
+
+# cubit files
+cubit*.jou
+history*.jou
+
+# log files
+*.log

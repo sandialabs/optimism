@@ -1,0 +1,5 @@
+$
+mesh
+  type: exodus mesh
+  options:
+    file: cube.g

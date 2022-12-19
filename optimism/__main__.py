@@ -1,7 +1,8 @@
 import argparse
 
+from optimism.helper_methods.General import setup_dof_manager
 from optimism.helper_methods.General import setup_essential_boundary_conditions
-from optimism.helper_methods.General import setup_function_spaces
+from optimism.helper_methods.General import setup_function_space
 from optimism.helper_methods.General import setup_mesh
 from optimism.helper_methods.General import setup_quadrature_rules
 
@@ -12,12 +13,11 @@ from optimism.helper_methods.Parser import parse_yaml_input_file
 class MeshInputBlockError(Exception): pass
 class EssentialBCBlockError(Exception): pass
 class QuadratureBlockError(Exception): pass
+class FunctionSpaceBlockError(Exception): pass
 
 
-# TODO make some pretty print stuff
+# TODO make some pretty print stuff, add authors, and emails, etc.
 print('\nOptimism v0.0.1\n')
-
-
 
 # create a parser
 parser = argparse.ArgumentParser(
@@ -31,13 +31,7 @@ args = parser.parse_args()
 print('Input file = %s\n' % args.input_file)
 
 # dump input file
-print('######################################################################')
-print('# BEGIN INPUT FILE DUMP')
-print('######################################################################\n')
 dump_input_file(args.input_file)
-print('######################################################################')
-print('# END INPUT FILE DUMP')
-print('######################################################################\n')
 
 print('######################################################################')
 print('# BEGIN OPTIMISM LOGGING')
@@ -64,14 +58,23 @@ except (AssertionError, KeyError, TypeError, ValueError):
 
 # setup quadrature rules
 try:
-    cell_q_rule, edge_q_rule = setup_quadrature_rules(inputs['quadrature rules'])
-except (AssertionError, KeyError):
+    quad_rules = setup_quadrature_rules(inputs['quadrature rules'])
+except (AttributeError, AssertionError, KeyError):
     print('Error in input file quadrature rules block.')
-    print('Correct syntax is:\n\nquadrature rules:\n  cell degree: <int>\n  edge degree: <int>\n\n')
+    print('Correct syntax is:\n\nquadrature rules:\n  - name:        <str>\n    cell degree: <int>\n    edge degree: <int>')
+    print('  - name:        <str>\n    cell degree: <int>\n    edge degree: <int>\n  ...\n\n')
     raise QuadratureBlockError
 
 # setup function spaces
-f_spaces = setup_function_spaces()
+try:
+    f_space = setup_function_space(inputs['function space'], mesh, quad_rules)
+except KeyError:
+    print('Error in input file functions pace block.')
+    print('Correct syntax is:\n\nfunctions pace:\n  quadrature rule: <str>\n\n')
+    raise FunctionSpaceBlockError
+
+# setup dof manager
+dof_manager = setup_dof_manager(f_space, bcs, dim=2)
 
 print('######################################################################')
 print('# END OPTIMISM LOGGING')
