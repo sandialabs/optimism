@@ -1,3 +1,4 @@
+import re
 import yaml
 
 
@@ -8,3 +9,11 @@ def parse_yaml_input_file(input_file: str) -> dict:
         except yaml.YAMLError:
             raise ValueError('Issue with yaml input file yaml format!')
     return d
+
+
+def dump_input_file(input_file: str) -> None:
+    with open(input_file, 'r') as f:
+        lines = f.readlines()
+
+    for line in lines:
+        print(re.sub('\n', '', line))

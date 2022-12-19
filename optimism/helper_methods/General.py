@@ -5,12 +5,14 @@ from optimism import QuadratureRule
 from optimism import ReadExodusMesh
 
 from typing import List
+from typing import Tuple
 from typing import Union
 
 
 class MeshTypeError(Exception): pass
 class MeshOptionsError(Exception): pass
 class EssentialBCError(AssertionError): pass
+class QuadratureError(AssertionError): pass
 
 
 def setup_mesh(mesh_type: str, mesh_options: Union[None, dict]) -> Mesh.Mesh:
@@ -76,12 +78,28 @@ def setup_essential_boundary_conditions(bc_inputs: List[dict]) -> List[FunctionS
     return bcs
 
 
-def setup_quadrature_rules():
-    pass
+def setup_quadrature_rules(quadrature_inputs: dict) -> Tuple[QuadratureRule.QuadratureRule, QuadratureRule.QuadratureRule]:
+    print('Setting up quadrature rules...')
+    try:
+        assert 'cell degree' in quadrature_inputs.keys()
+        assert 'edge degree' in quadrature_inputs.keys()
+        print('    Cell degree = %s' % quadrature_inputs['cell degree'])
+        print('    Edge degree = %s' % quadrature_inputs['edge degree'])
+        cell_degree = quadrature_inputs['cell degree']
+        edge_degree = quadrature_inputs['edge degree']
+    except AssertionError:
+        raise QuadratureError
+    cell_q_rule = QuadratureRule.create_quadrature_rule_on_triangle(cell_degree)
+    edge_q_rule = QuadratureRule.create_quadrature_rule_1D(edge_degree)
+    print('Setup quadrature rules.\n')
+    return cell_q_rule, edge_q_rule
 
 
 def setup_function_spaces():
-    pass
+    print('Setting up function spaces...')
+
+
+    print('Setup function spaces.\n')
 
 
 def setup_post_processor():

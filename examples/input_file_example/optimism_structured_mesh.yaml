@@ -1,0 +1,20 @@
+mesh:
+  type: structured mesh
+  options:
+    Nx: 5
+    Ny: 15
+    xExtent: [0.0, 1.0]
+    yExtent: [0.0, 1.0]
+
+essential boundary conditions:
+  - nodeset name: left
+    component: 0
+  - nodeset name: bottom
+    component: 1
+  - nodeset name: top
+    component: 0
+
+quadrature rules:
+  cell degree: 2
+  edge degree: 2
+
