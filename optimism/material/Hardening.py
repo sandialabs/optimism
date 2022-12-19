@@ -12,16 +12,16 @@ def create_hardening_model(properties):
         m = properties['rate sensitivity exponent']
         epsDot0 = properties['reference plastic strain rate']
 
-        def kinetic_potential(eqps, eqpsOld, dt):
+        def kinetic_potential_density(eqps, eqpsOld, dt):
             return power_law_rate_sensitivity(eqps, eqpsOld, dt, S, m, epsDot0)
     else:
-        kinetic_potential = lambda e, eo, dt: 0
+        kinetic_potential_density = lambda e, eo, dt: 0
     
     if properties['hardening model'] == 'linear':
         Y0 = properties['yield strength']
         H = properties['hardening modulus']
 
-        def hardening_energy_density(eqps):
+        def free_energy_density(eqps):
             return linear(eqps, Y0, H)
 
     elif properties['hardening model'] == 'voce':
@@ -29,7 +29,7 @@ def create_hardening_model(properties):
         Ysat = properties['saturation strength']
         eps0 = properties['reference plastic strain']
 
-        def hardening_energy_density(eqps):
+        def free_energy_density(eqps):
             return voce(eqps, Y0, Ysat, eps0)
 
     elif properties['hardening model'] == 'power law':
@@ -37,18 +37,18 @@ def create_hardening_model(properties):
         n = properties['hardening exponent']
         eps0 = properties['reference plastic strain']
 
-        def hardening_energy_density(eqps):
+        def free_energy_density(eqps):
             return power_law(eqps, Y0, n, eps0)
 
     else:
         raise ValueError('Unknown hardening model specified')
     
 
-    def total(eqps, eqpsOld, dt):
-        return hardening_energy_density(eqps) + kinetic_potential(eqps, eqpsOld, dt)
+    def hardening(eqps, eqpsOld, dt):
+        return free_energy_density(eqps) + kinetic_potential_density(eqps, eqpsOld, dt)
     
 
-    return HardeningModel(total, jax.grad(total))
+    return HardeningModel(hardening, jax.grad(hardening))
 
 
 def linear(eqps, Y0, H):
