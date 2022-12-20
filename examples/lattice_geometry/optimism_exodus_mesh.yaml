@@ -43,7 +43,7 @@ time:
 
 blocks:
   - block name: soft
-    material model: soft material
+    material model: hard material
   
 boundary conditions:
   displacement:
