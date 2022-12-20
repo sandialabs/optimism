@@ -5,20 +5,6 @@ mesh:
   options:
     file: multi_material.g 
 
-blocks:
-  - block name: soft
-    material model: soft material
-  - block name: hard
-    material model: hard material
-
-essential boundary conditions:
-  - nodeset name: left
-    component: 0
-  - nodeset name: bottom
-    component: 1
-  - nodeset name: top
-    component: 0
-
 # Interpolation section of input deck
 #
 quadrature rules:
@@ -50,9 +36,39 @@ material models:
 #
 physics: mechanics
 time integration: static
+objective: scaled objective
+
+blocks:
+  - block name: soft
+    material model: soft material
+  - block name: hard
+    material model: hard material
+
+boundary conditions:
+  displacement:
+    - nodeset: bottom
+      component: 0
+      type: fixed
+    - nodeset: bottom
+      component: 1 
+      type: fixed
+    - nodeset: top
+      component: 0
+      type: prescribed
+      max displacement: 0.3
+    - nodeset: top
+      component: 1
+      type: prescribed
+      max displacement: 0.3
+
+solver:
+  max cumulative cg iters: 100
+  max trust iters: 1000
+  use preconditioned inner product for cg: on
+
 
 
 # Post-processor
 #
-# postprocessor:
-#  output file base name: output
+postprocessor:
+ output file base name: output

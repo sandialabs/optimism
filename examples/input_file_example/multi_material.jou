@@ -9,7 +9,9 @@ create surface rectangle width {W / 2} height {L} zplane
 move surface 1 x {W / 4} y {L / 2}
 move surface 2 x {3 * W / 4} y {L / 2}
 
-imprint volume 1 2
+#imprint volume 1 2
+merge surface 1 2
+imprint surface 1 2 with curve 4 
 
 surface 1 2 scheme trimesh
 surface 1 2 size {W / 5}
@@ -32,3 +34,4 @@ nodeset 3 name "bottom"
 nodeset 4 name "right"
 
 export genesis "multi_material.g" overwrite
+

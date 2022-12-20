@@ -8,10 +8,13 @@ from optimism.helper_methods.General import setup_material_models
 from optimism.helper_methods.General import setup_mesh
 from optimism.helper_methods.General import setup_quadrature_rules
 
-from optimism.helper_methods.Mechanics import setup_mechanics_functions
+from optimism.helper_methods.StaticMechanics import run_static_mechanics_simulation
+from optimism.helper_methods.StaticMechanics import setup_mechanics_functions
 
 from optimism.helper_methods.Parser import dump_input_file
 from optimism.helper_methods.Parser import parse_yaml_input_file
+
+from optimism.helper_methods.Postprocessor import setup_vtk_writer
 
 
 class MeshInputBlockError(Exception): pass
@@ -19,6 +22,7 @@ class EssentialBCBlockError(Exception): pass
 class QuadratureBlockError(Exception): pass
 class FunctionSpaceBlockError(Exception): pass
 class PhysicsError(Exception): pass
+class TimeIntegrationError(Exception): pass
 
 
 # TODO make some pretty print stuff, add authors, and emails, etc.
@@ -54,7 +58,7 @@ except KeyError:
 
 # setup bcs
 try:
-    bcs = setup_essential_boundary_conditions(inputs['essential boundary conditions'])
+    bcs = setup_essential_boundary_conditions(inputs['boundary conditions'])
 except (AssertionError, KeyError, TypeError, ValueError):
     print('Error in input file essential boundary condition block.')
     print('Correct syntax is:\n\nessential boundary conditions:\n  - nodeset name: <str>\n    component:    <int>')
@@ -93,11 +97,20 @@ else:
     print('WARNING: No block section. Each block must have a unique material model in this mode!')
     print('WARNING: The material model names should match block names in this mode!\n')
 
+# post-processor
+vtk_writer = setup_vtk_writer(inputs['postprocessor']['output file base name'], mesh)
+
 # now switch on physics type
 if inputs['physics'] == 'mechanics':
     # TODO currently only supported plane strain mode!
     # TODO make this parametric when you're not so lazy
     mech_functions = setup_mechanics_functions(f_space, mat_models)
+    if inputs['time integration'] == 'static':
+        run_static_mechanics_simulation(mesh, f_space, dof_manager, mech_functions, inputs['boundary conditions'],
+                                        inputs['objective'], inputs['solver'], vtk_writer)
+    else:
+        print('Unsupported time integration mode "%s"!' % input['time integration'])
+        raise TimeIntegrationError
 else:
     print('Unsupported physics mode "%s"!' % inputs['physics'])
     raise PhysicsError

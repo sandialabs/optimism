@@ -68,14 +68,17 @@ def setup_essential_boundary_conditions(bc_inputs: List[dict]) -> List[FunctionS
     print('Setting up essential boundary conditions...')
     bcs = []
     # loop over bcs
-    for n, bc in enumerate(bc_inputs):
+    for n, bc in enumerate(bc_inputs['displacement']):
         try:
-            assert 'nodeset name' in bc.keys()
+            assert 'nodeset' in bc.keys()
             assert 'component' in bc.keys()
-            print('    Nodeset name = %s' % bc['nodeset name'])
-            print('    Component    = %s' % bc['component'])
-            if n < len(bc_inputs) - 1: print()
-            bcs.append(FunctionSpace.EssentialBC(bc['nodeset name'], int(bc['component'])))
+            assert 'type' in bc.keys()
+            print('    Nodeset   = %s' % bc['nodeset'])
+            print('    Component = %s' % bc['component'])
+            print('    Type      = %s' % bc['type'])
+            print('    ...Ignoring other settings for now.')
+            if n < len(bc_inputs['displacement']) - 1: print()
+            bcs.append(FunctionSpace.EssentialBC(bc['nodeset'], int(bc['component'])))
         except AssertionError:
             print('\n\n')
             print('Error in bc %s' % bc)
