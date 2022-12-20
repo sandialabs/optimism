@@ -1,0 +1,75 @@
+# Geometry section of input deck
+#
+mesh:
+  type: exodus mesh
+  options:
+    file: mesh.g 
+
+# Interpolation section of input deck
+#
+quadrature rules:
+  quad rule 1:
+    cell degree: 2
+    edge degree: 2
+
+function space:
+  quadrature rule: quad rule 1
+
+# Material models
+#
+material models:
+  soft material: 
+    model name: Neohookean
+    model properties:
+      elastic modulus: 5.0
+      poisson ratio: 0.25
+  hard material: 
+    model name: J2Plastic
+    model properties:
+      elastic modulus: 10.0
+      poisson ratio: 0.25
+      yield strength: 0.1
+      hardening model: linear
+      hardening modulus: 0.1
+
+# Mechanics
+#
+physics: mechanics
+time integration: quasi-static
+objective: scaled objective
+
+time:
+  number of steps: 20
+
+blocks:
+  - block name: soft
+    material model: soft material
+  
+boundary conditions:
+  displacement:
+    - nodeset: nset_bottom
+      component: 0
+      type: fixed
+    - nodeset: nset_bottom
+      component: 1 
+      type: fixed
+    - nodeset: nset_top
+      component: 0
+      type: prescribed
+      max displacement: 0.3
+    - nodeset: nset_top
+      component: 1
+      type: prescribed
+      max displacement: -0.3
+
+solver:
+  max cumulative cg iters: 100
+  max trust iters: 1000
+  use preconditioned inner product for cg: on
+
+
+# Post-processor
+#
+postprocessor:
+  type: vtk
+  output file base name: output

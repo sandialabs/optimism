@@ -1,0 +1,53 @@
+#side_length = {side_length = 1.0}
+#wall_thickness = {wall_thickness = 0.1}
+
+reset
+
+create surface rectangle width {side_length} zplane 
+move surface 1 x {side_length / 2} y {side_length / 2}
+create surface rectangle width {side_length - 2 * wall_thickness} zplane
+move surface 2 x {side_length / 2} y {side_length / 2}
+subtract volume 2 from volume 1
+
+create surface rectangle width {side_length} zplane 
+move surface 4 x {side_length / 2} y {side_length / 2}
+create surface rectangle width {side_length - 2 * wall_thickness} zplane
+move surface 5 x {side_length / 2} y {side_length / 2}
+subtract volume 4 from volume 3
+
+move surface 6 x {side_length - wall_thickness}
+
+create surface rectangle width {side_length} zplane 
+move surface 7 x {side_length / 2} y {side_length / 2}
+create surface rectangle width {side_length - 2 * wall_thickness} zplane
+move surface 8 x {side_length / 2} y {side_length / 2}
+subtract volume 6 from volume 5
+
+move surface 9 y {side_length - wall_thickness}
+
+create surface rectangle width {side_length} zplane 
+move surface 10 x {side_length / 2} y {side_length / 2}
+create surface rectangle width {side_length - 2 * wall_thickness} zplane
+move surface 11 x {side_length / 2} y {side_length / 2}
+subtract volume 8 from volume 7
+
+move surface 12 x {side_length - wall_thickness} y {side_length - wall_thickness}
+
+unite volume 1 3 5 7
+
+# mesh
+surface 13 size {wall_thickness / 3}
+surface 13 scheme trimesh
+mesh surface 13
+
+block 1 add surface 13
+block 1 element type tri6
+block 1 name "soft"
+
+nodeset 1 add curve 51
+nodeset 1 name "nset_bottom"
+
+nodeset 2 add curve 49
+nodeset 2 name "nset_top"
+
+export genesis "mesh.g" overwrite
