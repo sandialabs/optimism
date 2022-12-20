@@ -33,3 +33,27 @@ def write_standard_fields_static(
                         fieldType=VTKWriter.VTKFieldType.TENSORS)
 
     writer.write()
+
+
+def write_standard_fields_quasi_static(
+    base_file_name: str, 
+    time_step: int,
+    Uu: np.ndarray,
+    p: np.ndarray,
+    f_space: FunctionSpace.FunctionSpace,
+    create_field: Callable,
+    mech_funcs: MechanicsFunctions) -> None:
+
+    writer = setup_vtk_writer(base_file_name + str(time_step).zfill(4), f_space.mesh)
+
+    U = create_field(Uu, p)
+    state = mech_funcs.compute_updated_internal_variables(U, p.state_data)
+    p = Objective.param_index_update(p, 1, state)
+    writer.add_nodal_field(name='displacement', nodalData=onp.array(U), fieldType=VTKWriter.VTKFieldType.VECTORS)
+
+    _, stresses = mech_funcs.compute_output_energy_densities_and_stresses(U, state)
+    cellStresses = FunctionSpace.project_quadrature_field_to_element_field(f_space, stresses)
+    writer.add_cell_field(name='stress', cellData=onp.array(cellStresses),
+                        fieldType=VTKWriter.VTKFieldType.TENSORS)
+
+    writer.write()

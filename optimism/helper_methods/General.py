@@ -1,9 +1,11 @@
 from optimism.JaxConfig import *
 from optimism import FunctionSpace
+from optimism import Mechanics
 from optimism import Mesh
 from optimism import QuadratureRule
 from optimism import ReadExodusMesh
 from optimism.material import MaterialModelFactory
+from optimism.Mechanics import MechanicsFunctions
 
 from typing import List
 from typing import NamedTuple
@@ -165,6 +167,21 @@ def setup_blocks(block_inputs: dict, mat_models: dict) -> dict:
         return_dict[block['block name']] = mat_models[block['material model']]
     print('Finished setting up blocks.\n')
     return return_dict
+
+
+def setup_mechanics_functions(f_space: FunctionSpace, mat_models: dict,
+                              mode2D: Optional[str] = 'plane strain') -> MechanicsFunctions:
+    print('Setting up mechanics functions...')
+    if len(mat_models.keys()) == 1:
+        print('    Running mechanics in single block mode')
+        key = list(mat_models.keys())[0]
+        mech_functions = Mechanics.create_mechanics_functions(f_space, mode2D, mat_models[key])
+    else:
+        print('    Running mechanics in multi-block mode')
+        mech_functions = Mechanics.create_multi_block_mechanics_functions(f_space, mode2D, mat_models)
+
+    print('Finished setting up mechanics functions.\n')
+    return mech_functions
 
 
 def setup_post_processor():

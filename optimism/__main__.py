@@ -5,11 +5,13 @@ from optimism.helper_methods.General import setup_dof_manager
 from optimism.helper_methods.General import setup_essential_boundary_conditions
 from optimism.helper_methods.General import setup_function_space
 from optimism.helper_methods.General import setup_material_models
+from optimism.helper_methods.General import setup_mechanics_functions
 from optimism.helper_methods.General import setup_mesh
 from optimism.helper_methods.General import setup_quadrature_rules
 
+from optimism.helper_methods.QuasiStaticMechanics import run_quasi_static_mechanics_simulation
 from optimism.helper_methods.StaticMechanics import run_static_mechanics_simulation
-from optimism.helper_methods.StaticMechanics import setup_mechanics_functions
+# from optimism.helper_methods.StaticMechanics import setup_mechanics_functions
 
 from optimism.helper_methods.Parser import dump_input_file
 from optimism.helper_methods.Parser import parse_yaml_input_file
@@ -108,6 +110,9 @@ if inputs['physics'] == 'mechanics':
     if inputs['time integration'] == 'static':
         run_static_mechanics_simulation(mesh, f_space, dof_manager, mech_functions, inputs['boundary conditions'],
                                         inputs['objective'], inputs['solver'], vtk_writer)
+    elif inputs['time integration'] == 'quasi-static':
+        run_quasi_static_mechanics_simulation(mesh, f_space, dof_manager, mech_functions, inputs['boundary conditions'],
+                                              inputs['objective'], inputs['solver'], inputs['time'], inputs['postprocessor'])
     else:
         print('Unsupported time integration mode "%s"!' % input['time integration'])
         raise TimeIntegrationError

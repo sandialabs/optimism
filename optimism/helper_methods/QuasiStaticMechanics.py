@@ -9,7 +9,7 @@ from optimism.FunctionSpace import FunctionSpace
 from optimism.Mechanics import MechanicsFunctions
 from optimism.Mesh import Mesh
 
-from optimism.helper_methods.Postprocessor import write_standard_fields_static
+from optimism.helper_methods.Postprocessor import write_standard_fields_quasi_static
 
 from typing import List
 
@@ -18,7 +18,7 @@ class ObjectiveError(Exception): pass
 class BCTypeError(Exception): pass
 
 
-def run_static_mechanics_simulation(
+def run_quasi_static_mechanics_simulation(
     mesh: Mesh, 
     f_space: FunctionSpace,
     dof_manager: DofManager, 
@@ -26,9 +26,10 @@ def run_static_mechanics_simulation(
     bcs: List[dict],
     objective_type: str,
     solver_settings: dict,
-    pp: any) -> None:
+    time_settings: dict,
+    pp_settings: dict) -> None:
 
-    print('Running static mechanics simulation')
+    print('Running quasi-static mechanics simulation')
 
     # setup displacement bcs
     disp_bcs = bcs['displacement']
@@ -81,22 +82,48 @@ def run_static_mechanics_simulation(
 
     # unknown and params setup
     Uu = np.zeros(dof_manager.get_unknown_size())
-    # p = Objective.Params(0.0, mech_funcs.compute_initial_state())
     p = Objective.Params(np.array(len(disp_bcs_values) * [0.0]), mech_funcs.compute_initial_state())
 
     if objective_type.lower() == 'scaled objective':
         objective = Objective.ScaledObjective(energy_function, Uu, p, precondStrategy=precond_strategy)
+    elif objective_type.lower() == 'objective':
+        objective = Objective.Objective(energy_function, Uu, p, precondStrategy=precond_strategy)
     else:
         print('Unsupported objective type "%s".' % objective_type)
 
     # TODO parameterize this later
     # p = Objective.param_index_update(p, 0, 0.3)
-    p = Objective.param_index_update(p, 0, np.array(disp_bcs_values))
+    # p = Objective.param_index_update(p, 0, np.array(disp_bcs_values))
     
     # solve
-    Uu = EquationSolver.nonlinear_equation_solve(objective, Uu, p, solver_settings)
+    # Uu = EquationSolver.nonlinear_equation_solve(objective, Uu, p, solver_settings)
 
-    if type(pp) == VTKWriter.VTKWriter:
-        write_standard_fields_static(pp, Uu, p, f_space, create_field, mech_funcs)
+
+    # setup
+    step = 0
+    disps = np.array(len(disp_bcs_values) * [0.0])
+    # write initial output
+    if pp_settings['type'] == 'vtk':
+        write_standard_fields_quasi_static(pp_settings['output file base name'], 0, Uu, p, f_space, create_field, mech_funcs)
     else:
         raise ValueError('Unsupported post processor')
+
+    # now loop
+    for step in range(1, time_settings['number of steps']):
+        print('====================================================')
+        print('==== LOAD STEP = %s' % step)
+        print('====================================================')
+
+        # update bc stuff
+        for n in range(len(disps)):
+            disps = disps.at[n].set(disps[n] + disp_bcs_values[n] / time_settings['number of steps'])
+        
+        p = Objective.param_index_update(p, 0, disps)
+        Uu = EquationSolver.nonlinear_equation_solve(objective, Uu, p, solver_settings)
+
+        if pp_settings['type'] == 'vtk':
+            write_standard_fields_quasi_static(pp_settings['output file base name'], step, Uu, p, f_space, create_field, mech_funcs)
+        else:
+            raise ValueError('Unsupported post processor')
+
+

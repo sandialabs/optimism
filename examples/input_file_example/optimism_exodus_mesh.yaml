@@ -35,8 +35,11 @@ material models:
 # Mechanics
 #
 physics: mechanics
-time integration: static
+time integration: quasi-static
 objective: scaled objective
+
+time:
+  number of steps: 20
 
 blocks:
   - block name: soft
@@ -71,4 +74,5 @@ solver:
 # Post-processor
 #
 postprocessor:
- output file base name: output
+  type: vtk
+  output file base name: output
