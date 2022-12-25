@@ -24,18 +24,20 @@ class VoceHardeningTestFixture(TestFixture):
 
         
     def test_voce_hardening_zero_point(self):
-        Wp = self.plasticEnergy(0.0)
+        eqps = 0.0
+        Wp = self.plasticEnergy(eqps, eqpsOld=0.0, dt=0.0)
         self.assertLess(Wp, 1e-14)
 
 
     def test_voce_hardening_yield_strength(self):
-        Y = self.flowStrength(0.0)
+        eqps = 0.0
+        Y = self.flowStrength(eqps, eqpsOld=0.0, dt=0.0)
         self.assertAlmostEqual(Y, Y0, 12)
 
 
     def test_voce_hardening_saturates_to_correct_value(self):
         eqps = 15.0*self.eps0
-        Y = self.flowStrength(eqps)
+        Y = self.flowStrength(eqps, eqpsOld=0.0, dt=0.0)
         self.assertAlmostEqual(Y, self.Ysat, 5)
 
 
@@ -54,24 +56,26 @@ class PowerLawHardeningTestFixture(TestFixture):
 
         
     def test_power_law_hardening_zero_point(self):
-        Wp = self.plasticEnergy(0.0)
+        Wp = self.plasticEnergy(eqps=0.0, eqpsOld=0.0, dt=0.0)
         self.assertLess(Wp, 1e-14)
 
 
     def test_power_law_hardening_yield_strength(self):
-        Y = self.flowStrength(0.0)
+        eqps = 0.0
+        Y = self.flowStrength(eqps, eqpsOld=0.0, dt=0.0)
         self.assertAlmostEqual(Y, Y0, 12)
 
 
     def test_power_law_strength_increases(self):
         eqps = 5.0*self.eps0
-        Y = self.flowStrength(eqps)
+        Y = self.flowStrength(eqps, eqpsOld=0.0, dt=0.0)
         self.assertGreater(Y, Y0)
 
 
-    def test_power_law_hardening_rate_is_finite_at_origin(self):
+    def test_power_law_hardening_slope_is_finite_at_origin(self):
         hardeningRate = jacfwd(self.flowStrength)
-        H = hardeningRate(0.0)
+        eqps = 0.0
+        H = hardeningRate(eqps, eqpsOld=0.0, dt=0.0)
         self.assertTrue(np.isfinite(H))
 
 
