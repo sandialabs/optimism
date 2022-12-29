@@ -1,4 +1,5 @@
-from optimism.JaxConfig import *
+import jax.numpy as np
+
 from optimism.material.MaterialModel import MaterialModel
 
 # props
@@ -74,4 +75,6 @@ def make_initial_state():
 
 
 def _compute_state_new(dispGrad, internalVars, props):
+    del dispGrad
+    del props
     return internalVars
