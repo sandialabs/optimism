@@ -223,9 +223,10 @@ class DynamicsFixture(MeshFixture.MeshFixture):
     def constant_body_force_potential(self, Uu, p):
         U = self.dofManager.create_field(Uu, self.get_ubcs())
         internalVariables = p[1]
+        dtUnused = 0.0
         b = np.array([1.0, 0.0])
-        f = lambda u, du, q, x: -np.dot(b, u)
-        return FunctionSpace.integrate_over_block(self.fs, U, internalVariables,
+        f = lambda u, du, q, x, dt: -np.dot(b, u)
+        return FunctionSpace.integrate_over_block(self.fs, U, internalVariables, dtUnused,
                                                   f, self.mesh.blocks['block'])
 
 class DynamicPatchTest(MeshFixture.MeshFixture):
@@ -308,7 +309,7 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
             U = dofManager.create_field(Uu, dofManager.get_bc_values(V*t))
             UCorrection = U - UPrediction
             V, A = self.dynamics.correct(UCorrection, V, A, dt)
-            internals = self.dynamics.compute_updated_internal_variables(U, internals)
+            internals = self.dynamics.compute_updated_internal_variables(U, internals, dt)
             objective.p = Objective.param_index_update(objective.p, 1, internals)
 
             UExact = np.dot(self.mesh.coords, t*self.targetDispGradRate.T)
@@ -324,7 +325,8 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
             dispGrad = self.targetDispGradRate*t
             dispGrad3D = np.zeros((3,3)).at[:2, :2].set(dispGrad)
             q = np.array([0.0])
-            P = self.compute_stress(dispGrad3D, q)[:2, :2]
+            dt = 0.0
+            P = self.compute_stress(dispGrad3D, q, dt)[:2, :2]
             return np.dot(P, N)
 
         def energy(Uu, p):
@@ -372,7 +374,7 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
             U = dofManager.create_field(Uu)
             UCorrection = U - UPrediction
             V, A = self.dynamics.correct(UCorrection, V, A, dt)
-            internals = self.dynamics.compute_updated_internal_variables(U, internals)
+            internals = self.dynamics.compute_updated_internal_variables(U, internals, dt)
             objective.p = Objective.param_index_update(objective.p, 1, internals)
 
             UExact = np.dot(self.mesh.coords, t*self.targetDispGradRate.T)

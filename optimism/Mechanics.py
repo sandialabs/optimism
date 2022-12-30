@@ -295,21 +295,24 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel, pressurePro
 
 
 def _compute_kinetic_energy(functionSpace, V, internals, density):
-    def lagrangian_density(U, gradU, Q, X):
+    def lagrangian_density(U, gradU, Q, X, dt):
         return kinetic_energy_density(U, density)
-    return FunctionSpace.integrate_over_block(functionSpace, V, internals, lagrangian_density, slice(None))
+    unused = 0.0
+    return FunctionSpace.integrate_over_block(functionSpace, V, internals, unused, lagrangian_density, slice(None))
 
 
 def _compute_element_masses(functionSpace, U, internals, density, modify_element_gradient):
-    def lagrangian_density(V, gradV, Q, X):
+    def lagrangian_density(V, gradV, Q, X, dt):
         return kinetic_energy_density(V, density)
-    f = vmap(compute_element_stiffness_from_global_fields, (None, None, 0 ,0 ,0 ,0 ,0, None, None))
+    f = vmap(compute_element_stiffness_from_global_fields, (None, None, 0, None, 0 ,0 ,0 ,0, None, None))
     fs = functionSpace
-    return f(U, fs.mesh.coords, internals, fs.mesh.conns, fs.shapes, fs.shapeGrads, fs.vols,
-             lagrangian_density, modify_element_gradient)
+    unusedDt = 0.0
+    return f(U, fs.mesh.coords, internals, unusedDt, fs.mesh.conns, fs.shapes, fs.shapeGrads,
+             fs.vols, lagrangian_density, modify_element_gradient)
 
 
 def kinetic_energy_density(V, density):
+    # assumes spatially homogeneous density
     return 0.5*density*np.dot(V, V)
 
 
@@ -319,25 +322,26 @@ def compute_newmark_lagrangian(functionSpace, U, UPredicted, internals, density,
     # is beneficial, we could add the time derivative field to the Lagrangian
     # density definition.
 
-    def lagrangian_density(W, gradW, Q, X):
+    def lagrangian_density(W, gradW, Q, X, dtime):
         return kinetic_energy_density(W, density)
-    KE = FunctionSpace.integrate_over_block(functionSpace, U - UPredicted, internals, lagrangian_density,
-                                            slice(None)) / (newmarkBeta*dt**2)
+    KE =  FunctionSpace.integrate_over_block(functionSpace, U - UPredicted, internals, dt,
+                                             lagrangian_density, slice(None))
+    KE *= 1 / (newmarkBeta*dt**2)
 
     lagrangian_density = strain_energy_density_to_lagrangian_density(strain_energy_density)
-    SE = FunctionSpace.integrate_over_block(functionSpace, U, internals, lagrangian_density,
+    SE = FunctionSpace.integrate_over_block(functionSpace, U, internals, dt, lagrangian_density,
                                             slice(None), modify_element_gradient=modify_element_gradient)
     return SE + KE
 
 
 def _compute_newmark_element_hessians(functionSpace, U, UPredicted, internals, density, dt, newmarkBeta, strain_energy_density, modify_element_gradient):
-    def lagrangian_density(W, gradW, Q, X):
-        return kinetic_energy_density(W, density)/(newmarkBeta*dt**2) + strain_energy_density(gradW, Q)
+    def lagrangian_density(W, gradW, Q, X, dtime):
+        return kinetic_energy_density(W, density)/(newmarkBeta*dtime**2) + strain_energy_density(gradW, Q, dtime)
     f =  vmap(compute_element_stiffness_from_global_fields,
-              (None, None, 0, 0, 0, 0, 0, None, None))
+              (None, None, 0, None, 0, 0, 0, 0, None, None))
     fs = functionSpace
     UAlgorithmic = U - UPredicted
-    return f(UAlgorithmic, fs.mesh.coords, internals, fs.mesh.conns, fs.shapes, fs.shapeGrads, fs.vols,
+    return f(UAlgorithmic, fs.mesh.coords, internals, dt, fs.mesh.conns, fs.shapes, fs.shapeGrads, fs.vols,
              lagrangian_density, modify_element_gradient)
 
 
@@ -380,8 +384,8 @@ def create_dynamics_functions(functionSpace, mode2D, materialModel, newmarkParam
                                           materialModel.compute_energy_density,
                                           modify_element_gradient)
     
-    def compute_updated_internal_variables(U, stateVariables):
-        return _compute_updated_internal_variables(fs, U, stateVariables, materialModel.compute_state_new, modify_element_gradient)
+    def compute_updated_internal_variables(U, stateVariables, dt):
+        return _compute_updated_internal_variables(fs, U, stateVariables, dt, materialModel.compute_state_new, modify_element_gradient)
     
     def compute_element_hessians(U, UPredicted, stateVariables, dt):
         return _compute_newmark_element_hessians(
@@ -390,15 +394,15 @@ def create_dynamics_functions(functionSpace, mode2D, materialModel, newmarkParam
 
     output_lagrangian = strain_energy_density_to_lagrangian_density(materialModel.compute_energy_density)
     output_constitutive = value_and_grad(output_lagrangian, 1)
-    def compute_output_potential_densities_and_stresses(U, stateVariables):
-        return FunctionSpace.evaluate_on_block(fs, U, stateVariables, output_constitutive, slice(None), modify_element_gradient=modify_element_gradient)
+    def compute_output_potential_densities_and_stresses(U, stateVariables, dt):
+        return FunctionSpace.evaluate_on_block(fs, U, stateVariables, dt, output_constitutive, slice(None), modify_element_gradient=modify_element_gradient)
 
     def compute_kinetic_energy(V):
         stateVariables = np.zeros((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule)))
         return _compute_kinetic_energy(functionSpace, V, stateVariables, materialModel.density)
 
-    def compute_output_strain_energy(U, stateVariables):
-        return _compute_strain_energy(functionSpace, U, stateVariables, materialModel.compute_energy_density, modify_element_gradient)
+    def compute_output_strain_energy(U, stateVariables, dt):
+        return _compute_strain_energy(functionSpace, U, stateVariables, dt, materialModel.compute_energy_density, modify_element_gradient)
 
     def compute_initial_state():
         shape = Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule), 1
