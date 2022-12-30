@@ -172,7 +172,7 @@ def create_phasefield_functions(functionSpace, mode2D,
         return _compute_block_diagonal_element_stiffnesses(U, Q, dt, fs, L, modify_element_gradient)
 
     Lphase = energy_density_to_lagrangian_density(materialModel.compute_phase_potential_density)
-    def compute_phase_potential_energy(U, Q, dt):
+    def compute_phase_potential_energy(U, Q, dt=0.0):
         return FunctionSpace.integrate_over_block(fs, U, Q, dt, Lphase, slice(None), modify_element_gradient=modify_element_gradient)
     
     return PhaseFieldFunctions(compute_internal_energy,

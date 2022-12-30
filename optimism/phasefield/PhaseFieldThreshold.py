@@ -56,9 +56,7 @@ def create_material_model_functions(properties):
         return energy_density(strain, phase, phaseGrad, props)
 
     def compute_output_energy_density(dispGrad, phase, phaseGrad, internalVars, dt):
-        del internalVars
-        del dt
-        return compute_energy_density(dispGrad, phase, phaseGrad, internalVars)
+        return compute_energy_density(dispGrad, phase, phaseGrad, internalVars, dt)
 
     def compute_strain_energy_density(dispGrad, phase, phaseGrad, internalVars, dt):
         del phaseGrad
