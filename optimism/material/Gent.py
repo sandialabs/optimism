@@ -15,11 +15,15 @@ def create_material_functions(properties):
 
     energy_density = _gent_3D_energy_density
 
-    def strain_energy(dispGrad, internalVars):
-        return energy_density(dispGrad, internalVars, props)
+    def strain_energy(dispGrad, internalVars, dt):
+        del internalVars
+        del dt
+        return energy_density(dispGrad, props)
     
-    def compute_state_new(dispGrad, internalVars):
-        return _compute_state_new(dispGrad, internalVars, props)
+    def compute_state_new(dispGrad, internalVars, dt):
+        del dispGrad
+        del dt
+        return internalVars
 
     density = properties.get('density')
 
@@ -31,7 +35,7 @@ def create_material_functions(properties):
 def _make_properties(K, mu, Jm):
     return np.array([K, mu, Jm])
 
-def _gent_3D_energy_density(dispGrad, internalVariables, props):
+def _gent_3D_energy_density(dispGrad, props):
     F = dispGrad + np.eye(3)
     J = np.linalg.det(F)
     I1_bar = np.power(J, -2. / 3.) * np.tensordot(F, F)
@@ -42,6 +46,3 @@ def _gent_3D_energy_density(dispGrad, internalVariables, props):
 def make_initial_state():
     return np.array([])
 
-
-def _compute_state_new(dispGrad, internalVars, props):
-    return internalVars
