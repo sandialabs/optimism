@@ -26,15 +26,6 @@ def get_best_overlap_vector(mesh, edge, listOfEdges):
     return minDistance * integrationRay[1]
 
 
-# coarse search
-
-#def test_contact_search(self):
-#    sideA = self.mesh.sideSets['right1']
-#    sideB = self.mesh.sideSets['left2']
-#
-#    closeEdgesinAForSidesInB = get_close_edge_list(sideA, sideB, self.mesh, self.disp, 0.15)
-
-
 class TwoBodyContactFixture(MeshFixture):
 
     def setUp(self):
