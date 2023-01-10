@@ -31,12 +31,9 @@ jobs:
           pip install -e ".[sparse]"
           # pip install flake8 pytest
           # if [ -f requirements.txt ]; then pip install -r requirements-test.txt; fi
-      - name: unit test
-        run: |
-          python -m unittest discover -vb
       - name: pytest
         run: |
           pip install -e ".[sparse,test]"
-          python -m pytest --cov=optimism -Wignore
+          python -m pytest -n auto --cov=optimism -Wignore
           # we can also add the flag -n auto for parallel testing
           
