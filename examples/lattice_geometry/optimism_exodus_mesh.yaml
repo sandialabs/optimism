@@ -23,6 +23,7 @@ material models:
     model properties:
       elastic modulus: 5.0
       poisson ratio: 0.25
+
   hard material: 
     model name: J2Plastic
     model properties:
@@ -39,7 +40,7 @@ time integration: quasi-static
 objective: scaled objective
 
 time:
-  number of steps: 20
+  number of steps: 40
 
 blocks:
   - block name: soft
@@ -55,18 +56,17 @@ boundary conditions:
       type: fixed
     - nodeset: nset_top
       component: 0
-      type: prescribed
-      max displacement: 0.3
+      type: fixed
+      max displacement: 0.0
     - nodeset: nset_top
       component: 1
       type: prescribed
-      max displacement: -0.3
+      max displacement: -1.0
 
 solver:
   max cumulative cg iters: 100
   max trust iters: 1000
   use preconditioned inner product for cg: on
-
 
 # Post-processor
 #
