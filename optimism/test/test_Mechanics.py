@@ -54,4 +54,3 @@ class MechanicsFunctionsFixture(MeshFixture.MeshFixture):
 
 if __name__ == "__main__":
     unittest.main()
-

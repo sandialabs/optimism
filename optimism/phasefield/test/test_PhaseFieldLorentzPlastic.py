@@ -104,7 +104,6 @@ class GradOfPlasticPhaseFieldModelFixture(TestFixture.TestFixture):
         energyExact = 0.5*self.E*elasticStrain11**2 + self.Y0*eqps + 0.5*self.H*eqps**2
         energy = self.model.compute_energy_density(dispGrad, phase, phaseGrad, self.internalVariables, self.dt)
         self.assertNear(energy, energyExact, 12)
-
         
         stress,_,_ = self.flux_func(dispGrad, phase, phaseGrad, self.internalVariables, self.dt)
         mandelStress = stress@(dispGrad + np.identity(3)).T

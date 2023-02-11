@@ -295,6 +295,7 @@ class PlasticityOnMesh(MeshFixture):
         nElems = Mesh.num_elements(mesh)
         nQpsPerElem = QuadratureRule.len(quadRule)
         internalVariables = mechFuncs.compute_initial_state()
+
         tOld = 0.0
         t = 1.0
         p = Objective.Params(None, internalVariables, None, None, np.array([t, tOld]))

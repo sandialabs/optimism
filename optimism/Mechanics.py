@@ -170,7 +170,7 @@ def _compute_initial_state_multi_block(fs, blockModels):
 
 def _compute_element_stiffnesses_multi_block(U, stateVariables, functionSpace, blockModels, modify_element_gradient):
     fs = functionSpace
-    nen = Interpolants.num_nodes(functionSpace.mesh.masterElement)
+    nen = Interpolants.num_nodes(functionSpace.mesh.parentElement)
     elementHessians = np.zeros((Mesh.num_elements(functionSpace.mesh), nen, 2, nen, 2))
     for blockKey in blockModels:
         materialModel = blockModels[blockKey]

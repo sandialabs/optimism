@@ -37,6 +37,7 @@ class TestGentMaterial(TestFixture.TestFixture):
         key = jax.random.PRNGKey(1)
         dispGrad = jax.random.uniform(key, (3, 3))
         
+
         W = self.material.compute_energy_density(dispGrad, self.internalVariables, self.dt)
         for i in range(10):
             Q = Rotation.random(random_state=i).as_matrix()
