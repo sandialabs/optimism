@@ -1,0 +1,56 @@
+reset
+create surface rectangle width 1 zplane
+move surface 1 x 0.5 y 0.5
+create surface rectangle width 0.75 zplane
+move surface 2 x {0.75 / 2 + 0.125} y {0.75 / 2 + 0.125}
+subtract volume 2 from volume 1
+
+surface 3 size 0.025
+surface 3 scheme trimesh
+mesh surface 3
+
+block 1 add surface 3
+block 1 element type tri6
+
+sideset 1 add curve 1
+sideset 1 name "sset_outer_top"
+nodeset 1 add curve in sideset 1
+nodeset 1 name "nset_outer_top"
+
+sideset 2 add curve 2
+sideset 2 name "sset_outer_left"
+nodeset 2 add curve in sideset 2
+nodeset 2 name "nset_outer_left"
+
+sideset 3 add curve 3
+sideset 3 name "sset_outer_bottom"
+nodeset 3 add curve in sideset 3
+nodeset 3 name "nset_outer_bottom"
+
+sideset 4 add curve 4
+sideset 4 name "sset_outer_right"
+nodeset 4 add curve in sideset 4
+nodeset 4 name "nset_outer_right"
+
+sideset 5 add curve 9
+sideset 5 name "sset_inner_top"
+nodeset 5 add curve in sideset 5
+nodeset 5 name "nset_inner_top"
+
+sideset 6 add curve 11
+sideset 6 name "sset_inner_bottom"
+nodeset 6 add curve in sideset 6
+nodeset 6 name "nset_inner_bottom"
+
+sideset 7 add curve 12
+sideset 7 name "sset_inner_left"
+
+sideset 8 add curve 10
+sideset 8 name "sset_inner_right"
+
+export genesis "geometry.g" overwrite
+
+
+
+
+
