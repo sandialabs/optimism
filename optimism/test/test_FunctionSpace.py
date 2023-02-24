@@ -84,6 +84,7 @@ class TestFunctionSpaceSingleQuadPointFixture(MeshFixture.MeshFixture):
         nElements = Mesh.num_elements(self.mesh)
         nQuadPoints = QuadratureRule.len(self.quadratureRule)
         self.state = np.zeros((nElements,nQuadPoints,1))
+        self.dt = 0.0
 
 
     def test_element_volume_single_point_quadrature(self):
@@ -104,7 +105,8 @@ class TestFunctionSpaceSingleQuadPointFixture(MeshFixture.MeshFixture):
         integralOfOne = FunctionSpace.integrate_over_block(self.fs,
                                                            self.U,
                                                            self.state,
-                                                           lambda u, gradu, state, X: 1.0,
+                                                           self.dt,
+                                                           lambda u, gradu, state, X, dt: 1.0,
                                                            self.mesh.blocks['block'])
         self.assertNear(integralOfOne, 1.0, 14)
 
@@ -114,7 +116,8 @@ class TestFunctionSpaceSingleQuadPointFixture(MeshFixture.MeshFixture):
         Ix = FunctionSpace.integrate_over_block(self.fs,
                                                 self.U,
                                                 self.state,
-                                                lambda u, gradu, state, X: gradu[0,0],
+                                                self.dt,
+                                                lambda u, gradu, state, X, dt: gradu[0,0],
                                                 self.mesh.blocks['block'])
         # displacement at x=1 should match integral
         idx = np.argmax(self.mesh.coords[:,0])
@@ -124,7 +127,8 @@ class TestFunctionSpaceSingleQuadPointFixture(MeshFixture.MeshFixture):
         Iy = FunctionSpace.integrate_over_block(self.fs,
                                                 self.U,
                                                 self.state,
-                                                lambda u, gradu, state, X: gradu[1,1],
+                                                self.dt,
+                                                lambda u, gradu, state, X, dt: gradu[1,1],
                                                 self.mesh.blocks['block'])
         idx = np.argmax(self.mesh.coords[:,1])
         expected = self.U[idx,1]*(self.xRange[1] - self.xRange[0])
@@ -149,6 +153,7 @@ class TestFunctionSpaceMultiQuadPointFixture(MeshFixture.MeshFixture):
         nElements = Mesh.num_elements(self.mesh)
         nQuadPoints = QuadratureRule.len(self.quadratureRule)
         self.state = np.zeros((nElements,nQuadPoints,))
+        self.dt = 0.0
 
 
     def test_element_volume_multi_point_quadrature(self):
@@ -169,7 +174,8 @@ class TestFunctionSpaceMultiQuadPointFixture(MeshFixture.MeshFixture):
         integralOfOne = FunctionSpace.integrate_over_block(self.fs,
                                                            self.U,
                                                            self.state,
-                                                           lambda u, gradu, state, X: 1.0,
+                                                           self.dt,
+                                                           lambda u, gradu, state, X, dt: 1.0,
                                                            self.mesh.blocks['block'])
         self.assertNear(integralOfOne, 1.0, 14)
 
@@ -178,7 +184,8 @@ class TestFunctionSpaceMultiQuadPointFixture(MeshFixture.MeshFixture):
         Ix = FunctionSpace.integrate_over_block(self.fs,
                                                 self.U,
                                                 self.state,
-                                                lambda u, gradu, state, X: gradu[0,0],
+                                                self.dt,
+                                                lambda u, gradu, state, X, dt: gradu[0,0],
                                                 self.mesh.blocks['block'])
         idx = np.argmax(self.mesh.coords[:,0])
         expected = self.U[idx,0]*(self.yRange[1] - self.yRange[0])
@@ -187,7 +194,8 @@ class TestFunctionSpaceMultiQuadPointFixture(MeshFixture.MeshFixture):
         Iy = FunctionSpace.integrate_over_block(self.fs,
                                                 self.U,
                                                 self.state,
-                                                lambda u, gradu, state, X: gradu[1,1],
+                                                self.dt,
+                                                lambda u, gradu, state, X, dt: gradu[1,1],
                                                 self.mesh.blocks['block'])
         idx = np.argmax(self.mesh.coords[:,1])
         expected = self.U[idx,1]*(self.xRange[1] - self.xRange[0])
@@ -205,7 +213,8 @@ class TestFunctionSpaceMultiQuadPointFixture(MeshFixture.MeshFixture):
         integral = FunctionSpace.integrate_over_block(self.fs,
                                                       self.U,
                                                       self.state,
-                                                      lambda u, gradu, state, X: 1.0,
+                                                      self.dt,
+                                                      lambda u, gradu, state, X, dt: 1.0,
                                                       blockWithHalfTheVolume)
         self.assertNear(integral, 1.0/2.0, 14)
 
@@ -222,20 +231,21 @@ class TestFunctionSpaceMultiQuadPointFixture(MeshFixture.MeshFixture):
         integral = FunctionSpace.integrate_over_block(self.fs,
                                                       self.U,
                                                       self.state,
-                                                      lambda u, gradu, state, X: 1.0,
+                                                      self.dt,
+                                                      lambda u, gradu, state, X, dt: 1.0,
                                                       blockWithHalfTheVolume)
         self.assertNear(integral, 1.0/2.0, 14)
         
         
     def test_jit_on_integration(self):
-        integrate_jit = jax.jit(FunctionSpace.integrate_over_block, static_argnums=(3,))
-        I = integrate_jit(self.fs, self.U, self.state, lambda u, gradu, state, X: 1.0, self.mesh.blocks['block'])
+        integrate_jit = jax.jit(FunctionSpace.integrate_over_block, static_argnums=(4,))
+        I = integrate_jit(self.fs, self.U, self.state, self.dt, lambda u, gradu, state, X, dt: 1.0, self.mesh.blocks['block'])
         self.assertNear(I, 1.0, 14)
 
         
     def test_jit_and_jacrev_on_integration(self):
-        F = jax.jit(jax.jacrev(FunctionSpace.integrate_over_block, 1), static_argnums=(3,))
-        dI = F(self.fs, self.U, self.state, lambda u, gradu, state, X: 0.5*np.tensordot(gradu, gradu),
+        F = jax.jit(jax.jacrev(FunctionSpace.integrate_over_block, 1), static_argnums=(4,))
+        dI = F(self.fs, self.U, self.state, self.dt, lambda u, gradu, state, X, dt: 0.5*np.tensordot(gradu, gradu),
                self.mesh.blocks['block'])
         nNodes = self.mesh.coords.shape[0]
         interiorNodeIds = np.setdiff1d(np.arange(nNodes), self.mesh.nodeSets['all_boundary'])
@@ -261,6 +271,7 @@ class ParameterizationTestSuite(MeshFixture.MeshFixture):
         nElements = Mesh.num_elements(self.mesh)
         nQuadPoints = QuadratureRule.len(self.quadratureRule)
         self.state = np.zeros((nElements,nQuadPoints,))
+        self.dt = 0.0
 
     def test_integrate_with_parameter(self):
         def centroid(v):
@@ -269,7 +280,7 @@ class ParameterizationTestSuite(MeshFixture.MeshFixture):
         xc = jax.vmap(lambda conn, coords: centroid(coords[conn, :]), (0, None))(self.mesh.conns, self.mesh.coords)
         weights = np.ones(Mesh.num_elements(self.mesh), dtype=np.float64)
         weights = weights.at[xc[:,0] < self.xRange[1]/2].set(2.0)
-        f = FunctionSpace.integrate_over_block(self.fs, self.U, self.state, lambda u, dudx, q, x, p: p, self.mesh.blocks['block'], weights)
+        f = FunctionSpace.integrate_over_block(self.fs, self.U, self.state, self.dt, lambda u, dudx, q, x, dt, p: p, self.mesh.blocks['block'], weights)
         exact = 1.5*self.xRange[1]*self.yRange[1]
         self.assertAlmostEqual(f, exact, 12)
 

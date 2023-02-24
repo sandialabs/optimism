@@ -64,32 +64,32 @@ def axisymmetric_element_gradient_transformation(elemDispGrads, elemShapes, elem
 element_hess_func = hessian(FunctionSpace.integrate_element_from_local_field)
 
 
-def compute_element_stiffness_from_global_fields(U, coords, elInternals, elConn, elShapes, elShapeGrads, elVols, lagrangian_density, modify_element_gradient):
+def compute_element_stiffness_from_global_fields(U, coords, elInternals, dt, elConn, elShapes, elShapeGrads, elVols, lagrangian_density, modify_element_gradient):
     elDisp = U[elConn,:]
     elCoords = coords[elConn,:]
-    return element_hess_func(elDisp, elCoords, elInternals, elShapes, elShapeGrads,
+    return element_hess_func(elDisp, elCoords, elInternals, dt, elShapes, elShapeGrads,
                              elVols, lagrangian_density, modify_element_gradient)
 
 
-def _compute_element_stiffnesses(U, internals, functionSpace, compute_energy_density, modify_element_gradient):
+def _compute_element_stiffnesses(U, internals, dt, functionSpace, compute_energy_density, modify_element_gradient):
     L = strain_energy_density_to_lagrangian_density(compute_energy_density)
     f =  vmap(compute_element_stiffness_from_global_fields,
-              (None, None, 0, 0, 0, 0, 0, None, None))
+              (None, None, 0, None, 0, 0, 0, 0, None, None))
     fs = functionSpace
-    return f(U, fs.mesh.coords, internals, fs.mesh.conns, fs.shapes, fs.shapeGrads, fs.vols,
+    return f(U, fs.mesh.coords, internals, dt, fs.mesh.conns, fs.shapes, fs.shapeGrads, fs.vols,
              L, modify_element_gradient)
 
 
-def _compute_strain_energy(functionSpace, UField, stateField,
+def _compute_strain_energy(functionSpace, UField, stateField, dt,
                            compute_energy_density,
                            modify_element_gradient):
     L = strain_energy_density_to_lagrangian_density(compute_energy_density)
-    return FunctionSpace.integrate_over_block(functionSpace, UField, stateField, L,
+    return FunctionSpace.integrate_over_block(functionSpace, UField, stateField, dt, L,
                                               slice(None),
                                               modify_element_gradient=modify_element_gradient)
 
 
-def _compute_strain_energy_multi_block(functionSpace, UField, stateField, blockModels,
+def _compute_strain_energy_multi_block(functionSpace, UField, stateField, dt, blockModels,
                                        modify_element_gradient):
     energy = 0.0
     for blockKey in blockModels:
@@ -98,22 +98,22 @@ def _compute_strain_energy_multi_block(functionSpace, UField, stateField, blockM
         
         L = strain_energy_density_to_lagrangian_density(materialModel.compute_energy_density)
         
-        blockEnergy = FunctionSpace.integrate_over_block(functionSpace, UField, stateField, L,
+        blockEnergy = FunctionSpace.integrate_over_block(functionSpace, UField, stateField, dt, L,
                                                          elemIds, modify_element_gradient=modify_element_gradient)
         
         energy += blockEnergy
     return energy
 
 
-def _compute_updated_internal_variables(functionSpace, U, states, compute_state_new, modify_element_gradient):
+def _compute_updated_internal_variables(functionSpace, U, states, dt, compute_state_new, modify_element_gradient):
     dispGrads = FunctionSpace.compute_field_gradient(functionSpace, U, modify_element_gradient)
     dgQuadPointRavel = dispGrads.reshape(dispGrads.shape[0]*dispGrads.shape[1],*dispGrads.shape[2:])
     stQuadPointRavel = states.reshape(states.shape[0]*states.shape[1],*states.shape[2:])
-    statesNew = vmap(compute_state_new)(dgQuadPointRavel, stQuadPointRavel)
+    statesNew = vmap(compute_state_new, (0, 0, None))(dgQuadPointRavel, stQuadPointRavel, dt)
     return statesNew.reshape(states.shape)
 
 
-def _compute_updated_internal_variables_multi_block(functionSpace, U, states, blockModels, modify_element_gradient):
+def _compute_updated_internal_variables_multi_block(functionSpace, U, states, dt, blockModels, modify_element_gradient):
     dispGrads = FunctionSpace.compute_field_gradient(functionSpace, U, modify_element_gradient)
 
     statesNew = np.array(states)
@@ -134,7 +134,7 @@ def _compute_updated_internal_variables_multi_block(functionSpace, U, states, bl
         
         dgQuadPointRavel = blockDispGrads.reshape(blockDispGrads.shape[0]*blockDispGrads.shape[1],*blockDispGrads.shape[2:])
         stQuadPointRavel = blockStates.reshape(blockStates.shape[0]*blockStates.shape[1],-1)
-        blockStatesNew = vmap(compute_state_new)(dgQuadPointRavel, stQuadPointRavel).reshape(blockStates.shape)        
+        blockStatesNew = vmap(compute_state_new, (0, 0, None))(dgQuadPointRavel, stQuadPointRavel, dt).reshape(blockStates.shape)
         statesNew = statesNew.at[elemIds, :, :blockStatesNew.shape[2]].set(blockStatesNew)
         
 
@@ -186,8 +186,8 @@ def _compute_element_stiffnesses_multi_block(U, stateVariables, functionSpace, b
 
 
 def strain_energy_density_to_lagrangian_density(strain_energy_density):
-    def L(U, gradU, Q, X):
-        return strain_energy_density(gradU, Q)
+    def L(U, gradU, Q, X, dt):
+        return strain_energy_density(gradU, Q, dt)
     return L
 
 
@@ -210,19 +210,19 @@ def create_multi_block_mechanics_functions(functionSpace, mode2D, materialModels
             return grad_2D_to_3D(elemGrads, elemVols)
     
     
-    def compute_strain_energy(U, stateVariables):
-        return _compute_strain_energy_multi_block(fs, U, stateVariables, materialModels, modify_element_gradient)
+    def compute_strain_energy(U, stateVariables, dt=0.0):
+        return _compute_strain_energy_multi_block(fs, U, stateVariables, dt, materialModels, modify_element_gradient)
 
         
-    def compute_updated_internal_variables(U, stateVariables):
-        return _compute_updated_internal_variables_multi_block(fs, U, stateVariables, materialModels, modify_element_gradient)
+    def compute_updated_internal_variables(U, stateVariables, dt=0.0):
+        return _compute_updated_internal_variables_multi_block(fs, U, stateVariables, dt, materialModels, modify_element_gradient)
 
     
-    def compute_element_stiffnesses(U, stateVariables):
+    def compute_element_stiffnesses(U, stateVariables, dt=0.0):
         return _compute_element_stiffnesses_multi_block(U, stateVariables, functionSpace, materialModels, modify_element_gradient)
 
 
-    def compute_output_energy_densities_and_stresses(U, stateVariables): 
+    def compute_output_energy_densities_and_stresses(U, stateVariables, dt=0.0):
         energy_densities = np.zeros((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule)))
         stresses = np.zeros((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule), 3, 3))
         for blockKey in materialModels:
@@ -230,7 +230,7 @@ def create_multi_block_mechanics_functions(functionSpace, mode2D, materialModels
             output_lagrangian = strain_energy_density_to_lagrangian_density(compute_output_energy_density)
             output_constitutive = value_and_grad(output_lagrangian, 1)
             elemIds = fs.mesh.blocks[blockKey]
-            blockEnergyDensities, blockStresses = FunctionSpace.evaluate_on_block(fs, U, stateVariables, output_constitutive, elemIds, modify_element_gradient=modify_element_gradient)
+            blockEnergyDensities, blockStresses = FunctionSpace.evaluate_on_block(fs, U, stateVariables, dt, output_constitutive, elemIds, modify_element_gradient=modify_element_gradient)
             energy_densities = energy_densities.at[elemIds].set(blockEnergyDensities)
             stresses = stresses.at[elemIds].set(blockStresses)
         return energy_densities, stresses
@@ -267,24 +267,24 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel, pressurePro
             return grad_2D_to_3D(elemGrads, elemShapes, elemVols, elemNodalDisps, elemNodalCoords)
     
     
-    def compute_strain_energy(U, stateVariables):
-        return _compute_strain_energy(fs, U, stateVariables, materialModel.compute_energy_density, modify_element_gradient)
+    def compute_strain_energy(U, stateVariables, dt=0.0):
+        return _compute_strain_energy(fs, U, stateVariables, dt, materialModel.compute_energy_density, modify_element_gradient)
 
         
-    def compute_updated_internal_variables(U, stateVariables):
-        return _compute_updated_internal_variables(fs, U, stateVariables, materialModel.compute_state_new, modify_element_gradient)
+    def compute_updated_internal_variables(U, stateVariables, dt=0.0):
+        return _compute_updated_internal_variables(fs, U, stateVariables, dt, materialModel.compute_state_new, modify_element_gradient)
 
     
-    def compute_element_stiffnesses(U, stateVariables):
-        return _compute_element_stiffnesses(U, stateVariables, fs, materialModel.compute_energy_density, modify_element_gradient)
+    def compute_element_stiffnesses(U, stateVariables, dt=0.0):
+        return _compute_element_stiffnesses(U, stateVariables, dt, fs, materialModel.compute_energy_density, modify_element_gradient)
 
 
     output_lagrangian = strain_energy_density_to_lagrangian_density(materialModel.compute_energy_density)
     output_constitutive = value_and_grad(output_lagrangian, 1)
 
     
-    def compute_output_energy_densities_and_stresses(U, stateVariables):
-        return FunctionSpace.evaluate_on_block(fs, U, stateVariables, output_constitutive, slice(None), modify_element_gradient=modify_element_gradient)
+    def compute_output_energy_densities_and_stresses(U, stateVariables, dt=0.0):
+        return FunctionSpace.evaluate_on_block(fs, U, stateVariables, dt, output_constitutive, slice(None), modify_element_gradient=modify_element_gradient)
 
     
     def compute_initial_state():
@@ -295,21 +295,24 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel, pressurePro
 
 
 def _compute_kinetic_energy(functionSpace, V, internals, density):
-    def lagrangian_density(U, gradU, Q, X):
+    def lagrangian_density(U, gradU, Q, X, dt):
         return kinetic_energy_density(U, density)
-    return FunctionSpace.integrate_over_block(functionSpace, V, internals, lagrangian_density, slice(None))
+    unused = 0.0
+    return FunctionSpace.integrate_over_block(functionSpace, V, internals, unused, lagrangian_density, slice(None))
 
 
 def _compute_element_masses(functionSpace, U, internals, density, modify_element_gradient):
-    def lagrangian_density(V, gradV, Q, X):
+    def lagrangian_density(V, gradV, Q, X, dt):
         return kinetic_energy_density(V, density)
-    f = vmap(compute_element_stiffness_from_global_fields, (None, None, 0 ,0 ,0 ,0 ,0, None, None))
+    f = vmap(compute_element_stiffness_from_global_fields, (None, None, 0, None, 0 ,0 ,0 ,0, None, None))
     fs = functionSpace
-    return f(U, fs.mesh.coords, internals, fs.mesh.conns, fs.shapes, fs.shapeGrads, fs.vols,
-             lagrangian_density, modify_element_gradient)
+    unusedDt = 0.0
+    return f(U, fs.mesh.coords, internals, unusedDt, fs.mesh.conns, fs.shapes, fs.shapeGrads,
+             fs.vols, lagrangian_density, modify_element_gradient)
 
 
 def kinetic_energy_density(V, density):
+    # assumes spatially homogeneous density
     return 0.5*density*np.dot(V, V)
 
 
@@ -319,25 +322,26 @@ def compute_newmark_lagrangian(functionSpace, U, UPredicted, internals, density,
     # is beneficial, we could add the time derivative field to the Lagrangian
     # density definition.
 
-    def lagrangian_density(W, gradW, Q, X):
+    def lagrangian_density(W, gradW, Q, X, dtime):
         return kinetic_energy_density(W, density)
-    KE = FunctionSpace.integrate_over_block(functionSpace, U - UPredicted, internals, lagrangian_density,
-                                            slice(None)) / (newmarkBeta*dt**2)
+    KE =  FunctionSpace.integrate_over_block(functionSpace, U - UPredicted, internals, dt,
+                                             lagrangian_density, slice(None))
+    KE *= 1 / (newmarkBeta*dt**2)
 
     lagrangian_density = strain_energy_density_to_lagrangian_density(strain_energy_density)
-    SE = FunctionSpace.integrate_over_block(functionSpace, U, internals, lagrangian_density,
+    SE = FunctionSpace.integrate_over_block(functionSpace, U, internals, dt, lagrangian_density,
                                             slice(None), modify_element_gradient=modify_element_gradient)
     return SE + KE
 
 
 def _compute_newmark_element_hessians(functionSpace, U, UPredicted, internals, density, dt, newmarkBeta, strain_energy_density, modify_element_gradient):
-    def lagrangian_density(W, gradW, Q, X):
-        return kinetic_energy_density(W, density)/(newmarkBeta*dt**2) + strain_energy_density(gradW, Q)
+    def lagrangian_density(W, gradW, Q, X, dtime):
+        return kinetic_energy_density(W, density)/(newmarkBeta*dtime**2) + strain_energy_density(gradW, Q, dtime)
     f =  vmap(compute_element_stiffness_from_global_fields,
-              (None, None, 0, 0, 0, 0, 0, None, None))
+              (None, None, 0, None, 0, 0, 0, 0, None, None))
     fs = functionSpace
     UAlgorithmic = U - UPredicted
-    return f(UAlgorithmic, fs.mesh.coords, internals, fs.mesh.conns, fs.shapes, fs.shapeGrads, fs.vols,
+    return f(UAlgorithmic, fs.mesh.coords, internals, dt, fs.mesh.conns, fs.shapes, fs.shapeGrads, fs.vols,
              lagrangian_density, modify_element_gradient)
 
 
@@ -380,8 +384,8 @@ def create_dynamics_functions(functionSpace, mode2D, materialModel, newmarkParam
                                           materialModel.compute_energy_density,
                                           modify_element_gradient)
     
-    def compute_updated_internal_variables(U, stateVariables):
-        return _compute_updated_internal_variables(fs, U, stateVariables, materialModel.compute_state_new, modify_element_gradient)
+    def compute_updated_internal_variables(U, stateVariables, dt):
+        return _compute_updated_internal_variables(fs, U, stateVariables, dt, materialModel.compute_state_new, modify_element_gradient)
     
     def compute_element_hessians(U, UPredicted, stateVariables, dt):
         return _compute_newmark_element_hessians(
@@ -390,15 +394,15 @@ def create_dynamics_functions(functionSpace, mode2D, materialModel, newmarkParam
 
     output_lagrangian = strain_energy_density_to_lagrangian_density(materialModel.compute_energy_density)
     output_constitutive = value_and_grad(output_lagrangian, 1)
-    def compute_output_potential_densities_and_stresses(U, stateVariables):
-        return FunctionSpace.evaluate_on_block(fs, U, stateVariables, output_constitutive, slice(None), modify_element_gradient=modify_element_gradient)
+    def compute_output_potential_densities_and_stresses(U, stateVariables, dt):
+        return FunctionSpace.evaluate_on_block(fs, U, stateVariables, dt, output_constitutive, slice(None), modify_element_gradient=modify_element_gradient)
 
     def compute_kinetic_energy(V):
         stateVariables = np.zeros((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule)))
         return _compute_kinetic_energy(functionSpace, V, stateVariables, materialModel.density)
 
-    def compute_output_strain_energy(U, stateVariables):
-        return _compute_strain_energy(functionSpace, U, stateVariables, materialModel.compute_energy_density, modify_element_gradient)
+    def compute_output_strain_energy(U, stateVariables, dt):
+        return _compute_strain_energy(functionSpace, U, stateVariables, dt, materialModel.compute_energy_density, modify_element_gradient)
 
     def compute_initial_state():
         shape = Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule), 1

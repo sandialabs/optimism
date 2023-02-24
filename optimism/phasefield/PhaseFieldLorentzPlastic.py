@@ -63,20 +63,20 @@ def create_material_model_functions(properties):
 
     hardeningModel = Hardening.create_hardening_model(properties)
     
-    def compute_energy_density(dispGrad, phase, phaseGrad, internalVars):
+    def compute_energy_density(dispGrad, phase, phaseGrad, internalVars, dt):
         elasticTrialStrain = compute_elastic_strain(dispGrad, internalVars)
-        return energy_density_generic(elasticTrialStrain, phase, phaseGrad, internalVars, props, hardeningModel, doUpdate=True)
+        return energy_density_generic(elasticTrialStrain, phase, phaseGrad, internalVars, dt, props, hardeningModel, doUpdate=True)
 
-    def compute_output_energy_density(dispGrad, phase, phaseGrad, internalVars):
+    def compute_output_energy_density(dispGrad, phase, phaseGrad, internalVars, dt):
         elasticStrain = compute_elastic_strain(dispGrad, internalVars)
-        return energy_density_generic(elasticStrain, phase, phaseGrad, internalVars, props, hardeningModel, doUpdate=False)
+        return energy_density_generic(elasticStrain, phase, phaseGrad, internalVars, dt, props, hardeningModel, doUpdate=False)
 
-    def compute_strain_energy_density(dispGrad, phase, phaseGrad, internalVars):
+    def compute_strain_energy_density(dispGrad, phase, phaseGrad, internalVars, dt):
         elasticStrain = compute_elastic_strain(dispGrad, internalVars)
-        return strain_energy_density(elasticStrain, phase, props)
+        return strain_energy_density(elasticStrain, phase, dt, props)
 
-    def compute_phase_potential_density(dispGrad, phase, phaseGrad, internalVars):
-        return phase_potential_density(phase, phaseGrad, props)
+    def compute_phase_potential_density(dispGrad, phase, phaseGrad, internalVars, dt):
+        return phase_potential_density(phase, phaseGrad, dt, props)
     
     if finiteDeformations:
         compute_initial_state_func = make_initial_state_finite_deformations
@@ -88,8 +88,8 @@ def create_material_model_functions(properties):
     def compute_initial_state(shape=(1,)):
         return compute_initial_state_func(shape)
         
-    def compute_state_new(dispGrad, phase, phaseGrad, internalVars):
-        return compute_state_new_func(dispGrad, phase, phaseGrad, internalVars, props, hardeningModel)
+    def compute_state_new(dispGrad, phase, phaseGrad, internalVars, dt):
+        return compute_state_new_func(dispGrad, phase, phaseGrad, internalVars, dt, props, hardeningModel)
     
     return MaterialModel(compute_energy_density,
                          compute_output_energy_density,
@@ -119,21 +119,21 @@ def make_initial_state_small_deformations(shape=(1,)):
     return np.tile(pointState, shape)
 
 
-def compute_state_new_small_deformations(dispGrad, phase, phaseGrad, stateOld, props, hardeningModel):
+def compute_state_new_small_deformations(dispGrad, phase, phaseGrad, stateOld, dt, props, hardeningModel):
     strain = TensorMath.sym(dispGrad)
     plasticStrainOld = stateOld[STATE_PLASTIC_STRAIN].reshape(3,3)
     elasticTrialStrain = strain - plasticStrainOld
-    stateInc = compute_state_increment(elasticTrialStrain, phase, stateOld, props, hardeningModel)
+    stateInc = compute_state_increment(elasticTrialStrain, phase, stateOld, dt, props, hardeningModel)
     eqpsNew = stateOld[STATE_EQPS] + stateInc[STATE_EQPS]
     plasticStrainNew = stateOld[STATE_PLASTIC_STRAIN] + stateInc[STATE_PLASTIC_STRAIN]
     elasticStrainNew = strain - plasticStrainNew
     return np.hstack((eqpsNew, plasticStrainNew))
 
 
-def compute_state_new_finite_deformations(dispGrad, phase, phaseGrad, stateOld, props, hardeningModel):
+def compute_state_new_finite_deformations(dispGrad, phase, phaseGrad, stateOld, dt, props, hardeningModel):
     FpOld = stateOld[STATE_PLASTIC_DISTORTION].reshape((3,3))
     elasticTrialStrain = compute_elastic_logarithmic_strain(dispGrad, FpOld)
-    stateInc = compute_state_increment(elasticTrialStrain, phase, stateOld, props, hardeningModel)
+    stateInc = compute_state_increment(elasticTrialStrain, phase, stateOld, dt, props, hardeningModel)
     eqpsNew = stateOld[STATE_EQPS] + stateInc[STATE_EQPS]
     FpOld = np.reshape(stateOld[STATE_PLASTIC_STRAIN], (3,3))
     FpNew = expm(stateInc[STATE_PLASTIC_STRAIN].reshape((3,3)))@FpOld
@@ -141,16 +141,16 @@ def compute_state_new_finite_deformations(dispGrad, phase, phaseGrad, stateOld, 
     return np.hstack((eqpsNew, FpNew.ravel()))
 
 
-def energy_density_generic(elStrain, phase, phaseGrad, state, props, hardeningModel, doUpdate):
+def energy_density_generic(elStrain, phase, phaseGrad, state, dt, props, hardeningModel, doUpdate):
     if doUpdate:
         eqps = state[STATE_EQPS]
         N = compute_flow_direction(elStrain)
         trialStress = 2 * degradation(phase,props) * props[PROPS_MU] * np.tensordot(TensorMath.dev(elStrain), N)
-        flowStress = hardeningModel.compute_flow_stress(eqps)
+        flowStress = hardeningModel.compute_flow_stress(eqps, eqps, dt)
         isYielding = trialStress > flowStress
 
         stateInc = np.where(isYielding,
-                            update_state(elStrain, state, state, phase, props, hardeningModel),
+                            update_state(elStrain, state, state, phase, dt, props, hardeningModel),
                             np.zeros(NUM_STATE_VARS))
 
         # Other way to introduce conditional
@@ -166,16 +166,16 @@ def energy_density_generic(elStrain, phase, phaseGrad, state, props, hardeningMo
     eqpsNew = state[STATE_EQPS] + stateInc[STATE_EQPS]
     elasticStrainNew = elStrain - stateInc[STATE_PLASTIC_STRAIN].reshape((3,3))
         
-    psi = compute_free_energy_density(elasticStrainNew, phase, phaseGrad, eqpsNew, props, hardeningModel)
+    psi = compute_free_energy_density(elasticStrainNew, phase, phaseGrad, eqpsNew, state[STATE_EQPS], dt, props, hardeningModel)
     
     return psi
 
 
-def compute_state_increment(elasticTrialStrain, phase, stateOld, props, hardeningModel):
+def compute_state_increment(elasticTrialStrain, phase, stateOld, dt, props, hardeningModel):
     eqpsOld = stateOld[STATE_EQPS]
     N = compute_flow_direction(elasticTrialStrain)
     trialStress = 2 * degradation(phase,props)*props[PROPS_MU] * np.tensordot(TensorMath.dev(elasticTrialStrain), N)
-    flowStress = hardeningModel.compute_flow_stress(eqpsOld)
+    flowStress = hardeningModel.compute_flow_stress(eqpsOld, eqpsOld, dt)
     isYielding = trialStress > flowStress
 
     stateInc = np.where(isYielding,
@@ -214,17 +214,17 @@ def phase_potential_density(phase, gradPhase, props):
     return 3.0*props[PROPS_GC]/8.0*(phase/props[PROPS_L] + props[PROPS_L]*gradPhaseNormSquared)
 
 
-def compute_free_energy_density(elasticStrain, phase, phaseGrad, eqps, props, hardeningModel):
+def compute_free_energy_density(elasticStrain, phase, phaseGrad, eqps, eqpsOld, dt, props, hardeningModel):
     return (strain_energy_density(elasticStrain, phase, props)
-            + hardeningModel.compute_hardening_energy_density(eqps)
+            + hardeningModel.compute_hardening_energy_density(eqps, eqpsOld, dt)
             + phase_potential_density(phase, phaseGrad, props))
 
 
-def incremental_potential(elasticTrialStrain, eqps, eqpsOld, phase, props, hardeningModel):
+def incremental_potential(elasticTrialStrain, eqps, eqpsOld, phase, dt, props, hardeningModel):
     N = compute_flow_direction(elasticTrialStrain)
     elasticStrain = elasticTrialStrain - (eqps-eqpsOld) * N
     return elastic_deviatoric_free_energy(elasticStrain, phase, props) + \
-        hardeningModel.compute_hardening_energy_density(eqps)
+        hardeningModel.compute_hardening_energy_density(eqps, eqpsOld, dt)
 
 
 r = jacfwd(incremental_potential, 1)
@@ -232,7 +232,7 @@ r_and_deqps = value_and_grad(r, 1)
 dr = jacfwd(r, (0,1,3))
 
 
-def update_state(elasticTrialStrain, stateOld, stateNewGuess, phase, props, hardeningModel):
+def update_state(elasticTrialStrain, stateOld, stateNewGuess, phase, dt, props, hardeningModel):
     tol = 1e-8*props[PROPS_Y0]
     @custom_jvp
     def radial_return(eqpsGuess, etStrain, eqpsOld, phase):
@@ -240,11 +240,11 @@ def update_state(elasticTrialStrain, stateOld, stateNewGuess, phase, props, hard
         maxIterations=25
         def cond_func(eqpsAndIter):
             eqps,i = eqpsAndIter
-            return (np.abs(r(etStrain, eqps, eqpsOld, phase, props, hardeningModel)) > tol) & (i < maxIterations)
+            return (np.abs(r(etStrain, eqps, eqpsOld, phase, dt, props, hardeningModel)) > tol) & (i < maxIterations)
         
         def update(eqpsAndIter):
             eqps,i = eqpsAndIter
-            R, dR_dEqps = r_and_deqps(etStrain, eqps, eqpsOld, phase, props, hardeningModel)
+            R, dR_dEqps = r_and_deqps(etStrain, eqps, eqpsOld, phase, dt, props, hardeningModel)
             return (eqps - R / dR_dEqps, i+1)
 
         eqpsNew, iters = lax.while_loop(cond_func,
@@ -259,7 +259,7 @@ def update_state(elasticTrialStrain, stateOld, stateNewGuess, phase, props, hard
         eqpsGuess, estrain, eqpsOld, phase = primals
         vEqpsGuess, vStrain, vEqpsOld, vPhase = vt
         eqpsNew = radial_return(eqpsGuess, estrain, eqpsOld, phase)
-        drdStrain, J, drdPhase = dr(estrain, eqpsNew, eqpsOld, phase, props, hardeningModel)
+        drdStrain, J, drdPhase = dr(estrain, eqpsNew, eqpsOld, phase, dt, props, hardeningModel)
         tangent_out = -(drdPhase*vPhase + np.tensordot(vStrain, drdStrain) + 0.0 * vEqpsGuess) / J
         return eqpsNew, tangent_out
 

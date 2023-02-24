@@ -49,24 +49,35 @@ def create_material_model_functions(properties):
     else:
         compute_strain = compute_linear_strain
 
-    def compute_energy_density(dispGrad, phase, phaseGrad, internalVars):
+    def compute_energy_density(dispGrad, phase, phaseGrad, internalVars, dt):
+        del internalVars
+        del dt
         strain = compute_strain(dispGrad)
         return energy_density(strain, phase, phaseGrad, props)
 
-    def compute_output_energy_density(dispGrad, phase, phaseGrad, internalVars):
-        return compute_energy_density(dispGrad, phase, phaseGrad, internalVars)
+    def compute_output_energy_density(dispGrad, phase, phaseGrad, internalVars, dt):
+        return compute_energy_density(dispGrad, phase, phaseGrad, internalVars, dt)
 
-    def compute_strain_energy_density(dispGrad, phase, phaseGrad, internalVars):
+    def compute_strain_energy_density(dispGrad, phase, phaseGrad, internalVars, dt):
+        del phaseGrad
+        del internalVars
+        del dt
         strain = compute_strain(dispGrad)
         return strain_energy_density(strain, phase, props)
 
-    def compute_phase_potential_density(dispGrad, phase, phaseGrad, internalVars):
+    def compute_phase_potential_density(dispGrad, phase, phaseGrad, internalVars, dt):
+        del dispGrad
+        del internalVars
+        del dt
         return phase_potential_density(phase, phaseGrad, props)
 
     def compute_initial_state(shape=(1,)):
         return initial_state(shape)
 
-    def compute_state_new(dispGrad, phase, phaseGrad, internalVars):
+    def compute_state_new(dispGrad, phase, phaseGrad, internalVars, dt):
+        del phaseGrad
+        del internalVars
+        del dt
         strain = compute_strain(dispGrad)
         return state_new(strain, phase, props)
 

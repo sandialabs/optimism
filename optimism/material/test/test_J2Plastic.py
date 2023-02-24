@@ -49,11 +49,12 @@ class GradOfPlasticityModelFixture(TestFixture):
     def test_zero_point(self):
         dispGrad = np.zeros((3,3))
         state = self.compute_initial_state()
+        dt = 1.0
 
-        energy = self.energy_density(dispGrad, state)
+        energy = self.energy_density(dispGrad, state, dt)
         self.assertNear(energy, 0.0, 12)
 
-        stress = self.stress_func(dispGrad, state)
+        stress = self.stress_func(dispGrad, state, dt)
         self.assertArrayNear(stress, np.zeros((3,3)), 12)
 
 
@@ -62,15 +63,16 @@ class GradOfPlasticityModelFixture(TestFixture):
         
         strain = strainBelowYield*np.diag(np.array([1.0, -self.props['poisson ratio'], -self.props['poisson ratio']]))
         dispGrad = make_disp_grad_from_strain(strain)
+        dt = 1.0
         
         state = self.compute_initial_state()
 
-        energy = self.energy_density(dispGrad, state)
+        energy = self.energy_density(dispGrad, state, dt)
         WExact = 0.5*self.props['elastic modulus']*strainBelowYield**2
         self.assertNear(energy, WExact, 12)
 
         F = dispGrad + np.identity(3)
-        kirchhoffStress = self.stress_func(dispGrad, state) @ F.T
+        kirchhoffStress = self.stress_func(dispGrad, state, dt) @ F.T
         kirchhoffstressExact = np.zeros((3,3)).at[0,0].set(self.props['elastic modulus']*strainBelowYield)
         self.assertArrayNear(kirchhoffStress, kirchhoffstressExact, 12)
 
@@ -79,6 +81,7 @@ class GradOfPlasticityModelFixture(TestFixture):
         strain = np.zeros((3,3))
         strain_inc = 1e-6
         stateOld = self.compute_initial_state()
+        dt = 1.0
 
         strainHistory = []
         stressHistory = []
@@ -87,10 +90,10 @@ class GradOfPlasticityModelFixture(TestFixture):
         for i in range(10):
             dispGrad = make_disp_grad_from_strain(strain)
             F = dispGrad + np.identity(3)
-            energy = self.energy_density(dispGrad, stateOld)
+            energy = self.energy_density(dispGrad, stateOld, dt)
             strainHistory.append(strain[0,0])
-            stateNew = self.compute_state_new(dispGrad, stateOld)
-            stressNew = self.stress_func(dispGrad, stateNew) @ F.T
+            stateNew = self.compute_state_new(dispGrad, stateOld, dt)
+            stressNew = self.stress_func(dispGrad, stateNew, dt) @ F.T
             stressHistory.append(stressNew[0,0])
             eqpsHistory.append(stateNew[J2.EQPS])
             energyHistory.append(energy)
@@ -109,6 +112,7 @@ class GradOfPlasticityModelFixture(TestFixture):
         strain = np.zeros((3,3))
         strain_inc = 0.2
         stateOld = self.compute_initial_state()
+        dt = 1.0
         
         strainHistory = []
         stressHistory = []
@@ -119,10 +123,10 @@ class GradOfPlasticityModelFixture(TestFixture):
             strain = strain.at[0,0].add(strain_inc)
             dispGrad = make_disp_grad_from_strain(strain)
             F = dispGrad + np.identity(3)
-            energy  = self.energy_density(dispGrad, stateOld)
-            tangentsNew = self.tangents_func(dispGrad, stateOld)
-            stateNew = self.compute_state_new(dispGrad, stateOld)
-            stressNew = self.stress_func(dispGrad, stateOld) @ F.T
+            energy  = self.energy_density(dispGrad, stateOld, dt)
+            tangentsNew = self.tangents_func(dispGrad, stateOld, dt)
+            stateNew = self.compute_state_new(dispGrad, stateOld, dt)
+            stressNew = self.stress_func(dispGrad, stateOld, dt) @ F.T
             strainHistory.append(strain[0,0])
             stressHistory.append(stressNew[0,0])
             tangentsHistory.append(tangentsNew[0,0,0,0])
@@ -195,17 +199,18 @@ class J2UpdateFixture(TestFixture):
         self.compute_initial_state = materialModel.compute_initial_state
 
     def test_update_only_happens_once(self):
-        key = jax.random.PRNGKey(0)
+        dt = 1.0
 
         # get 10,000 random displacement gradients
+        key = jax.random.PRNGKey(0)
         dispGrads = jax.random.uniform(key, (10000, 3, 3))
 
         # get 10,000 copies of the initial state
         states = np.tile(self.compute_initial_state(), (10000, 1))
 
-        states_new = jax.vmap(self.compute_state_new)(dispGrads, states)
+        states_new = jax.vmap(self.compute_state_new, (0, 0, None))(dispGrads, states, dt)
 
-        states_should_be_unchanged = jax.vmap(self.compute_state_new)(dispGrads, states_new)
+        states_should_be_unchanged = jax.vmap(self.compute_state_new, (0, 0, None))(dispGrads, states_new, dt)
         self.assertArrayEqual(states_new, states_should_be_unchanged)
 
 
@@ -290,14 +295,17 @@ class PlasticityOnMesh(MeshFixture):
         nElems = Mesh.num_elements(mesh)
         nQpsPerElem = QuadratureRule.len(quadRule)
         internalVariables = mechFuncs.compute_initial_state()
-        p = Objective.Params(None,
-                             internalVariables)
+
+        tOld = 0.0
+        t = 1.0
+        p = Objective.Params(None, internalVariables, None, None, np.array([t, tOld]))
         
         
         def compute_energy(Uu, p):
             U = dofManager.create_field(Uu, Ubc)
             internalVariables = p[1]
-            return mechFuncs.compute_strain_energy(U, internalVariables)
+            dt = p.time[0] - p.time[1]
+            return mechFuncs.compute_strain_energy(U, internalVariables, dt)
 
         UuGuess = 0.0*dofManager.get_unknown_values(U)
         
@@ -311,7 +319,7 @@ class PlasticityOnMesh(MeshFixture):
         for dg in dispGrads.reshape(nElems*nQpsPerElem, 2, 2):
             self.assertArrayNear(dg, dispGrad0, 11)
 
-        internalVariablesNew = mechFuncs.compute_updated_internal_variables(U, p[1])
+        internalVariablesNew = mechFuncs.compute_updated_internal_variables(U, p[1], t - tOld)
         
         # check to make sure plastic strain evolved
         # if this fails, make the applied displacement grad bigger

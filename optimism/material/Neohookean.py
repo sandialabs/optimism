@@ -1,4 +1,5 @@
-from optimism.JaxConfig import *
+import jax.numpy as np
+
 from optimism.material.MaterialModel import MaterialModel
 
 # props
@@ -21,10 +22,12 @@ def create_material_model_functions(properties):
         elif properties['version'] == 'coupled':
             energy_density = _neohookean_3D_energy_density
             
-    def strain_energy(dispGrad, internalVars):
+    def strain_energy(dispGrad, internalVars, dt):
+        del dt
         return energy_density(dispGrad, internalVars, props)
 
-    def compute_state_new(dispGrad, internalVars):
+    def compute_state_new(dispGrad, internalVars, dt):
+        del dt
         return _compute_state_new(dispGrad, internalVars, props)
 
     density = properties.get('density')
@@ -72,4 +75,6 @@ def make_initial_state():
 
 
 def _compute_state_new(dispGrad, internalVars, props):
+    del dispGrad
+    del props
     return internalVars

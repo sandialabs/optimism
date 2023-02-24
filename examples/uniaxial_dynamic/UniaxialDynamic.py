@@ -120,6 +120,7 @@ class UniaxialDynamic:
         U = self.create_field(Uu, p)
         V = self.create_field(Vu, p)
         internalVariables = p[1]
+        dt = p[4][0] - p[4][1]
         
         writer.add_nodal_field(name='displacement', nodalData=U, fieldType=VTKWriter.VTKFieldType.VECTORS)
         writer.add_nodal_field(name='velocity', nodalData=V, fieldType=VTKWriter.VTKFieldType.VECTORS)
@@ -139,7 +140,7 @@ class UniaxialDynamic:
        
         strainEnergyDensities, stresses = \
             self.dynamicsFunctions.\
-            compute_output_energy_densities_and_stresses(U, internalVariables)
+            compute_output_energy_densities_and_stresses(U, internalVariables, dt)
         cellStrainEnergyDensities = FunctionSpace.\
             project_quadrature_field_to_element_field(self.fs, strainEnergyDensities)
         cellStresses = FunctionSpace.\
@@ -155,7 +156,7 @@ class UniaxialDynamic:
 
         UEnd = np.average(U[self.mesh.nodeSets['right'],0])
         KE = self.dynamicsFunctions.compute_output_kinetic_energy(V)
-        SE = self.dynamicsFunctions.compute_output_strain_energy(U, internalVariables)
+        SE = self.dynamicsFunctions.compute_output_strain_energy(U, internalVariables, dt)
         self.outputDisp.append(UEnd)
         self.outputTime.append(p.time[0])
         self.outputKineticEnergy.append(KE)
@@ -218,7 +219,7 @@ class UniaxialDynamic:
             Vu, Au = self.dynamicsFunctions.correct(UuCorrection, Vu, Au, dt)
             
             internalVariables = self.dynamicsFunctions.\
-                compute_updated_internal_variables(self.create_field(Uu, p), p[1])
+                compute_updated_internal_variables(self.create_field(Uu, p), p[1], dt)
             p = Objective.param_index_update(p, 1, internalVariables)
             
             self.write_output(Uu, Vu, p, i)

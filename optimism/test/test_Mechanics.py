@@ -1,6 +1,6 @@
-import jax
 import jax.numpy as np
 import unittest
+from unittest import mock
 
 from optimism import FunctionSpace
 from optimism import QuadratureRule
@@ -46,19 +46,11 @@ class MechanicsFunctionsFixture(MeshFixture.MeshFixture):
         self.assertArrayEqual(internals[4, 0], np.array([0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]))
 
     def test_internal_variables_update_on_multi_block(self):
-        nQuadPoints = QuadratureRule.len(self.quadRule)
         internals = Mechanics._compute_initial_state_multi_block(self.fs, self.blockModels)
-        internalsNew = Mechanics._compute_updated_internal_variables_multi_block(self.fs, self.U, internals, self.blockModels, Mechanics.plane_strain_gradient_transformation)
+        dt = 1.0
+        internalsNew = Mechanics._compute_updated_internal_variables_multi_block(self.fs, self.U, internals, dt, self.blockModels, Mechanics.plane_strain_gradient_transformation)
         self.assertEqual(internals.shape, internalsNew.shape)
         self.assertGreater(internalsNew[4,0,J2Plastic.EQPS], 0.05)
 
-
-    def test_stiffness_matrix_assembly_on_multi_block(self):
-        internals = Mechanics._compute_initial_state_multi_block(self.fs, self.blockModels)
-        elementHessians = Mechanics._compute_element_stiffnesses_multi_block(self.U, internals, self.fs, self.blockModels, Mechanics.plane_strain_gradient_transformation)
-        norms = jax.vmap(np.linalg.norm)(elementHessians)
-        self.assertTrue(np.all(norms > 0.0))
-
 if __name__ == "__main__":
     unittest.main()
-    

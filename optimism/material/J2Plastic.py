@@ -57,9 +57,9 @@ def create_material_model_functions(properties):
     hardeningModel = Hardening.create_hardening_model(properties)
 
     
-    def energy_density_function(dispGrad, state):
+    def energy_density_function(dispGrad, state, dt):
         elasticTrialStrain = compute_elastic_strain(dispGrad, state)
-        return _energy_density(elasticTrialStrain, state, props, hardeningModel)
+        return _energy_density(elasticTrialStrain, state, dt, props, hardeningModel)
 
     if finiteDeformations:
         compute_state_new_func = compute_state_new_finite_deformations
@@ -72,8 +72,8 @@ def create_material_model_functions(properties):
             compute_state_new_func = compute_state_new_small_deformations
             compute_initial_state = make_initial_state_small_deformations
         
-    def compute_state_new_function(dispGrad, state):
-            return compute_state_new_func(dispGrad, state, props, hardeningModel)
+    def compute_state_new_function(dispGrad, state, dt):
+        return compute_state_new_func(dispGrad, state, dt, props, hardeningModel)
 
     density = properties.get('density')
 
@@ -102,50 +102,50 @@ def make_initial_state_small_deformations(shape=(1,)):
     return np.tile(pointState, shape)
 
 
-def compute_state_new_finite_deformations(dispGrad, stateOld, props, hardening_model):
+def compute_state_new_finite_deformations(dispGrad, stateOld, dt, props, hardening_model):
     elasticTrialStrain = compute_elastic_logarithmic_strain(dispGrad, stateOld)
-    stateInc = compute_state_increment(elasticTrialStrain, stateOld, props, hardening_model)
+    stateInc = compute_state_increment(elasticTrialStrain, stateOld, dt, props, hardening_model)
     eqpsNew = stateOld[EQPS] + stateInc[EQPS]
     FpOld = np.reshape(stateOld[PLASTIC_DISTORTION], (3,3))
     FpNew = linalg.expm(stateInc[PLASTIC_DISTORTION].reshape((3,3)))@FpOld
     return np.hstack((eqpsNew, FpNew.ravel()))
 
 
-def compute_state_new_small_deformations(dispGrad, stateOld, props, hardening_model):
+def compute_state_new_small_deformations(dispGrad, stateOld, dt, props, hardening_model):
     elasticTrialStrain = compute_elastic_linear_strain(dispGrad, stateOld)
-    stateInc = compute_state_increment(elasticTrialStrain, stateOld, props, hardening_model)
+    stateInc = compute_state_increment(elasticTrialStrain, stateOld, dt, props, hardening_model)
     return stateOld + stateInc
 
 
-def compute_state_new_seth_hill(dispGrad, stateOld, props, hardening_model):
+def compute_state_new_seth_hill(dispGrad, stateOld, dt, props, hardening_model):
     elasticTrialStrain = compute_elastic_seth_hill_strain(dispGrad, stateOld)
-    stateInc = compute_state_increment(elasticTrialStrain, stateOld, props, hardening_model)
+    stateInc = compute_state_increment(elasticTrialStrain, stateOld, dt, props, hardening_model)
     return stateOld + stateInc
 
 
-def _energy_density(elStrain, state, props, hardening_model):
-    stateInc = compute_state_increment(elStrain, state, props, hardening_model)
+def _energy_density(elStrain, state, dt, props, hardening_model):
+    stateInc = compute_state_increment(elStrain, state, dt, props, hardening_model)
     
     eqpsNew = state[EQPS] + stateInc[EQPS]
     elasticStrainNew = elStrain - stateInc[PLASTIC_DISTORTION].reshape((3,3))
         
-    W = elastic_free_energy(elasticStrainNew, props) + hardening_model[ENERGY_DENSITY](eqpsNew)
+    W = elastic_free_energy(elasticStrainNew, props) + hardening_model[ENERGY_DENSITY](eqpsNew, state[EQPS], dt)
     
     return W
 
 
-def compute_state_increment(elasticStrain, state, props, hardening_model):
+def compute_state_increment(elasticStrain, state, dt, props, hardening_model):
     eqps = state[EQPS]
     N = compute_flow_direction(elasticStrain)
     trialStress = 2 * props[PROPS_MU] * np.tensordot(TensorMath.dev(elasticStrain), N)
-    flowStress = hardening_model[FLOW_STRESS](eqps)
+    flowStress = hardening_model[FLOW_STRESS](eqps, eqps, dt)
 
     # The tolerance on the yield check is the same as that in the nonlinear solve.
     # This ensures that we take the elastic branch if the state vars are updated.
     isYielding = trialStress - flowStress > _TOLERANCE*props[PROPS_Y0]
 
     stateInc = jax.lax.cond(isYielding,
-                            lambda e: update_state(e, state, state, props, hardening_model),
+                            lambda e: update_state(e, state, dt, props, hardening_model),
                             lambda e: np.zeros(NUM_STATE_VARS),
                             elasticStrain)
 
@@ -181,26 +181,28 @@ def compute_flow_direction(elasticStrain):
                     dummyN)
 
 
-def incremental_potential(elasticTrialStrain, eqps, eqpsOld, props, hardening_model):
+def incremental_potential(elasticTrialStrain, eqps, eqpsOld, dt, props, hardening_model):
     N = compute_flow_direction(elasticTrialStrain)
     elasticStrain = elasticTrialStrain - (eqps-eqpsOld) * N
     return elastic_deviatoric_free_energy(elasticStrain, props) + \
-        hardening_model[ENERGY_DENSITY](eqps)
+        hardening_model[ENERGY_DENSITY](eqps, eqpsOld, dt)
 
 
 r = jax.jacfwd(incremental_potential, 1)
 
 
-def update_state(elasticTrialStrain, stateOld, stateNewGuess, props, hardening_model):
+def update_state(elasticTrialStrain, stateOld, dt, props, hardening_model):
     settings = ScalarRootFind.get_settings(x_tol=0, r_tol=_TOLERANCE*props[PROPS_Y0])
     eqpsOld = stateOld[EQPS]
-    eqpsGuess = stateNewGuess[EQPS]
 
     N = compute_flow_direction(elasticTrialStrain)
     lb = eqpsOld
     trialMises = 2 * props[PROPS_MU] * np.tensordot(TensorMath.dev(elasticTrialStrain), N)
-    ub = eqpsOld + (trialMises - hardening_model.compute_flow_stress(eqpsOld))/(3.0*props[PROPS_MU])
-    eqps, _ = ScalarRootFind.find_root(lambda e: r(elasticTrialStrain, e, eqpsOld, props, hardening_model),
+    ub = eqpsOld + (trialMises - hardening_model.compute_flow_stress(eqpsOld, eqpsOld, dt))/(3.0*props[PROPS_MU])
+    # Avoid the initial guess eqpsGuess = eqpsOld, because the power law rate sensitivity has an infinte slope
+    # in this case.
+    eqpsGuess = 0.5*(lb + ub)
+    eqps, _ = ScalarRootFind.find_root(lambda e: r(elasticTrialStrain, e, eqpsOld, dt, props, hardening_model),
                                        eqpsGuess,
                                        np.array([lb, ub]),
                                        settings)
