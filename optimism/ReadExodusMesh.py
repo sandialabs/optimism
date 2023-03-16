@@ -1,4 +1,5 @@
 import netCDF4
+import numpy as onp
 
 from optimism.JaxConfig import *
 from optimism import Mesh
@@ -11,8 +12,8 @@ def read_exodus_mesh(fileName):
     with netCDF4.Dataset(fileName) as exData:
         coords = _read_coordinates(exData)
         conns, blocks = _read_blocks(exData)
-        nodeSets = _read_node_sets(exData)
         sideSets = _read_side_sets(exData)
+        nodeSets = _read_node_sets(exData, sideSets)
 
         elementType = _read_element_type(exData).lower()
         if elementType == "tri3" or elementType == "tri":
@@ -77,27 +78,6 @@ def _read_blocks(exodusDataset):
     return conns, blocks
 
 
-def _read_node_sets(exodusDataset):
-    if "num_node_sets" in exodusDataset.dimensions:
-        nodeSetNames = _read_names_list(exodusDataset, "ns_names")
-        for i, name in enumerate(nodeSetNames):
-            if not name:
-                nodeSetNames[i] = "nodeset_" + str(i+1)
-            
-        nodeSetNodes = []
-        nNodeSets = len(exodusDataset.dimensions["num_node_sets"])
-        for i in range(nNodeSets):
-            key = 'node_ns' + str(i + 1)
-            record = exodusDataset.variables[key]
-            record.set_auto_mask(False)
-            nodeSetNodes.append(record[:] - 1)
-        nodeSets = dict(zip(nodeSetNames, nodeSetNodes))
-    else:
-        nodeSets = {}
-
-    return nodeSets
-
-
 def _read_side_sets(exodusDataset):
     if "num_side_sets" in exodusDataset.dimensions:
         sideSetNames = _read_names_list(exodusDataset, 'ss_names')
@@ -124,6 +104,56 @@ def _read_side_sets(exodusDataset):
         sideSets = {}
 
     return sideSets
+
+
+def _read_node_sets(exodusDataset, sideSets):
+    if "num_node_sets" in exodusDataset.dimensions:
+        nodeSetNames = _read_names_list(exodusDataset, "ns_names")
+        for i, name in enumerate(nodeSetNames):
+            if not name:
+                nodeSetNames[i] = "nodeset_" + str(i+1)
+            
+        nodeSetNodes = []
+        nNodeSets = len(exodusDataset.dimensions["num_node_sets"])
+        for i in range(nNodeSets):
+            key = 'node_ns' + str(i + 1)
+            record = exodusDataset.variables[key]
+            record.set_auto_mask(False)
+            nodeSetNodes.append(record[:] - 1)
+        nodeSets = dict(zip(nodeSetNames, nodeSetNodes))
+
+    elif (len(sideSets) > 0):
+        conn = exodusDataset.variables['connect1']
+
+        elementType = _read_element_type(exodusDataset).lower()
+        if elementType == "tri3" or elementType == "tri":
+            edgeNodeMap = [[0, 1], [1, 2], [0, 2]]
+        elif elementType == "tri6":
+            edgeNodeMap = [[0, 1, 3], [1, 2, 4], [0, 2, 5]]
+        else:
+            raise
+
+        nodeSetNodes = []
+        nodeSetNames = []
+        for name in sideSets:
+            nodeIDs = []
+            vals = sideSets[name]
+            for pair in vals:
+                elem = pair[0]
+                side = pair[1]
+                eleConn = conn[elem]
+                nodeIDs.append(eleConn[edgeNodeMap[side]] -  1)
+            
+            nodeSetNodes.append(np.unique(np.array(nodeIDs)).tolist())
+            ns_name = name[:name.rindex("_")] + "_nodeset"
+            nodeSetNames.append(ns_name)
+
+        nodeSets = dict(zip(nodeSetNames, nodeSetNodes))
+
+    else:
+        nodeSets = {}
+
+    return nodeSets
 
 
 def _read_element_type(exodusDataset):
