@@ -1,0 +1,38 @@
+# v2.csm written by ocsmSave (v1.16)
+
+# Constant, Design, and Output Parameters:
+despmtr thk 0.1 lbound 0.05 ubound 0.25 initial 0.1
+
+conpmtr Lx 1.0
+conpmtr Ly 1.0
+
+outpmtr MeshLength
+
+# Global Attributes:
+set MeshLength Lx/40
+
+skbeg     -Lx/2   -Ly/2   0
+   linseg     Lx/2   -Ly/2   0
+   linseg     Lx/2    Ly/2   0
+   linseg    -Lx/2    Ly/2   0
+   linseg    -Lx/2   -Ly/2   0
+skend     0
+
+skbeg     (-Lx/2+thk)   (-Ly/2+thk)   0
+   linseg     (Lx/2-thk)   (-Ly/2+thk)   0
+   linseg     (Lx/2-thk)    (Ly/2-thk)   0
+   linseg    (-Lx/2+thk)    (Ly/2-thk)   0
+   linseg    (-Lx/2+thk)   (-Ly/2+thk)   0
+skend     0
+
+subtract
+
+select    body   13
+select    edge   1
+attribute capsGroup   $yminus_sideset
+
+select    body   13
+select    edge   3
+attribute capsGroup   $yplus_sideset
+
+end

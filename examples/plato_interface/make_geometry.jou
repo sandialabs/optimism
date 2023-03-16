@@ -48,7 +48,7 @@ sideset 7 name "sset_inner_left"
 sideset 8 add curve 10
 sideset 8 name "sset_inner_right"
 
-export genesis "geometry.g" overwrite
+export mesh "window.exo"  overwrite
 
 
 
