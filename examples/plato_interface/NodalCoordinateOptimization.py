@@ -27,11 +27,17 @@ class NodalCoordinateOptimization:
 
         self.quad_rule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2)
 
+        # self.ebcs = [
+        #     EssentialBC(nodeSet='yminus_nodeset', component=0),
+        #     EssentialBC(nodeSet='yminus_nodeset', component=1),
+        #     EssentialBC(nodeSet='yplus_nodeset', component=0),
+        #     EssentialBC(nodeSet='yplus_nodeset', component=1)
+        # ]
         self.ebcs = [
-            EssentialBC(nodeSet='yminus_nodeset', component=0),
-            EssentialBC(nodeSet='yminus_nodeset', component=1),
-            EssentialBC(nodeSet='yplus_nodeset', component=0),
-            EssentialBC(nodeSet='yplus_nodeset', component=1)
+            EssentialBC(nodeSet='nset_bottom', component=0),
+            EssentialBC(nodeSet='nset_bottom', component=1),
+            EssentialBC(nodeSet='nset_top', component=0),
+            EssentialBC(nodeSet='nset_top', component=1)
         ]
 
         props = {
@@ -49,11 +55,13 @@ class NodalCoordinateOptimization:
             tol=5e-8
         )
 
-        self.input_mesh = './window.exo'
-        # self.output_file = 'output.exo'
+        # self.input_mesh = './window.exo'
+        self.input_mesh = './mesh.g'
+        self.output_file = 'output.exo'
         self.plot_file = 'disp_control_response.npz'
         self.steps = 20
-        self.maxDisp = 0.25
+        # self.maxDisp = 0.25
+        self.maxDisp = 0.75
 
     def reload_mesh(self):
         self.mesh = ReadExodusMesh.read_exodus_mesh(self.input_mesh)
@@ -72,7 +80,8 @@ class NodalCoordinateOptimization:
         def get_ubcs(p):
             disp = p[0]
             V = np.zeros(coords.shape)
-            index = (self.mesh.nodeSets['yplus_nodeset'], 1)
+            # index = (self.mesh.nodeSets['yplus_nodeset'], 1)
+            index = (self.mesh.nodeSets['nset_top'], 1)
             V = V.at[index].set(disp)
             return dof_manager.get_bc_values(V)
 
@@ -101,7 +110,8 @@ class NodalCoordinateOptimization:
             U = create_field(Uu, p)
             f = nodal_forces(U, p)
 
-            index = (self.mesh.nodeSets['yplus_nodeset'], 1)
+            # index = (self.mesh.nodeSets['yplus_nodeset'], 1)
+            index = (self.mesh.nodeSets['nset_top'], 1)
             force.append( onp.abs(onp.sum(onp.array(f.at[index].get()))) )
 
             disp.append( onp.abs(dispval) )
@@ -125,12 +135,12 @@ class NodalCoordinateOptimization:
         objective = Objective.Objective(energy_function, Uu, p, precond_strategy)
 
         # # set up output mesh
-        # ExodusWriter.copy_exodus_mesh(self.input_mesh, self.output_file)
-        # exo = ExodusWriter.setup_exodus_database(
-        #     self.output_file,
-        #     2, 0, ['disp_x', 'disp_y'], []
-        # )
-        # save_displacement(Uu, exo, 0)
+        ExodusWriter.copy_exodus_mesh(self.input_mesh, self.output_file)
+        exo = ExodusWriter.setup_exodus_database(
+            self.output_file,
+            2, 0, ['disp_x', 'disp_y'], []
+        )
+        save_displacement(Uu, exo, 1)
 
         # loop over load steps
         disp = 0.
@@ -147,7 +157,7 @@ class NodalCoordinateOptimization:
             Uu = EquationSolver.nonlinear_equation_solve(objective, Uu, p, self.eq_settings)
 
             store_force_displacement(Uu, disp, fd_force, fd_disp)
-            # save_displacement(Uu, exo, step)
+            save_displacement(Uu, exo, step + 1)
 
         self.state = (Uu, p)
         self.stateNotStored = False
@@ -160,7 +170,8 @@ class NodalCoordinateOptimization:
         def get_ubcs(p):
             disp = p[0]
             V = np.zeros(coords.shape)
-            index = (self.mesh.nodeSets['yplus_nodeset'], 1)
+            # index = (self.mesh.nodeSets['yplus_nodeset'], 1)
+            index = (self.mesh.nodeSets['nset_top'], 1)
             V = V.at[index].set(disp)
             return dof_manager.get_bc_values(V)
 
@@ -183,3 +194,9 @@ class NodalCoordinateOptimization:
 
         gradient = -grad(self.objective_function, argnums=0)(self.mesh.coords)
         return onp.array(gradient).flatten().tolist()
+
+
+if __name__ == '__main__':
+    nco = NodalCoordinateOptimization()
+    nco.reload_mesh()
+    nco.run_simulation()
