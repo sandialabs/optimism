@@ -1,9 +1,12 @@
+from functools import partial
 import numpy as onp
 import jax
 from jax import numpy as np
 #from matplotlib import pyplot as plt
 
 from optimism.material import LinearElastic
+
+import nonlinear
 
 
 E = 1.0
@@ -44,17 +47,16 @@ def f(lateral_strain, axial_strain, state):
 
 df = jax.jacfwd(f)
 
+solve = jax.jit(partial(nonlinear.solve, f, df))
+
 for i in range(steps):
     ax_strain_old = ax_strain
     ax_strain += strain_rate*dt
     t += dt
 
-    # newton solve for lateral strain
-    for j in range(2):
-        lat_strain -= f(lat_strain, ax_strain, internal_state)/df(lat_strain, ax_strain, internal_state)
+    lat_strain = solve(lat_strain, ax_strain, internal_state)
     
     stress = compute_stress(make_strain(ax_strain, lat_strain), internal_state, dt)    
-    
     work += stress[0,0]*(ax_strain - ax_strain_old)
     strain_history[i] = ax_strain
     stress_history[i] = stress[0,0]
