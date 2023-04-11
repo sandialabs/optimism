@@ -28,9 +28,8 @@ steps = 50
 dt = t_max/steps
 
 t = 0.0
-ax_strain = 0.0
-ax_strain_old = 0.0
-lat_strain = 0.0
+strain = np.zeros((3,3))
+strain_old = np.zeros((3,3))
 internal_state = material.compute_initial_state()
 work = 0.0
 
@@ -49,24 +48,24 @@ df = jax.jacfwd(f)
 
 solve = jax.jit(partial(nonlinear.solve, f, df))
 
-def qoi_work(axial_stress_new, axial_strain_new, axial_strain_old):
-    return axial_stress_new*(axial_strain_new - axial_strain_old)
+def qoi_work(stress_new, strain_new, strain_old):
+    return np.tensordot(stress_new, strain_new - strain_old)
 
 for i in range(steps):
-    ax_strain_old = ax_strain
-    ax_strain += strain_rate*dt
+    strain_old = strain
+    strain = strain.at[0,0].add(strain_rate*dt)
     t += dt
 
-    lat_strain = solve(lat_strain, ax_strain, internal_state)
-    
-    strain = make_strain(ax_strain, lat_strain)
+    lat_strain = solve(strain[1,1], strain[0,0], internal_state)
+
+    strain = np.diag(np.array([strain[0,0], lat_strain, lat_strain]))
     stress = compute_stress(strain, internal_state, dt)
-    work += qoi_work(stress[0,0], ax_strain, ax_strain_old)
+    work += qoi_work(stress, strain, strain_old)
     strain_history[i] = strain
     stress_history[i] = stress
 
 print(f"work QOI: {work:3e}")
-print(f"Exact:    {0.5*E*ax_strain*ax_strain:3e}")
+print(f"Exact:    {0.5*E*strain[0,0]**2:3e}")
 
 print(f"strain hist {strain_history[:, 0, 0]}")
 print(f"stress hist {stress_history[:, 0, 0]}")
