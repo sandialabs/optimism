@@ -5,7 +5,7 @@ def solve(f, df, x0, *params):
     def cond(args):
         x, p = args
         r = f(x, *p)
-        return np.linalg.norm(r) > 1e-4
+        return np.linalg.norm(r) > 1e-6
     
     def body(args):
         x, p = args

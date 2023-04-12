@@ -5,8 +5,8 @@ from jax import numpy as np
 #from matplotlib import pyplot as plt
 
 #from optimism.material import LinearElastic
-import parameterized_linear_elastic
-
+#import parameterized_linear_elastic
+import parameterized_neohookean
 import nonlinear
 
 
@@ -17,7 +17,7 @@ properties = {"elastic modulus": E,
               "strain measure": "linear",
               "version": "coupled"}
 
-material = parameterized_linear_elastic.create_material_model_functions(properties)
+material = parameterized_neohookean.create_material_model_functions(properties)
 compute_stress = jax.jit(jax.grad(material.compute_energy_density))
 compute_tangents = jax.jit(jax.jacfwd(compute_stress))
 
@@ -64,13 +64,14 @@ for i in range(steps):
     strain_history[i] = strain
     stress_history[i] = stress
 
-
+work_exact = material.compute_energy_density(strain_history[-1, :, :], internal_state, dt, E, nu)
 print(f"work QOI: {work:3e}")
-final_strain = strain[0,0]
-print(f"Exact:    {0.5*E*final_strain**2:3e}")
+print(f"Exact:    {work_exact:3e}")
 
 print(f"strain hist {strain_history[:, 0, 0]}")
 print(f"stress hist {stress_history[:, 0, 0]}")
+
+# compute sensitivity
 
 compute_adjoint_load = jax.jit(jax.grad(qoi_work, 0))
 compute_pseudo_load = jax.jit(jax.grad(f, 3))
@@ -88,5 +89,7 @@ for i in reversed(range(steps)):
     psload = compute_pseudo_load(strain[1,1], strain[0,0], internal_state, E, nu)
     dqoi_dE += W*psload
 
+dwork_dE_exact = jax.jacfwd(material.compute_energy_density, 3)(strain_history[-1, :, :], internal_state, dt, E, nu)
+
 print(f"dqoi_dE = {dqoi_dE}")
-print(f"exact   = {0.5*final_strain**2}")
+print(f"exact   = {dwork_dE_exact}")
