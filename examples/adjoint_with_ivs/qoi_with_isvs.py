@@ -55,9 +55,13 @@ internal_state = material.compute_initial_state()
 D = 0.0
 stress_history = onp.zeros((steps, 3, 3))
 strain_history = onp.zeros((steps, 3, 3))
+internal_state_history = onp.zeros((steps, internal_state.shape[0]))
+internal_state_history[0] = internal_state
 
 # Phase 1: Simulation
 for i in range(1, steps):
+    print("-----------------------")
+    print(f"Step {i}")
     strain_old = strain
     strain = strain.at[0,0].add(strain_rate*dt)
     t += dt
@@ -71,6 +75,7 @@ for i in range(1, steps):
     D += qoi(strain, internal_state, internal_state_old, E, nu, Y0, H)
     strain_history[i] = strain
     stress_history[i] = stress
+    internal_state_history[i] = internal_state
 
 D_exact = Material.linear_hardening_potential(internal_state[Material.EQPS], Y0, H)
 compute_energy_density(strain_history[-1, :, :], internal_state, dt, E, nu, Y0, H)
@@ -80,48 +85,56 @@ print(f"Exact:    {D_exact:6e}")
 print(f"strain hist {strain_history[:, 0, 0]}")
 print(f"stress hist {stress_history[:, 0, 0]}")
 
-plt.plot(strain_history[:, 0, 0], stress_history[:, 0, 0])
-plt.show()
+# plt.plot(strain_history[:, 0, 0], stress_history[:, 0, 0])
+# plt.show()
 
 # Phase 2:
 # compute sensitivity
 
-# compute_adjoint_load = jax.jit(jax.grad(qoi, 0))
-# compute_adjoint_load2 = jax.jit(jax.grad(qoi, 1))
-# compute_pseudo_load = jax.jit(jax.grad(f, (3, 4)))
-# compute_explicit_sensitivity = jax.jit(jax.grad(qoi, (2, 3)))
+compute_adjoint_load = jax.jit(jax.grad(qoi, 0))
+compute_pseudo_load = jax.jit(jax.grad(f, 5))
+compute_explicit_sensitivity = jax.jit(jax.grad(qoi, (5,)))
 
-# qoi_derivatives = np.array([0.0, 0.0])
-# F = 0.0 # adjoint load
-# for i in reversed(range(1, steps)):
-#     strain = strain_history[i]
-#     strain_old = strain_history[i-1]
-#     stress = stress_history[i]
-#     K = df(strain[1,1], strain[0,0], internal_state, E, nu)
-#     F -= compute_adjoint_load(strain, strain_old, E, nu)[1,1]
-#     W = F/K
+compute_dq = jax.jit(jax.jacrev(compute_state_new, (0, 1, 5)))
+compute_foo = jax.jit(jax.jacfwd(f, 2))
+
+qoi_derivatives = 0.0
+adjoint_internal_state_force = np.zeros_like(internal_state)
+F = 0.0 # adjoint load
+print("adjoint phase")
+for i in reversed(range(1, steps)):
+    print("-------------------------")
+    print(f"Step {i}")
+    strain = strain_history[i]
+    strain_old = strain_history[i-1]
+    stress = stress_history[i]
+    internal_state = internal_state_history[i]
+    internal_state_old = internal_state_history[i-1]
     
-#     explicit_sensitivity = compute_explicit_sensitivity(strain, strain_old, E, nu)
-#     qoi_derivatives += np.array(explicit_sensitivity)
-#     pseudoloads = compute_pseudo_load(strain[1,1], strain[0,0], internal_state, E, nu)
-#     qoi_derivatives += W*np.array(pseudoloads)
+    K = df(strain[1,1], strain[0,0], internal_state_old, E, nu, Y0, H)
+    F = -compute_adjoint_load(strain, internal_state, internal_state_old, E, nu, Y0, H)[1,1]
+    dQ_dStrain, dQ_dQOld, dQ_Y0 = compute_dq(strain, internal_state_old, dt, E, nu, Y0, H)
+    F -= np.tensordot(adjoint_internal_state_force, dQ_dStrain, axes=1)[1,1]
+    W = F/K
 
-#     # part of adjoint load from strain_old in qoi
-#     F = -compute_adjoint_load2(strain, strain_old, E, nu)[1,1]
+    explicit_sensitivity = compute_explicit_sensitivity(strain, internal_state, internal_state_old, E, nu, Y0, H)
+    qoi_derivatives += np.array(explicit_sensitivity)
+    pseudoloads = compute_pseudo_load(strain[1,1], strain[0,0], internal_state, E, nu, Y0, H)
+    qoi_derivatives += W*np.array(pseudoloads)
+    qoi_derivatives += np.dot(adjoint_internal_state_force, dQ_Y0)
+
+    adjoint_internal_state_force = np.tensordot(adjoint_internal_state_force, dQ_dQOld, axes=1)
+    adjoint_internal_state_force += W*compute_foo(strain[1,1], strain[0,0], internal_state_old, E, nu, Y0, H)
     
-#     # print("------------------------------")
-#     # print("iter", i)
-#     # print(f"strain={strain}")
-#     # print(f"strain_old={strain_old}")
-#     # print(f"stress = {stress}")
-#     # print(f"W = {W}, F = {F}")
-#     # print(f"pl = {pl_nu}")
-#     # print(f"dqoi={dqoi_dnu}")
+    # print("------------------------------")
+    # print("iter", i)
+    # print(f"strain={strain}")
+    # print(f"strain_old={strain_old}")
+    # print(f"stress = {stress}")
+    # print(f"W = {W}, F = {F}")
+    # print(f"pl = {pl_nu}")
+    # print(f"dqoi={dqoi_dnu}")
 
-# dwork_dE_exact = jax.jacfwd(material.compute_energy_density, 3)(strain_history[-1, :, :], internal_state, dt, E, nu)
-# print(f"dqoi_dE = {qoi_derivatives[0]:6e}")
-# print(f"exact   = {dwork_dE_exact:6e}")
-
-# dwork_dnu_exact = jax.jacfwd(material.compute_energy_density, 4)(strain_history[-1, :, :], internal_state, dt, E, nu)
-# print(f"dqoi_dnu = {qoi_derivatives[1]:6e}")
-# print(f"exact    = {dwork_dnu_exact:6e}")
+#dwork_dE_exact = jax.jacfwd(material.compute_energy_density, 3)(strain_history[-1, :, :], internal_state, dt, E, nu)
+print(f"dqoi_dE = {qoi_derivatives[0]:6e}")
+#print(f"exact   = {dwork_dE_exact:6e}")
