@@ -77,6 +77,12 @@ for i in range(1, steps):
     stress_history[i] = stress
     internal_state_history[i] = internal_state
 
+    print(f"residual norm: {np.abs(stress[1,1]) })")
+    print(f"strain = {strain[0,0]}, \tstress = {stress[0,0]}")
+    plastic_strain = internal_state[Material.PLASTIC_STRAIN].reshape(3,3)
+    print(f"elastic strain = {strain[0,0] - plastic_strain[0,0]}")
+
+print("================")
 D_exact = Material.linear_hardening_potential(internal_state[Material.EQPS], Y0, H)
 compute_energy_density(strain_history[-1, :, :], internal_state, dt, E, nu, Y0, H)
 print(f"QOI: {D:6e}")
@@ -101,7 +107,8 @@ compute_foo = jax.jit(jax.jacfwd(f, 2))
 qoi_derivatives = 0.0
 adjoint_internal_state_force = np.zeros_like(internal_state)
 F = 0.0 # adjoint load
-print("adjoint phase")
+print("\n\n")
+print("ADJOINT PHASE")
 for i in reversed(range(1, steps)):
     print("-------------------------")
     print(f"Step {i}")
@@ -126,15 +133,13 @@ for i in reversed(range(1, steps)):
     adjoint_internal_state_force = np.tensordot(adjoint_internal_state_force, dQ_dQOld, axes=1)
     adjoint_internal_state_force += W*compute_foo(strain[1,1], strain[0,0], internal_state_old, E, nu, Y0, H)
     
-    # print("------------------------------")
-    # print("iter", i)
     # print(f"strain={strain}")
     # print(f"strain_old={strain_old}")
     # print(f"stress = {stress}")
-    # print(f"W = {W}, F = {F}")
-    # print(f"pl = {pl_nu}")
-    # print(f"dqoi={dqoi_dnu}")
+    print(f"W = {W}, F = {F}")
+    print(f"dqoi={qoi_derivatives}")
 
-#dwork_dE_exact = jax.jacfwd(material.compute_energy_density, 3)(strain_history[-1, :, :], internal_state, dt, E, nu)
-print(f"dqoi_dE = {qoi_derivatives[0]:6e}")
-#print(f"exact   = {dwork_dE_exact:6e}")
+eqps = internal_state_history[-1, Material.EQPS]
+dD_dY0_exact = eqps-(Y0+H*eqps)/(H+E)
+print(f"dqoi_dY0 = {qoi_derivatives[0]:6e}")
+print(f"exact   = {dD_dY0_exact:6e}")
