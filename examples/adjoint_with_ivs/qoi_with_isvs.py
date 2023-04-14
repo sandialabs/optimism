@@ -96,12 +96,9 @@ print(f"Exact:    {D_exact:6e}")
 # Phase 2:
 # compute sensitivity
 
-compute_adjoint_load = jax.jit(jax.grad(qoi, 0))
-compute_pseudo_load = jax.jit(jax.grad(f, 5))
-compute_explicit_sensitivity = jax.jit(jax.grad(qoi, (5,)))
-compute_dpi_dq = jax.jit(jax.grad(qoi, (1,2)))
+compute_dpi = jax.jit(jax.grad(qoi, (0, 1, 2, 5)))
 compute_dq = jax.jit(jax.jacrev(compute_state_new, (0, 1, 5)))
-compute_dstress_dq = jax.jit(jax.jacfwd(f, 2))
+compute_dsigma = jax.jit(jax.jacrev(compute_stress, (0, 1, 5)))
 
 qoi_derivatives = 0.0
 adjoint_internal_state_force = np.zeros_like(internal_state)
@@ -117,23 +114,22 @@ for i in reversed(range(1, steps)):
     internal_state = internal_state_history[i]
     internal_state_old = internal_state_history[i-1]
     
+    dpi_dH, dpi_dQ, dpi_dQOld, dpi_dY0 = compute_dpi(strain, internal_state, internal_state_old, E, nu, Y0, H)
+    dQ_dH, dQ_dQOld, dQ_Y0 = compute_dq(strain, internal_state_old, dt, E, nu, Y0, H)
     K = df(strain[1,1], strain[0,0], internal_state_old, E, nu, Y0, H)
-    F = -compute_adjoint_load(strain, internal_state, internal_state_old, E, nu, Y0, H)[1,1]
-    dQ_dStrain, dQ_dQOld, dQ_Y0 = compute_dq(strain, internal_state_old, dt, E, nu, Y0, H)
-    dpi_dQ, dpi_dQold = compute_dpi_dq(strain, internal_state, internal_state_old, E, nu, Y0, H)
+    F = -dpi_dH[1,1]
     adjoint_internal_state_force += dpi_dQ
-    F -= np.tensordot(adjoint_internal_state_force, dQ_dStrain, axes=1)[1,1]
+    F -= np.tensordot(adjoint_internal_state_force, dQ_dH, axes=1)[1,1]
     W = F/K
 
-    explicit_sensitivity = compute_explicit_sensitivity(strain, internal_state, internal_state_old, E, nu, Y0, H)
-    qoi_derivatives += np.array(explicit_sensitivity)
-    pseudoloads = compute_pseudo_load(strain[1,1], strain[0,0], internal_state, E, nu, Y0, H)
-    qoi_derivatives += W*np.array(pseudoloads)
+    qoi_derivatives += dpi_dY0
+    dSigma_dH, dSigma_dQOld, dSigma_dY0 = compute_dsigma(strain, internal_state_old, dt, E, nu, Y0, H)
+    qoi_derivatives += W*dSigma_dY0[1,1]
     qoi_derivatives += np.dot(adjoint_internal_state_force, dQ_Y0)
 
     adjoint_internal_state_force = np.tensordot(adjoint_internal_state_force, dQ_dQOld, axes=1)
-    adjoint_internal_state_force += W*compute_dstress_dq(strain[1,1], strain[0,0], internal_state_old, E, nu, Y0, H)
-    adjoint_internal_state_force += dpi_dQold
+    adjoint_internal_state_force += W*dSigma_dQOld[1,1]
+    adjoint_internal_state_force += dpi_dQOld
     
     # print(f"strain={strain}")
     # print(f"strain_old={strain_old}")
@@ -143,5 +139,5 @@ for i in reversed(range(1, steps)):
 
 eqps = internal_state_history[-1, Material.EQPS]
 dD_dY0_exact = eqps-(Y0+H*eqps)/(H+E)
-print(f"dqoi_dY0 = {qoi_derivatives[0]:6e}")
+print(f"dqoi_dY0 = {qoi_derivatives:6e}")
 print(f"exact   = {dD_dY0_exact:6e}")
