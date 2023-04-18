@@ -56,7 +56,7 @@ def simulate_fwd(material, max_strain, strain_rate, steps, compute_qoi, *params)
         stress = compute_stress(strain, internal_state, dt, *params)
         internal_state_old = internal_state
         internal_state = compute_state_new(strain, internal_state, dt, *params)
-        pi += compute_qoi(strain, internal_state, internal_state_old, dt, *params)
+        pi += compute_qoi(strain, strain_old, internal_state, internal_state_old, dt, *params)
         strain_history[i] = strain
         stress_history[i] = stress
         internal_state_history[i] = internal_state
@@ -84,7 +84,7 @@ def simulate_bwd(material, compute_qoi, tape, cotangent):
         return stress[1,1]
     dr = jax.jit(jax.jacfwd(r))
 
-    compute_dpi = jax.jit(jax.grad(compute_qoi, (0, 1, 2, 4)))
+    compute_dpi = jax.jit(jax.grad(compute_qoi, (0, 1, 2, 3, 5)))
     compute_dq = jax.jit(jax.jacrev(compute_state_new, (0, 1, 3)))
     compute_dsigma = jax.jit(jax.jacrev(compute_stress, (0, 1, 3)))
     
@@ -98,15 +98,14 @@ def simulate_bwd(material, compute_qoi, tape, cotangent):
         print(f"Step {i}")
         strain = strain_history[i]
         strain_old = strain_history[i-1]
-        stress = stress_history[i]
         internal_state = internal_state_history[i]
         internal_state_old = internal_state_history[i-1]
         dt = time_history[i] - time_history[i-1]
         
-        dpi_dH, dpi_dQ, dpi_dQOld, dpi_dp = compute_dpi(strain, internal_state, internal_state_old, dt, *params)
+        dpi_dH, dpi_dHOld, dpi_dQ, dpi_dQOld, dpi_dp = compute_dpi(strain, strain_old, internal_state, internal_state_old, dt, *params)
         dQ_dH, dQ_dQOld, dQ_dp = compute_dq(strain, internal_state_old, dt, *params)
         K = dr(strain[1,1], strain[0,0], internal_state_old, dt, *params)
-        F = -dpi_dH[1,1]
+        F -= dpi_dH[1,1]
         adjoint_internal_state_force += dpi_dQ
         F -= np.tensordot(adjoint_internal_state_force, dQ_dH, axes=1)[1,1]
         W = F/K
@@ -120,6 +119,8 @@ def simulate_bwd(material, compute_qoi, tape, cotangent):
         adjoint_internal_state_force += W*dSigma_dQOld[1,1]
         adjoint_internal_state_force += dpi_dQOld
         
+        F = -dpi_dHOld[1,1]
+
         # print(f"strain={strain}")
         # print(f"strain_old={strain_old}")
         # print(f"stress = {stress}")
@@ -146,14 +147,14 @@ if __name__ == "__main__":
     max_strain = 0.5
     steps = 50
 
-    def compute_qoi(strain_new, isv_new, isv_old, dt, params):
+    def compute_plastic_work(strain_new, strain_old, isv_new, isv_old, dt, params):
         """Compute increment of dissipation by right-side rectangle rule."""
         stress_new = compute_stress(strain_new, isv_old, dt, params)
         plastic_strain_new = isv_new[Material.STATE_PLASTIC_STRAIN].reshape(3,3)
         plastic_strain_old = isv_old[Material.STATE_PLASTIC_STRAIN].reshape(3,3)
         return np.tensordot(stress_new, plastic_strain_new - plastic_strain_old)
 
-    pi, dpi_dp = jax.value_and_grad(simulate, 5)(material, max_strain, strain_rate, steps, compute_qoi, params)
+    pi, dpi_dp = jax.value_and_grad(simulate, 5)(material, max_strain, strain_rate, steps, compute_plastic_work, params)
 
     eqps = (E*max_strain - Y0)/(E + H)
     pi_exact = Y0*eqps + 0.5*H*eqps**2
