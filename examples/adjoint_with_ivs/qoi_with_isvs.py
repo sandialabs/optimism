@@ -8,7 +8,12 @@ import parameterized_j2 as Material
 import nonlinear
 
 
+@partial(jax.custom_vjp, nondiff_argnums=(0, 4))
 def simulate(material, max_strain, strain_rate, steps, compute_qoi, *params):
+    pi, _ = simulate_fwd(material, max_strain, strain_rate, steps, compute_qoi, *params)
+    return pi
+
+def simulate_fwd(material, max_strain, strain_rate, steps, compute_qoi, *params):
     t_max = max_strain/strain_rate
     dt = t_max/steps
     compute_stress = jax.jit(jax.grad(material.compute_energy_density))
@@ -34,6 +39,7 @@ def simulate(material, max_strain, strain_rate, steps, compute_qoi, *params):
     strain_history = onp.zeros((steps, 3, 3))
     internal_state_history = onp.zeros((steps, internal_state.shape[0]))
     internal_state_history[0] = internal_state
+    time_history = onp.zeros(steps)
 
     # Phase 1: Simulation
     for i in range(1, steps):
@@ -54,72 +60,77 @@ def simulate(material, max_strain, strain_rate, steps, compute_qoi, *params):
         strain_history[i] = strain
         stress_history[i] = stress
         internal_state_history[i] = internal_state
+        time_history[i] = t
 
-        print(f"residual norm: {np.abs(stress[1,1]) })")
+        print(f"residual norm: {np.abs(stress[1,1])}")
         print(f"strain = {strain[0,0]}, \tstress = {stress[0,0]}")
         print(f"QOI: {pi:6e}")
+        
+        history = strain_history, stress_history, internal_state_history, time_history
+        helper_functions = compute_stress, compute_state_new, df
 
-    return (strain_history, stress_history, internal_state_history), pi
+    return pi, (history, helper_functions, params)
 
 
+def simulate_bwd(material, compute_qoi, tape, cotangents):
+    history, helper_functions, params = tape
+    strain_history, stress_history, internal_state_history, time_history = history
+    compute_stress, compute_state_new, df = helper_functions
+    g_pi = cotangents
 
-# Phase 2:
-# compute sensitivity
-
-# compute_dpi = jax.jit(jax.grad(qoi, (0, 1, 2, 5)))
-# compute_dq = jax.jit(jax.jacrev(compute_state_new, (0, 1, 5)))
-# compute_dsigma = jax.jit(jax.jacrev(compute_stress, (0, 1, 5)))
-
-# qoi_derivatives = 0.0
-# adjoint_internal_state_force = np.zeros_like(internal_state)
-# F = 0.0 # adjoint load
-# print("\n\n")
-# print("ADJOINT PHASE")
-# for i in reversed(range(1, steps)):
-#     print("-------------------------")
-#     print(f"Step {i}")
-#     strain = strain_history[i]
-#     strain_old = strain_history[i-1]
-#     stress = stress_history[i]
-#     internal_state = internal_state_history[i]
-#     internal_state_old = internal_state_history[i-1]
+    compute_dpi = jax.jit(jax.grad(compute_qoi, (0, 1, 2, 4)))
+    compute_dq = jax.jit(jax.jacrev(compute_state_new, (0, 1, 3)))
+    compute_dsigma = jax.jit(jax.jacrev(compute_stress, (0, 1, 3)))
     
-#     dpi_dH, dpi_dQ, dpi_dQOld, dpi_dY0 = compute_dpi(strain, internal_state, internal_state_old, E, nu, Y0, H)
-#     dQ_dH, dQ_dQOld, dQ_Y0 = compute_dq(strain, internal_state_old, dt, E, nu, Y0, H)
-#     K = df(strain[1,1], strain[0,0], internal_state_old, E, nu, Y0, H)
-#     F = -dpi_dH[1,1]
-#     adjoint_internal_state_force += dpi_dQ
-#     F -= np.tensordot(adjoint_internal_state_force, dQ_dH, axes=1)[1,1]
-#     W = F/K
+    qoi_derivatives = 0.0
+    adjoint_internal_state_force = np.zeros_like(internal_state)
+    F = 0.0 # adjoint load
+    print("\n\n")
+    print("ADJOINT PHASE")
+    for i in reversed(range(1, steps)):
+        print("-------------------------")
+        print(f"Step {i}")
+        strain = strain_history[i]
+        strain_old = strain_history[i-1]
+        stress = stress_history[i]
+        internal_state = internal_state_history[i]
+        internal_state_old = internal_state_history[i-1]
+        dt = time_history[i] - time_history[i-1]
+        
+        dpi_dH, dpi_dQ, dpi_dQOld, dpi_dp = compute_dpi(strain, internal_state, internal_state_old, params)
+        dQ_dH, dQ_dQOld, dQ_dp = compute_dq(strain, internal_state_old, dt, params)
+        K = df(strain[1,1], strain[0,0], internal_state_old, params)
+        F = -dpi_dH[1,1]
+        adjoint_internal_state_force += dpi_dQ
+        F -= np.tensordot(adjoint_internal_state_force, dQ_dH, axes=1)[1,1]
+        W = F/K
 
-#     qoi_derivatives += dpi_dY0
-#     dSigma_dH, dSigma_dQOld, dSigma_dY0 = compute_dsigma(strain, internal_state_old, dt, E, nu, Y0, H)
-#     qoi_derivatives += W*dSigma_dY0[1,1]
-#     qoi_derivatives += np.dot(adjoint_internal_state_force, dQ_Y0)
+        qoi_derivatives += dpi_dp
+        dSigma_dH, dSigma_dQOld, dSigma_dY0 = compute_dsigma(strain, internal_state_old, dt, params)
+        qoi_derivatives += W*dSigma_dY0[1,1]
+        qoi_derivatives += np.dot(adjoint_internal_state_force, dQ_dp)
 
-#     adjoint_internal_state_force = np.tensordot(adjoint_internal_state_force, dQ_dQOld, axes=1)
-#     adjoint_internal_state_force += W*dSigma_dQOld[1,1]
-#     adjoint_internal_state_force += dpi_dQOld
-    
-#     # print(f"strain={strain}")
-#     # print(f"strain_old={strain_old}")
-#     # print(f"stress = {stress}")
-#     print(f"W = {W}, F = {F}")
-#     print(f"dqoi={qoi_derivatives}")
+        adjoint_internal_state_force = np.tensordot(adjoint_internal_state_force, dQ_dQOld, axes=1)
+        adjoint_internal_state_force += W*dSigma_dQOld[1,1]
+        adjoint_internal_state_force += dpi_dQOld
+        
+        # print(f"strain={strain}")
+        # print(f"strain_old={strain_old}")
+        # print(f"stress = {stress}")
+        print(f"W = {W}, F = {F}")
+        print(f"dqoi={qoi_derivatives}")
+        
+        return 0.0, 0.0, 0, (0.0, 0.0, cotangents*qoi_derivatives, 0.0)
 
-# eqps = internal_state_history[-1, Material.EQPS]
-# dD_dY0_exact = eqps-(Y0+H*eqps)/(H+E)
-# print(f"dqoi_dY0 = {qoi_derivatives:6e}")
-# print(f"exact   = {dD_dY0_exact:6e}")
+simulate.defvjp(simulate_fwd, simulate_bwd)
 
 if __name__ == "__main__":
     E = 2.0
     nu = 0.25
     Y0 = 0.01
     H = E/50.0
-    properties = {"elastic modulus": E,
-                  "poisson ratio": nu,
-                  "kinematics": "small deformations"}
+    params = np.array([E, nu, Y0, H])
+    properties = {"kinematics": "small deformations"}
 
     material = Material.create_material_model_functions(properties)
     compute_stress = jax.jit(jax.grad(material.compute_energy_density))
@@ -128,16 +139,20 @@ if __name__ == "__main__":
     max_strain = 0.5
     steps = 50
 
-    def compute_qoi(strain_new, isv_new, isv_old, dt, E, nu, Y0, H):
+    def compute_qoi(strain_new, isv_new, isv_old, dt, params):
         """Compute increment of dissipation by right-side rectangle rule."""
-        stress_new = compute_stress(strain_new, isv_old, dt, E, nu, Y0, H)
-        plastic_strain_new = isv_new[Material.PLASTIC_STRAIN].reshape(3,3)
-        plastic_strain_old = isv_old[Material.PLASTIC_STRAIN].reshape(3,3)
+        stress_new = compute_stress(strain_new, isv_old, dt, params)
+        plastic_strain_new = isv_new[Material.STATE_PLASTIC_STRAIN].reshape(3,3)
+        plastic_strain_old = isv_old[Material.STATE_PLASTIC_STRAIN].reshape(3,3)
         return np.tensordot(stress_new, plastic_strain_new - plastic_strain_old)
 
-    output, pi = simulate(material, max_strain, strain_rate, steps, compute_qoi, E, nu, Y0, H)
+    #output, pi = simulate(material, max_strain, strain_rate, steps, compute_qoi, E, nu, Y0, H)
+    #F = jax.grad(simulate, (5,))
+    #dpi = F(material, max_strain, strain_rate, steps, compute_qoi, params)
+    pi = simulate(material, max_strain, strain_rate, steps, compute_qoi, params)
 
-    pi_exact = Material.linear_hardening_potential(output[2][-1, Material.EQPS], Y0, H)
+    eqps = (E*max_strain - Y0)/(E + H)
+    pi_exact = Y0*eqps + 0.5*H*eqps**2
 
     print("===========SUMMARY===============")
     print(f"Plastic work: {pi:6e}")
@@ -148,3 +163,7 @@ if __name__ == "__main__":
     # plt.plot(strain_history[:, 0, 0], stress_history[:, 0, 0])
     # plt.show()
     
+    #eqps = internal_state_history[-1, Material.EQPS]
+    # dD_dY0_exact = eqps - (Y0+H*eqps)/(H+E)
+    # print(f"dqoi_dY0 = {dpi[2]:6e}")
+    # print(f"exact   = {dD_dY0_exact:6e}")
