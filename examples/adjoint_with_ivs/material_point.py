@@ -110,6 +110,9 @@ def simulate_bwd(material, compute_qoi, tape, cotangent):
         F -= np.tensordot(adjoint_internal_state_force, dQ_dH, axes=1)[1,1]
         W = F/K
 
+        print(f"adjoint internal var force = {adjoint_internal_state_force}")
+        print(f"W = {W}, F = {F}")
+
         qoi_derivatives += dpi_dp
         dSigma_dH, dSigma_dQOld, dSigma_dp = compute_dsigma(strain, internal_state_old, dt, *params)
         qoi_derivatives += W*dSigma_dp[1,1]
@@ -124,8 +127,6 @@ def simulate_bwd(material, compute_qoi, tape, cotangent):
         # print(f"strain={strain}")
         # print(f"strain_old={strain_old}")
         # print(f"stress = {stress}")
-        print(f"W = {W}, F = {F}")
-        print(f"adjoint internal var force = {adjoint_internal_state_force}")
         print(f"dqoi={qoi_derivatives}")
         
     return 0.0, 0.0, 0, cotangent*qoi_derivatives
