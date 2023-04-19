@@ -9,10 +9,11 @@ import material_point
 E = 2.0
 nu = 0.25
 Y0 = 0.01
-H = E/50.0
-params = np.array([E, nu, Y0, H])
+Ysat = 0.03
+eps0 = 0.125
+params = np.array([E, nu, Y0, Ysat, eps0])
 properties = {"kinematics": "small deformations",
-              "hardening model": "linear"}
+              "hardening model": "voce"}
 
 material = Material.create_material_model_functions(properties)
 compute_stress = jax.jit(jax.grad(material.compute_energy_density))
@@ -36,32 +37,14 @@ plt.show()
 
 pi, dpi_dp = jax.value_and_grad(material_point.simulate, 5)(material, max_strain, strain_rate, steps, compute_plastic_work, params)
 
-eqps = (E*max_strain - Y0)/(E + H)
-pi_exact = Y0*eqps + 0.5*H*eqps**2
+dpi_dp_h = np.zeros_like(params)
+for i in range(params.shape[0]):
+    h = 1e-5*params[i]
+    params_p = params.at[i].add(h)
+    pi_p = material_point.simulate(material, max_strain, strain_rate, steps, compute_plastic_work, params_p)
+    params_m = params.at[i].add(-h)
+    pi_m = material_point.simulate(material, max_strain, strain_rate, steps, compute_plastic_work, params_m)
+    dpi_dp_h = dpi_dp_h.at[i].set((pi_p - pi_m)/(2.0*h))
 
-print("===========SUMMARY===============")
-print(f"Plastic work: {pi:6e}")
-print(f"Exact:        {pi_exact:6e}")
-
-# print(f"strain hist {strain_history[:, 0, 0]}")
-# print(f"stress hist {stress_history[:, 0, 0]}")
-# plt.plot(strain_history[:, 0, 0], stress_history[:, 0, 0])
-# plt.show()
-
-print("")
-print(f"dpi_dE = {dpi_dp[0]:6e}")
-print(f"exact  = {(Y0+H*eqps)*(H*max_strain+Y0)/(H+E)**2:6e}")
-
-print("")
-print(f"dpi_dnu = {dpi_dp[1]:6e}")
-print(f"exact   = 0")
-
-dD_dY0_exact = eqps - (Y0+H*eqps)/(H+E)
-print("")
-print(f"dpi_dY0  = {dpi_dp[2]:6e}")
-print(f"exact    = {dD_dY0_exact:6e}")
-
-dpi_dH_exact = 0.5*eqps**2-H*eqps*(E*max_strain-Y0)/(H+E)**2
-print("")
-print(f"dpi_dH = {dpi_dp[3]:6e}")
-print(f"exact = {dpi_dH_exact:6e}")
+print(f"dpi_dp   = {dpi_dp}")
+print(f"dpi_dp_h = {dpi_dp_h}")

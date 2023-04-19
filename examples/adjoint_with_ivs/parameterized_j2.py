@@ -11,7 +11,6 @@ from optimism import ScalarRootFind
 PARAMS_E   = 0
 PARAMS_NU  = 1
 PARAMS_Y0  = 2
-PARAMS_H   = 3
 
 # internal variables
 STATE_EQPS = 0
@@ -33,16 +32,26 @@ def create_material_model_functions(properties):
         elif properties['kinematics'] == 'small deformations':
             finiteDeformations = False
         else:
-            raise ValueError('Unknown value specified for kinematics in J2Plastic')
+            raise ValueError('Unknown value specified for kinematics')
         
     if finiteDeformations:
         compute_elastic_strain = compute_elastic_logarithmic_strain
     else:
         compute_elastic_strain = compute_elastic_linear_strain
     
+    # choose hardening
+    if properties['hardening model'] == 'linear':
+        hardening = linear_hardening_potential
+    elif properties['hardening model'] == 'power law':
+        hardening = power_law_hardening_potential
+    elif properties['hardening model'] == 'voce':
+        hardening = voce_hardening_potential
+    else:
+        raise ValueError('Unknown hardening model chosen')
+    
     def energy_density_function(dispGrad, state, dt, params):
         elasticTrialStrain = compute_elastic_strain(dispGrad, state)
-        return _energy_density(elasticTrialStrain, state, dt, params)
+        return _energy_density(elasticTrialStrain, state, dt, params, hardening)
 
     if finiteDeformations:
         compute_state_new_func = compute_state_new_finite_deformations
@@ -52,7 +61,7 @@ def create_material_model_functions(properties):
         compute_initial_state = make_initial_state_small_deformations
         
     def compute_state_new_function(dispGrad, state, dt, params):
-        return compute_state_new_func(dispGrad, state, dt, params)
+        return compute_state_new_func(dispGrad, state, dt, params, hardening)
 
     density = properties.get('density')
 
@@ -62,20 +71,27 @@ def create_material_model_functions(properties):
                          density)
 
 
-def linear_hardening_potential(eqps, Y0, H):
+def linear_hardening_potential(eqps, eqps_old, dt, params):
+    Y0 = params[PARAMS_Y0]
+    H  = params[PARAMS_Y0 + 1]
     return Y0*eqps + 0.5*H*eqps**2
 
 
-def power_law_hardening_potential(eqps, Y0, n, eps0):
+def power_law_hardening_potential(eqps, eqps_old, dt, params):
+    Y0   = params[PARAMS_Y0]
+    n    = params[PARAMS_Y0 + 1]
+    eps0 = params[PARAMS_Y0 + 2]
     A = n*Y0*eps0/(1.0 + n)
     x = eqps/eps0
     return A*( (1.0 + x)**((n+1)/n) - 1.0 )
 
 
-def hardening_potential(eqps_new, eqps_old, dt, params):
-    Y0 = params[PARAMS_Y0]
-    H = params[PARAMS_H]
-    return linear_hardening_potential(eqps_new, Y0, H)
+def voce_hardening_potential(eqps, eqps_old, dt, params):
+    #Y0, Ysat, eps0
+    Y0   = params[PARAMS_Y0]
+    Ysat = params[PARAMS_Y0 + 1]
+    eps0 = params[PARAMS_Y0 + 2]
+    return Ysat*eqps + (Ysat - Y0)*eps0*(np.expm1(-eqps/eps0))
 
 
 def make_initial_state_finite_deformations(shape=(1,)):
@@ -91,23 +107,23 @@ def make_initial_state_small_deformations(shape=(1,)):
     return np.tile(pointState, shape)
 
 
-def compute_state_new_finite_deformations(dispGrad, stateOld, dt, params):
+def compute_state_new_finite_deformations(dispGrad, stateOld, dt, params, hardening_potential):
     elasticTrialStrain = compute_elastic_logarithmic_strain(dispGrad, stateOld)
-    stateInc = compute_state_increment(elasticTrialStrain, stateOld, dt, params)
+    stateInc = compute_state_increment(elasticTrialStrain, stateOld, dt, params, hardening_potential)
     eqpsNew = stateOld[STATE_EQPS] + stateInc[STATE_EQPS]
     FpOld = np.reshape(stateOld[STATE_PLASTIC_DISTORTION], (3,3))
     FpNew = linalg.expm(stateInc[STATE_PLASTIC_DISTORTION].reshape((3,3)))@FpOld
     return np.hstack((eqpsNew, FpNew.ravel()))
 
 
-def compute_state_new_small_deformations(dispGrad, stateOld, dt, params):
+def compute_state_new_small_deformations(dispGrad, stateOld, dt, params, hardening_potential):
     elasticTrialStrain = compute_elastic_linear_strain(dispGrad, stateOld)
-    stateInc = compute_state_increment(elasticTrialStrain, stateOld, dt, params)
+    stateInc = compute_state_increment(elasticTrialStrain, stateOld, dt, params, hardening_potential)
     return stateOld + stateInc
 
 
-def _energy_density(elStrain, state, dt, params):
-    stateInc = compute_state_increment(elStrain, state, dt, params)
+def _energy_density(elStrain, state, dt, params, hardening_potential):
+    stateInc = compute_state_increment(elStrain, state, dt, params, hardening_potential)
     
     eqpsNew = state[STATE_EQPS] + stateInc[STATE_EQPS]
     elasticStrainNew = elStrain - stateInc[STATE_PLASTIC_DISTORTION].reshape((3,3))
@@ -117,7 +133,7 @@ def _energy_density(elStrain, state, dt, params):
     return W
 
 
-def compute_state_increment(elasticStrain, state, dt, params):
+def compute_state_increment(elasticStrain, state, dt, params, hardening_potential):
     E = params[PARAMS_E]
     nu = params[PARAMS_NU]
     mu = 0.5*E/(1.0 + nu)
@@ -132,7 +148,7 @@ def compute_state_increment(elasticStrain, state, dt, params):
     isYielding = trialStress - flowStress > _TOLERANCE*Y0
 
     stateInc = jax.lax.cond(isYielding,
-                            lambda e: update_state(e, state, dt, params),
+                            lambda e: update_state(e, state, dt, params, hardening_potential),
                             lambda e: np.zeros(NUM_STATE_VARS),
                             elasticStrain)
 
@@ -174,7 +190,7 @@ def compute_flow_direction(elasticStrain):
                     dummyN)
 
 
-def incremental_potential(elasticTrialStrain, eqps, eqpsOld, dt, params):
+def incremental_potential(elasticTrialStrain, eqps, eqpsOld, dt, params, hardening_potential):
     N = compute_flow_direction(elasticTrialStrain)
     elasticStrain = elasticTrialStrain - (eqps-eqpsOld) * N
     return elastic_deviatoric_free_energy(elasticStrain, params) + \
@@ -184,7 +200,7 @@ def incremental_potential(elasticTrialStrain, eqps, eqpsOld, dt, params):
 r = jax.jacfwd(incremental_potential, 1)
 
 
-def update_state(elasticTrialStrain, stateOld, dt, params):
+def update_state(elasticTrialStrain, stateOld, dt, params, hardening_potential):
     Y0 = params[PARAMS_Y0]
     settings = ScalarRootFind.get_settings(x_tol=0, r_tol=_TOLERANCE*Y0)
     eqpsOld = stateOld[STATE_EQPS]
@@ -199,7 +215,7 @@ def update_state(elasticTrialStrain, stateOld, dt, params):
     # Avoid the initial guess eqpsGuess = eqpsOld, because the power law rate sensitivity has an infinte slope
     # in this case.
     eqpsGuess = 0.5*(lb + ub)
-    eqps, _ = ScalarRootFind.find_root(lambda e: r(elasticTrialStrain, e, eqpsOld, dt, params),
+    eqps, _ = ScalarRootFind.find_root(lambda e: r(elasticTrialStrain, e, eqpsOld, dt, params, hardening_potential),
                                        eqpsGuess,
                                        np.array([lb, ub]),
                                        settings)
