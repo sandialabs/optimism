@@ -68,18 +68,16 @@ print(f"Exact:        {pi_exact:6e}")
 
 print("")
 print(f"dpi_dE = {dpi_dp[0]:6e}")
-print(f"exact  = {(Y0+H*eqps)*(H*max_strain+Y0)/(H+E)**2:6e}")
+print(f"exact  = {dpi_dp_exact[0]:6e}")
 
 print("")
 print(f"dpi_dnu = {dpi_dp[1]:6e}")
-print(f"exact   = 0")
+print(f"exact   = {dpi_dp_exact[1]}")
 
-dD_dY0_exact = eqps - (Y0+H*eqps)/(H+E)
 print("")
 print(f"dpi_dY0  = {dpi_dp[2]:6e}")
-print(f"exact    = {dD_dY0_exact:6e}")
+print(f"exact    = {dpi_dp_exact[2]:6e}")
 
-dpi_dH_exact = 0.5*eqps**2-H*eqps*(E*max_strain-Y0)/(H+E)**2
 print("")
 print(f"dpi_dH = {dpi_dp[3]:6e}")
 print(f"exact = {dpi_dH_exact:6e}")
