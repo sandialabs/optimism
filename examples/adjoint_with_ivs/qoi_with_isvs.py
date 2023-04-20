@@ -22,7 +22,6 @@ compute_stress = jax.jit(jax.grad(material.compute_energy_density))
 
 strain_rate = 1e-3
 max_strain = 0.5
-steps = 50
 
 def compute_plastic_work(strain_new, strain_old, isv_new, isv_old, dt, params):
     """Compute increment of dissipation by right-side rectangle rule."""
@@ -38,6 +37,7 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--qoi",
                     choices=["plasticwork", "lateralstrain"],
                     default="plasticwork")
+parser.add_argument("--steps", type=int, default=50)
 args = parser.parse_args()
 
 print(f"QoI is {args.qoi}")
@@ -45,6 +45,9 @@ if args.qoi == "plasticwork":
     compute_qoi = compute_plastic_work
 elif args.qoi == "lateralstrain":
     compute_qoi = compute_lateral_strain
+    compute_exact = compute_lateral_strain_exact
+    
+steps = args.steps
 
 # pi, (history, _) = material_point.simulate_fwd(material, max_strain, strain_rate, steps, compute_lateral_strain, params)
 # strain_history = history[0]
@@ -58,8 +61,8 @@ eqps = (E*max_strain - Y0)/(E + H)
 pi_exact = Y0*eqps + 0.5*H*eqps**2
 
 print("===========SUMMARY===============")
-print(f"Plastic work: {pi:6e}")
-print(f"Exact:        {pi_exact:6e}")
+print(f"QOI:   {pi:6e}")
+print(f"Exact: {pi_exact:6e}")
 
 # print(f"strain hist {strain_history[:, 0, 0]}")
 # print(f"stress hist {stress_history[:, 0, 0]}")
@@ -72,7 +75,7 @@ print(f"exact  = {dpi_dp_exact[0]:6e}")
 
 print("")
 print(f"dpi_dnu = {dpi_dp[1]:6e}")
-print(f"exact   = {dpi_dp_exact[1]}")
+print(f"exact   = {dpi_dp_exact[1]:6e}")
 
 print("")
 print(f"dpi_dY0  = {dpi_dp[2]:6e}")
@@ -93,3 +96,5 @@ print(f"exact = {dpi_dH_exact:6e}")
 
 # print(f"dpi_dp   = {dpi_dp}")
 # print(f"dpi_dp_h = {dpi_dp_h}")
+# print(f"dpi_dp_exact = {dpi_dp_exact}")
+

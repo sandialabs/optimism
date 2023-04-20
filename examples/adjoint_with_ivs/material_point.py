@@ -15,7 +15,7 @@ def simulate(material, max_strain, strain_rate, steps, compute_qoi, *params):
 
 def simulate_fwd(material, max_strain, strain_rate, steps, compute_qoi, *params):
     t_max = max_strain/strain_rate
-    dt = t_max/steps
+    time_history, dt = np.linspace(0.0, t_max, steps, retstep=True)
     compute_stress = jax.jit(jax.grad(material.compute_energy_density))
     compute_tangents = jax.jit(jax.jacfwd(compute_stress))
     compute_state_new = jax.jit(material.compute_state_new)
@@ -59,7 +59,6 @@ def simulate_fwd(material, max_strain, strain_rate, steps, compute_qoi, *params)
         strain_history[i] = strain
         stress_history[i] = stress
         internal_state_history[i] = internal_state
-        time_history[i] = t
 
         print(f"residual norm: {np.abs(stress[1,1])}")
         print(f"strain = {strain[0,0]}, \tstress = {stress[0,0]}")
