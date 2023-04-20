@@ -33,6 +33,17 @@ def compute_plastic_work(strain_new, strain_old, isv_new, isv_old, dt, params):
 def compute_lateral_strain(strain_new, strain_old, isv_new, isv_old, dt, params):
     return strain_new[1,1] - strain_old[1,1]
 
+def compute_lateral_strain_exact():
+    eqps = (E*max_strain - Y0)/(E + H) if max_strain > Y0/E else 0
+    pi_exact = -nu*(max_strain - eqps) - 0.5*eqps
+    
+    dpi_dE = (nu - 0.5)*(H*max_strain + Y0)/(H + E)**2
+    dpi_dnu = eqps - max_strain
+    dpi_dY0 = (0.5 - nu)/(H + E)
+    dpi_dH = (0.5 - nu)/(H + E)**2
+    return pi_exact, np.array([dpi_dE, dpi_dnu, dpi_dY0, dpi_dH])
+    
+
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--qoi",
                     choices=["plasticwork", "lateralstrain"],
@@ -85,6 +96,7 @@ print("")
 print(f"dpi_dH = {dpi_dp[3]:6e}")
 print(f"exact = {dpi_dH_exact:6e}")
 
+# # Finite difference check
 # dpi_dp_h = np.zeros_like(params)
 # for i in range(params.shape[0]):
 #     h = 1e-5*params[i]
@@ -97,4 +109,3 @@ print(f"exact = {dpi_dH_exact:6e}")
 # print(f"dpi_dp   = {dpi_dp}")
 # print(f"dpi_dp_h = {dpi_dp_h}")
 # print(f"dpi_dp_exact = {dpi_dp_exact}")
-
