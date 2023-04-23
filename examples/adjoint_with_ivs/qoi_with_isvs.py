@@ -33,6 +33,18 @@ def compute_plastic_work(strain_new, strain_old, isv_new, isv_old, dt, params):
 def compute_lateral_strain(strain_new, strain_old, isv_new, isv_old, dt, params):
     return strain_new[1,1] - strain_old[1,1]
 
+def compute_plastic_work_exact():
+    eqps = (E*max_strain - Y0)/(E + H)
+    pi_exact = Y0*eqps + 0.5*H*eqps**2
+    
+    Y = Y0 + H*eqps
+    dWp_dE = Y*(H*max_strain + Y0)/(H + E)**2
+    dWp_dnu = 0.0
+    dWp_dY0 = 2*eqps - max_strain #eqps - Y/(H + E)
+    dWp_dH = 0.5*eqps**2 - Y*(E*max_strain - Y0)/(H + E)**2
+    return pi_exact, np.array([dWp_dE, dWp_dnu, dWp_dY0, dWp_dH])
+    
+
 def compute_lateral_strain_exact():
     eqps = (E*max_strain - Y0)/(E + H) if max_strain > Y0/E else 0
     pi_exact = -nu*(max_strain - eqps) - 0.5*eqps
@@ -54,9 +66,10 @@ args = parser.parse_args()
 print(f"QoI is {args.qoi}")
 if args.qoi == "plasticwork":
     compute_qoi = compute_plastic_work
+    compute_qoi_exact = compute_plastic_work_exact
 elif args.qoi == "lateralstrain":
     compute_qoi = compute_lateral_strain
-    compute_exact = compute_lateral_strain_exact
+    compute_qoi_exact = compute_lateral_strain_exact
     
 steps = args.steps
 
@@ -67,9 +80,7 @@ steps = args.steps
 # plt.show()
 
 pi, dpi_dp = jax.value_and_grad(material_point.simulate, 5)(material, max_strain, strain_rate, steps, compute_qoi, params)
-
-eqps = (E*max_strain - Y0)/(E + H)
-pi_exact = Y0*eqps + 0.5*H*eqps**2
+pi_exact, dpi_dp_exact = compute_qoi_exact()
 
 print("===========SUMMARY===============")
 print(f"QOI:   {pi:6e}")
@@ -94,7 +105,7 @@ print(f"exact    = {dpi_dp_exact[2]:6e}")
 
 print("")
 print(f"dpi_dH = {dpi_dp[3]:6e}")
-print(f"exact = {dpi_dH_exact:6e}")
+print(f"exact = {dpi_dp_exact[3]:6e}")
 
 # # Finite difference check
 # dpi_dp_h = np.zeros_like(params)
