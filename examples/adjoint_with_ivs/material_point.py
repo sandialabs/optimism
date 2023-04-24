@@ -104,9 +104,10 @@ def simulate_bwd(material, compute_qoi, tape, cotangent):
         dpi_dH, dpi_dHOld, dpi_dQ, dpi_dQOld, dpi_dp = compute_dpi(strain, strain_old, internal_state, internal_state_old, dt, *params)
         dQ_dH, dQ_dQOld, dQ_dp = compute_dq(strain, internal_state_old, dt, *params)
         K = dr(strain[1,1], strain[0,0], internal_state_old, dt, *params)
-        F -= dpi_dH[1,1]
+        F -= (dpi_dH[1,1] + dpi_dH[2,2])
         adjoint_internal_state_force += dpi_dQ
-        F -= np.tensordot(adjoint_internal_state_force, dQ_dH, axes=1)[1,1]
+        dpi_dH_implicit = np.einsum('q,qij->ij', adjoint_internal_state_force, dQ_dH)
+        F -= (dpi_dH_implicit[1,1] + dpi_dH_implicit[2,2])
         W = F/K
 
         print(f"adjoint internal var force = {adjoint_internal_state_force}")
