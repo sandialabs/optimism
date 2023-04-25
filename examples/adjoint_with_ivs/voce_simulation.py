@@ -29,7 +29,12 @@ def compute_plastic_work(strain_new, strain_old, isv_new, isv_old, dt, params):
     plastic_strain_old = isv_old[Material.STATE_PLASTIC_STRAIN].reshape(3,3)
     return np.tensordot(stress_new, plastic_strain_new - plastic_strain_old)
 
-(pi, history), dpi_dp = jax.value_and_grad(material_point.simulate, 5, has_aux=True)(material, max_strain, strain_rate, steps, compute_plastic_work, params)
+def compute_lateral_strain(strain_new, strain_old, isv_new, isv_old, dt, params):
+    return strain_new[1,1] - strain_old[1,1]
+
+compute_qoi = compute_plastic_work
+
+(pi, history), dpi_dp = jax.value_and_grad(material_point.simulate, 5, has_aux=True)(material, max_strain, strain_rate, steps, compute_qoi, params)
 plt.plot(history.strain[:, 0, 0], history.stress[:, 0, 0])
 plt.show()
 
@@ -37,9 +42,9 @@ dpi_dp_h = np.zeros_like(params)
 for i in range(params.shape[0]):
     h = 1e-5*params[i]
     params_p = params.at[i].add(h)
-    pi_p, _ = material_point.simulate(material, max_strain, strain_rate, steps, compute_plastic_work, params_p)
+    pi_p, _ = material_point.simulate(material, max_strain, strain_rate, steps, compute_qoi, params_p)
     params_m = params.at[i].add(-h)
-    pi_m, _ = material_point.simulate(material, max_strain, strain_rate, steps, compute_plastic_work, params_m)
+    pi_m, _ = material_point.simulate(material, max_strain, strain_rate, steps, compute_qoi, params_m)
     dpi_dp_h = dpi_dp_h.at[i].set((pi_p - pi_m)/(2.0*h))
 
 print(f"dpi_dp   = {dpi_dp}")
