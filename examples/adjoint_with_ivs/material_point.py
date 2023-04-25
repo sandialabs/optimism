@@ -7,20 +7,6 @@ jax.config.update("jax_enable_x64", True)
 
 import nonlinear
 
-StateHistory = namedtuple("StateHistory", ["time", "strain", "internal_state", "stress"])
-StateHistory.__doc__ = """Simulation output at each time step"""
-
-# The output type of the simulate function must be registered with jax 
-# in order to ignore it as aux_data (that is, non-differentiable output).
-def flatten(state):
-    return (), (state.time, state.strain, state.internal_state, state.stress)
-
-def unflatten(aux_data, children):
-    time, strain, internal_state, stress = aux_data
-    return StateHistory(time, strain, internal_state, stress)
-
-jax.tree_util.register_pytree_node(StateHistory, flatten, unflatten)
-
 
 @partial(jax.custom_vjp, nondiff_argnums=(0, 4))
 def simulate(material, max_strain, strain_rate, steps, compute_qoi, *params):
@@ -150,3 +136,18 @@ def simulate_bwd(material, compute_qoi, tape, cotangent):
     return 0.0, 0.0, 0, cotangent*qoi_derivatives
 
 simulate.defvjp(simulate_fwd, simulate_bwd)
+
+
+StateHistory = namedtuple("StateHistory", ["time", "strain", "internal_state", "stress"])
+StateHistory.__doc__ = """Simulation output at each time step"""
+
+# The StateHistory type must be registered with jax in order to ignore 
+# it as aux_data (that is, non-differentiable output).
+def flatten(state):
+    return (), (state.time, state.strain, state.internal_state, state.stress)
+
+def unflatten(aux_data, children):
+    time, strain, internal_state, stress = aux_data
+    return StateHistory(time, strain, internal_state, stress)
+
+jax.tree_util.register_pytree_node(StateHistory, flatten, unflatten)
