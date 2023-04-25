@@ -79,7 +79,7 @@ steps = args.steps
 # plt.plot(strain_history[:, 0, 0], stress_history[:, 0, 0])
 # plt.show()
 
-pi, dpi_dp = jax.value_and_grad(material_point.simulate, 5)(material, max_strain, strain_rate, steps, compute_qoi, params)
+(pi, history), dpi_dp = jax.value_and_grad(material_point.simulate, 5, has_aux=True)(material, max_strain, strain_rate, steps, compute_qoi, params)
 pi_exact, dpi_dp_exact = compute_qoi_exact()
 
 print("===========SUMMARY===============")

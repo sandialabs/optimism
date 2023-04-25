@@ -1,19 +1,31 @@
+from collections import namedtuple
 from functools import partial
 import numpy as onp
 import jax
 from jax import numpy as np
+jax.config.update("jax_enable_x64", True)
 
 import nonlinear
 
-jax.config.update("jax_enable_x64", True)
+StateHistory = namedtuple("StateHistory", ["time", "strain", "internal_state", "stress"])
+StateHistory.__doc__ = """Simulation output at each time step"""
+
+# The output type of the simulate function must be registered with jax 
+# in order to ignore it as aux_data (that is, non-differentiable output).
+def flatten(state):
+    return (), (state.time, state.strain, state.internal_state, state.stress)
+
+def unflatten(aux_data, children):
+    time, strain, internal_state, stress = aux_data
+    return StateHistory(time, strain, internal_state, stress)
+
+jax.tree_util.register_pytree_node(StateHistory, flatten, unflatten)
+
 
 @partial(jax.custom_vjp, nondiff_argnums=(0, 4))
 def simulate(material, max_strain, strain_rate, steps, compute_qoi, *params):
-    pi, _ = simulate_fwd(material, max_strain, strain_rate, steps, compute_qoi, *params)
-    return pi
+    """Run a material point simulation and return the QOI and the history."""
 
-
-def simulate_fwd(material, max_strain, strain_rate, steps, compute_qoi, *params):
     t_max = max_strain/strain_rate
     time_history, dt = np.linspace(0.0, t_max, steps, retstep=True)
     compute_stress = jax.jit(jax.grad(material.compute_energy_density))
@@ -65,14 +77,20 @@ def simulate_fwd(material, max_strain, strain_rate, steps, compute_qoi, *params)
         print(f"internal={internal_state}")
         print(f"QOI: {pi:6e}")
         
-        history = strain_history, stress_history, internal_state_history, time_history
+        history = StateHistory(time_history, strain_history, internal_state_history, stress_history)
 
-    return pi, (history, params)
+    return pi, history
+
+
+def simulate_fwd(material, max_strain, strain_rate, steps, compute_qoi, *params):
+    pi, history = simulate(material, max_strain, strain_rate, steps, compute_qoi, *params)
+    return (pi, history), (history, params)
 
 
 def simulate_bwd(material, compute_qoi, tape, cotangent):
     history, params = tape
-    strain_history, stress_history, internal_state_history, time_history = history
+    cotangent, _ = cotangent # drop cotangents for aux data
+    time_history, strain_history, internal_state_history, stress_history = history
     steps = time_history.shape[0]
     compute_stress = jax.jit(jax.grad(material.compute_energy_density))
     compute_state_new = jax.jit(material.compute_state_new)
