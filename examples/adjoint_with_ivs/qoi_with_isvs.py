@@ -73,12 +73,6 @@ elif args.qoi == "lateralstrain":
     
 steps = args.steps
 
-# pi, (history, _) = material_point.simulate_fwd(material, max_strain, strain_rate, steps, compute_lateral_strain, params)
-# strain_history = history[0]
-# stress_history = history[1]
-# plt.plot(strain_history[:, 0, 0], stress_history[:, 0, 0])
-# plt.show()
-
 (pi, history), dpi_dp = jax.value_and_grad(material_point.simulate, 5, has_aux=True)(material, max_strain, strain_rate, steps, compute_qoi, params)
 pi_exact, dpi_dp_exact = compute_qoi_exact()
 
@@ -86,9 +80,7 @@ print("===========SUMMARY===============")
 print(f"QOI:   {pi:6e}")
 print(f"Exact: {pi_exact:6e}")
 
-# print(f"strain hist {strain_history[:, 0, 0]}")
-# print(f"stress hist {stress_history[:, 0, 0]}")
-# plt.plot(strain_history[:, 0, 0], stress_history[:, 0, 0])
+# plt.plot(history.strain[:, 0, 0], history.stress[:, 0, 0])
 # plt.show()
 
 print("")
