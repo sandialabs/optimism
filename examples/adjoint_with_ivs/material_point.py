@@ -36,12 +36,12 @@ def simulate(material, max_strain, strain_rate, steps, compute_qoi, *params):
     strain_history = onp.zeros((steps, 3, 3))
     internal_state_history = onp.zeros((steps, internal_state.shape[0]))
     internal_state_history[0] = internal_state
-    time_history = onp.zeros(steps)
 
     # Phase 1: Simulation
     for i in range(1, steps):
         print("-----------------------")
         print(f"Step {i}")
+        print(f"t = {t}")
         strain_old = strain
         strain = strain.at[0,0].add(strain_rate*dt)
         t += dt
