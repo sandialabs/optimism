@@ -150,4 +150,5 @@ def unflatten(aux_data, children):
     time, strain, internal_state, stress = aux_data
     return StateHistory(time, strain, internal_state, stress)
 
+
 jax.tree_util.register_pytree_node(StateHistory, flatten, unflatten)
