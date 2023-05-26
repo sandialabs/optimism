@@ -109,7 +109,7 @@ class Buckle:
                                                                         U,
                                                                         self.quadRule,
                                                                         self.mesh.sideSets[topSide],
-                                                                        lambda x, n, t: np.array([0.0, p[0][0]]))
+                                                                        lambda x, n: np.array([0.0, p[0][0]]))
         #mechanicalEnergy = -compute_energy(Uu, p,
         #                                   fs, self.dofManager,
         #                                   mechFuncs, self.quadRule, False)
@@ -298,7 +298,7 @@ def compute_energy(Uu, p, fs, dofManager, mechFuncs, edgeQuadRule, useTraction):
     U = create_field(Uu, p, fs.mesh, dofManager, useTraction)
     mechanicalEnergy = mechFuncs.compute_strain_energy(U, p[1])
     tractionEnergy = Mechanics.compute_traction_potential_energy(fs, U, edgeQuadRule, fs.mesh.sideSets[topSide], 
-                                                                  lambda x, n, t: np.array([0.0, p[0][0]])) if useTraction else 0.
+                                                                  lambda x, n: np.array([0.0, p[0][0]])) if useTraction else 0.
     
     return mechanicalEnergy + tractionEnergy
 

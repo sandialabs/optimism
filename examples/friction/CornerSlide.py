@@ -84,7 +84,7 @@ class CornerSlide(MeshFixture):
             
             rightPushEnergy = 0 #Mechanics.compute_traction_potential_energy(fs, U, self.quadRule, self.mesh.sideSets['right'], lambda x: np.array([-0.3, 0.0]))
             topPushEnergy = Mechanics.compute_traction_potential_energy(fs, U, self.quadRule, self.mesh.sideSets['top'], 
-                                                                        lambda x, n, t: np.array([-tractionRelMag*traction, -traction]))
+                                                                        lambda x, n: np.array([-tractionRelMag*traction, -traction]))
             mechanicalEnergy = self.mechFuncs.compute_strain_energy(U, self.state)
 
             levelsetMotion = np.array([0.0, 0.0])
