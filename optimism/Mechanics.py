@@ -435,7 +435,7 @@ def create_dynamics_functions(functionSpace, mode2D, materialModel, newmarkParam
                              jit(correct))
 
 
-def compute_traction_potential_energy(fs, U, quadRule, edges, load, time=0.0):
+def compute_traction_potential_energy(fs, U, quadRule, edges, load):
     """Compute potential energy of surface tractions.
 
     Arguments:
@@ -446,11 +446,11 @@ def compute_traction_potential_energy(fs, U, quadRule, edges, load, time=0.0):
          element ID, and the permutation of that edge in the triangle (0, 1,
          2).
     load: Callable that returns the traction vector. The signature is
-        load(X, n, t), where X is coordinates of a material point, n is the
-        outward unit normal, and t is the time.
+        load(X, n), where X is coordinates of a material point, and n is the
+        outward unit normal.
     time: current time
     """
-    def compute_energy_density(u, X, n, t):
-        traction = load(X, n, t)
+    def compute_energy_density(u, X, n):
+        traction = load(X, n)
         return -np.dot(u, traction)
-    return FunctionSpace.integrate_function_on_edges(fs, compute_energy_density, U, quadRule, edges, time)
+    return FunctionSpace.integrate_function_on_edges(fs, compute_energy_density, U, quadRule, edges)

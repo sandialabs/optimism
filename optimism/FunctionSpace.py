@@ -336,18 +336,18 @@ def interpolate_nodal_field_on_edge(functionSpace, U, interpolationPoints, edge)
     return edgeShapes.values.T@edgeU
 
 
-def integrate_function_on_edge(functionSpace, func, U, quadRule, edge, time):
+def integrate_function_on_edge(functionSpace, func, U, quadRule, edge):
     uq = interpolate_nodal_field_on_edge(functionSpace, U, quadRule.xigauss, edge)
     Xq = interpolate_nodal_field_on_edge(functionSpace, functionSpace.mesh.coords, quadRule.xigauss, edge)
     edgeCoords = Mesh.get_edge_coords(functionSpace.mesh, edge)
     _, normal, jac = Mesh.compute_edge_vectors(functionSpace.mesh, edgeCoords)
-    integrand = jax.vmap(func, (0, 0, None, None))(uq, Xq, normal, time)
+    integrand = jax.vmap(func, (0, 0, None))(uq, Xq, normal)
     return np.dot(integrand, jac*quadRule.wgauss)
 
 
-def integrate_function_on_edges(functionSpace, func, U, quadRule, edges, time=0.0):
-    integrate_on_edges = jax.vmap(integrate_function_on_edge, (None, None, None, None, 0, None))
-    return np.sum(integrate_on_edges(functionSpace, func, U, quadRule, edges, time))
+def integrate_function_on_edges(functionSpace, func, U, quadRule, edges):
+    integrate_on_edges = jax.vmap(integrate_function_on_edge, (None, None, None, None, 0))
+    return np.sum(integrate_on_edges(functionSpace, func, U, quadRule, edges))
 
 
 class DofManager:
