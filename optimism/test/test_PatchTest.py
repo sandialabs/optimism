@@ -11,8 +11,6 @@ from optimism import Mechanics
 from optimism.Timer import Timer
 from optimism.EquationSolver import newton_solve
 from optimism import QuadratureRule
-from optimism import Surface
-from optimism import TractionBC
 from optimism.test import MeshFixture
 
 
@@ -91,8 +89,8 @@ class PatchTest(MeshFixture.MeshFixture):
         def objective(Uu):
             U = dofManager.create_field(Uu, Ubc)
             internalPotential = self.compute_energy(U, self.internals)
-            loadPotential = TractionBC.compute_traction_potential_energy(self.mesh, U, quadRule, self.mesh.sideSets['right'], traction_func, time=0.0)
-            loadPotential += TractionBC.compute_traction_potential_energy(self.mesh, U, quadRule, self.mesh.sideSets['top'], traction_func, time=0.0)
+            loadPotential = Mechanics.compute_traction_potential_energy(self.fs, U, quadRule, self.mesh.sideSets['right'], traction_func, time=0.0)
+            loadPotential += Mechanics.compute_traction_potential_energy(self.fs, U, quadRule, self.mesh.sideSets['top'], traction_func, time=0.0)
             return internalPotential + loadPotential
         
         with Timer(name="NewtonSolve"):

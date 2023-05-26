@@ -10,7 +10,6 @@ from optimism import Mesh
 from optimism import Objective
 from optimism import QuadratureRule
 from optimism import SparseMatrixAssembler
-from optimism import TractionBC
 
 from optimism.material import Neohookean, LinearElastic
 from optimism.test import MeshFixture
@@ -335,8 +334,8 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
             U = dofManager.create_field(Uu)
             UPre = p.dynamic_data
             internalVariables = p[1]
-            loadPotential = TractionBC.compute_traction_potential_energy(
-                self.fs.mesh, U, self.qr1d, self.fs.mesh.sideSets["all_boundary"], traction, t)
+            loadPotential = Mechanics.compute_traction_potential_energy(
+                self.fs, U, self.qr1d, self.fs.mesh.sideSets["all_boundary"], traction, t)
             return self.dynamics.compute_algorithmic_energy(U, UPre, internalVariables, dt) + loadPotential
 
         dt = 1.0

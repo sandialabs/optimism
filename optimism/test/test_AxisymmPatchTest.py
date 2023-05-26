@@ -1,13 +1,9 @@
 from optimism.JaxConfig import *
 from optimism import FunctionSpace
-from optimism import Interpolants
 from optimism.material import LinearElastic as MatModel
-from optimism import Mesh
 from optimism import Mechanics
 from optimism.EquationSolver import newton_solve
 from optimism import QuadratureRule
-from optimism import Surface
-from optimism import TractionBC
 from optimism.test import MeshFixture
 
 
