@@ -59,14 +59,14 @@ class TractionPatch(MeshFixture.MeshFixture):
         dofManager = FunctionSpace.DofManager(self.fs, self.UTarget.shape[1], ebcs)
         Ubc = dofManager.get_bc_values(self.UTarget)
         
-        traction_func = lambda x, n, t: np.dot(self.targetStress[0:2, 0:2], n)
+        traction_func = lambda x, n: np.dot(self.targetStress[0:2, 0:2], n)
         
         
         def objective(Uu):
             U = dofManager.create_field(Uu, Ubc)
             internalPotential = self.compute_energy(U, self.internals)
-            loadPotential = Mechanics.compute_traction_potential_energy(self.fs, U, self.edgeQuadRule, self.mesh.sideSets['right'], traction_func, time=0.0)
-            loadPotential += Mechanics.compute_traction_potential_energy(self.fs, U, self.edgeQuadRule, self.mesh.sideSets['top'], traction_func, time=0.0)
+            loadPotential = Mechanics.compute_traction_potential_energy(self.fs, U, self.edgeQuadRule, self.mesh.sideSets['right'], traction_func)
+            loadPotential += Mechanics.compute_traction_potential_energy(self.fs, U, self.edgeQuadRule, self.mesh.sideSets['top'], traction_func)
             return internalPotential + loadPotential
         
         with Timer(name="NewtonSolve"):
