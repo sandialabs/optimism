@@ -1,27 +1,23 @@
 import jax
 from jax import numpy as np
 
-from optimism import ReadMesh
 from optimism.material import Neohookean
 from optimism.material import LinearElastic
 from optimism import EquationSolver
 
-from optimism.SparseCholesky import SparseCholesky as Cholesky
 from optimism import SparseMatrixAssembler
 from optimism import FunctionSpace
 from optimism import Mechanics
 
 from optimism import VTKWriter
-from optimism import Mesh
 from optimism import Mechanics
 from optimism import QuadratureRule
-from optimism import TractionBC
 
 from optimism.inverse import NonlinearSolve
 from optimism.FunctionSpace import EssentialBC, DofManager
 from optimism.Timer import Timer
 from optimism import Objective
-from jax.experimental import optimizers
+from jax.example_libraries import optimizers
 from optimism.test.MeshFixture import MeshFixture
 
 shapeOpt = True
@@ -71,10 +67,10 @@ class Buckle(MeshFixture):
 
         assert(self.mesh.nodeSets['push'].shape[0] == 2)
         
-        EBCs = [EssentialBC(nodeSet='left', field=0),
-                EssentialBC(nodeSet='left', field=1),
-                EssentialBC(nodeSet='right', field=0),
-                EssentialBC(nodeSet='right', field=1)]
+        EBCs = [EssentialBC(nodeSet='left', component=0),
+                EssentialBC(nodeSet='left', component=1),
+                EssentialBC(nodeSet='right', component=0),
+                EssentialBC(nodeSet='right', component=1)]
         
         # We need a function space to create the DofManager, so we'll
         # make a dummy function space now that we don't use later. We will
