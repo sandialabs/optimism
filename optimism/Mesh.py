@@ -303,3 +303,40 @@ def num_elements(mesh):
 
 def num_nodes(mesh):
     return mesh.coords.shape[0]
+
+
+def get_edge_coords(mesh, edge):
+    """Get coordinates of nodes on an element edge.
+
+    Arguments:
+    mesh: a Mesh object
+    edge: tuple containing the element number containing the edge and the
+        permutation (0, 1, or 2) of the edge within the triangle
+    """
+    edgeNodes = mesh.parentElement.faceNodes[edge[1], :]
+    nodes = mesh.conns[edge[0], edgeNodes]
+    return mesh.coords[nodes]
+
+
+def compute_edge_vectors(mesh, edgeCoords):
+    """Get geometric vectors for an element edge.
+    
+    Assumes that the edgs has a constant shape jacobian, that is, the
+    transformation from the parent element is affine.
+    
+    Arguments:
+    mesh: a Mesh object
+    edgeCoords: coordinates of all nodes on the edge, in the order
+        defined by the 1D parent element convention
+
+    Returns:
+    tuple (t, n, j) with
+    t: the unit tangent vector
+    n: the outward unit normal vector
+    j: jacobian of the transformation from parent to physical space
+    """
+    Xv = edgeCoords[mesh.parentElement1d.vertexNodes, :]
+    tangent = Xv[1] - Xv[0]
+    normal = np.array([tangent[1], -tangent[0]])
+    jac = np.linalg.norm(tangent)
+    return tangent/jac, normal/jac, jac

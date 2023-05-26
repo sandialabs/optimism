@@ -305,6 +305,37 @@ def average_quadrature_field_over_element(elemQPData, vols):
     return S/elVol
 
 
+def get_nodal_values_on_edge(functionSpace, nodalField, edge):
+    """Get nodal values of a field on an element edge.
+
+    Arguments:
+    functionSpace: a FunctionSpace object
+    nodalField: The nodal vector defined over the mesh (shape is number of
+        nodes by number of field components)
+    edge: tuple containing the element number containing the edge and the
+        permutation (0, 1, or 2) of the edge within the triangle
+    """
+    edgeNodes = functionSpace.mesh.parentElement.faceNodes[edge[1], :]
+    nodes = functionSpace.mesh.conns[edge[0], edgeNodes]
+    return nodalField[nodes]
+
+
+def interpolate_nodal_field_on_edge(functionSpace, U, interpolationPoints, edge):
+    """Interpolate a nodal field to specified points on an element edge.
+
+    Arguments:
+    functionSpace: a FunctionSpace object
+    U: the nodal values array
+    interpolationPoints: coordinates of points (in the 1D parametric space) to
+        interpolate to
+    edge: tuple containing the element number containing the edge and the
+        permutation (0, 1, or 2) of the edge within the triangle
+    """
+    edgeShapes = Interpolants.compute_shapes(functionSpace.mesh.parentElement1d, interpolationPoints)
+    edgeU = get_nodal_values_on_edge(functionSpace, U, edge)
+    return edgeShapes.values.T@edgeU
+
+
 class DofManager:
     def __init__(self, functionSpace, dim, EssentialBCs):
         self.fieldShape = Mesh.num_nodes(functionSpace.mesh), dim
