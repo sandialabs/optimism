@@ -320,7 +320,7 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
         ebcs = []
         dofManager = FunctionSpace.DofManager(self.fs, dim=2, EssentialBCs=ebcs)
 
-        def traction(X, N, t):
+        def traction(X, N):
             dispGrad = self.targetDispGradRate*t
             dispGrad3D = np.zeros((3,3)).at[:2, :2].set(dispGrad)
             q = np.array([0.0])
@@ -335,7 +335,7 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
             UPre = p.dynamic_data
             internalVariables = p[1]
             loadPotential = Mechanics.compute_traction_potential_energy(
-                self.fs, U, self.qr1d, self.fs.mesh.sideSets["all_boundary"], traction, t)
+                self.fs, U, self.qr1d, self.fs.mesh.sideSets["all_boundary"], traction)
             return self.dynamics.compute_algorithmic_energy(U, UPre, internalVariables, dt) + loadPotential
 
         dt = 1.0
