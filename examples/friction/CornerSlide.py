@@ -9,15 +9,12 @@ from optimism import EquationSolver as EqSolver
 from optimism import VTKWriter
 from optimism import AlSolver
 from optimism import QuadratureRule
-from optimism import Mesh
-from optimism import TractionBC
 
 from optimism.FunctionSpace import EssentialBC, DofManager
 from optimism.contact import PenaltyContact
 from optimism.contact import Friction
 from optimism.contact import Levelset
 from optimism.contact import LevelsetConstraint
-from optimism.Timer import Timer
 from optimism import Objective
 from optimism.ConstrainedObjective import ConstrainedObjective
 from optimism.ConstrainedObjective import ConstrainedQuasiObjective
@@ -58,8 +55,7 @@ class CornerSlide(MeshFixture):
         self.edges = np.vstack((self.mesh.sideSets['left'], self.mesh.sideSets['bottom']))
         
         triQuadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
-        fs = FunctionSpace.construct_function_space(self.mesh,
-                                                    triQuadRule)
+        fs = FunctionSpace.construct_function_space(self.mesh, triQuadRule)
         
         ebcs = []
         self.dofManager = DofManager(fs, self.U.shape[1], ebcs)
@@ -86,9 +82,9 @@ class CornerSlide(MeshFixture):
             tractionRelMag = p[0][0]
             traction = 1e-5
             
-            rightPushEnergy = 0 #TractionBC.compute_traction_potential_energy(self.mesh, U, self.quadRule, self.mesh.sideSets['right'], lambda x: np.array([-0.3, 0.0]))
-            topPushEnergy = TractionBC.compute_traction_potential_energy(self.mesh, U, self.quadRule, self.mesh.sideSets['top'], 
-                                                                         lambda x, n, t: np.array([-tractionRelMag*traction, -traction]))
+            rightPushEnergy = 0 #Mechanics.compute_traction_potential_energy(fs, U, self.quadRule, self.mesh.sideSets['right'], lambda x: np.array([-0.3, 0.0]))
+            topPushEnergy = Mechanics.compute_traction_potential_energy(fs, U, self.quadRule, self.mesh.sideSets['top'], 
+                                                                        lambda x, n: np.array([-tractionRelMag*traction, -traction]))
             mechanicalEnergy = self.mechFuncs.compute_strain_energy(U, self.state)
 
             levelsetMotion = np.array([0.0, 0.0])

@@ -10,7 +10,6 @@ from optimism import Mesh
 from optimism import Objective
 from optimism import QuadratureRule
 from optimism import SparseMatrixAssembler
-from optimism import TractionBC
 
 from optimism.material import Neohookean, LinearElastic
 from optimism.test import MeshFixture
@@ -321,22 +320,23 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
         ebcs = []
         dofManager = FunctionSpace.DofManager(self.fs, dim=2, EssentialBCs=ebcs)
 
-        def traction(X, N, t):
-            dispGrad = self.targetDispGradRate*t
-            dispGrad3D = np.zeros((3,3)).at[:2, :2].set(dispGrad)
-            q = np.array([0.0])
-            dt = 0.0
-            P = self.compute_stress(dispGrad3D, q, dt)[:2, :2]
-            return np.dot(P, N)
-
         def energy(Uu, p):
             t = p.time[0]
+            
+            def traction(X, N):
+                dispGrad = self.targetDispGradRate*t
+                dispGrad3D = np.zeros((3,3)).at[:2, :2].set(dispGrad)
+                q = np.array([0.0])
+                dt = 0.0
+                P = self.compute_stress(dispGrad3D, q, dt)[:2, :2]
+                return np.dot(P, N)
+            
             dt = t - p.time[1]
             U = dofManager.create_field(Uu)
             UPre = p.dynamic_data
             internalVariables = p[1]
-            loadPotential = TractionBC.compute_traction_potential_energy(
-                self.fs.mesh, U, self.qr1d, self.fs.mesh.sideSets["all_boundary"], traction, t)
+            loadPotential = Mechanics.compute_traction_potential_energy(
+                self.fs, U, self.qr1d, self.fs.mesh.sideSets["all_boundary"], traction)
             return self.dynamics.compute_algorithmic_energy(U, UPre, internalVariables, dt) + loadPotential
 
         dt = 1.0

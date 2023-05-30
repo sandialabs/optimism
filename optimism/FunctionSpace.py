@@ -305,6 +305,51 @@ def average_quadrature_field_over_element(elemQPData, vols):
     return S/elVol
 
 
+def get_nodal_values_on_edge(functionSpace, nodalField, edge):
+    """Get nodal values of a field on an element edge.
+
+    Arguments:
+    functionSpace: a FunctionSpace object
+    nodalField: The nodal vector defined over the mesh (shape is number of
+        nodes by number of field components)
+    edge: tuple containing the element number containing the edge and the
+        permutation (0, 1, or 2) of the edge within the triangle
+    """
+    edgeNodes = functionSpace.mesh.parentElement.faceNodes[edge[1], :]
+    nodes = functionSpace.mesh.conns[edge[0], edgeNodes]
+    return nodalField[nodes]
+
+
+def interpolate_nodal_field_on_edge(functionSpace, U, interpolationPoints, edge):
+    """Interpolate a nodal field to specified points on an element edge.
+
+    Arguments:
+    functionSpace: a FunctionSpace object
+    U: the nodal values array
+    interpolationPoints: coordinates of points (in the 1D parametric space) to
+        interpolate to
+    edge: tuple containing the element number containing the edge and the
+        permutation (0, 1, or 2) of the edge within the triangle
+    """
+    edgeShapes = Interpolants.compute_shapes(functionSpace.mesh.parentElement1d, interpolationPoints)
+    edgeU = get_nodal_values_on_edge(functionSpace, U, edge)
+    return edgeShapes.values.T@edgeU
+
+
+def integrate_function_on_edge(functionSpace, func, U, quadRule, edge):
+    uq = interpolate_nodal_field_on_edge(functionSpace, U, quadRule.xigauss, edge)
+    Xq = interpolate_nodal_field_on_edge(functionSpace, functionSpace.mesh.coords, quadRule.xigauss, edge)
+    edgeCoords = Mesh.get_edge_coords(functionSpace.mesh, edge)
+    _, normal, jac = Mesh.compute_edge_vectors(functionSpace.mesh, edgeCoords)
+    integrand = jax.vmap(func, (0, 0, None))(uq, Xq, normal)
+    return np.dot(integrand, jac*quadRule.wgauss)
+
+
+def integrate_function_on_edges(functionSpace, func, U, quadRule, edges):
+    integrate_on_edges = jax.vmap(integrate_function_on_edge, (None, None, None, None, 0))
+    return np.sum(integrate_on_edges(functionSpace, func, U, quadRule, edges))
+
+
 class DofManager:
     def __init__(self, functionSpace, dim, EssentialBCs):
         self.fieldShape = Mesh.num_nodes(functionSpace.mesh), dim

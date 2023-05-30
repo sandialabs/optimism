@@ -1,11 +1,9 @@
 import jax
 import jax.numpy as np
-from matplotlib import pyplot as plt
 
 from optimism import EquationSolver as EqSolver
 from optimism import EquationSolverSubspace as SolverSubspace
 from optimism import FunctionSpace
-from optimism import Interpolants
 from optimism.material import Neohookean as MatModel
 from optimism import Mechanics
 from optimism import Mesh
@@ -15,7 +13,6 @@ from optimism import Objective
 from optimism import SparseMatrixAssembler
 from optimism import QuadratureRule
 from optimism.Timer import Timer
-from optimism import TractionBC
 from optimism import VTKWriter
 from optimism.test.MeshFixture import MeshFixture           
 
@@ -75,8 +72,9 @@ class TractionArch(MeshFixture):
             internalVariables = p[1]
             strainEnergy = self.bvpFuncs.compute_strain_energy(U, internalVariables)
             F = p[0]
-            loadPotential = TractionBC.compute_traction_potential_energy(self.mesh, U, self.lineQuadRule, self.mesh.sideSets['push'], 
-                                                                         lambda x, n, t: np.array([0.0, -F/self.pushArea]))
+            loadPotential = Mechanics.compute_traction_potential_energy(
+                self.fs, U, self.lineQuadRule, self.mesh.sideSets['push'], 
+                lambda x, n: np.array([0.0, -F/self.pushArea]))
             return strainEnergy + loadPotential
         
         self.compute_bc_reactions = jax.jit(jax.grad(compute_energy_from_bcs, 1))
@@ -92,8 +90,8 @@ class TractionArch(MeshFixture):
         internalVariables = p[1]
         strainEnergy = self.bvpFuncs.compute_strain_energy(U, internalVariables)
         F = p[0]
-        loadPotential = TractionBC.compute_traction_potential_energy(self.mesh, U, self.lineQuadRule, self.mesh.sideSets['push'], 
-                                                                     lambda x, n, t: np.array([0.0, -F/self.pushArea]))
+        loadPotential = Mechanics.compute_traction_potential_energy(self.fs, U, self.lineQuadRule, self.mesh.sideSets['push'], 
+                                                                    lambda x, n: np.array([0.0, -F/self.pushArea]))
         return strainEnergy + loadPotential
 
     

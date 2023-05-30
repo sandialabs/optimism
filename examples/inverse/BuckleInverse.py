@@ -1,6 +1,5 @@
 import jax
 from jax import numpy as np
-from jax import custom_jvp, custom_vjp
 
 from optimism import ReadMesh
 
@@ -14,17 +13,14 @@ from optimism import FunctionSpace
 from optimism import Mechanics
 
 from optimism import VTKWriter
-from optimism import Mesh
 from optimism import Mechanics
 from optimism import QuadratureRule
-from optimism import TractionBC
 
 from optimism.inverse import TopOpt
 from optimism.inverse import NonlinearSolve
 from optimism.FunctionSpace import EssentialBC, DofManager
-from optimism.Timer import Timer
 from optimism import Objective
-from jax.experimental import optimizers
+from jax.example_libraries import optimizers
 
 props = {'elastic modulus': 10.0,
          'poisson ratio': 0.3}
@@ -92,7 +88,7 @@ class Buckle:
                                                          materialModel)
             
         return compute_energy(Uu, p,
-                              self.mesh, self.dofManager,
+                              fs, self.dofManager,
                               mechFuncs, self.quadRule, self.useTraction)
 
 
@@ -109,13 +105,13 @@ class Buckle:
         #                                                 materialModel)
 
         U = create_field(Uu, p, self.mesh, self.dofManager, self.useTraction)
-        mechanicalEnergy = -TractionBC.compute_traction_potential_energy(self.mesh,
-                                                                         U,
-                                                                         self.quadRule,
-                                                                         self.mesh.sideSets[topSide],
-                                                                         lambda x, n, t: np.array([0.0, p[0][0]]))
+        mechanicalEnergy = -Mechanics.compute_traction_potential_energy(fs,
+                                                                        U,
+                                                                        self.quadRule,
+                                                                        self.mesh.sideSets[topSide],
+                                                                        lambda x, n: np.array([0.0, p[0][0]]))
         #mechanicalEnergy = -compute_energy(Uu, p,
-        #                                   self.mesh, self.dofManager,
+        #                                   fs, self.dofManager,
         #                                   mechFuncs, self.quadRule, False)
 
 
@@ -298,11 +294,11 @@ def get_ubcs(p, mesh, dofManager, useTraction):
     return dofManager.get_bc_values(V)
 
                 
-def compute_energy(Uu, p, mesh, dofManager, mechFuncs, edgeQuadRule, useTraction):
-    U = create_field(Uu, p, mesh, dofManager, useTraction)
+def compute_energy(Uu, p, fs, dofManager, mechFuncs, edgeQuadRule, useTraction):
+    U = create_field(Uu, p, fs.mesh, dofManager, useTraction)
     mechanicalEnergy = mechFuncs.compute_strain_energy(U, p[1])
-    tractionEnergy = TractionBC.compute_traction_potential_energy(mesh, U, edgeQuadRule, mesh.sideSets[topSide], 
-                                                                  lambda x, n, t: np.array([0.0, p[0][0]])) if useTraction else 0.
+    tractionEnergy = Mechanics.compute_traction_potential_energy(fs, U, edgeQuadRule, fs.mesh.sideSets[topSide], 
+                                                                  lambda x, n: np.array([0.0, p[0][0]])) if useTraction else 0.
     
     return mechanicalEnergy + tractionEnergy
 

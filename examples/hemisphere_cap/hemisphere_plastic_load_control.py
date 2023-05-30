@@ -3,7 +3,6 @@ from jax import numpy as np
 
 from optimism import EquationSolver as EqSolver
 from optimism import FunctionSpace
-from optimism import Interpolants
 #from optimism.material import Neohookean as MatModel
 from optimism.material import J2Plastic as MatModel
 from optimism import Mechanics
@@ -14,7 +13,6 @@ from optimism import SparseMatrixAssembler
 from optimism import Surface
 from optimism import QuadratureRule
 from optimism import ReadExodusMesh
-from optimism import TractionBC
 from optimism import VTKWriter
 
         
@@ -93,8 +91,8 @@ class TractionArch():
             internalVariables = p[1]
             strainEnergy = self.bvpFuncs.compute_strain_energy(U, internalVariables)
             F = p[0]
-            loadPotential = TractionBC.compute_traction_potential_energy(self.mesh, U, self.lineQuadRule, self.mesh.sideSets['push'], 
-                                                                         lambda x, n, t: np.array([0.0, -F/self.pushArea]))
+            loadPotential = Mechanics.compute_traction_potential_energy(self.fs, U, self.lineQuadRule, self.mesh.sideSets['push'], 
+                                                                        lambda x, n: np.array([0.0, -F/self.pushArea]))
             return strainEnergy + loadPotential
         
         self.compute_bc_reactions = jax.jit(jax.grad(compute_energy_from_bcs, 1))
@@ -110,8 +108,8 @@ class TractionArch():
         internalVariables = p[1]
         strainEnergy = self.bvpFuncs.compute_strain_energy(U, internalVariables)
         F = p[0]
-        loadPotential = TractionBC.compute_traction_potential_energy(self.mesh, U, self.lineQuadRule, self.mesh.sideSets['push'], 
-                                                                     lambda x, n, t: np.array([0.0, -F/self.pushArea])*2*np.pi*x[0])
+        loadPotential = Mechanics.compute_traction_potential_energy(self.fs, U, self.lineQuadRule, self.mesh.sideSets['push'], 
+                                                                    lambda x, n: np.array([0.0, -F/self.pushArea])*2*np.pi*x[0])
         return strainEnergy + loadPotential
 
     
