@@ -5,8 +5,7 @@ setuptools.setup(
     description='Rapid development platform for solid mechanics research using optimization tools',
     author="Michael Tupek and Brandon Talamini",
     author_email='talamini1@llnl.gov', # todo: make an email list
-    install_requires=['jax',
-                      'jaxlib',
+    install_requires=['jax[cpu]',
                       'scipy',
                       'matplotlib', # this is not strictly necessary
                       'netcdf4'],
