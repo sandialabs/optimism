@@ -113,7 +113,6 @@ class TestEdgeIntersection(TestFixture):
     def get_ray_length_arg_y(self, yComp):
         sol = EdgeIntersection.compute_intersection(self.get_edge(), self.get_ray([-1.0, yComp]))
         return sol[1]
-
     
     @unittest.skip
     def test_plot(self):

@@ -1,5 +1,3 @@
-import matplotlib.pyplot as plt
-
 from optimism.JaxConfig import *
 from optimism.contact.SmoothMinMax import *
 from optimism.test.TestFixture import *
