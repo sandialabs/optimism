@@ -2,9 +2,9 @@ from optimism.test.TestFixture import *
 from optimism import QuadratureRule
 import jax
 import jax.numpy as np
+import numpy as onp
 
-usingTestingFilter = True
-
+usingTestingFilter = False
 
 def eval_linear_field_on_edge(field, xi):
     return field[0] * (1.0 - xi) + field[1] * xi
@@ -31,7 +31,6 @@ def compute_error(edgeA, edgeB, xiA, xiB, g):
 
 
 def compute_intersection(edgeA, edgeB):
-    normal = compute_common_normal(edgeA, edgeB)
 
     def compute_xi(xa, edgeB, normal):
         # solve xa - xb(xi) + g * normal = 0
@@ -41,73 +40,22 @@ def compute_intersection(edgeA, edgeB):
         xig = np.linalg.solve(M,r)
         return xig[0], xig[1]
 
-    xiAs = []
-    xiBs = []
-    gs = []
+    normal = compute_common_normal(edgeA, edgeB)
+    xiBs1, gs1 = jax.vmap(compute_xi, (0,None,None))(edgeA, edgeB, normal)
+    xiAs2, gs2 = jax.vmap(compute_xi, (0,None,None))(edgeB, edgeA, -normal)
 
-    for i in range(2):
-        xiA = 1.0 * (i==1)
-        xiB, g = compute_xi(edgeA[i], edgeB, normal)
-        xiAs.append(xiA)
-        xiBs.append(xiB)
-        gs.append(g)
+    xiAs = np.hstack((np.arange(2), xiAs2))
+    xiBs = np.hstack((xiBs1, np.arange(2)))
+    gs = np.hstack((gs1, gs2))
 
-    for i in range(2):
-        xiB = 1.0 * (i==1)
-        xiA, g = compute_xi(edgeB[i], edgeA, -normal)
-        xiAs.append(xiA)
-        xiBs.append(xiB)
-        gs.append(g)
-        
-    xiAk = [] # k is for korrected
-    xiBk = []
-    gk = []
-    for i in range(len(xiAs)):
-        xiA = xiAs[i]
-        xiB = xiBs[i]
-        if xiA <= 1.0 and xiA >= 0.0 and xiB <= 1.0 and xiB >= 0.0:
-            xiAk.append(xiA)
-            xiBk.append(xiB)
-            gk.append(gs[i])
+    xiAgood = jax.vmap(lambda xia, xib: np.where((xia >= 0.0) & (xia <= 1.0) & (xib >= 0.0) & (xib <= 1.0), xia, np.nan))(xiAs, xiBs)
+    argsMinMax = np.array([np.nanargmin(xiAgood), np.nanargmax(xiAgood)])
 
-    xiAk = np.array(xiAk)
-    xiBk = np.array(xiBk)
-    gk = np.array(gk)
+    return xiAs[argsMinMax], xiBs[argsMinMax], gs[argsMinMax]
 
-    if len(gk) > 2:
-        xiAk = np.zeros(2)
-        xiBk = np.zeros(2)
-        gk = np.zeros(2)
-
-        xiAMin = np.min(xiAk)
-        xAtMin = eval_linear_field_on_edge(edgeA, xiAMin)
-        xiBMin, gMin = compute_xi(xAtMin, edgeB, normal)
-        xiAk = xiAk.at[0].set(xiAMin)
-        xiBk = xiBk.at[0].set(xiBMin)
-        gk = gk.at[0].set(gMin)
-
-        xiAMax = np.max(xiAk)
-        xAtMax = eval_linear_field_on_edge(edgeA, xiAMax)
-        xiBMax, gMax = compute_xi(xAtMax, edgeB, normal)
-        xiAk = xiAk.at[1].set(xiAMax)
-        xiBk = xiBk.at[1].set(xiBMax)
-        gk = gk.at[1].set(gMax)
-
-    if len(gk)==0:
-        return None,None,None
-    
-    if len(gk)==1 or len(gk) > 2:
-        print("\n\nA very unusual bug found in intersection test")
-        print("edges = \n\n", edgeA, edgeB)
-        return None, None, None
-
-    return xiAk, xiBk, gk
-        
 
 def create_mortar_integrator(edgeA, edgeB):
     xiA,xiB,g = compute_intersection(edgeA, edgeB)
-    if xiA == None:
-        return lambda func : 0.0
 
     edgeQuad = QuadratureRule.create_quadrature_rule_1D(degree=2)
     xiGauss = edgeQuad.xigauss
@@ -117,18 +65,22 @@ def create_mortar_integrator(edgeA, edgeB):
     quadWeightA = lengthA * np.abs(xiA[0]-xiA[1]) * edgeQuad.wgauss
 
     quadXiB = jax.vmap(eval_linear_field_on_edge, (None,0))(xiB, xiGauss)
-    lengthB = np.linalg.norm(edgeB[0] - edgeB[1])
-    quadWeightB = lengthB * np.abs(xiB[0]-xiB[1]) * edgeQuad.wgauss
+    #lengthB = np.linalg.norm(edgeB[0] - edgeB[1])
+    #quadWeightB = lengthB * np.abs(xiB[0]-xiB[1]) * edgeQuad.wgauss
 
     gs = jax.vmap(eval_linear_field_on_edge, (None,0))(g, xiGauss)
 
-    if (np.linalg.norm(quadWeightA-quadWeightB) > 1e-14):
-        print("\n\nPoor accuracy for mortar integrals, the two side disagree on their common area")
-        print("edges = \n\n", edgeA, edgeB)
+    #if (np.linalg.norm(quadWeightA-quadWeightB) > 1e-14):
+    #    print("\n\nPoor accuracy for mortar integrals, the two side disagree on their common area")
+    #    print("edges = \n\n", edgeA, edgeB)
 
-    def integrator(func_of_xiA_xiB_g_weight):
-        integral = jax.vmap(func_of_xiA_xiB_g_weight, (0,0,0,0))(quadXiA, quadXiB, quadWeightA, gs)
-        return np.sum(integral)
+    def integrator(func_of_xiA_xiB_weight_g): # returns the integral of the provided kernel ('q') function over the intersection of edges
+        branches = [func_of_xiA_xiB_weight_g, lambda xiA, xiB, w, g: 0.0]
+        def integrand(xiA, xiB, w, g):
+            index = np.where(xiA==np.nan, 1, 0)
+            return jax.lax.switch(index, branches, xiA, xiB, w, g)
+                
+        return np.sum(jax.vmap(integrand)(quadXiA, quadXiB, quadWeightA, gs))
 
     return integrator
 
@@ -168,11 +120,10 @@ class TestMortarGeom(TestFixture):
             err = compute_error(edgeA, edgeB, xiA[i], xiB[i], g[i])
             self.assertTrue(err < 1e-15)
 
-    #@unittest.skipIf(usingTestingFilter, '')
+    @unittest.skipIf(usingTestingFilter, '')
     def testAreaIntegrals(self):
         edgeA = np.array([[0.1, 0.1], [0.2, 0.1]])
         edgeB = np.array([[0.22, 0.0], [0.18, 0.0]])
-
         # eventually...
         # can give options about how to compute common normal
         # can give options on integrating on common vs different surfaces
@@ -180,6 +131,41 @@ class TestMortarGeom(TestFixture):
         edgeIntegrator = create_mortar_integrator(edgeA, edgeB)
         commonArea = edgeIntegrator(lambda xiA, xiB, w, g: w*g)
         self.assertNear(commonArea, 0.002, 16)
+
+    def testMortarIntegralOneSided(self):
+        
+        from matplotlib import pyplot as plt
+
+        @jax.jit
+        def integrate_area(edgeA, edgeB, lambdaA, lambdaB):
+            edgeIntegrator = create_mortar_integrator(edgeA, edgeB)
+
+            # 1-sided integral for now
+            def q(xiA, xiB, w, g):
+                lamA = eval_linear_field_on_edge(lambdaA, xiA)
+                #print('shape lamA = ', lamA)
+                #return w * g
+                #lamB = eval_linear_field_on_edge(lambdaB, xiB)
+                return w * lamA * g 
+
+            return edgeIntegrator(q)
+        
+        edgeA = np.array([[0.1, 0.1], [0.2, 0.1]])
+        edgeB = np.array([[0.22, 0.0], [0.18, 0.0]])
+        lambdaA = np.array([0.0, 1.0])
+        lambdaB = np.zeros(2)
+
+        N = 101
+        edgeAy = np.linspace(0.09, 0.11, N)
+        energy = onp.zeros(len(edgeAy))
+
+        print("e1 = ", integrate_area(edgeA, edgeB, lambdaA, lambdaB))
+
+        #for n in range(N):
+        #    energy[n] = integrate_area( edgeA.at[0,1].set(edgeAy[n]), edgeB, lambdaA, lambdaB )
+
+        plt.plot(edgeAy, energy)
+        plt.savefig('plt.png')
 
 
 if __name__ == '__main__':
