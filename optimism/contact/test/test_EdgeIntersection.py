@@ -5,6 +5,7 @@ from optimism.JaxConfig import *
 from optimism.contact import EdgeIntersection
 from optimism.test.TestFixture import TestFixture
 
+
 class TestEdgeIntersection(TestFixture):
 
     def setUp(self):
@@ -113,6 +114,7 @@ class TestEdgeIntersection(TestFixture):
     def get_ray_length_arg_y(self, yComp):
         sol = EdgeIntersection.compute_intersection(self.get_edge(), self.get_ray([-1.0, yComp]))
         return sol[1]
+
     
     @unittest.skip
     def test_plot(self):
