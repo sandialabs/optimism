@@ -16,21 +16,25 @@ def compute_normal(edgeCoords):
     return normal / np.linalg.norm(normal)
 
 
-def compute_common_normal(edgeA, edgeB):
+def compute_average_normal(edgeA, edgeB):
     nA = compute_normal(edgeA)
     nB = compute_normal(edgeB)
     normal = nA - nB
     return normal / np.linalg.norm(normal)
 
 
-def compute_error(edgeA, edgeB, xiA, xiB, g):
-    normal = compute_common_normal(edgeA, edgeB)
+def compute_normal_from_a(edgeA, edgeB):
+    return compute_normal(edgeA)
+
+
+def compute_error(edgeA, edgeB, xiA, xiB, g, f_common_normal):
+    normal = f_common_normal(edgeA, edgeB)
     xA = eval_linear_field_on_edge(edgeA, xiA)
     xB = eval_linear_field_on_edge(edgeB, xiB)
     return np.linalg.norm(xA - xB + g * normal)
 
 
-def compute_intersection(edgeA, edgeB):
+def compute_intersection(edgeA, edgeB, f_common_normal):
 
     def compute_xi(xa, edgeB, normal):
         # solve xa - xb(xi) + g * normal = 0
@@ -40,9 +44,9 @@ def compute_intersection(edgeA, edgeB):
         xig = np.linalg.solve(M,r)
         return xig[0], xig[1]
 
-    normal = compute_common_normal(edgeA, edgeB)
+    normal = f_common_normal(edgeA, edgeB)
     xiBs1, gs1 = jax.vmap(compute_xi, (0,None,None))(edgeA, edgeB, normal)
-    xiAs2, gs2 = jax.vmap(compute_xi, (0,None,None))(edgeB, edgeA, -normal)
+    xiAs2, gs2 = jax.vmap(compute_xi, (0,None,None))(edgeB, edgeA,-normal)
 
     xiAs = np.hstack((np.arange(2), xiAs2))
     xiBs = np.hstack((xiBs1, np.arange(2)))
@@ -54,70 +58,56 @@ def compute_intersection(edgeA, edgeB):
     return xiAs[argsMinMax], xiBs[argsMinMax], gs[argsMinMax]
 
 
-def create_mortar_integrator(edgeA, edgeB):
-    xiA,xiB,g = compute_intersection(edgeA, edgeB)
-
+def integrate_with_active_mortar(xiA, xiB, g, lengthA, func_of_xiA_xiB_w_g):
     edgeQuad = QuadratureRule.create_quadrature_rule_1D(degree=2)
     xiGauss = edgeQuad.xigauss
 
     quadXiA = jax.vmap(eval_linear_field_on_edge, (None,0))(xiA, xiGauss)
-    lengthA = np.linalg.norm(edgeA[0] - edgeA[1])
-    quadWeightA = lengthA * np.abs(xiA[0]-xiA[1]) * edgeQuad.wgauss
-
     quadXiB = jax.vmap(eval_linear_field_on_edge, (None,0))(xiB, xiGauss)
-    #lengthB = np.linalg.norm(edgeB[0] - edgeB[1])
-    #quadWeightB = lengthB * np.abs(xiB[0]-xiB[1]) * edgeQuad.wgauss
-
+    quadWeightA = lengthA * (xiA[1]-xiA[0]) * edgeQuad.wgauss
     gs = jax.vmap(eval_linear_field_on_edge, (None,0))(g, xiGauss)
 
-    #if (np.linalg.norm(quadWeightA-quadWeightB) > 1e-14):
-    #    print("\n\nPoor accuracy for mortar integrals, the two side disagree on their common area")
-    #    print("edges = \n\n", edgeA, edgeB)
+    return np.sum(jax.vmap(func_of_xiA_xiB_w_g)(quadXiA, quadXiB, quadWeightA, gs))
 
-    def integrator(func_of_xiA_xiB_weight_g): # returns the integral of the provided kernel ('q') function over the intersection of edges
-        branches = [func_of_xiA_xiB_weight_g, lambda xiA, xiB, w, g: 0.0]
-        def integrand(xiA, xiB, w, g):
-            index = np.where(xiA==np.nan, 1, 0)
-            return jax.lax.switch(index, branches, xiA, xiB, w, g)
-                
-        return np.sum(jax.vmap(integrand)(quadXiA, quadXiB, quadWeightA, gs))
 
-    return integrator
+def integrate_with_mortar(edgeA, edgeB, f_common_normal, func_of_xiA_xiB_w_g):
+    xiA,xiB,g = compute_intersection(edgeA, edgeB, f_common_normal)
+    branches = [lambda : integrate_with_active_mortar(xiA, xiB, g, np.linalg.norm(edgeA[0] - edgeA[1]), func_of_xiA_xiB_w_g), 
+                lambda : 0.0]
+
+    return jax.lax.switch(1*np.any(xiA==np.nan), branches)
 
 
 class TestMortarGeom(TestFixture):
     
     def setUp(self):
-        return
+        self.f_common_normal = compute_average_normal #compute_normal_from_a 
 
     @unittest.skipIf(usingTestingFilter, '')
     def testOffEdges(self):
         edgeA = np.array([[0.1, 0.2], [-0.2, 0.3]])
         edgeB = np.array([[-0.2, 0.28], [0.15, -0.25]])
-        xiA,xiB,g = compute_intersection(edgeA, edgeB)
-
+        xiA,xiB,g = compute_intersection(edgeA, edgeB, self.f_common_normal)
         for i in range(len(g)):
-            err = compute_error(edgeA, edgeB, xiA[i], xiB[i], g[i])
+            err = compute_error(edgeA, edgeB, xiA[i], xiB[i], g[i], self.f_common_normal)
             self.assertTrue(err < 1e-15)
 
     @unittest.skipIf(usingTestingFilter, '')
     def testEdgesWithCommonPoint(self):
         edgeA = np.array([[0.1, 0.2], [-0.2, 0.3]])
         edgeB = np.array([[-0.2, 0.3], [0.15, -0.25]])
-        xiA,xiB,g = compute_intersection(edgeA, edgeB)
-
+        xiA,xiB,g = compute_intersection(edgeA, edgeB, self.f_common_normal)
         for i in range(len(g)):
-            err = compute_error(edgeA, edgeB, xiA[i], xiB[i], g[i])
+            err = compute_error(edgeA, edgeB, xiA[i], xiB[i], g[i], self.f_common_normal)
             self.assertTrue(err < 1e-15)
 
     @unittest.skipIf(usingTestingFilter, '')
     def testEdgesWithTwoCommonPoints(self):
         edgeA = np.array([[0.1, 0.2], [-0.2, 0.3]])
         edgeB = np.array([[-0.2, 0.3], [0.1, 0.2]])
-        xiA,xiB,g = compute_intersection(edgeA, edgeB)
-
+        xiA,xiB,g = compute_intersection(edgeA, edgeB, self.f_common_normal)
         for i in range(len(g)):
-            err = compute_error(edgeA, edgeB, xiA[i], xiB[i], g[i])
+            err = compute_error(edgeA, edgeB, xiA[i], xiB[i], g[i], self.f_common_normal)
             self.assertTrue(err < 1e-15)
 
     @unittest.skipIf(usingTestingFilter, '')
@@ -125,46 +115,40 @@ class TestMortarGeom(TestFixture):
         edgeA = np.array([[0.1, 0.1], [0.2, 0.1]])
         edgeB = np.array([[0.22, 0.0], [0.18, 0.0]])
         # eventually...
-        # can give options about how to compute common normal
         # can give options on integrating on common vs different surfaces
         # can give options on quadrature rule on common surface
-        edgeIntegrator = create_mortar_integrator(edgeA, edgeB)
-        commonArea = edgeIntegrator(lambda xiA, xiB, w, g: w*g)
+        commonArea = integrate_with_mortar(edgeA, edgeB, self.f_common_normal, lambda xiA, xiB, w, g: w*g)
         self.assertNear(commonArea, 0.002, 16)
 
-    def testMortarIntegralOneSided(self):
-        
+    def testMortarIntegralOneSided(self):        
         from matplotlib import pyplot as plt
 
-        @jax.jit
-        def integrate_area(edgeA, edgeB, lambdaA, lambdaB):
-            edgeIntegrator = create_mortar_integrator(edgeA, edgeB)
-
-            # 1-sided integral for now
+        def integrate_multipliers(edgeA, edgeB, lambdaA, lambdaB):
             def q(xiA, xiB, w, g):
                 lamA = eval_linear_field_on_edge(lambdaA, xiA)
-                #print('shape lamA = ', lamA)
-                #return w * g
-                #lamB = eval_linear_field_on_edge(lambdaB, xiB)
-                return w * lamA * g 
+                lamB = eval_linear_field_on_edge(lambdaB, xiB)
+                return w * g * (lamA + lamB) 
 
-            return edgeIntegrator(q)
+            return integrate_with_mortar(edgeA, edgeB, self.f_common_normal, q)
         
-        edgeA = np.array([[0.1, 0.1], [0.2, 0.1]])
-        edgeB = np.array([[0.22, 0.0], [0.18, 0.0]])
-        lambdaA = np.array([0.0, 1.0])
+        edgeA = np.array([[1.0, 0.1], [2.0, 0.1]])
+        edgeB = np.array([[3.0, 0.0], [2.0, 0.0]])
+
+        lambdaA = np.array([1.0, 1.0])
         lambdaB = np.zeros(2)
 
-        N = 101
-        edgeAy = np.linspace(0.09, 0.11, N)
-        energy = onp.zeros(len(edgeAy))
+        def gap_of_y(y):
+            ea = edgeA.at[0,0].set(y)
+            ea = ea.at[1,0].set(y+1.0)
+            return integrate_multipliers(ea, edgeB, lambdaA, lambdaB)
 
-        print("e1 = ", integrate_area(edgeA, edgeB, lambdaA, lambdaB))
+        N = 300
+        edgeAy = np.linspace(0.9, 3.1, N)
+        energy = jax.vmap(gap_of_y)(edgeAy)
+        force = jax.vmap(jax.grad(gap_of_y))(edgeAy)
 
-        #for n in range(N):
-        #    energy[n] = integrate_area( edgeA.at[0,1].set(edgeAy[n]), edgeB, lambdaA, lambdaB )
-
-        plt.plot(edgeAy, energy)
+        #plt.plot(edgeAy, energy)
+        plt.plot(edgeAy, force)
         plt.savefig('plt.png')
 
 
