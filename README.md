@@ -147,6 +147,6 @@ For details about the OptimiSM API, see the [documentation]().
 ## Contact
 
 OptimiSM was created and is maintained by Michael Tupek
-<mrtupek@sandia.gov> and Brandon Talamini <btalami@sandia.gov>.
+<tupek2@llnl.gov> and Brandon Talamini <talamini1@llnl.gov>.
 
 SCR#: 2709.0
