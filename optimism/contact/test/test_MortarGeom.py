@@ -72,16 +72,16 @@ def integrate_with_active_mortar(xiA, xiB, g, lengthA, func_of_xiA_xiB_w_g):
 
 def integrate_with_mortar(edgeA, edgeB, f_common_normal, func_of_xiA_xiB_w_g):
     xiA,xiB,g = compute_intersection(edgeA, edgeB, f_common_normal)
-    branches = [lambda : integrate_with_active_mortar(xiA, xiB, g, np.linalg.norm(edgeA[0] - edgeA[1]), func_of_xiA_xiB_w_g), 
+    branches = [lambda : integrate_with_active_mortar(xiA, xiB, g, np.linalg.norm(edgeA[0] - edgeA[1]), func_of_xiA_xiB_w_g),
                 lambda : 0.0]
 
     return jax.lax.switch(1*np.any(xiA==np.nan), branches)
 
 
 class TestMortarGeom(TestFixture):
-    
+
     def setUp(self):
-        self.f_common_normal = compute_average_normal #compute_normal_from_a 
+        self.f_common_normal = compute_average_normal #compute_normal_from_a
 
     @unittest.skipIf(usingTestingFilter, '')
     def testOffEdges(self):
@@ -120,17 +120,17 @@ class TestMortarGeom(TestFixture):
         commonArea = integrate_with_mortar(edgeA, edgeB, self.f_common_normal, lambda xiA, xiB, w, g: w*g)
         self.assertNear(commonArea, 0.002, 16)
 
-    def testMortarIntegralOneSided(self):        
+    def testMortarIntegralOneSided(self):
         from matplotlib import pyplot as plt
 
         def integrate_multipliers(edgeA, edgeB, lambdaA, lambdaB):
             def q(xiA, xiB, w, g):
                 lamA = eval_linear_field_on_edge(lambdaA, xiA)
                 lamB = eval_linear_field_on_edge(lambdaB, xiB)
-                return w * g * (lamA + lamB) 
+                return w * g * (lamA + lamB)
 
             return integrate_with_mortar(edgeA, edgeB, self.f_common_normal, q)
-        
+
         edgeA = np.array([[1.0, 0.1], [2.0, 0.1]])
         edgeB = np.array([[3.0, 0.0], [2.0, 0.0]])
 
