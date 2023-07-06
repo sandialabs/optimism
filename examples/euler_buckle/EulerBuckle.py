@@ -123,7 +123,7 @@ class EulerBeam(MeshFixture):
         self.outputForce.append(float(force))
         self.outputDisp.append(float(disp))
 
-        with open('traction_Fd.npz','wb') as f:
+        with open('column_Fd.npz','wb') as f:
             np.savez(f, force=np.array(self.outputForce), displacement=np.array(self.outputDisp))
 
 
