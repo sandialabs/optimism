@@ -90,7 +90,7 @@ class EulerBeam(MeshFixture):
 
     def write_output(self, Uu, p, step):
         U = self.create_field(Uu, p)
-        plotName = 'traction-'+str(step).zfill(3)
+        plotName = 'euler_column-'+str(step).zfill(3)
         writer = VTKWriter.VTKWriter(self.mesh, baseFileName=plotName)
 
         writer.add_nodal_field(name='displacement', nodalData=U, fieldType=VTKWriter.VTKFieldType.VECTORS)
