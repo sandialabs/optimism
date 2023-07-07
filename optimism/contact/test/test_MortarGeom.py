@@ -4,10 +4,24 @@ import jax
 import jax.numpy as np
 import numpy as onp
 
-usingTestingFilter = True
+usingTestingFilter = False
+
 
 def smooth_linear(xi, l):                
-    return np.where( xi < l, 0.5*xi*xi/l, np.where(xi > 1.0-l, 1.0-l-0.5*(1-xi)*(1-xi)/l, xi-0.5*l))
+    return np.where( xi < l, 0.5*xi*xi/l, np.where(xi > 1.0-l, 1.0-l-0.5*(1.0-xi)*(1.0-xi)/l, xi-0.5*l) )
+
+
+def spline_ramp(eta):
+    # return 3*eta*eta - 2*eta*eta*eta # a less smoothing ramp
+    #K = np.array([[3,4,5],[6,12,20],[1,1,1]])
+    #r = np.array([0,0,1])
+    #abc = np.linalg.solve(K,r)
+    a = 10
+    b = -15
+    c = 6
+    eta2 = eta*eta
+    eta3 = eta2*eta
+    return np.where(eta >= 1.0, 1.0, a * eta3 + b * eta2*eta2 + c * eta2*eta3)
 
 
 def eval_linear_field_on_edge(field, xi):
@@ -93,10 +107,6 @@ def integrate_with_mortar(edgeA, edgeB, f_common_normal, func_of_xiA_xiB_w_g):
     return jax.lax.switch(1*np.any(xiA==np.nan), branches)
 
 
-K = np.array([[3,4,5],[6,12,20],[1,1,1]])
-r = np.array([0,0,1])
-abc = np.linalg.solve(K,r)
-
 class TestMortarGeom(TestFixture):
 
     def setUp(self):
@@ -139,38 +149,23 @@ class TestMortarGeom(TestFixture):
         commonArea = integrate_with_mortar(edgeA, edgeB, self.f_common_normal, lambda xiA, xiB, w, g: w*g)
         self.assertNear(commonArea, 0.002, 16)
 
-
-    
-
-    def spline_ramp(self, eta):
-        # return 3*eta*eta - 2*eta*eta*eta
-        return np.where(eta >= 1.0, 1.0, abc[0] * np.power(eta,3) + abc[1] * np.power(eta,4) + abc[2] * np.power(eta,5))
-
-
-    #@unittest.skipIf(usingTestingFilter, '')
+    unittest.skipIf(True, '')
     def testSpline(self):
         from matplotlib import pyplot as plt
         x = np.linspace(0.0,1.0,100)
-        #y = jax.vmap(self.spline_ramp)(x)
-        y = jax.vmap(smooth_linear,(0,None))(x,0.1)
-        
+        y = jax.vmap(spline_ramp)(x)
+        #y = jax.vmap(smooth_linear,(0,None))(x,0.1)    
         plt.clf()
         plt.plot(x,y)
         plt.savefig('tmp.png')
-
     
+    unittest.skipIf(True, '')
     def testMortarIntegralOneSided(self):
         from matplotlib import pyplot as plt
 
         def integrate_multipliers(edgeA, edgeB, lambdaA, lambdaB):
             xiThresh = 0.02
             def q(xiA, xiB, w, g):
-                #w *= np.where(xiA < xiThresh, self.spline_kernel(xiThresh-xiA, 0.5 * xiThresh), 1.0)
-                #w *= (1.0-2*xiThresh) * np.where(xiA > 0.0, self.spline_ramp(xiA/xiThresh), 1.0)
-                #w *= (1.0-2*xiThresh) * np.where(xiB > 0.0, self.spline_ramp(xiB/xiThresh), 1.0)
-                #w *= (1.0-2*xiThresh) * np.where(xiA < 1.0, self.spline_ramp((1.0-xiA)/xiThresh), 1.0)
-                #w *= (1.0-2*xiThresh) * np.where(xiB < 1.0, self.spline_ramp((1.0-xiB)/xiThresh), 1.0)
-
                 lamA = eval_linear_field_on_edge(lambdaA, xiA)
                 lamB = eval_linear_field_on_edge(lambdaB, xiB)
                 return w * g * (lamA + lamB)
