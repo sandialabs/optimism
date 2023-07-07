@@ -4,7 +4,11 @@ import jax
 import jax.numpy as np
 import numpy as onp
 
-usingTestingFilter = False
+usingTestingFilter = True
+
+def smooth_linear(xi, l):                
+    return np.where( xi < l, 0.5*xi*xi/l, np.where(xi > 1.0-l, 1.0-l-0.5*(1-xi)*(1-xi)/l, xi-0.5*l))
+
 
 def eval_linear_field_on_edge(field, xi):
     return field[0] * (1.0 - xi) + field[1] * xi
@@ -58,25 +62,40 @@ def compute_intersection(edgeA, edgeB, f_common_normal):
     return xiAs[argsMinMax], xiBs[argsMinMax], gs[argsMinMax]
 
 
-def integrate_with_active_mortar(xiA, xiB, g, lengthA, func_of_xiA_xiB_w_g):
+def integrate_with_active_mortar(xiA, xiB, g, lengthA, lengthB, func_of_xiA_xiB_w_g):
     edgeQuad = QuadratureRule.create_quadrature_rule_1D(degree=2)
     xiGauss = edgeQuad.xigauss
 
     quadXiA = jax.vmap(eval_linear_field_on_edge, (None,0))(xiA, xiGauss)
     quadXiB = jax.vmap(eval_linear_field_on_edge, (None,0))(xiB, xiGauss)
-    quadWeightA = lengthA * (xiA[1]-xiA[0]) * edgeQuad.wgauss
+
+    smoothingSize = 0.1
+    xiAsmooth = smooth_linear(xiA, smoothingSize)
+    xiBsmooth = smooth_linear(xiB, smoothingSize)
+    dxiA = xiAsmooth[1] - xiAsmooth[0]
+    dxiB = xiBsmooth[1] - xiBsmooth[0]
+
+    quadWeightA = lengthA * dxiA * edgeQuad.wgauss
+    quadWeightB = quadWeightA #lengthB * dxiB * edgeQuad.wgauss
     gs = jax.vmap(eval_linear_field_on_edge, (None,0))(g, xiGauss)
 
-    return np.sum(jax.vmap(func_of_xiA_xiB_w_g)(quadXiA, quadXiB, quadWeightA, gs))
+    return np.sum(jax.vmap(func_of_xiA_xiB_w_g)(quadXiA, quadXiB, 0.5*(quadWeightA+quadWeightB), gs))
 
 
 def integrate_with_mortar(edgeA, edgeB, f_common_normal, func_of_xiA_xiB_w_g):
     xiA,xiB,g = compute_intersection(edgeA, edgeB, f_common_normal)
-    branches = [lambda : integrate_with_active_mortar(xiA, xiB, g, np.linalg.norm(edgeA[0] - edgeA[1]), func_of_xiA_xiB_w_g),
+    branches = [lambda : integrate_with_active_mortar(xiA, xiB, g, 
+                                                      np.linalg.norm(edgeA[0] - edgeA[1]), 
+                                                      np.linalg.norm(edgeB[0] - edgeB[1]),
+                                                      func_of_xiA_xiB_w_g),
                 lambda : 0.0]
 
     return jax.lax.switch(1*np.any(xiA==np.nan), branches)
 
+
+K = np.array([[3,4,5],[6,12,20],[1,1,1]])
+r = np.array([0,0,1])
+abc = np.linalg.solve(K,r)
 
 class TestMortarGeom(TestFixture):
 
@@ -120,11 +139,38 @@ class TestMortarGeom(TestFixture):
         commonArea = integrate_with_mortar(edgeA, edgeB, self.f_common_normal, lambda xiA, xiB, w, g: w*g)
         self.assertNear(commonArea, 0.002, 16)
 
+
+    
+
+    def spline_ramp(self, eta):
+        # return 3*eta*eta - 2*eta*eta*eta
+        return np.where(eta >= 1.0, 1.0, abc[0] * np.power(eta,3) + abc[1] * np.power(eta,4) + abc[2] * np.power(eta,5))
+
+
+    #@unittest.skipIf(usingTestingFilter, '')
+    def testSpline(self):
+        from matplotlib import pyplot as plt
+        x = np.linspace(0.0,1.0,100)
+        #y = jax.vmap(self.spline_ramp)(x)
+        y = jax.vmap(smooth_linear,(0,None))(x,0.1)
+        
+        plt.clf()
+        plt.plot(x,y)
+        plt.savefig('tmp.png')
+
+    
     def testMortarIntegralOneSided(self):
         from matplotlib import pyplot as plt
 
         def integrate_multipliers(edgeA, edgeB, lambdaA, lambdaB):
+            xiThresh = 0.02
             def q(xiA, xiB, w, g):
+                #w *= np.where(xiA < xiThresh, self.spline_kernel(xiThresh-xiA, 0.5 * xiThresh), 1.0)
+                #w *= (1.0-2*xiThresh) * np.where(xiA > 0.0, self.spline_ramp(xiA/xiThresh), 1.0)
+                #w *= (1.0-2*xiThresh) * np.where(xiB > 0.0, self.spline_ramp(xiB/xiThresh), 1.0)
+                #w *= (1.0-2*xiThresh) * np.where(xiA < 1.0, self.spline_ramp((1.0-xiA)/xiThresh), 1.0)
+                #w *= (1.0-2*xiThresh) * np.where(xiB < 1.0, self.spline_ramp((1.0-xiB)/xiThresh), 1.0)
+
                 lamA = eval_linear_field_on_edge(lambdaA, xiA)
                 lamB = eval_linear_field_on_edge(lambdaB, xiB)
                 return w * g * (lamA + lamB)
@@ -142,14 +188,17 @@ class TestMortarGeom(TestFixture):
             ea = ea.at[1,0].set(y+1.0)
             return integrate_multipliers(ea, edgeB, lambdaA, lambdaB)
 
-        N = 300
+        N = 500
         edgeAy = np.linspace(0.9, 3.1, N)
         energy = jax.vmap(gap_of_y)(edgeAy)
         force = jax.vmap(jax.grad(gap_of_y))(edgeAy)
 
-        #plt.plot(edgeAy, energy)
+        plt.clf()
+        plt.plot(edgeAy, energy)
+        plt.savefig('energy.png')
+        plt.clf()
         plt.plot(edgeAy, force)
-        plt.savefig('plt.png')
+        plt.savefig('force.png')
 
 
 if __name__ == '__main__':
