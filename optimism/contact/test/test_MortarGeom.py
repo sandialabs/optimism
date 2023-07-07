@@ -73,10 +73,10 @@ def integrate_with_active_mortar(xiA, xiB, g, lengthA, lengthB, func_of_xiA_xiB_
     xiAsmooth = smooth_linear(xiA, smoothingSize)
     xiBsmooth = smooth_linear(xiB, smoothingSize)
     dxiA = xiAsmooth[1] - xiAsmooth[0]
-    dxiB = xiBsmooth[1] - xiBsmooth[0]
+    dxiB = np.abs(xiBsmooth[1] - xiBsmooth[0])
 
     quadWeightA = lengthA * dxiA * edgeQuad.wgauss
-    quadWeightB = quadWeightA #lengthB * dxiB * edgeQuad.wgauss
+    quadWeightB = lengthB * dxiB * edgeQuad.wgauss
     gs = jax.vmap(eval_linear_field_on_edge, (None,0))(g, xiGauss)
 
     return np.sum(jax.vmap(func_of_xiA_xiB_w_g)(quadXiA, quadXiB, 0.5*(quadWeightA+quadWeightB), gs))
