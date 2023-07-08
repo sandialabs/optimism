@@ -21,7 +21,6 @@ def compute_closest_distance_to_each_side_smooth(mesh, disp, quadRule, interacti
 def get_potential_interaction_list(surfaceM, surfaceI, mesh, disp, maxNeighbors):
 
     def get_close_edge_indices(surfaceM, edgeI):
-        print('edge size = ', edgeI.shape)
         minDistsToA = vmap(min_dist_squared, (0,None,None,None,None))(surfaceM, edgeI, mesh, mesh.coords, disp)
         return surfaceM[np.argsort(minDistsToA)[:maxNeighbors]]
     
