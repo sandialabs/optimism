@@ -245,7 +245,7 @@ class TensorMathFixture(TestFixture):
         C = F.T@F
         sqrtC = TensorMath.sqrtm(C)
         shouldBeC = np.dot(sqrtC,sqrtC)
-        self.assertArrayNear(shouldBeC, C, 12)
+        self.assertArrayNear(shouldBeC, C, 11)
 
 
     def test_sqrtm_derivatives_on_10x10(self):

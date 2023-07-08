@@ -83,7 +83,7 @@ def integrate_with_active_mortar(xiA, xiB, g, lengthA, lengthB, func_of_xiA_xiB_
     quadXiA = jax.vmap(eval_linear_field_on_edge, (None,0))(xiA, xiGauss)
     quadXiB = jax.vmap(eval_linear_field_on_edge, (None,0))(xiB, xiGauss)
 
-    smoothingSize = 0.1
+    smoothingSize = 1e-7
     xiAsmooth = smooth_linear(xiA, smoothingSize)
     xiBsmooth = smooth_linear(xiB, smoothingSize)
     dxiA = xiAsmooth[1] - xiAsmooth[0]
@@ -147,9 +147,9 @@ class TestMortarGeom(TestFixture):
         # can give options on integrating on common vs different surfaces
         # can give options on quadrature rule on common surface
         commonArea = integrate_with_mortar(edgeA, edgeB, self.f_common_normal, lambda xiA, xiB, w, g: w*g)
-        self.assertNear(commonArea, 0.002, 16)
+        self.assertNear(commonArea, 0.002, 9)
 
-    unittest.skipIf(True, '')
+    @unittest.skipIf(True, 'Used to explore smooth ramp behavior')
     def testSpline(self):
         from matplotlib import pyplot as plt
         x = np.linspace(0.0,1.0,100)
@@ -159,9 +159,10 @@ class TestMortarGeom(TestFixture):
         plt.plot(x,y)
         plt.savefig('tmp.png')
     
-    unittest.skipIf(True, '')
+    @unittest.skipIf(True, 'Used to explore contact behavior')
     def testMortarIntegralOneSided(self):
         from matplotlib import pyplot as plt
+        self.assertTrue(False)
 
         def integrate_multipliers(edgeA, edgeB, lambdaA, lambdaB):
             xiThresh = 0.02

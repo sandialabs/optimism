@@ -196,7 +196,7 @@ def create_edges(conns):
     for i, ec in enumerate(edgeConns):
         rowsMatch = onp.all(onp.flip(ec) == allTriFaces, axis=1)
         if onp.any(rowsMatch):
-            j = onp.where(rowsMatch)[0]
+            j = onp.where(rowsMatch)[0][0]
             # there should only be one matching row, but take element 0
             # because j will have the same number of axes (2) as
             # rowsMatch.
