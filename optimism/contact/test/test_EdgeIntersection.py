@@ -5,6 +5,7 @@ from optimism.JaxConfig import *
 from optimism.contact import EdgeIntersection
 from optimism.test.TestFixture import TestFixture
 
+
 class TestEdgeIntersection(TestFixture):
 
     def setUp(self):

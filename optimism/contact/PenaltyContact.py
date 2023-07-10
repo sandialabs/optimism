@@ -44,7 +44,7 @@ def compute_total_penalty_contact_energy(levelset, dispField, mesh, quadRule, ed
     return np.sum(vmap(compute_edge_penalty_contact_energy, (None,None,None,None,0,None))(levelset, mesh, dispField, quadRule, edges, stiffness))
 
 
-def compute_fisher_burmeister_linearization(levelset, disp, mesh, quadRule, edges, lmbda):
+def compute_fisher_burmeister_linearization(levelset, dispField, mesh, quadRule, edges, lmbda):
     for edge in edges:
         quadratureCurCoords = get_current_coordinates_at_quadrature_points(mesh, dispField, quadRule, edge)
         phi = levelset(quadratureCurCoords)

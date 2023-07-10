@@ -1,5 +1,7 @@
 from optimism.JaxConfig import *
 
+# this is hard coded for tri elements
+
 def create_edges(coords, conns, edge_is_potentially_in_contact):
     edges = []
     for e,elem in enumerate(conns):
@@ -19,23 +21,11 @@ def get_coords(mesh, side):
     return elemCoords[ np.array([lSide, (lSide+1)%3]), : ]
 
 
-def interpolate_nodal_field_on_edge(mesh, U, interpolationPoints, edge):
-    # This function isn't used yet.
-    # We may want to replicate parts of FunctionSpace to do surface integrals.
-    # 
-    fieldIndex = Surface.get_field_index(edge, mesh.conns)  
-    nodalValues = Surface.eval_field(U, fieldIndex)
-    return 0.0
-
-
 def integrate_values(quadratureRule, coords, gaussField):
-    xigauss, wgauss = quadratureRule
+    _, wgauss = quadratureRule
     jac = np.linalg.norm(coords[0,:] - coords[1,:])
-    xgauss = np.array([coords[0] + (coords[1] - coords[0])*xi for xi in xigauss])
     dx = jac*wgauss
-    
-    res = dx.dot(gaussField)
-    return res
+    return dx.dot(gaussField)
 
 
 def integrate_function(quadratureRule, coords, field_func):
