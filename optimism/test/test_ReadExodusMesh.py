@@ -20,7 +20,8 @@ haveNetCDF = 'netCDF4' in sys.modules
 skipMessage = 'netCDF4 not installed, exodus reader disabled'
 
 
-TEST_FILE = pathlib.Path(__file__).parent.joinpath('patch_2_blocks.g')
+TEST_FILE_PATCH = pathlib.Path(__file__).parent.joinpath('patch_2_blocks.g')
+TEST_FILE_NSETS = pathlib.Path(__file__).parent.joinpath('single_block.exo')
 
 
 class TestMeshReadData(TestFixture.TestFixture):
@@ -41,7 +42,7 @@ class TestMeshReadData(TestFixture.TestFixture):
     #    Length of distribution list       =          18  
 
     def setUp(self):
-        self.mesh = ReadExodusMesh.read_exodus_mesh(TEST_FILE)
+        self.mesh = ReadExodusMesh.read_exodus_mesh(TEST_FILE_PATCH)
 
     @TestFixture.unittest.skipIf(not haveNetCDF, skipMessage)
     def test_entity_counts(self):
@@ -92,9 +93,73 @@ class TestMeshReadData(TestFixture.TestFixture):
 
 
 
+class TestMeshReadAddNodesets(TestFixture.TestFixture):
+    # output from explore:
+    
+    # Number of coordinates per node       =           2
+    # Number of nodes                      =           9
+    # Number of elements                   =           8
+    # Number of element blocks             =           1
+
+
+    # Number of nodal point sets           =           0
+    # Number of element side sets          =           2
+    #    Length of element list            =           4
+    #    Length of node list               =           8
+    #    Length of distribution list       =           8  
+
+    def setUp(self):
+        self.mesh = ReadExodusMesh.read_exodus_mesh(TEST_FILE_NSETS)
+
+    @TestFixture.unittest.skipIf(not haveNetCDF, skipMessage)
+    def test_nodesets_exist(self):
+        readSideSets = len(self.mesh.sideSets)
+        self.assertEqual(readSideSets, 2)
+
+        readNodeSets = len(self.mesh.nodeSets)
+        self.assertEqual(readNodeSets, 2)
+
+
+    @TestFixture.unittest.skipIf(not haveNetCDF, skipMessage)
+    def test_nodesets_lengths(self):
+        self.assertEqual(self.mesh.sideSets["yminus_sideset"].shape[0], 2)
+        self.assertEqual(self.mesh.sideSets["yplus_sideset"].shape[0], 2)
+
+        self.assertEqual(len(self.mesh.nodeSets["yminus_nodeset"]), 3)
+        self.assertEqual(len(self.mesh.nodeSets["yplus_nodeset"]), 3)
+    
+
+    @TestFixture.unittest.skipIf(not haveNetCDF, skipMessage)
+    def test_nodesets_coordinates(self):
+        yminusCoords_node0 = self.mesh.coords[self.mesh.nodeSets["yminus_nodeset"][0]]
+        self.assertEqual(yminusCoords_node0[0], -0.5)
+        self.assertEqual(yminusCoords_node0[1], -0.5)
+
+        yminusCoords_node1 = self.mesh.coords[self.mesh.nodeSets["yminus_nodeset"][1]]
+        self.assertAlmostEqual(yminusCoords_node1[0], 0.0, 16)
+        self.assertEqual(yminusCoords_node1[1], -0.5)
+
+        yminusCoords_node2 = self.mesh.coords[self.mesh.nodeSets["yminus_nodeset"][2]]
+        self.assertEqual(yminusCoords_node2[0], 0.5)
+        self.assertEqual(yminusCoords_node2[1], -0.5)
+
+        yplusCoords_node0 = self.mesh.coords[self.mesh.nodeSets["yplus_nodeset"][0]]
+        self.assertEqual(yplusCoords_node0[0], -0.5)
+        self.assertEqual(yplusCoords_node0[1], 0.5)
+
+        yplusCoords_node1 = self.mesh.coords[self.mesh.nodeSets["yplus_nodeset"][1]]
+        self.assertAlmostEqual(yplusCoords_node1[0], 0.0, 16)
+        self.assertEqual(yplusCoords_node1[1], 0.5)
+
+        yplusCoords_node2 = self.mesh.coords[self.mesh.nodeSets["yplus_nodeset"][2]]
+        self.assertEqual(yplusCoords_node2[0], 0.5)
+        self.assertEqual(yplusCoords_node2[1], 0.5)
+
+
+
 class TestMeshReadPatchTest(TestFixture.TestFixture):
     def setUp(self):
-        self.mesh = ReadExodusMesh.read_exodus_mesh(TEST_FILE)
+        self.mesh = ReadExodusMesh.read_exodus_mesh(TEST_FILE_PATCH)
         quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2)
         self.fs = FunctionSpace.construct_function_space(self.mesh, quadRule)
 
