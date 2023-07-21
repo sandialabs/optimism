@@ -11,7 +11,7 @@ def compute_normal(edgeCoords):
     return normal / jnp.linalg.norm(normal)
 
 
-def compute_average_normal(edgeA, edgeB):
+def compute_average_normal(edgeA : jnp.array, edgeB : jnp.array) -> jnp.array:
     nA = compute_normal(edgeA)
     nB = compute_normal(edgeB)
     normal = nA - nB

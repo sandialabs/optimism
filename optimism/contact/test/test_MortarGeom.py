@@ -74,7 +74,7 @@ class TestMortarGeom(TestFixture):
         self.assertNear(commonArea, 0.002, 9)
 
 
-    @unittest.skipIf(True, 'Used to explore smoothing')
+    @unittest.skipIf(True, 'Used to visually explore smoothing')
     def testSpline(self):
         from matplotlib import pyplot as plt
         x = np.linspace(0.0,1.0,100)
@@ -85,12 +85,11 @@ class TestMortarGeom(TestFixture):
         plt.savefig('tmp.png')
     
 
-    @unittest.skipIf(False, 'Used to explore contact behavior')
+    @unittest.skipIf(False, 'Used to visually explore contact behavior')
     def testMortarIntegralOneSided(self):
         from matplotlib import pyplot as plt
 
         def integrate_multipliers(edgeA, edgeB, lambdaA, lambdaB):
-            xiThresh = 0.02
             def q(xiA, xiB, g):
                 lamA = MortarContact.eval_linear_field_on_edge(lambdaA, xiA)
                 lamB = MortarContact.eval_linear_field_on_edge(lambdaB, xiB)
