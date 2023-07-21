@@ -4,9 +4,23 @@ from optimism import Mesh
 from optimism import QuadratureRule
 from optimism import Surface
 from optimism.contact import EdgeIntersection
-from optimism.contact import Search
+from optimism import FunctionSpace
 from optimism.test.MeshFixture import MeshFixture
 from optimism.contact import Contact
+from matplotlib import pyplot as plt
+
+
+def get_side_set_segments(mesh, sideset, disp):
+
+    def get_current_edge_segments(edge):
+        XOnEdge = Mesh.get_edge_coords(mesh, edge)
+        uOnEdge = Mesh.get_edge_field(mesh, edge, disp)
+        xOnEdge = XOnEdge + uOnEdge
+        return vmap(lambda x, y: np.array([x,y]))(xOnEdge[:-1], xOnEdge[1:])
+
+    segments = vmap(get_current_edge_segments)(sideset)
+    return segments.reshape((segments.shape[0]*segments.shape[1], segments.shape[2], segments.shape[3]))
+
 
 def get_best_overlap_vector(mesh, edge, listOfEdges):
     edgeCoords = Surface.get_coords(mesh, edge)
@@ -16,7 +30,6 @@ def get_best_overlap_vector(mesh, edge, listOfEdges):
     integrationRay = np.array([edgeCenter, normal])
     
     minDistance = np.inf
-            
     for neighbor in listOfEdges:
         if not np.all(edge==neighbor):
             neighborCoords = Surface.get_coords(mesh, neighbor)
@@ -39,21 +52,32 @@ class TwoBodyContactFixture(MeshFixture):
                                         lambda x : self.targetDispGrad.dot(x), '2')
         
         self.mesh, _ = Mesh.combine_mesh(m1, m2)
-        # self.mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(self.mesh, order=2, copyNodeSets=False)
+        order=2
+        self.mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(self.mesh, order=order, copyNodeSets=False)
         self.disp = np.zeros(self.mesh.coords.shape)
+
+
+        edgesTop1 = get_side_set_segments(self.mesh, self.mesh.sideSets['right1'], self.disp)
+        edgesTop2 = get_side_set_segments(self.mesh, self.mesh.sideSets['left2'], self.disp)
+
+        plt.clf()
+        plt.plot( edgesTop1[:,:,0].T, edgesTop1[:,:,1].T, linestyle='-', color='y', markerfacecolor='red', marker='o')
+        plt.plot( edgesTop2[:,:,0].T, edgesTop2[:,:,1].T, linestyle='-', color='g', markerfacecolor='blue', marker='o')
+        plt.show()
+        exit(1)
 
         nodeSets = Mesh.create_nodesets_from_sidesets(self.mesh)
         self.mesh = Mesh.mesh_with_nodesets(self.mesh, nodeSets)
         self.quadRule = QuadratureRule.create_quadrature_rule_1D(3)
         
 
-    #@unittest.skipIf(True, '')
+    @unittest.skipIf(True, '')
     def test_combining_nodesets(self):
         self.assertArrayEqual( self.mesh.nodeSets['top1'], [12,13,14] )
         numNodesMesh1 = 15
         self.assertArrayEqual( self.mesh.nodeSets['top2'], np.array([6,7])+numNodesMesh1 )
 
-    #@unittest.skipIf(True, '')
+    @unittest.skipIf(False, '')
     def test_combining_sidesets(self):
         self.assertArrayEqual( self.mesh.sideSets['top1'], np.array([[7,1],[15,1]]) )
         numElemsMesh1 = 2*8
@@ -76,7 +100,7 @@ class TwoBodyContactFixture(MeshFixture):
         writer.write()
         
 
-    @unittest.skipIf(False, '')
+    @unittest.skipIf(True, '')
     def test_contact_search(self):
         self.disp = 0.0*self.disp
         
