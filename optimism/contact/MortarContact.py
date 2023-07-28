@@ -18,7 +18,7 @@ def compute_average_normal(edgeA : jnp.array, edgeB : jnp.array) -> jnp.array:
     return normal / jnp.linalg.norm(normal)
 
 
-def compute_normal_from_a(edgeA, edgeB):
+def compute_normal_from_a(edgeA : jnp.array, edgeB : jnp.array) -> jnp.array:
     return compute_normal(edgeA)
 
 # field utilities
@@ -90,3 +90,38 @@ def integrate_with_mortar(edgeA : jnp.array,
                 lambda : 0.0]
 
     return jax.lax.switch(1*jnp.any(xiA==jnp.nan), branches)
+
+
+def assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighborList, 
+                             f_average_normal : Callable,
+                             f_integrand : Callable):
+    def compute_nodal_gap_area(segB, neighborSegsA):
+        nodeLeft = segB[0]
+        nodeRight = segB[1]
+        def compute_quantities_for_segment_pair(segB, indexA):
+            segA = segmentConnsA[indexA]
+            coordsSegB = coords[segB] + disp[segB]
+            coordsSegA = coords[segA] + disp[segA]
+
+            gapAreaLeft = integrate_with_mortar(coordsSegB, coordsSegA, f_average_normal, lambda xiA, xiB, gap: f_integrand(gap) * (1.0-xiA), 1e-9)
+            gapAreaRight = integrate_with_mortar(coordsSegB, coordsSegA, f_average_normal, lambda xiA, xiB, gap: f_integrand(gap) * xiA, 1e-9)
+            return gapAreaLeft, gapAreaRight
+
+        gapAreaLeft, gapAreaRight = jax.vmap(compute_quantities_for_segment_pair, (None,0))(segB, neighborSegsA)
+        return nodeLeft, jnp.sum(gapAreaLeft), nodeRight, jnp.sum(gapAreaRight)
+
+    nodesLeft, gapsLeft, nodesRight, gapsRight = jax.vmap(compute_nodal_gap_area)(segmentConnsB, neighborList)
+
+    nodalGapField = jnp.zeros(disp.shape[0])
+    nodalGapField = nodalGapField.at[nodesLeft].add(gapsLeft)
+    nodalGapField = nodalGapField.at[nodesRight].add(gapsRight)
+
+    return nodalGapField
+
+
+def assemble_area_weighted_gaps(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal : Callable):
+    return assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal, lambda gap : gap)
+
+
+def assemble_nodal_areas(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal : Callable):
+    return assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal, lambda gap : 1.0)

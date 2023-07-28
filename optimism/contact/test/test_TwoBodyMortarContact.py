@@ -10,6 +10,8 @@ from optimism.contact import MortarContact
 import unittest
 
 
+
+
 #@partial(jit, static_argnums=(4,))
 def get_closest_neighbors(edgeSetA : np.array,
                           edgeSetB : np.array,
@@ -44,7 +46,7 @@ class TwoBodyContactFixture(MeshFixture):
     def setUp(self):
         self.targetDispGrad = np.array([[0.1, -0.2],[0.4, -0.1]])
         
-        m1 = self.create_mesh_and_disp(3, 4, [0.0, 1.0], [0.0, 0.8],
+        m1 = self.create_mesh_and_disp(3, 5, [0.0, 1.0], [0.0, 1.0],
                                         lambda x : self.targetDispGrad.dot(x), '1')
 
         m2 = self.create_mesh_and_disp(2, 8, [0.9, 2.0], [0.0, 1.0],
@@ -60,17 +62,16 @@ class TwoBodyContactFixture(MeshFixture):
         
         self.segmentConnsA = get_facet_connectivities(self.mesh, sideA)
         self.segmentConnsB = get_facet_connectivities(self.mesh, sideB)
-        
+
+
     def plot_solution(self, plotName):
         from optimism import VTKWriter
-
         writer = VTKWriter.VTKWriter(self.mesh, baseFileName=plotName)
         writer.add_nodal_field(name='displacement',
                                nodalData=self.disp,
                                fieldType=VTKWriter.VTKFieldType.VECTORS)
         writer.add_contact_edges(self.segmentConnsA)
         writer.add_contact_edges(self.segmentConnsB)
-        
         writer.write()
         
 
@@ -99,32 +100,9 @@ class TwoBodyContactFixture(MeshFixture):
 
         neighborList = get_closest_neighbors(self.segmentConnsA, self.segmentConnsB, self.mesh, self.disp, 5)
 
-        def compute_nodal_gap_area(segB, neighborSegsA):
-            nodeLeft = segB[0]
-            nodeRight = segB[1]
-            def compute_quantities_for_segment_pair(segB, indexA):
-                segA = self.segmentConnsA[indexA]
-                coordsSegB = self.mesh.coords[segB] + self.disp[segB]
-                coordsSegA = self.mesh.coords[segA] + self.disp[segA]
 
-                gapAreaLeft = MortarContact.integrate_with_mortar(coordsSegB, coordsSegA, MortarContact.compute_average_normal, lambda xiA, xiB, gap: gap * (1.0-xiA), 1e-9)
-                areaLeft = MortarContact.integrate_with_mortar(coordsSegB, coordsSegA, MortarContact.compute_average_normal, lambda xiA, xiB, gap: (1.0-xiA), 1e-9)
-                gapAreaRight = MortarContact.integrate_with_mortar(coordsSegB, coordsSegA, MortarContact.compute_average_normal, lambda xiA, xiB, gap: gap * xiA, 1e-9)
-                areaRight = MortarContact.integrate_with_mortar(coordsSegB, coordsSegA, MortarContact.compute_average_normal, lambda xiA, xiB, gap: xiA, 1e-9)
-                return gapAreaLeft, areaLeft, gapAreaRight, areaRight
-
-            gapAreaLeft, areaLeft, gapAreaRight, areaRight = vmap(compute_quantities_for_segment_pair, (None,0))(segB, neighborSegsA)
-            return nodeLeft, np.sum(gapAreaLeft), np.sum(areaLeft), nodeRight, np.sum(gapAreaRight), np.sum(areaRight)
-
-        nodesLeft, gapsLeft, areasLeft, nodesRight, gapsRight, areasRight = vmap(compute_nodal_gap_area)(self.segmentConnsB, neighborList)
-    
-        nodalGapField = np.zeros(self.disp.shape[0])
-        nodalAreaField = np.zeros(self.disp.shape[0])
-
-        nodalGapField = nodalGapField.at[nodesLeft].add(gapsLeft)
-        nodalGapField = nodalGapField.at[nodesRight].add(gapsRight)
-        nodalAreaField = nodalAreaField.at[nodesLeft].add(areasLeft)
-        nodalAreaField = nodalAreaField.at[nodesRight].add(areasRight)
+        nodalGapField = MortarContact.assemble_area_weighted_gaps(self.mesh.coords, self.disp, self.segmentConnsA, self.segmentConnsB, neighborList, MortarContact.compute_average_normal)
+        nodalAreaField = MortarContact.assemble_nodal_areas(self.mesh.coords, self.disp, self.segmentConnsA, self.segmentConnsB, neighborList, MortarContact.compute_average_normal)
 
         nodesB = np.unique(np.concatenate(self.segmentConnsB))
 
@@ -137,8 +115,6 @@ class TwoBodyContactFixture(MeshFixture):
         print('coords = ', self.mesh.coords[nodesB])
 
         print('sum area = ', np.sum(nodalAreaField), np.sum(nodalAreaField[nodesB]), np.sum(nodalAreaField[~nodesB]))
-
-
 
 if __name__ == '__main__':
     unittest.main()
