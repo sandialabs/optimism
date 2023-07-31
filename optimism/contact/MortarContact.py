@@ -89,7 +89,7 @@ def integrate_with_mortar(edgeA : jnp.array,
                                                       relativeSmoothingSize),
                 lambda : 0.0]
 
-    return jax.lax.switch(1*jnp.any(xiA==jnp.nan), branches)
+    return jax.lax.switch(1*jnp.any(xiA==jnp.nan), branches) #jax.lax.cond(jnp.any(xiA==jnp.nan), branches[1], branches[0]) #
 
 
 def assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighborList, 
