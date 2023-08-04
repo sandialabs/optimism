@@ -579,6 +579,7 @@ def newton_solve(objective_func, solution, maxSteps=1):
             with Timer(name="LinearSolve"):
                 solution = solution - np.reshape(np.linalg.solve(hess,gradients), gradShape)
                 
+    print("Newton solve took", step, "steps.")
     return solution
 
 
