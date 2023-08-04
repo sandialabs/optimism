@@ -4,13 +4,15 @@ import numpy as onp
 import scipy as scipy
 
 from optimism import FunctionSpace
-from optimism.material import Neohookean as MatModel
+from optimism.material import LinearElastic as MatModel
+#from optimism.material import Neohookean as MatModel
 from optimism import Mesh
 from optimism import Mechanics
 from optimism.Timer import Timer
 from optimism.EquationSolver import newton_solve
 from optimism import QuadratureRule
 from optimism.test import MeshFixture
+from optimism.TensorMath import tensor_2D_to_3D
 import metis
 
 E = 1.0
@@ -67,18 +69,6 @@ def construct_basis_on_poly(elems, conns, fs : FunctionSpace.FunctionSpace):
 
     globalNodeToLocalNode = {nodeN : n for n, nodeN in enumerate(uniqueNodes)}
 
-    S = onp.zeros((Q))
-    B = onp.zeros((len(elems), Nnode, 2))
-
-    for e, elem in enumerate(elems):
-        shapeGrad = fs.shapeGrads[elem]
-        for n, node in enumerate(conns[elem]):
-            node = int(node)
-            N = globalNodeToLocalNode[node]
-            B[e,N,:] = shapeGrad[:,n]
-
-    # return B,S,globalNodeToLocalNode
-
     G = onp.zeros((Q,Q))
     for e in elems:
         elemShapes = fs.shapes[e]
@@ -96,7 +86,7 @@ def construct_basis_on_poly(elems, conns, fs : FunctionSpace.FunctionSpace):
     Sinv = onp.array([1.0/s if abs(s) > 1e-13 else 0.0 for s in S])
     Ginv = U@onp.diag(Sinv)@U.T
 
-    B = onp.zeros((Q, Nnode, 2)) # MRT hard coded 2
+    B = onp.zeros((Q, Nnode, fs.shapeGrads.shape[3])) # MRT hard coded 2
     for e in elems:
         elemShapes = fs.shapes[e]
         elemShapeGrads = fs.shapeGrads[e]
@@ -112,7 +102,7 @@ def construct_basis_on_poly(elems, conns, fs : FunctionSpace.FunctionSpace):
     for q in range(Q):
         B[:,q] = Ginv@B[:,q]
 
-    S = np.sum(G)
+    S = np.sum(G, axis=0)
 
     return B, S, globalNodeToLocalNode # return map from global nodes to local index of B, S
 
@@ -133,12 +123,12 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
         self.quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
         self.fs = FunctionSpace.construct_function_space(self.mesh, self.quadRule)
 
-        materialModel = MatModel.create_material_model_functions(props)
+        self.materialModel = MatModel.create_material_model_functions(props)
 
         mcxFuncs = \
             Mechanics.create_mechanics_functions(self.fs,
                                                  "plane strain",
-                                                 materialModel)
+                                                 self.materialModel)
 
         self.compute_energy = mcxFuncs.compute_strain_energy
         self.internals = mcxFuncs.compute_initial_state()
@@ -182,33 +172,51 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
         self.UTarget = self.mesh.coords@self.targetDispGrad.T
         Ubc = self.dofManager.get_bc_values(self.UTarget)
 
-
         polys = self.create_polys()
+
+        polyFs = []
+
         totalVol = 0.0
         for p in polys:
             pElems = polys[p]
-
             B,W,globalToLocalNode = construct_basis_on_poly(pElems, self.mesh.conns, self.fs)
+            polyFs.append((B,W,globalToLocalNode))
 
             totalVol += np.sum(W)
-
-            gradUTarget = np.zeros((B.shape[0],B.shape[2],B.shape[2]))
+            gradUs = np.zeros((B.shape[0],B.shape[2],B.shape[2]))
             for node in globalToLocalNode:
                 n = globalToLocalNode[node]
                 b = B[:,n,:]
                 UatN = self.UTarget[node]
-                gradUTarget += jax.vmap(lambda bb : np.outer(UatN,bb))(b)
-                
-            print(gradUTarget)
+                gradUs += jax.vmap(lambda bb : np.outer(UatN,bb))(b)
+
+            for gradU in gradUs:
+                self.assertArrayNear(gradU, self.targetDispGrad, 8)   
 
         print('total vol = ', totalVol)
 
-        @jax.jit
-        def objective(Uu):
+        def objective_poly(Uu):
+
+            def energy_density(gradu):
+                g = tensor_2D_to_3D(gradu)
+                return self.materialModel.compute_energy_density(g, None, 0.0)
+
             U = self.dofManager.create_field(Uu, Ubc)
-            return self.compute_energy(U, self.internals)
-        
-        Uu = newton_solve(objective, self.dofManager.get_unknown_values(self.UTarget))
+            totalEnergy = 0.0
+            for B,W,gToLMap in polyFs:
+                gradU = np.zeros((B.shape[0],B.shape[2],B.shape[2]))
+                for node in gToLMap:
+                    n = gToLMap[node]
+                    b = B[:,n,:]
+                    UatN = U[node]
+                    gradU += jax.vmap(lambda bb : np.outer(UatN,bb))(b)
+
+                energies = jax.vmap(energy_density)(gradU)
+                totalEnergy += W @ energies
+
+            return totalEnergy
+
+        Uu = newton_solve(objective_poly, self.dofManager.get_unknown_values(0.0*self.UTarget))
 
         self.write_output(Uu, Ubc, 0)
 
@@ -218,7 +226,7 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
         for dg in dispGrads.reshape(ne*nqpe,2,2):
             self.assertArrayNear(dg, self.targetDispGrad, 14)
 
-        grad_func = jax.grad(objective)
+        grad_func = jax.grad(objective_poly)
         self.assertNear(np.linalg.norm(grad_func(Uu)), 0.0, 14)
 
 
