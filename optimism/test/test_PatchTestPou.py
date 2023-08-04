@@ -20,16 +20,16 @@ props = {'elastic modulus': E,
          'strain measure': 'linear'}
 
 
+def insort(a, b, kind='mergesort'):
+    # took mergesort as it seemed a tiny bit faster for my sorted large array try.
+    c = onp.concatenate((a, b)) # we still need to do this unfortunatly.
+    c.sort(kind=kind)
+    flag = onp.ones(len(c), dtype=bool)
+    onp.not_equal(c[1:], c[:-1], out=flag[1:])
+    return c[flag]
+
+
 def create_graph(conns):
-
-    def insort(a, b, kind='mergesort'):
-        # took mergesort as it seemed a tiny bit faster for my sorted large array try.
-        c = onp.concatenate((a, b)) # we still need to do this unfortunatly.
-        c.sort(kind=kind)
-        flag = onp.ones(len(c), dtype=bool)
-        onp.not_equal(c[1:], c[:-1], out=flag[1:])
-        return c[flag]
-
     nodeToElem = {}
     for e, elem in enumerate(conns):
         for n in elem:
@@ -52,41 +52,69 @@ def create_graph(conns):
 
 def create_partitions(conns):
     graph = create_graph(conns)
-    (edgecuts, parts) = metis.part_graph(graph, 8)
+    (edgecuts, parts) = metis.part_graph(graph, 4)
     return np.array(parts, dtype=int)
 
 
 def construct_basis_on_poly(elems, conns, fs : FunctionSpace.FunctionSpace):
-    nodalShapes = {}
+    uniqueNodes = conns[elems[0]]
+    for e in elems[1:]:
+        uniqueNodes = insort(uniqueNodes, conns[e])
+
+    # these are not set to be general yet, assuming the pou integration is over all nodes, all nodes are active
+    Q = len(uniqueNodes) # number of quadrature bases
+    Nnode = len(uniqueNodes) # number of active nodes on poly
+
+    globalNodeToLocalNode = {nodeN : n for n, nodeN in enumerate(uniqueNodes)}
+
+    S = onp.zeros((Q))
+    B = onp.zeros((len(elems), Nnode, 2))
+
+    for e, elem in enumerate(elems):
+        shapeGrad = fs.shapeGrads[elem]
+        for n, node in enumerate(conns[elem]):
+            node = int(node)
+            N = globalNodeToLocalNode[node]
+            B[e,N,:] = shapeGrad[:,n]
+
+    # return B,S,globalNodeToLocalNode
+
+    G = onp.zeros((Q,Q))
     for e in elems:
         elemShapes = fs.shapes[e]
-
+        vols = fs.vols[e]
         for n, node in enumerate(conns[e]):
             node = int(node)
-            if node in nodalShapes:
-                nodalShapes[node][e] = elemShapes[:,n]
-            else:
-                nodalShapes[node] = {e : elemShapes[:,n]}
-
-    Q = len(nodalShapes)
-    G = onp.zeros((Q,Q))
-
-    for n, nodeN in enumerate(nodalShapes):
-        elemsAndWeightsN = nodalShapes[nodeN]
-        for m, nodeM in enumerate(nodalShapes):
-            elemsAndWeightsM = nodalShapes[nodeM]
-            for elemN in elemsAndWeightsN:
-                if elemN in elemsAndWeightsM:
-                    integralOfShapes = fs.vols[elemN] @ (elemsAndWeightsN[elemN] * elemsAndWeightsM[elemN])
-                    G[n,m] = integralOfShapes
-                    #G = G.at[n,m].set(integralOfShapes)
+            for m, mode in enumerate(conns[e]):
+                mode = int(mode)
+                N = globalNodeToLocalNode[node]
+                M = globalNodeToLocalNode[mode]
+                G[N,M] += vols @ (elemShapes[:,n] * elemShapes[:,m])
 
     S,U = onp.linalg.eigh(G)
-    print('diff = ', U@np.diag(S)@U.T - G)
 
+    Sinv = onp.array([1.0/s if abs(s) > 1e-13 else 0.0 for s in S])
+    Ginv = U@onp.diag(Sinv)@U.T
 
-    
-    return nodalShapes
+    B = onp.zeros((Q, Nnode, 2)) # MRT hard coded 2
+    for e in elems:
+        elemShapes = fs.shapes[e]
+        elemShapeGrads = fs.shapeGrads[e]
+        vols = fs.vols[e]
+        for n, node in enumerate(conns[e]):
+            node = int(node)
+            for m, mode in enumerate(conns[e]):
+                mode = int(mode)
+                N = globalNodeToLocalNode[node]
+                M = globalNodeToLocalNode[mode]
+                B[N,M,:] += vols @ ( elemShapes[:,n] * elemShapeGrads[:,m])
+
+    for q in range(Q):
+        B[:,q] = Ginv@B[:,q]
+
+    S = np.sum(G)
+
+    return B, S, globalNodeToLocalNode # return map from global nodes to local index of B, S
 
 
 class PatchTestQuadraticElements(MeshFixture.MeshFixture):
@@ -102,22 +130,8 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
 
         self.partition = create_partitions(self.mesh.conns)
 
-        polys = {}
-        for e,p in enumerate(self.partition):
-            p = int(p)
-            e = int(e)
-            if p in polys:
-                polys[p].append(e)
-            else:
-                polys[p] = [e]
-
         self.quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
         self.fs = FunctionSpace.construct_function_space(self.mesh, self.quadRule)
-
-
-        for p in polys:
-            construct_basis_on_poly(polys[p], self.mesh.conns, self.fs)
-
 
         materialModel = MatModel.create_material_model_functions(props)
 
@@ -128,6 +142,18 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
 
         self.compute_energy = mcxFuncs.compute_strain_energy
         self.internals = mcxFuncs.compute_initial_state()
+
+
+    def create_polys(self):
+        polys = {}
+        for e,p in enumerate(self.partition):
+            p = int(p)
+            e = int(e)
+            if p in polys:
+                polys[p].append(e)
+            else:
+                polys[p] = [e]
+        return polys
 
 
     def write_output(self, Uu, Ubc, step):
@@ -144,7 +170,6 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
         writer.add_cell_field(name='partition',
                               cellData=self.partition,
                               fieldType=VTKWriter.VTKFieldType.SCALARS)
-
         writer.write()
     
 
@@ -156,13 +181,33 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
         self.targetDispGrad = np.array([[0.1, -0.2],[0.4, -0.1]]) 
         self.UTarget = self.mesh.coords@self.targetDispGrad.T
         Ubc = self.dofManager.get_bc_values(self.UTarget)
-        
+
+
+        polys = self.create_polys()
+        totalVol = 0.0
+        for p in polys:
+            pElems = polys[p]
+
+            B,W,globalToLocalNode = construct_basis_on_poly(pElems, self.mesh.conns, self.fs)
+
+            totalVol += np.sum(W)
+
+            gradUTarget = np.zeros((B.shape[0],B.shape[2],B.shape[2]))
+            for node in globalToLocalNode:
+                n = globalToLocalNode[node]
+                b = B[:,n,:]
+                UatN = self.UTarget[node]
+                gradUTarget += jax.vmap(lambda bb : np.outer(UatN,bb))(b)
+                
+            print(gradUTarget)
+
+        print('total vol = ', totalVol)
+
         @jax.jit
         def objective(Uu):
             U = self.dofManager.create_field(Uu, Ubc)
             return self.compute_energy(U, self.internals)
         
-        #with Timer(name="NewtonSolve"):
         Uu = newton_solve(objective, self.dofManager.get_unknown_values(self.UTarget))
 
         self.write_output(Uu, Ubc, 0)
