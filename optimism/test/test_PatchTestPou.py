@@ -8,7 +8,7 @@ from optimism.material import LinearElastic as MatModel
 #from optimism.material import Neohookean as MatModel
 from optimism import Mesh
 from optimism import Mechanics
-from optimism.Timer import Timer
+#from optimism.Timer import Timer
 from optimism.EquationSolver import newton_solve
 from optimism import QuadratureRule
 from optimism.test import MeshFixture
@@ -22,6 +22,9 @@ props = {'elastic modulus': E,
          'strain measure': 'linear'}
 
 
+#phiT * M * phi = U @ S @ U.T
+#U.T @ phiT * M * phi @ U = diagonal
+
 def insort(a, b, kind='mergesort'):
     # took mergesort as it seemed a tiny bit faster for my sorted large array try.
     c = onp.concatenate((a, b)) # we still need to do this unfortunatly.
@@ -32,6 +35,17 @@ def insort(a, b, kind='mergesort'):
 
 
 def create_graph(conns):
+    
+    # MRT, debug why this is not working
+    #elemToElem = [ [] for _ in range(len(conns)) ]
+    #_, edges = Mesh.create_edges(conns)
+    #for edge in edges:
+    #    t0 = edge[0]
+    #    t1 = edge[2]
+    #    elemToElem[t0].append(t1)
+    #    elemToElem[t1].append(t0)
+    #return elemToElem
+
     nodeToElem = {}
     for e, elem in enumerate(conns):
         for n in elem:
@@ -82,11 +96,14 @@ def construct_basis_on_poly(elems, conns, fs : FunctionSpace.FunctionSpace):
                 G[N,M] += vols @ (elemShapes[:,n] * elemShapes[:,m])
 
     S,U = onp.linalg.eigh(G)
+    Sinv = onp.array([1.0/s if abs(s) > 1e-13 else 0.0 for s in S]) # consider smoothing?
 
-    Sinv = onp.array([1.0/s if abs(s) > 1e-13 else 0.0 for s in S])
+    nonzeroS = abs(S) > 1e-13
+    S = S[nonzeroS]
+
     Ginv = U@onp.diag(Sinv)@U.T
 
-    B = onp.zeros((Q, Nnode, fs.shapeGrads.shape[3])) # MRT hard coded 2
+    B = onp.zeros((Q, Nnode, fs.shapeGrads.shape[3]))
     for e in elems:
         elemShapes = fs.shapes[e]
         elemShapeGrads = fs.shapeGrads[e]
@@ -101,6 +118,27 @@ def construct_basis_on_poly(elems, conns, fs : FunctionSpace.FunctionSpace):
 
     for q in range(Q):
         B[:,q] = Ginv@B[:,q]
+
+    #for q in range(Q):
+        #colNorm = onp.linalg.norm(U[:,q])
+        #print('col norm = ', colNorm)
+    #    sm = onp.sum(U[:,q])
+    #    if (abs(sm) > 1e-15):
+            #U[q,:] /= sm
+    #         S[q] *= sm*sm
+    #    else:
+    #        print('bad S = ', S[q])
+
+    #for q in range(Q):
+    #    B[:,q] = U.T@B[:,q]
+
+    #Sinv = onp.array([1.0/s if abs(s) > 13 else 0.0 for s in S]) # consider smoothing?
+    #Ginv = U@onp.diag(Sinv)@U.T
+    #for q in range(Q):
+    #    B[:,q] = Ginv@B[:,q]
+    # print('diff = ', U@onp.diag(S)@U.T - G)
+
+    # print('sum s = ', onp.sum(S))
 
     S = np.sum(G, axis=0)
 
@@ -173,7 +211,6 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
         Ubc = self.dofManager.get_bc_values(self.UTarget)
 
         polys = self.create_polys()
-
         polyFs = []
 
         totalVol = 0.0
@@ -182,7 +219,9 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
             B,W,globalToLocalNode = construct_basis_on_poly(pElems, self.mesh.conns, self.fs)
             polyFs.append((B,W,globalToLocalNode))
 
-            totalVol += np.sum(W)
+            pvol = np.sum(W)
+            print('pvol = ', pvol)
+            totalVol += pvol
             gradUs = np.zeros((B.shape[0],B.shape[2],B.shape[2]))
             for node in globalToLocalNode:
                 n = globalToLocalNode[node]
