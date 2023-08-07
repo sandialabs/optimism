@@ -98,10 +98,11 @@ def construct_basis_on_poly(elems, conns, fs : FunctionSpace.FunctionSpace):
     S,U = onp.linalg.eigh(G)
     Sinv = onp.array([1.0/s if abs(s) > 1e-13 else 0.0 for s in S]) # consider smoothing?
 
-    nonzeroS = abs(S) > 1e-13
-    S = S[nonzeroS]
+    nonzeroS = abs(S) > 1e-14
+    Sinv = Sinv[nonzeroS]
+    Uu = U[:, nonzeroS]
 
-    Ginv = U@onp.diag(Sinv)@U.T
+    Ginv = Uu@onp.diag(Sinv)@Uu.T
 
     B = onp.zeros((Q, Nnode, fs.shapeGrads.shape[3]))
     for e in elems:
@@ -116,8 +117,16 @@ def construct_basis_on_poly(elems, conns, fs : FunctionSpace.FunctionSpace):
                 M = globalNodeToLocalNode[mode]
                 B[N,M,:] += vols @ ( elemShapes[:,n] * elemShapeGrads[:,m])
 
-    for q in range(Q):
-        B[:,q] = Ginv@B[:,q]
+    q = S.shape[0]
+    print('Q, q = ', Q, q)
+
+    b = onp.zeros((q, Nnode, fs.shapeGrads.shape[3]))
+    
+    for n in range(Nnode):
+        b[:,n] = Ginv@B[:,n]
+
+    #for q in range(Q):
+    #    B[:,q] = Ginv@B[:,q]
 
     #for q in range(Q):
         #colNorm = onp.linalg.norm(U[:,q])
@@ -140,9 +149,11 @@ def construct_basis_on_poly(elems, conns, fs : FunctionSpace.FunctionSpace):
 
     # print('sum s = ', onp.sum(S))
 
-    S = np.sum(G, axis=0)
+    S = np.sum(G, axis=1)
 
-    return B, S, globalNodeToLocalNode # return map from global nodes to local index of B, S
+    print('shapes = ', S.shape, b.shape)
+
+    return b, S, globalNodeToLocalNode # return map from global nodes to local index of B, S
 
 
 class PatchTestQuadraticElements(MeshFixture.MeshFixture):
