@@ -117,43 +117,31 @@ def construct_basis_on_poly(elems, conns, fs : FunctionSpace.FunctionSpace):
                 M = globalNodeToLocalNode[mode]
                 B[N,M,:] += vols @ ( elemShapes[:,n] * elemShapeGrads[:,m])
 
-    q = S.shape[0]
-    print('Q, q = ', Q, q)
-
-    b = onp.zeros((q, Nnode, fs.shapeGrads.shape[3]))
     
     for n in range(Nnode):
-        b[:,n] = Ginv@B[:,n]
+        B[:,n] = Ginv@B[:,n]
 
-    #for q in range(Q):
-    #    B[:,q] = Ginv@B[:,q]
+    Sreduced = S[nonzeroS]
+    Qreduced = Sreduced.shape[0]
+    delta = onp.zeros(Qreduced)
+    print('Qred, Uu shape = ', Qreduced, Uu.shape)
+    for q in range(Qreduced):
+        sm = onp.sum(Uu[:,q])
+        Sreduced[q] *= sm*sm
+        delta[q] = 1.0 / sm
 
-    #for q in range(Q):
-        #colNorm = onp.linalg.norm(U[:,q])
-        #print('col norm = ', colNorm)
-    #    sm = onp.sum(U[:,q])
-    #    if (abs(sm) > 1e-15):
-            #U[q,:] /= sm
-    #         S[q] *= sm*sm
-    #    else:
-    #        print('bad S = ', S[q])
+    dinvUt = onp.diag(delta) @ Uu.T
 
-    #for q in range(Q):
-    #    B[:,q] = U.T@B[:,q]
+    b = onp.zeros((Qreduced, Nnode, fs.shapeGrads.shape[3]))
+    for n in range(Nnode):
+        for i in range(2):
+            b[:,n, i] = dinvUt@B[:,n, i]
 
-    #Sinv = onp.array([1.0/s if abs(s) > 13 else 0.0 for s in S]) # consider smoothing?
-    #Ginv = U@onp.diag(Sinv)@U.T
-    #for q in range(Q):
-    #    B[:,q] = Ginv@B[:,q]
-    # print('diff = ', U@onp.diag(S)@U.T - G)
+    print('diag sum = ', onp.sum(Sreduced))
 
-    # print('sum s = ', onp.sum(S))
+    return B, np.sum(G, axis=1), globalNodeToLocalNode
+    #return b, Sreduced, globalNodeToLocalNode
 
-    S = np.sum(G, axis=1)
-
-    print('shapes = ', S.shape, b.shape)
-
-    return b, S, globalNodeToLocalNode # return map from global nodes to local index of B, S
 
 
 class PatchTestQuadraticElements(MeshFixture.MeshFixture):
