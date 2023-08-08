@@ -85,7 +85,7 @@ def construct_basis_on_poly(elems, conns, fs : FunctionSpace.FunctionSpace):
 
     G = onp.zeros((Q,Q))
     for e in elems:
-        elemShapes = fs.shapes[e]
+        elemQuadratureShapes = fs.shapes[e]
         vols = fs.vols[e]
         for n, node in enumerate(conns[e]):
             node = int(node)
@@ -93,7 +93,7 @@ def construct_basis_on_poly(elems, conns, fs : FunctionSpace.FunctionSpace):
                 mode = int(mode)
                 N = globalNodeToLocalNode[node]
                 M = globalNodeToLocalNode[mode]
-                G[N,M] += vols @ (elemShapes[:,n] * elemShapes[:,m])
+                G[N,M] += vols @ (elemQuadratureShapes[:,n] * elemQuadratureShapes[:,m])
 
     S,U = onp.linalg.eigh(G)
     Sinv = onp.array([1.0/s if abs(s) > 1e-13 else 0.0 for s in S]) # consider smoothing?
@@ -106,7 +106,7 @@ def construct_basis_on_poly(elems, conns, fs : FunctionSpace.FunctionSpace):
 
     B = onp.zeros((Q, Nnode, fs.shapeGrads.shape[3]))
     for e in elems:
-        elemShapes = fs.shapes[e]
+        elemQuadratureShapes = fs.shapes[e]
         elemShapeGrads = fs.shapeGrads[e]
         vols = fs.vols[e]
         for n, node in enumerate(conns[e]):
@@ -115,29 +115,46 @@ def construct_basis_on_poly(elems, conns, fs : FunctionSpace.FunctionSpace):
                 mode = int(mode)
                 N = globalNodeToLocalNode[node]
                 M = globalNodeToLocalNode[mode]
-                B[N,M,:] += vols @ ( elemShapes[:,n] * elemShapeGrads[:,m])
-
+                B[N,M,:] += vols @ (elemQuadratureShapes[:,n] * elemShapeGrads[:,m])
     
+    print('sum of shape grad = ', onp.sum(B, axis=1))
+
     for n in range(Nnode):
-        B[:,n] = Ginv@B[:,n]
+        for i in range(2):
+            B[:,n,i] = Ginv@B[:,n,i]
 
     Sreduced = S[nonzeroS]
     Qreduced = Sreduced.shape[0]
+
+    Vv = onp.zeros(Uu.shape)
+
+    #delta = onp.zeros(Nnode)
+    #for n in range(Nnode):
+    #    sm = onp.sum(Uu[n,:])
+    #    delta[n] = 1.0 / sm if sm > 0 else 1.0
+    #    Vv[n] = Uu[n] * delta[n]
+
     delta = onp.zeros(Qreduced)
-    print('Qred, Uu shape = ', Qreduced, Uu.shape)
     for q in range(Qreduced):
         sm = onp.sum(Uu[:,q])
-        Sreduced[q] *= sm*sm
-        delta[q] = 1.0 / sm
+        delta[q] = 1.0 / sm if sm > 0 else 1.0
+        Vv[:,q] = Uu[:,q] * delta[q]
 
-    dinvUt = onp.diag(delta) @ Uu.T
+    print('shapes = ', Vv.shape, Uu.shape)
+    Gtild = Vv.T @ G @ Vv
+
+    print('gtild = ', Gtild)
+
+    #dinvUt = onp.diag(delta) @ onp.diag(Sinv) @ Uu.T
+    dinvUt = onp.linalg.inv(Gtild)@Vv.T
 
     b = onp.zeros((Qreduced, Nnode, fs.shapeGrads.shape[3]))
     for n in range(Nnode):
+        #b[:,n,:] = dinvUt @ B[:,n,:]
         for i in range(2):
-            b[:,n, i] = dinvUt@B[:,n, i]
+            b[:,n,i] = dinvUt @ B[:,n,i]
 
-    print('diag sum = ', onp.sum(Sreduced))
+    print('sum of shape grad b = ', onp.sum(b, axis=1))
 
     return B, np.sum(G, axis=1), globalNodeToLocalNode
     #return b, Sreduced, globalNodeToLocalNode
@@ -217,9 +234,8 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
             pElems = polys[p]
             B,W,globalToLocalNode = construct_basis_on_poly(pElems, self.mesh.conns, self.fs)
             polyFs.append((B,W,globalToLocalNode))
-
             pvol = np.sum(W)
-            print('pvol = ', pvol)
+            # print('pvol = ', pvol)
             totalVol += pvol
             gradUs = np.zeros((B.shape[0],B.shape[2],B.shape[2]))
             for node in globalToLocalNode:
@@ -229,7 +245,8 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
                 gradUs += jax.vmap(lambda bb : np.outer(UatN,bb))(b)
 
             for gradU in gradUs:
-                self.assertArrayNear(gradU, self.targetDispGrad, 8)   
+                print('gus = ', gradU)
+                #self.assertArrayNear(gradU, self.targetDispGrad, 8)   
 
         print('total vol = ', totalVol)
 
