@@ -39,7 +39,7 @@ def create_graph(conns):
             elemToElem[t0].append(t1)
             elemToElem[t1].append(t0)
 
-    return elemToElem
+    #return elemToElem
 
     nodeToElem = {}
     for e, elem in enumerate(conns):
@@ -63,7 +63,6 @@ def create_graph(conns):
 
 def create_partitions(conns):
     graph = create_graph(conns)
-    print('elem to elem graph = ', graph)
     (edgecuts, parts) = metis.part_graph(graph, 4)
     return np.array(parts, dtype=int)
 
@@ -141,22 +140,12 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
         xRange = [0.,1.]
         yRange = [0.,1.]
         self.mesh, _ = self.create_mesh_and_disp(self.Nx, self.Ny, xRange, yRange, lambda x : x)
-        # self.mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(mesh, order=2, createNodeSetsFromSideSets=True)
-
-        self.partition = create_partitions(self.mesh.conns)
+        self.partition = create_partitions(self.mesh.conns) # partitioning seems to only work on lower order mesh at the moment
+        #self.mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(self.mesh, order=2, createNodeSetsFromSideSets=True)
 
         self.quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2)
         self.fs = FunctionSpace.construct_function_space(self.mesh, self.quadRule)
-
         self.materialModel = MatModel.create_material_model_functions(props)
-
-        mcxFuncs = \
-            Mechanics.create_mechanics_functions(self.fs,
-                                                 "plane strain",
-                                                 self.materialModel)
-
-        self.compute_energy = mcxFuncs.compute_strain_energy
-        self.internals = mcxFuncs.compute_initial_state()
 
 
     def create_polys(self):
@@ -206,7 +195,6 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
             B,W,globalToLocalNode = construct_basis_on_poly(pElems, self.mesh.conns, self.fs)
             polyFs.append((B,W,globalToLocalNode))
             pvol = np.sum(W)
-            # print('pvol = ', pvol)
             totalVol += pvol
             gradUs = np.zeros((B.shape[0],B.shape[2],B.shape[2]))
             for node in globalToLocalNode:
@@ -215,8 +203,8 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
                 UatN = self.UTarget[node]
                 gradUs += jax.vmap(lambda bb : np.outer(UatN,bb))(b)
 
-            #for gradU in gradUs:
-            #    self.assertArrayNear(gradU, self.targetDispGrad, 8)   
+            for gradU in gradUs:
+                self.assertArrayNear(gradU, self.targetDispGrad, 8)   
 
         def objective_poly(Uu):
 
