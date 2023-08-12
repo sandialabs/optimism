@@ -117,48 +117,22 @@ def construct_basis_on_poly(elems, conns, fs : FunctionSpace.FunctionSpace):
                 M = globalNodeToLocalNode[mode]
                 B[N,M,:] += vols @ (elemQuadratureShapes[:,n] * elemShapeGrads[:,m])
     
-    print('sum of shape grad = ', onp.sum(B, axis=1))
 
     for n in range(Nnode):
         for i in range(2):
             B[:,n,i] = Ginv@B[:,n,i]
 
-    Sreduced = S[nonzeroS]
-    Qreduced = Sreduced.shape[0]
+    G1 = onp.average(G, axis=1)
+    GinvG1 = Ginv @ G1
 
-    Vv = onp.zeros(Uu.shape)
+    V = onp.outer( onp.ones(Nnode), GinvG1 )
+    Gtilde = V @ G @ V.T
 
-    #delta = onp.zeros(Nnode)
-    #for n in range(Nnode):
-    #    sm = onp.sum(Uu[n,:])
-    #    delta[n] = 1.0 / sm if sm > 0 else 1.0
-    #    Vv[n] = Uu[n] * delta[n]
-
-    delta = onp.zeros(Qreduced)
-    for q in range(Qreduced):
-        sm = onp.sum(Uu[:,q])
-        delta[q] = 1.0 / sm if sm > 0 else 1.0
-        Vv[:,q] = Uu[:,q] * delta[q]
-
-    print('shapes = ', Vv.shape, Uu.shape)
-    Gtild = Vv.T @ G @ Vv
-
-    print('gtild = ', Gtild)
-
-    #dinvUt = onp.diag(delta) @ onp.diag(Sinv) @ Uu.T
-    dinvUt = onp.linalg.inv(Gtild)@Vv.T
-
-    b = onp.zeros((Qreduced, Nnode, fs.shapeGrads.shape[3]))
-    for n in range(Nnode):
-        #b[:,n,:] = dinvUt @ B[:,n,:]
-        for i in range(2):
-            b[:,n,i] = dinvUt @ B[:,n,i]
-
-    print('sum of shape grad b = ', onp.sum(b, axis=1))
+    #print('Gtilesum = ', onp.sum(onp.sum(Gtilde,axis=0),axis=0))
+    #print('Gsum = ', onp.sum(onp.sum(G,axis=0),axis=0))
+    #print('Gtilde = ', Gtilde)
 
     return B, np.sum(G, axis=1), globalNodeToLocalNode
-    #return b, Sreduced, globalNodeToLocalNode
-
 
 
 class PatchTestQuadraticElements(MeshFixture.MeshFixture):
@@ -245,10 +219,7 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
                 gradUs += jax.vmap(lambda bb : np.outer(UatN,bb))(b)
 
             for gradU in gradUs:
-                print('gus = ', gradU)
-                #self.assertArrayNear(gradU, self.targetDispGrad, 8)   
-
-        print('total vol = ', totalVol)
+                self.assertArrayNear(gradU, self.targetDispGrad, 8)   
 
         def objective_poly(Uu):
 
