@@ -42,9 +42,9 @@ class TwoBodyContactFixture(MeshFixture):
         writer.write()
         
 
-    @unittest.skipIf(True, '')
+    @unittest.skipIf(False, '')
     def test_contact_search(self):
-        self.plot_solution('mesh')
+        #self.plot_solution('mesh')
 
         neighborList = MortarContact.get_closest_neighbors(self.segmentConnsA, self.segmentConnsB, self.mesh, self.disp, 5)
 
@@ -58,8 +58,8 @@ class TwoBodyContactFixture(MeshFixture):
             return np.sum(vmap(compute_area_for_segment_pair, (None,0))(segB, neighborSegsA))
         
         totalSum = np.sum(vmap(compute_overlap_area)(self.segmentConnsB, neighborList))
-    
-        self.assertNear(totalSum, 0.3, 5)
+        print('total sum = ', totalSum)
+        self.assertNear(totalSum, 1.0, 5)
 
 
     def test_contact_constraints(self):

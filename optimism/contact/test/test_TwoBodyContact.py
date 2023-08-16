@@ -52,7 +52,7 @@ class TwoBodyContactFixture(MeshFixture):
                                         lambda x : self.targetDispGrad.dot(x), '2')
         
         self.mesh, _ = Mesh.combine_mesh(m1, m2)
-        order=2
+        order=1 # this quadrature on segment contact only works with 1st order meshes
         self.mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(self.mesh, order=order, copyNodeSets=False)
         self.disp = np.zeros(self.mesh.coords.shape)
 
@@ -69,7 +69,7 @@ class TwoBodyContactFixture(MeshFixture):
         self.quadRule = QuadratureRule.create_quadrature_rule_1D(3)
         
 
-    @unittest.skipIf(True, '')
+    @unittest.skipIf(False, '')
     def test_combining_nodesets(self):
         self.assertArrayEqual( self.mesh.nodeSets['top1'], [12,13,14] )
         numNodesMesh1 = 15
@@ -98,7 +98,7 @@ class TwoBodyContactFixture(MeshFixture):
         writer.write()
         
 
-    @unittest.skipIf(True, '')
+    @unittest.skipIf(False, '')
     def test_contact_search(self):
         self.disp = 0.0*self.disp
         
