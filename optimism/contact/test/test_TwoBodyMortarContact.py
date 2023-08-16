@@ -1,9 +1,5 @@
 from optimism.JaxConfig import *
 from optimism import Mesh
-from optimism import QuadratureRule
-from optimism import Surface
-from optimism.contact import EdgeIntersection
-from optimism import FunctionSpace
 from optimism.test.MeshFixture import MeshFixture
 from optimism.contact import MortarContact
 import unittest
@@ -58,12 +54,11 @@ class TwoBodyContactFixture(MeshFixture):
             return np.sum(vmap(compute_area_for_segment_pair, (None,0))(segB, neighborSegsA))
         
         totalSum = np.sum(vmap(compute_overlap_area)(self.segmentConnsB, neighborList))
-        print('total sum = ', totalSum)
         self.assertNear(totalSum, 1.0, 5)
 
 
     def test_contact_constraints(self):
-        self.plot_solution('mesh')
+        #self.plot_solution('mesh')
 
         neighborList = MortarContact.get_closest_neighbors(self.segmentConnsA, self.segmentConnsB, self.mesh, self.disp, 5)
 
