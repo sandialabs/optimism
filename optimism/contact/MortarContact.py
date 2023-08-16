@@ -1,7 +1,9 @@
 import jax
 from jax import numpy as jnp
 from optimism import QuadratureRule
+from optimism import Mesh
 from collections.abc import Callable
+from functools import partial
 
 # some normal utilities
 
@@ -125,3 +127,33 @@ def assemble_area_weighted_gaps(coords, disp, segmentConnsA, segmentConnsB, neig
 
 def assemble_nodal_areas(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal : Callable):
     return assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal, lambda gap : 1.0)
+
+# utilities for setting up mortar contact data structures
+
+@partial(jax.jit, static_argnums=(4,))
+def get_closest_neighbors(edgeSetA : jnp.array,
+                          edgeSetB : jnp.array,
+                          mesh : Mesh.Mesh,
+                          disp : jnp.array,
+                          maxNeighbors : int):
+    def min_dist_squared(edge1, edge2, coords, disp):
+        xs1 = coords[edge1] + disp[edge1]
+        xs2 = coords[edge2] + disp[edge2]
+        dists = jax.vmap( lambda x: jax.vmap( lambda y: (x-y)@(x-y) )(xs1) ) (xs2)    
+        return jnp.min(dists)
+    
+    def get_close_edge_indices(surfaceA, edgeB):
+        minDistsToA = jax.vmap(min_dist_squared, (0,None,None,None))(surfaceA, edgeB, mesh.coords, disp)
+        return jnp.argsort(minDistsToA)[:maxNeighbors]
+    
+    return jax.vmap(get_close_edge_indices, (None,0))(edgeSetA, edgeSetB) # loop over surface B, get neighbor index in A
+
+
+@jax.jit
+def get_facet_connectivities(mesh : Mesh.Mesh, sideset):
+    def get_sub_segments(side):
+        indices = Mesh.get_edge_node_indices(mesh, side)
+        return jax.vmap(lambda x,y: jnp.array([x,y]))(indices[:-1], indices[1:])
+
+    segmentConns = jax.vmap(get_sub_segments)(sideset)
+    return segmentConns.reshape((segmentConns.shape[0]*segmentConns.shape[1], segmentConns.shape[2]))

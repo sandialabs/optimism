@@ -5,41 +5,8 @@ from optimism import Surface
 from optimism.contact import EdgeIntersection
 from optimism import FunctionSpace
 from optimism.test.MeshFixture import MeshFixture
-#from optimism.contact import Contact
 from optimism.contact import MortarContact
 import unittest
-
-
-
-
-#@partial(jit, static_argnums=(4,))
-def get_closest_neighbors(edgeSetA : np.array,
-                          edgeSetB : np.array,
-                          mesh : Mesh.Mesh,
-                          disp : np.array,
-                          maxNeighbors : int):
-    def min_dist_squared(edge1, edge2, coords, disp):
-        xs1 = coords[edge1] + disp[edge1]
-        xs2 = coords[edge2] + disp[edge2]
-        dists = vmap( lambda x: vmap( lambda y: (x-y)@(x-y) )(xs1) ) (xs2)    
-        return np.min(dists)
-    
-    def get_close_edge_indices(surfaceA, edgeB):
-        minDistsToA = vmap(min_dist_squared, (0,None,None,None))(surfaceA, edgeB, mesh.coords, disp)
-        return np.argsort(minDistsToA)[:maxNeighbors]
-    
-    return vmap(get_close_edge_indices, (None,0))(edgeSetA, edgeSetB) # loop over surface B, get neighbor index in A
-
-
-@jit
-def get_facet_connectivities(mesh : Mesh.Mesh, sideset):
-    def get_sub_segments(side):
-        indices = Mesh.get_edge_node_indices(mesh, side)
-        return vmap(lambda x,y: np.array([x,y]))(indices[:-1], indices[1:])
-
-    segmentConns = vmap(get_sub_segments)(sideset)
-    return segmentConns.reshape((segmentConns.shape[0]*segmentConns.shape[1], segmentConns.shape[2]))
-
 
 class TwoBodyContactFixture(MeshFixture):
 
@@ -60,8 +27,8 @@ class TwoBodyContactFixture(MeshFixture):
         sideA = self.mesh.sideSets['right1']
         sideB = self.mesh.sideSets['left2']
         
-        self.segmentConnsA = get_facet_connectivities(self.mesh, sideA)
-        self.segmentConnsB = get_facet_connectivities(self.mesh, sideB)
+        self.segmentConnsA = MortarContact.get_facet_connectivities(self.mesh, sideA)
+        self.segmentConnsB = MortarContact.get_facet_connectivities(self.mesh, sideB)
 
 
     def plot_solution(self, plotName):
@@ -79,7 +46,7 @@ class TwoBodyContactFixture(MeshFixture):
     def test_contact_search(self):
         self.plot_solution('mesh')
 
-        neighborList = get_closest_neighbors(self.segmentConnsA, self.segmentConnsB, self.mesh, self.disp, 5)
+        neighborList = MortarContact.get_closest_neighbors(self.segmentConnsA, self.segmentConnsB, self.mesh, self.disp, 5)
 
         def compute_overlap_area(segB, neighborSegsA):
             def compute_area_for_segment_pair(segB, indexA):
@@ -98,7 +65,7 @@ class TwoBodyContactFixture(MeshFixture):
     def test_contact_constraints(self):
         self.plot_solution('mesh')
 
-        neighborList = get_closest_neighbors(self.segmentConnsA, self.segmentConnsB, self.mesh, self.disp, 5)
+        neighborList = MortarContact.get_closest_neighbors(self.segmentConnsA, self.segmentConnsB, self.mesh, self.disp, 5)
 
         nodalGapField = MortarContact.assemble_area_weighted_gaps(self.mesh.coords, self.disp, self.segmentConnsA, self.segmentConnsB, neighborList, MortarContact.compute_average_normal)
         nodalAreaField = MortarContact.assemble_nodal_areas(self.mesh.coords, self.disp, self.segmentConnsA, self.segmentConnsB, neighborList, MortarContact.compute_average_normal)

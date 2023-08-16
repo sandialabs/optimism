@@ -56,15 +56,13 @@ class TwoBodyContactFixture(MeshFixture):
         self.mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(self.mesh, order=order, copyNodeSets=False)
         self.disp = np.zeros(self.mesh.coords.shape)
 
+        #edgesTop1 = get_side_set_segments(self.mesh, self.mesh.sideSets['right1'], self.disp)
+        #edgesTop2 = get_side_set_segments(self.mesh, self.mesh.sideSets['left2'], self.disp)
 
-        edgesTop1 = get_side_set_segments(self.mesh, self.mesh.sideSets['right1'], self.disp)
-        edgesTop2 = get_side_set_segments(self.mesh, self.mesh.sideSets['left2'], self.disp)
-
-        plt.clf()
-        plt.plot( edgesTop1[:,:,0].T, edgesTop1[:,:,1].T, linestyle='-', color='y', markerfacecolor='red', marker='o')
-        plt.plot( edgesTop2[:,:,0].T, edgesTop2[:,:,1].T, linestyle='-', color='g', markerfacecolor='blue', marker='o')
-        plt.show()
-        exit(1)
+        #plt.clf()
+        #plt.plot( edgesTop1[:,:,0].T, edgesTop1[:,:,1].T, linestyle='-', color='y', markerfacecolor='red', marker='o')
+        #plt.plot( edgesTop2[:,:,0].T, edgesTop2[:,:,1].T, linestyle='-', color='g', markerfacecolor='blue', marker='o')
+        #plt.show()
 
         nodeSets = Mesh.create_nodesets_from_sidesets(self.mesh)
         self.mesh = Mesh.mesh_with_nodesets(self.mesh, nodeSets)
