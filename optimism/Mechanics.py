@@ -64,11 +64,11 @@ def axisymmetric_element_gradient_transformation(elemDispGrads, elemShapes, elem
 element_hess_func = hessian(FunctionSpace.integrate_element_from_local_field)
 
 
-def compute_element_stiffness_from_global_fields(U, coords, elInternals, dt, elConn, elShapes, elShapeGrads, elVols, lagrangian_density, modify_element_gradient):
+def compute_element_stiffness_from_global_fields(U, coords, elInternals, dt, elConn, elShapes, elShapeGrads, elVols, lagrangian_density, modify_element_gradient, *params):
     elDisp = U[elConn,:]
     elCoords = coords[elConn,:]
     return element_hess_func(elDisp, elCoords, elInternals, dt, elShapes, elShapeGrads,
-                             elVols, lagrangian_density, modify_element_gradient)
+                             elVols, lagrangian_density, *params, modify_element_gradient=modify_element_gradient)
 
 
 def _compute_element_stiffnesses(U, internals, dt, functionSpace, compute_energy_density, modify_element_gradient):

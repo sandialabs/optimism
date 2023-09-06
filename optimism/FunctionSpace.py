@@ -256,7 +256,8 @@ def integrate_element_from_local_field(elemNodalField, elemNodalCoords, elemStat
     elemGrads = jax.vmap(compute_quadrature_point_field_gradient, (None,0))(elemNodalField, elemShapeGrads)
     elemGrads = modify_element_gradient(elemGrads, elemShapes, elemVols, elemNodalField, elemNodalCoords)
     elemPoints = jax.vmap(interpolate_to_point, (None,0))(elemNodalCoords, elemShapes)
-    fVals = jax.vmap(func, (0, 0, 0, 0, None))(elemVals, elemGrads, elemStates, elemPoints, dt)
+    elemParams = tuple(jax.vmap(interpolate_to_point, (None,0))(p, elemShapes) for p in params)
+    fVals = jax.vmap(func, (0, 0, 0, 0, None, *tuple(0 for p in params)))(elemVals, elemGrads, elemStates, elemPoints, dt, *elemParams)
     return np.dot(fVals, elemVols)
 
 
