@@ -252,11 +252,12 @@ def integrate_element_from_local_field(elemNodalField, elemNodalCoords, elemStat
     """Integrate over element with element nodal field as input.
     This allows element residuals and element stiffness matrices to computed.
     """
-    elemVals = jax.vmap(interpolate_to_point, (None,0))(elemNodalField, elemShapes)
+    interpolate_to_points = jax.vmap(interpolate_to_point, (None, 0))
+    elemVals = interpolate_to_points(elemNodalField, elemShapes)
     elemGrads = jax.vmap(compute_quadrature_point_field_gradient, (None,0))(elemNodalField, elemShapeGrads)
     elemGrads = modify_element_gradient(elemGrads, elemShapes, elemVols, elemNodalField, elemNodalCoords)
-    elemPoints = jax.vmap(interpolate_to_point, (None,0))(elemNodalCoords, elemShapes)
-    elemParams = tuple(jax.vmap(interpolate_to_point, (None,0))(p, elemShapes) for p in params)
+    elemPoints = interpolate_to_points(elemNodalCoords, elemShapes)
+    elemParams = tuple(interpolate_to_points(p, elemShapes) for p in params)
     fVals = jax.vmap(func, (0, 0, 0, 0, None, *tuple(0 for p in params)))(elemVals, elemGrads, elemStates, elemPoints, dt, *elemParams)
     return np.dot(fVals, elemVols)
 
