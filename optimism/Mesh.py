@@ -158,6 +158,7 @@ def mesh_with_blocks(mesh, blocks):
                 mesh.parentElement, mesh.parentElement1d,
                 blocks, mesh.nodeSets, mesh.sideSets)
 
+
 def create_edges(conns):
     """Generate topological information about edges in a triangulation.
 
@@ -305,20 +306,27 @@ def num_nodes(mesh):
     return mesh.coords.shape[0]
 
 
-def get_edge_coords(mesh, edge):
-    """Get coordinates of nodes on an element edge.
+def get_edge_node_indices(mesh : Mesh, edge):
+    edgeNodes = mesh.parentElement.faceNodes[edge[1], :]
+    return mesh.conns[edge[0], edgeNodes]
 
+
+def get_edge_field(mesh : Mesh, edge, field):
+    """Evaluate field on nodes of an element edge.
     Arguments:
+
     mesh: a Mesh object
     edge: tuple containing the element number containing the edge and the
         permutation (0, 1, or 2) of the edge within the triangle
     """
-    edgeNodes = mesh.parentElement.faceNodes[edge[1], :]
-    nodes = mesh.conns[edge[0], edgeNodes]
-    return mesh.coords[nodes]
+    return field[get_edge_node_indices(mesh, edge)]
 
 
-def compute_edge_vectors(mesh, edgeCoords):
+def get_edge_coords(mesh : Mesh, edge):
+    return get_edge_field(mesh, edge, mesh.coords)
+
+
+def compute_edge_vectors(mesh : Mesh, edgeCoords):
     """Get geometric vectors for an element edge.
     
     Assumes that the edgs has a constant shape jacobian, that is, the

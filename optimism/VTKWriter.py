@@ -68,6 +68,8 @@ class VTKWriter:
         self.spheres = []
         self.sphereRadii = []
 
+        self.contactEdges = np.array([])
+
         # Legacy vtk can only plot linear and quadratic elements.
         # We will plot quadratic elements as is, and
         # all other elements will be converted to linear
@@ -84,6 +86,13 @@ class VTKWriter:
     def add_sphere(self, x, radius):
         self.spheres.append( np.array([x[0], x[1], 0.0]) )
         self.sphereRadii.append( radius )
+
+
+    def add_contact_edges(self, edgeConns):
+        if len(self.contactEdges > 0) :
+            self.contactEdges = np.vstack((self.contactEdges, edgeConns))
+        else:
+            self.contactEdges = edgeConns
 
 
     def add_nodal_field(self, name, nodalData, fieldType, dataType=VTKDataType.DOUBLE):
@@ -119,6 +128,7 @@ class VTKWriter:
         self._write_header(vtkFile)
         self._write_coordinate_data(vtkFile)
         self._write_cell_connectivity(vtkFile)
+        self._write_contact_edges(vtkFile)
         self._write_cell_types(vtkFile)
         self._write_nodal_fields(vtkFile)
         self._write_cell_fields(vtkFile)
@@ -178,21 +188,29 @@ class VTKWriter:
         nNodesPerElement = conns.shape[1]
         nNodesPerElementArray = np.tile(nNodesPerElement,
                                         (nelements,1))
-        nvals = conns.size + nNodesPerElementArray.size
-        vtkFile.write('CELLS {} {}\n'.format(nelements, nvals))
+        nvals = conns.size + nNodesPerElementArray.size + self.contactEdges.shape[0] * 3
+
+        vtkFile.write('CELLS {} {}\n'.format(nelements+self.contactEdges.shape[0], nvals))
         vtkConnectivity = np.concatenate((nNodesPerElementArray,conns), axis=1)
         vtkFile.write(write_matrix_as_table(vtkConnectivity))
         vtkFile.write('\n')
         
         
+    def _write_contact_edges(self, vtkFile):
+        for e in self.contactEdges:
+            vtkFile.write('2 {} {}\n'.format(e[0],e[1]))
+
+
     def _write_cell_types(self, vtkFile):
         nelements = self.mesh.conns.shape[0]
-        vtkFile.write('CELL_TYPES {}\n'.format(nelements))
+        vtkFile.write('CELL_TYPES {}\n'.format(nelements+self.contactEdges.shape[0]))
         vtkCellTypes = np.tile(self.vtkCellType, (nelements, 1))
         vtkFile.write(write_matrix_as_table(vtkCellTypes))
         vtkFile.write('\n')
+        for e in self.contactEdges:           
+            vtkFile.write('3\n')
 
-        
+
     def _write_nodal_fields(self, vtkFile):
 
         allFieldsAreEmpty = not self.nodalFields
@@ -209,11 +227,7 @@ class VTKWriter:
                                                       fieldRecord.fieldType,
                                                       fieldRecord.dataType)
                     
-
-
-
                 self.nodalFields[field] = fieldRecord
-
 
             if len(self.spheres) > 0:
                 nnodes = self.mesh.coords.shape[0]
