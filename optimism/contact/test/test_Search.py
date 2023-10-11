@@ -54,10 +54,6 @@ class TestDoubleMeshFixture(MeshFixture):
  
     def test_correct_number_of_edges_created_for_contact(self):
         edges = Surface.create_edges(self.mesh.coords, self.mesh.conns, self.is_contact_edge)
-
-        for edge in edges:
-            coords = Surface.get_coords(self.mesh, edge)
-        
         self.assertEqual(7, edges.shape[0])
         
 

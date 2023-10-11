@@ -1,10 +1,5 @@
 from TwoBodyContact import *
-
-from functools import partial
-
 from optimism.material import Neohookean as Material
-from optimism.contact import Levelset
-from optimism.contact import PenaltyContact
 
 props = {'elastic modulus': 10.0,
          'poisson ratio': 0.25}
@@ -13,9 +8,6 @@ materialModel = Material.create_material_model_functions(props)
 
 N = 7
 M = 85
-
-#N = 3
-#M = 12
 
 h = 1.5 / M # approximate element size
 smoothingDistance = 1e-1 * h
@@ -78,11 +70,6 @@ class ContactArch(MeshFixture):
         popNodes = self.mesh.nodeSets['bottom1']
         popNodes = popNodes[ np.where( np.abs(self.mesh.coords[popNodes,0]) < 1.0 ) ]
 
-        self.sphereLevelset = partial(Levelset.sphere,
-                                      xLoc=0.0,
-                                      yLoc=self.sphereCenter,
-                                      R=self.sphereRadius)
-        
         triQuadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
         fs = FunctionSpace.construct_function_space(self.mesh,
                                                     triQuadRule)

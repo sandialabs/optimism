@@ -1,5 +1,5 @@
 from TwoBodyContact import *
-from optimism import Neohookean as Material
+from optimism.material import Neohookean as Material
 
 props = {'elastic modulus': 10.0,
          'poisson ratio': 0.25}
