@@ -37,7 +37,7 @@ def _read_coordinates(exodusDataset):
     coordsX = exodusDataset.variables['coordx'][:]
     coordsY = exodusDataset.variables['coordy'][:]
     
-    return np.column_stack([coordsX, coordsY])
+    return np.column_stack([coordsX.filled(), coordsY.filled()])
 
 
 def _read_block_conns(exodusDataset, blockOrdinal):
