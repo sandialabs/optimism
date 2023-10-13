@@ -124,6 +124,31 @@ pip=/usr/local/opt/python/bin/pip3
 SUITESPARSE_INCLUDE_DIR=$INC SUITESPARSE_LIBRARY_DIR=$LIB $pip install -e . sparse
 ```
 
+## Installation using spack
+Utilizing spack can alleviate some of the steps and headaches encountered in build described above to use spack to build optimism in a development environment, use the following instructions.
+
+If you don't already have spack, you can clone the git repo using the following command
+```
+git clone https://github.com/spack/spack.git
+```
+
+Once you have spack you can do the following in the optimism directory
+```
+source /path/to/spack/share/spack/setup-env.sh
+spack env activate .
+spack concretize -f
+spack install
+```
+
+The above will install all dependencies needed for optimism (including suite sparse and testing dependencies).
+
+Finally, you can install optimism via pip with
+```
+pip install -e .[sparse,test]
+```
+
+Note that in each new terminal you will need to source the ```setup-env.sh``` script from spack and activate the env in the optimism folder.
+
 ## Citing OptimiSM
 
 If you use OptimiSM in your research, please cite
