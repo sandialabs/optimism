@@ -18,3 +18,8 @@ venv/
 # IDE files
 .idea/
 .vscode/
+
+# outputs from tests
+*.png
+loads
+.coverage

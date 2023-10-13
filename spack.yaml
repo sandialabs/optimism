@@ -11,7 +11,7 @@ spack:
   - py-pytest-cov
   - py-pytest-xdist
   - py-scikit-sparse
-  - exodusii
+  - exodusii+fortran
   view: true
   concretizer:
     unify: true
