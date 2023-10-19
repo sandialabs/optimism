@@ -13,9 +13,12 @@ from optimism.EquationSolver import newton_solve
 from optimism import QuadratureRule
 from optimism.test import MeshFixture
 
+kappa = 1.0
+mu = 0.25
 
-E = 1.0
-nu = 0.3
+E = 9 * kappa * mu / (3 * kappa + mu)
+nu = 0.5 * (3 * kappa - 2 * mu) / (3 * kappa + mu)
+
 props = {'elastic modulus': E,
          'poisson ratio': nu,
          'strain measure': 'linear'}
