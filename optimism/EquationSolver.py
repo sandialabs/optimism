@@ -564,7 +564,7 @@ def newton_solve(objective_func, solution, maxSteps=1):
         with Timer(name="Step"):
             with Timer(name="Fill Grad"):
                 gradients = grad_func(solution)
-                print('res = ', np.linalg.norm(gradients))
+                print('step: ', step, 'res = ', np.linalg.norm(gradients))
         
             with Timer(name="Fill Hess"):
                 hess = hess_func(solution)
