@@ -1,4 +1,5 @@
 import jax.numpy as np
+from jax import vmap
 from jax.scipy import linalg
 from optimism import TensorMath
 from optimism.material.MaterialModel import MaterialModel
@@ -7,10 +8,8 @@ from optimism.material.MaterialModel import MaterialModel
 # props
 PROPS_K_eq  = 0
 PROPS_G_eq  = 1
-# TODO generalize to arbitrary number of prony terms
-# PROPS_NUM_PRONY_TERMS = 2
-PROPS_G_neq           = 2
-PROPS_TAU             = 3
+PROPS_G_neq = 2
+PROPS_TAU   = 3
 
 NUM_PRONY_TERMS = -1
 
@@ -30,11 +29,11 @@ def create_material_model_functions(properties):
     # wrapper for state var ics
     def compute_initial_state(shape=(1,)):
         num_prony_terms = properties['number of prony terms']
-        state = np.array([])
-        for _ in range(num_prony_terms):
-            state = np.hstack((state, np.identity(3).ravel()))
 
-        print(state)
+        def vmap_body(_):
+            return np.identity(3).ravel()
+
+        state = np.hstack(vmap(vmap_body, in_axes=(0,))(np.arange(num_prony_terms)))
         return state
 
     # update state vars wrapper
@@ -58,10 +57,13 @@ def _make_properties(properties):
         assert 'non equilibrium shear modulus %s' % n in properties.keys()
         assert 'relaxation time %s' % n in properties.keys()
 
+    print('Equilibrium properties')
+    print('  Bulk modulus    = %s' % properties['equilibrium bulk modulus'])
+    print('  Shear modulus   = %s' % properties['equilibrium shear modulus'])
+
     # this is dirty, fuck jax (can't use an int from a jax numpy array or else jit tries to trace that)
-    # also to hell with python with this zero-based indexing
     global NUM_PRONY_TERMS
-    NUM_PRONY_TERMS = properties['number of prony terms'] #- 1
+    NUM_PRONY_TERMS = properties['number of prony terms']
 
     # first pack equilibrium properties
     props = np.array([
@@ -72,12 +74,13 @@ def _make_properties(properties):
     # props = np.hstack((props, properties['number of prony terms']))
 
     for n in range(1, properties['number of prony terms'] + 1):
+        print('Prony branch %s properties' % n)
+        print('  Shear modulus   = %s' % properties['non equilibrium shear modulus %s' % n])
+        print('  Relaxation time = %s' % properties['relaxation time %s' % n])
         props = np.hstack(
             (props, np.array([properties['non equilibrium shear modulus %s' % n],
                               properties['relaxation time %s' % n]])))
 
-    print('Props from HyperViscoelastic')
-    print(props)
     return props
 
 def _energy_density(dispGrad, state, dt, props):
@@ -96,37 +99,16 @@ def _eq_strain_energy(dispGrad, props):
     Wdev = 0.5 *G * (I1Bar - 3.0)
     return Wdev + Wvol
 
-# def _neq_strain_energy(dispGrad, stateOld, dt, props):
-#     G_neq = props[PROPS_G_neq]
-#     tau   = props[PROPS_TAU]
-#     I = np.identity(3)
-    
-#     F = dispGrad + I
-#     state_new = _compute_state_new(dispGrad, stateOld, dt, props)
-#     Fv = state_new[VISCOUS_DISTORTION].reshape((3, 3))
-#     Fe = F @ np.linalg.inv(Fv)
-#     Ee = 0.5 * TensorMath.mtk_log_sqrt(Fe.T @ Fe)
-
-#     # viscous shearing
-#     # Me = 2. * G_neq * Ee
-#     # M_bar = TensorMath.norm_of_deviator_squared(Me)
-#     # visco_energy = (dt / (G_neq * tau)) * M_bar**2
-
-#     # still need another term I think
-#     W_neq = G_neq * TensorMath.norm_of_deviator_squared(Ee) #+ visco_energy
-#     return W_neq
-
 def _neq_strain_energy(dispGrad, stateOld, dt, props):
-    W_neq = 0.0
     I = np.identity(3)
     F = dispGrad + I
     state_new = _compute_state_new(dispGrad, stateOld, dt, props)
-    for n in range(NUM_PRONY_TERMS):
+    Fvs = state_new.reshape((NUM_PRONY_TERMS, 3, 3))
+
+    def vmap_body(n, Fv):
         G_neq = props[PROPS_G_neq + 2 * n]
         # tau   = props[PROPS_TAU   + 2 * n]
 
-        # Fv = state_new[VISCOUS_DISTORTION + 9 * n].reshape((3, 3))
-        Fv = state_new[slice(0 + 9 * n, 9 * (n + 1))].reshape((3, 3))
         Fe = F @ np.linalg.inv(Fv)
         Ee = 0.5 * TensorMath.mtk_log_sqrt(Fe.T @ Fe)
 
@@ -136,41 +118,37 @@ def _neq_strain_energy(dispGrad, stateOld, dt, props):
         # visco_energy = (dt / (G_neq * tau)) * M_bar**2
 
         # still need another term I think
-        W_neq = W_neq + G_neq * TensorMath.norm_of_deviator_squared(Ee) #+ visco_energy
+        W_neq = G_neq * TensorMath.norm_of_deviator_squared(Ee) #+ visco_energy
+        return W_neq
+
+    W_neq = np.sum(vmap(vmap_body, in_axes=(0, 0))(np.arange(NUM_PRONY_TERMS), Fvs))
+
     return W_neq
 
 # state update
-# TODO generalize to arbitrary number of prony terms
 def _compute_state_new(dispGrad, stateOld, dt, props):
     state_inc = _compute_state_increment(dispGrad, stateOld, dt, props)
+    Fv_olds   = stateOld.reshape((NUM_PRONY_TERMS, 3, 3))
+    Fv_incs   = state_inc.reshape((NUM_PRONY_TERMS, 3, 3))
 
-    state_new = np.array([])
-    for n in range(NUM_PRONY_TERMS):
-        # Fv_old = stateOld[VISCOUS_DISTORTION + 9 * n].reshape((3, 3))
-        # Fv_inc = state_inc[VISCOUS_DISTORTION + 9 * n].reshape((3, 3))
-        Fv_old = stateOld[slice(0 + 9 * n, 9 * (n + 1))].reshape((3, 3))
-        Fv_inc = state_inc[slice(0 + 9 * n, 9 * (n + 1))].reshape((3, 3))
+    def vmap_body(n, Fv_old, Fv_inc):
         Fv_new = Fv_inc @ Fv_old
-        state_new = np.hstack((state_new, Fv_new.ravel()))
+        return Fv_new.ravel()
 
+    state_new = np.hstack(vmap(vmap_body, in_axes=(0, 0, 0))(np.arange(NUM_PRONY_TERMS), Fv_olds, Fv_incs))
     return state_new
-    # return Fv_new.ravel()
 
-# TODO generalize to arbitrary number of prony terms
 def _compute_state_increment(dispGrad, stateOld, dt, props):
-    state_inc = np.array([])
     I = np.identity(3)
     F = dispGrad + I
+    Fv_olds = stateOld.reshape((NUM_PRONY_TERMS, 3, 3))
 
-    for n in range(NUM_PRONY_TERMS):
+    def vmap_body(n, Fv_old):
         # TODO add shift factor
-        # G_neq, tau = props[PROPS_G_neq], props[PROPS_TAU]
         G_neq = props[PROPS_G_neq + 2 * n]
         tau   = props[PROPS_TAU + 2 * n]
 
         # kinematics
-        # Fv_old = stateOld[VISCOUS_DISTORTION + 9 * n].reshape((3, 3))
-        Fv_old = stateOld[slice(0 + 9 * n, 9 * (n + 1))].reshape((3, 3))
         Fe_trial = F @ np.linalg.inv(Fv_old)
         Ee_trial = 0.5 * TensorMath.mtk_log_sqrt(Fe_trial.T @ Fe_trial)
         Ee_dev = Ee_trial - (1. / 3.) * np.trace(Ee_trial) * I
@@ -186,7 +164,7 @@ def _compute_state_increment(dispGrad, stateOld, dt, props):
 
         Fv_inc = linalg.expm(A)
 
-        state_inc = np.hstack((state_inc, Fv_inc.ravel()))
+        return Fv_inc.ravel()
 
+    state_inc = np.hstack(vmap(vmap_body, in_axes=(0, 0))(np.arange(NUM_PRONY_TERMS), Fv_olds))
     return state_inc
-    # return Fv_inc
