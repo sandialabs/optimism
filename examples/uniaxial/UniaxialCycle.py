@@ -66,20 +66,15 @@ class Uniaxial:
         self.K_eq  = 1.e2
         self.G_eq  = 1.0
 
-        G_neq_1 = 10.0
-        G_neq_2 = 5.0
-        tau_1   = 1.0e-1
-        tau_2   = 1.0
+        G_neq_1 = 5.0
+        tau_1   = 0.1
 
         props = {
-            'equilibrium bulk modulus'       : self.K_eq,
-            'equilibrium shear modulus'      : self.G_eq,
+            'equilibrium bulk modulus'     : self.K_eq,
+            'equilibrium shear modulus'    : self.G_eq,
             #
-            'number of prony terms'          : 2,
-            'non equilibrium shear modulus 1': G_neq_1,
-            'non equilibrium shear modulus 2': G_neq_2,
-            'relaxation time 1'              : tau_1,
-            'relaxation time 2'              : tau_2
+            'non equilibrium shear modulus': G_neq_1,
+            'relaxation time'              : tau_1,
         } 
         materialModel = Material.create_material_model_functions(props)
 
