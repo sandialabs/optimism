@@ -8,7 +8,8 @@ setuptools.setup(
     install_requires=['jax[cpu]',
                       'scipy',
                       'matplotlib', # this is not strictly necessary
-                      'netcdf4'],
+                      'netcdf4',
+                      'metis'],
     #tests_require=[], # could put chex and pytest here
     extras_require={'sparse': ['scikit-sparse'],
                     'test': ['pytest', 'pytest-cov', 'pytest-xdist']},
