@@ -2,7 +2,8 @@ import unittest
 
 import jax
 import jax.numpy as np
-from matplotlib import pyplot as plt
+import numpy as onp
+from scipy.sparse import linalg
 
 from optimism import EquationSolver as EqSolver
 from optimism import QuadratureRule
@@ -13,10 +14,6 @@ from optimism import Mesh
 from optimism.material import Neohookean
 
 from optimism.inverse.test.FiniteDifferenceFixture import FiniteDifferenceFixture
-
-# for adjoint
-import numpy as onp
-from scipy.sparse import linalg
 
 # misc. modules in test directory for now while I test
 import adjoint_problem_function_space as AdjointFunctionSpace
