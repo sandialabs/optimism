@@ -1,0 +1,17 @@
+# This is a Spack Environment file.
+#
+# It describes a set of packages to be installed, along with
+# configuration settings.
+spack:
+  # add package specs to the `specs` list
+  specs:
+  - python
+  - py-pip
+  - py-pytest
+  - py-pytest-cov
+  - py-pytest-xdist
+  - py-scikit-sparse
+  view: true
+  concretizer:
+    unify: true
+
