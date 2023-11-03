@@ -105,47 +105,30 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
     def strain_energy_gradient(self, storedState, parameters):
         return jax.grad(self.strain_energy_objective, argnums=1)(storedState, parameters)
 
-    # def total_work_increment(self, Uu, Uu_prev, ivs, ivs_prev, p, p_prev, coordinates):
-    #     coords = coordinates.reshape(self.mesh.coords.shape)
-    #     internal_vars = ivs.reshape(p.state_data.shape)
-    #     internal_vars_prev = ivs_prev.reshape(p_prev.state_data.shape)
-
-    #     adjoint_func_space = AdjointFunctionSpace.construct_function_space_for_adjoint(coords, self.mesh, self.quadRule)
-    #     mech_funcs = Mechanics.create_mechanics_functions(adjoint_func_space, mode2D='plane strain', materialModel=self.materialModel)
-
-    #     def energy_function_all_dofs(U, ivs):
-    #         return mech_funcs.compute_strain_energy(U, ivs)
-
-    #     nodal_forces = jax.grad(energy_function_all_dofs, argnums=0)
-
-    #     index = (self.mesh.nodeSets['left'], 1) # arbitrarily choosing left side nodeset for reaction force
-
-    #     U = self.dofManager.create_field(Uu, p.bc_data)
-    #     force = np.array(nodal_forces(U, internal_vars).at[index].get())
-    #     disp = U.at[index].get()
-
-    #     U_prev = self.dofManager.create_field(Uu_prev, p_prev.bc_data)
-    #     force_prev = np.array(nodal_forces(U_prev, internal_vars_prev).at[index].get())
-    #     disp_prev = U_prev.at[index].get()
-
-    #     return 0.5*np.tensordot((force + force_prev),(disp - disp_prev), axes=1)
-
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~TESTER~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
     def total_work_increment(self, Uu, Uu_prev, ivs, ivs_prev, p, p_prev, coordinates):
         coords = coordinates.reshape(self.mesh.coords.shape)
         internal_vars = ivs.reshape(p.state_data.shape)
+        internal_vars_prev = ivs_prev.reshape(p_prev.state_data.shape)
+
         adjoint_func_space = AdjointFunctionSpace.construct_function_space_for_adjoint(coords, self.mesh, self.quadRule)
         mech_funcs = Mechanics.create_mechanics_functions(adjoint_func_space, mode2D='plane strain', materialModel=self.materialModel)
-        U = self.dofManager.create_field(Uu, p.bc_data)
 
         def energy_function_all_dofs(U, ivs):
             return mech_funcs.compute_strain_energy(U, ivs)
 
         nodal_forces = jax.grad(energy_function_all_dofs, argnums=0)
+
         index = (self.mesh.nodeSets['left'], 1) # arbitrarily choosing left side nodeset for reaction force
 
-        return np.sum(np.array(nodal_forces(U, internal_vars).at[index].get()))
-    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+        U = self.dofManager.create_field(Uu, p.bc_data)
+        force = np.array(nodal_forces(U, internal_vars).at[index].get())
+        disp = U.at[index].get()
+
+        U_prev = self.dofManager.create_field(Uu_prev, p_prev.bc_data)
+        force_prev = np.array(nodal_forces(U_prev, internal_vars_prev).at[index].get())
+        disp_prev = U_prev.at[index].get()
+
+        return 0.5*np.tensordot((force + force_prev),(disp - disp_prev), axes=1)
 
     def total_work_objective(self, storedState, parameters):
         val = 0.0
