@@ -202,7 +202,8 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
             adjointLoad -= np.tensordot(mu, dc_du, axes=1) # mu^T dc/du
 
             n = self.dofManager.get_unknown_size()
-            self.objective.p = p # have to update parameters to get precond to work
+            p_objective = Objective.Params(bc_data=p.bc_data, state_data=p_prev.state_data) # remember R is a function of ivs_prev
+            self.objective.p = p_objective 
             self.objective.update_precond(Uu) # update preconditioner for use in cg (will converge in 1 iteration as long as the preconditioner is not approximate)
             dRdu = linalg.LinearOperator((n, n), lambda V: onp.asarray(self.objective.hessian_vec(Uu, V)))
             dRdu_decomp = linalg.LinearOperator((n, n), lambda V: onp.asarray(self.objective.apply_precond(V)))
