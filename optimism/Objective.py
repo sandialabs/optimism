@@ -85,41 +85,46 @@ class Objective:
         self.p = p
         
         self.objective=jit(f)
-        self.grad_x = jit(grad(f,0))
-        self.grad_p = jit(grad(f,1))
+
+        grad_x = grad(f, 0)
+        grad_p = grad(f, 1)
+        # self.grad_x = jit(grad(f,0))
+        # self.grad_p = jit(grad(f,1))
+        self.grad_x = jit(grad_x)
+        self.grad_p = jit(grad_p)
         
         self.hess_vec   = jit(lambda x, p, vx:
-                              jvp(lambda z: self.grad_x(z,p), (x,), (vx,))[1])
+                              jvp(lambda z: grad_x(z,p), (x,), (vx,))[1])
 
         self.vec_hess   = jit(lambda x, p, vx:
-                              vjp(lambda z: self.grad_x(z,p), x)[1](vx))
+                              vjp(lambda z: grad_x(z,p), x)[1](vx))
         
         self.jac_xp_vec = jit(lambda x, p, vp0:
-                              jvp(lambda q0: self.grad_x(x, param_index_update(p,0,q0)),
+                              jvp(lambda q0: grad_x(x, param_index_update(p,0,q0)),
                                   (p[0],),
                                   (vp0,))[1])
 
         self.jac_xp2_vec = jit(lambda x, p, vp2:
-                               jvp(lambda q2: self.grad_x(x, param_index_update(p,2,q2)),
+                               jvp(lambda q2: grad_x(x, param_index_update(p,2,q2)),
                                    (p[2],),
                                    (vp2,))[1])
         
         self.vec_jac_xp0 = jit(lambda x, p, vx:
-                               vjp(lambda q0: self.grad_x(x, param_index_update(p,0,q0)), p[0])[1](vx))
+                               vjp(lambda q0: grad_x(x, param_index_update(p,0,q0)), p[0])[1](vx))
         
         self.vec_jac_xp1 = jit(lambda x, p, vx:
-                               vjp(lambda q1: self.grad_x(x, param_index_update(p,1,q1)), p[1])[1](vx))
+                               vjp(lambda q1: grad_x(x, param_index_update(p,1,q1)), p[1])[1](vx))
         
         self.vec_jac_xp2 = jit(lambda x, p, vx:
-                               vjp(lambda q2: self.grad_x(x, param_index_update(p,2,q2)), p[2])[1](vx))
+                               vjp(lambda q2: grad_x(x, param_index_update(p,2,q2)), p[2])[1](vx))
 
         self.vec_jac_xp4 = jit(lambda x, p, vx:
-                               vjp(lambda q4: self.grad_x(x, param_index_update(p,4,q4)), p[4])[1](vx))
+                               vjp(lambda q4: grad_x(x, param_index_update(p,4,q4)), p[4])[1](vx))
 
 
-        self.grad_and_tangent = lambda x, p: linearize(lambda z: self.grad_x(z,p), x)
+        self.grad_and_tangent = lambda x, p: linearize(lambda z: grad_x(z,p), x)
         
-        self.hess = jit(jacfwd(self.grad_x, 0))
+        self.hess = jit(jacfwd(grad_x, 0))
 
         self.scaling = 1.0
         self.invScaling = 1.0
