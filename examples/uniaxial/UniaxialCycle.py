@@ -79,7 +79,7 @@ class Uniaxial:
         materialModel = Material.create_material_model_functions(props)
 
         self.mechanicsFunctions =  Mechanics.create_mechanics_functions(
-            self.fs, "plane strain", materialModel, dt=dt
+            self.fs, "plane strain", materialModel
         )
         
         self.outputForce = []
@@ -99,14 +99,14 @@ class Uniaxial:
     def energy_function(self, Uu, p):
         U = self.create_field(Uu, p)
         internalVariables = p[1]
-        return self.mechanicsFunctions.compute_strain_energy(U, internalVariables)
+        return self.mechanicsFunctions.compute_strain_energy(U, internalVariables, dt)
 
 
     @partial(jax.jit, static_argnums=0)
     @partial(jax.value_and_grad, argnums=2)
     def compute_reactions_from_bcs(self, Uu, Ubc, internalVariables):
         U = self.dofManager.create_field(Uu, Ubc)
-        return self.mechanicsFunctions.compute_strain_energy(U, internalVariables)
+        return self.mechanicsFunctions.compute_strain_energy(U, internalVariables, dt)
 
 
     def create_field(self, Uu, p):
@@ -193,7 +193,7 @@ class Uniaxial:
             Uu = EqSolver.nonlinear_equation_solve(objective, Uu, p, settings)
             
             state = self.mechanicsFunctions.\
-                compute_updated_internal_variables(self.create_field(Uu, p), p[1])
+                compute_updated_internal_variables(self.create_field(Uu, p), p[1], dt)
             p = Objective.param_index_update(p, 1, state)
             
             self.write_output(Uu, p, i)
@@ -239,7 +239,7 @@ if __name__=='__main__':
     materialModel = Neohookean.create_material_model_functions(props)
 
     app.mechanicsFunctions =  Mechanics.create_mechanics_functions(
-        app.fs, "plane strain", materialModel, dt=0.0
+        app.fs, "plane strain", materialModel
     )
 
     app.run()
