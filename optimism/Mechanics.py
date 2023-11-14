@@ -247,8 +247,7 @@ def create_multi_block_mechanics_functions(functionSpace, mode2D, materialModels
     
     
 def create_mechanics_functions(functionSpace, mode2D, materialModel, 
-                               pressureProjectionDegree=None,
-                               dt=0.0):
+                               pressureProjectionDegree=None):
     fs = functionSpace
 
     if mode2D == 'plane strain':
@@ -269,15 +268,15 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel,
             return grad_2D_to_3D(elemGrads, elemShapes, elemVols, elemNodalDisps, elemNodalCoords)
     
     
-    def compute_strain_energy(U, stateVariables, dt=dt):
+    def compute_strain_energy(U, stateVariables, dt=0.0):
         return _compute_strain_energy(fs, U, stateVariables, dt, materialModel.compute_energy_density, modify_element_gradient)
 
         
-    def compute_updated_internal_variables(U, stateVariables, dt=dt):
+    def compute_updated_internal_variables(U, stateVariables, dt=0.0):
         return _compute_updated_internal_variables(fs, U, stateVariables, dt, materialModel.compute_state_new, modify_element_gradient)
 
     
-    def compute_element_stiffnesses(U, stateVariables, dt=dt):
+    def compute_element_stiffnesses(U, stateVariables, dt=0.0):
         return _compute_element_stiffnesses(U, stateVariables, dt, fs, materialModel.compute_energy_density, modify_element_gradient)
 
 
@@ -285,7 +284,7 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel,
     output_constitutive = value_and_grad(output_lagrangian, 1)
 
     
-    def compute_output_energy_densities_and_stresses(U, stateVariables, dt=dt):
+    def compute_output_energy_densities_and_stresses(U, stateVariables, dt=0.0):
         return FunctionSpace.evaluate_on_block(fs, U, stateVariables, dt, output_constitutive, slice(None), modify_element_gradient=modify_element_gradient)
 
     
