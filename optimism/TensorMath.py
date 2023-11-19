@@ -1,7 +1,10 @@
+"""Provide differentiable operations on 3x3 tensors."""
+
 from functools import partial
 import jax
 import jax.numpy as np
 
+from optimism.JaxConfig import if_then_else
 from optimism import Math
 
 def trace(A):
@@ -48,12 +51,12 @@ def norm_of_deviator_squared(tensor):
 def norm_of_deviator(tensor):
     return norm( compute_deviatoric_tensor(tensor) )
 
-def mises_equivalent_stress(stress):
+def mises_invariant(stress):
     return np.sqrt(1.5)*norm_of_deviator(stress)
 
 def triaxiality(A):
     mean_normal = trace(A)/3.0
-    mises_norm = mises_equivalent_stress(A)
+    mises_norm = mises_invariant(A)
     # avoid division by zero in case of spherical tensor
     mises_norm += np.finfo(np.dtype("float64")).eps
     return mean_normal/mises_norm
@@ -66,23 +69,15 @@ def gradient_2D_to_axisymmetric(dudX_2D, u, X):
     dudX = dudX.at[2, 2].set(u[0]/X[0])
     return dudX
 
-# BT 11/2023
-# We should probably replace this with np.where and avoid duplication
-def if_then_else(cond, val1, val2):
-    return jax.lax.cond(cond,
-                        lambda x: val1,
-                        lambda x: val2,
-                        None)
-
-#  Compute eigen values and vectors of a symmetric 3x3 tensor
-#  Note, returned eigen vectors may not be unit length
-#
-#  Note, this routine involves high powers of the input tensor (~M^8).  
-#  Thus results can start to denormalize when the infinity norm of the input
-#  tensor falls outside the range 1.0e-40 to 1.0e+40.
-#
-#  Outside this range use  eigen_sym33_unit
 def eigen_sym33_non_unit(tensor):
+    """Compute eigen values and vectors of a symmetric 3x3 tensor.
+
+    Note, returned eigen vectors may not be unit length
+    Note, this routine involves high powers of the input tensor (~M^8).
+    Thus results can start to denormalize when the infinity norm of the input
+    tensor falls outside the range 1.0e-40 to 1.0e+40.
+    Outside this range use eigen_sym33_unit
+    """
     cxx = tensor[0,0]
     cyy = tensor[1,1]
     czz = tensor[2,2]
