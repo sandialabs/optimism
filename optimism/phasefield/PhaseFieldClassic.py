@@ -24,7 +24,7 @@ def degradation(phase):
 
 def intact_strain_energy_density(props, strain):
     dil = np.trace(strain)
-    dev = compute_deviatoric_tensor(strain).ravel()
+    dev = deviator(strain).ravel()
     return 0.5*props['kappa'] * dil**2 + props['mu'] * np.dot(dev,dev)
 
 

@@ -29,11 +29,11 @@ def inv(A):
                                     [invA20, invA21, invA22]])
     return invA
 
-def compute_deviatoric_tensor(A):
+def deviator(A):
     dil = trace(A)
     return A - (dil/3.)*np.identity(3)
 
-def dev(strain): return compute_deviatoric_tensor(strain)
+def dev(strain): return deviator(strain)
 
 def sym(A):
     return 0.5*(A + A.T)
@@ -45,11 +45,11 @@ def norm(A):
     return Math.safe_sqrt(A.ravel() @ A.ravel())
 
 def norm_of_deviator_squared(tensor):
-    dev = compute_deviatoric_tensor(tensor)
+    dev = deviator(tensor)
     return np.tensordot(dev,dev)
 
 def norm_of_deviator(tensor):
-    return norm( compute_deviatoric_tensor(tensor) )
+    return norm( deviator(tensor) )
 
 def mises_invariant(stress):
     return np.sqrt(1.5)*norm_of_deviator(stress)
