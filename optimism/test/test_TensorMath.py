@@ -183,7 +183,6 @@ class TensorMathFixture(TestFixture):
             return np.tensordot(lg, lg)
         check_grads(pow_squared, (C,), order=1)
 
-
     def test_pow_squared_grad_rand(self):
         key = jax.random.PRNGKey(0)
         F = jax.random.uniform(key, (3,3), minval=1e-8, maxval=10.0)
@@ -194,10 +193,38 @@ class TensorMathFixture(TestFixture):
             lg = TensorMath.mtk_pow(A, m)
             return np.tensordot(lg, lg)
         check_grads(pow_squared, (C,), order=1)
-        
-        
-   
 
-        
+    def test_determinant(self):
+        A = np.array([[5/9, 4/7, 2/11],
+                      [7/9, 4/9, 1/5],
+                      [1/3, 3/7, 17/18]])
+        self.assertEqual(TensorMath.det(A), -45583/280665)
+
+    def test_detpIm1(self):
+        A = np.array([[-8.7644781692191447986e-7, -0.00060943437636452272438, 0.0006160110345770283824],
+                      [0.00059197095431573693372, -0.00032421698142571543644, -0.00075031460538177354586],
+                      [-0.00057095032376313107833, 0.00042675236045286923589, -0.00029239794707394684004]])
+        exact = -0.00061636368316760725654 # computed with exact arithmetic in Mathematica and truncated
+        val = TensorMath.detpIm1(A)
+        self.assertAlmostEqual(exact, val, 15)
+
+    def test_determinant_precision(self):
+        eps = 1e-8
+        A = np.diag(np.array([eps, eps, eps]))
+        # det(A + I) - 1
+        exact = eps**3 + 3*eps**2 + 3*eps
+
+        # straightforward approach loses precision
+        Jm1 = TensorMath.det(A + np.identity(3)) - 1
+        error = np.abs((Jm1 - exact)/exact)
+        self.assertGreater(error, 1e-9)
+
+        # special function retains precision
+        Jm1 = TensorMath.detpIm1(A)
+        error = np.abs((Jm1 - exact)/exact)
+        self.assertEqual(error, 0)
+
+
+
 if __name__ == '__main__':
     unittest.main()

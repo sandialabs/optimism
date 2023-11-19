@@ -10,9 +10,17 @@ from optimism import Math
 def trace(A):
     return A[0, 0] + A[1, 1] + A[2, 2]
 
+def I2(A):
+    trA = np.trace(A)
+    return 0.5*(trA*trA - A.ravel()@A.T.ravel())
+
 def det(A):
     return A[0, 0]*A[1, 1]*A[2, 2] + A[0, 1]*A[1, 2]*A[2, 0] + A[0, 2]*A[1, 0]*A[2, 1] \
         - A[0, 0]*A[1, 2]*A[2, 1] - A[0, 1]*A[1, 0]*A[2, 2] - A[0, 2]*A[1, 1]*A[2, 0]
+
+def detpIm1(A):
+    """Compute det(A + I) - 1 while preserving precision when A is small compared to the identity."""
+    return trace(A) + I2(A) + det(A)
 
 def inv(A):
     invA00 = A[1, 1]*A[2, 2] - A[1, 2]*A[2, 1]
@@ -31,7 +39,7 @@ def inv(A):
 
 def deviator(A):
     dil = trace(A)
-    return A - (dil/3.)*np.identity(3)
+    return A - (dil/3)*np.identity(3)
 
 def dev(strain): return deviator(strain)
 
