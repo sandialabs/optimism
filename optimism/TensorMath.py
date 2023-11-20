@@ -69,6 +69,23 @@ def triaxiality(A):
     mises_norm += np.finfo(np.dtype("float64")).eps
     return mean_normal/mises_norm
 
+def right_polar_decomposition(F):
+    """Compute the right polar decomposition of a tensor.
+
+    Computes the factors R and U such that R@U = F, where R is an
+    orthogonal matrix and U is symmetric positive semi-definite.
+
+    Parameters: F : 3x3 matrix
+
+    Returns: a tuple of the following arrays
+             R : orthogonal matrix
+             U : right stretch matrix
+    """
+    C = F.T@F
+    U = mtk_sqrt(C)
+    R = F@inv(U)
+    return R, U
+
 def tensor_2D_to_3D(H):
     return np.zeros((3,3)).at[ 0:H.shape[0], 0:H.shape[1] ].set(H)
 
@@ -535,4 +552,7 @@ def log_jvp(Cpack, Hpack):
         
     return logSqrtC, sol
 
-
+def mtk_sqrt(A):
+    """Square root of a symmetric positive semi-definite tensor."""
+    lam, V = eigen_sym33_unit(A)
+    return V @ np.diag(Math.safe_sqrt(lam)) @ V.T

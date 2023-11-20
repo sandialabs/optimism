@@ -224,6 +224,24 @@ class TensorMathFixture(TestFixture):
         error = np.abs((Jm1 - exact)/exact)
         self.assertEqual(error, 0)
 
+    def test_right_polar_decomp(self):
+        key = jax.random.PRNGKey(0)
+        F = jax.random.uniform(key, (3,3), minval=1e-8, maxval=10.0)
+        R, U = TensorMath.right_polar_decomposition(F)
+        # R is orthogonal
+        self.assertArrayNear(R@R.T, np.identity(3), 14)
+        self.assertArrayNear(R.T@R, np.identity(3), 14)
+        # U is symmetric
+        self.assertArrayNear(U, TensorMath.sym(U), 14)
+        # RU = F
+        self.assertArrayNear(R@U, F, 14)
+
+    def test_tensor_sqrt(self):
+        eigvals = np.array([2., 0.5, 2.])
+        C = R@np.diag(eigvals)@R.T
+        U = TensorMath.mtk_sqrt(C)
+        self.assertArrayNear(U, TensorMath.sym(U), 14)
+        self.assertArrayNear(U@U, C, 14)
 
 
 if __name__ == '__main__':
