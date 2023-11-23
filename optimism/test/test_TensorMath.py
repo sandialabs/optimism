@@ -28,39 +28,11 @@ def numerical_grad(f):
 class TensorMathFixture(TestFixture):
 
     def setUp(self):
+        key = jax.random.PRNGKey(1)
+        self.R = jax.random.orthogonal(key, 3)
+        self.assertGreater(np.linalg.det(self.R), 0) # make sure this is a rotation and not a reflection
         self.log_squared = lambda A: np.tensordot(TensorMath.log_sqrt(A), TensorMath.log_sqrt(A))
         
-
-    def test_log_sqrt_tensor_jvp_0(self):
-        A = np.array([ [2.0, 0.0, 0.0],
-                       [0.0, 1.2, 0.0],
-                       [0.0, 0.0, 2.0] ])
-
-        check_grads(self.log_squared, (A,), order=1)
-        
-        
-    def test_log_sqrt_tensor_jvp_1(self):
-        A = np.array([ [2.0, 0.0, 0.0],
-                       [0.0, 1.2, 0.0],
-                       [0.0, 0.0, 3.0] ])
-
-        check_grads(self.log_squared, (A,), order=1)
-
-        
-    def test_log_sqrt_tensor_jvp_2(self):
-        A = np.array([ [2.0, 0.0, 0.2],
-                       [0.0, 1.2, 0.1],
-                       [0.2, 0.1, 3.0] ])
-
-        check_grads(self.log_squared, (A,), order=1)
-
-
-    @unittest.expectedFailure
-    def test_log_sqrt_hessian_on_double_degenerate_eigenvalues(self):
-        eigvals = np.array([2., 0.5, 2.])
-        C = R@np.diag(eigvals)@R.T
-        check_grads(jax.jacrev(TensorMath.log_sqrt), (C,), order=1, modes=['fwd'], rtol=1e-9, atol=1e-9, eps=1e-5)
-
 
     def test_eigen_sym33_non_unit(self):
         key = jax.random.PRNGKey(0)
@@ -132,8 +104,137 @@ class TensorMathFixture(TestFixture):
             lg = TensorMath.mtk_log_sqrt(A)
             return np.tensordot(lg, lg)
         check_grads(log_squared, (C,), order=1)
-        
-        
+
+    # log_symm tests
+
+    def test_log_symm_scaled_identity(self):
+        val = 1.2
+        C = np.diag(np.array([val, val, val]))
+        logVal = np.log(val)
+        self.assertArrayNear(TensorMath.log_symm(C), np.diag(np.array([logVal, logVal, logVal])), 12)
+
+    def test_log_symm_double_eigs(self):
+        val1 = 2.0
+        val2 = 0.5
+        C = self.R@np.diag(np.array([val1, val2, val1]))@self.R.T
+
+        log1 = np.log(val1)
+        log2 = np.log(val2)
+        diagLog = np.diag(np.array([log1, log2, log1]))
+
+        logCExpected = self.R@diagLog@self.R.T
+        self.assertArrayNear(TensorMath.log_symm(C), logCExpected, 12)
+
+    def test_log_symm_gradient_scaled_identity(self):
+        val = 1.2
+        C = np.diag(np.array([val, val, val]))
+        check_grads(TensorMath.log_symm, (C,), order=1)
+
+    def test_log_symm_gradient_double_eigs(self):
+        val1 = 2.0
+        val2 = 0.5
+        C = self.R@np.diag(np.array([val1, val2, val1]))@self.R.T
+        check_grads(TensorMath.log_symm, (C,), order=1)
+
+    def test_log_symm_gradient_distinct_eigenvalues(self):
+        key = jax.random.PRNGKey(0)
+        F = jax.random.uniform(key, (3,3), minval=1e-8, maxval=10.0)
+        C = F.T@F
+        check_grads(TensorMath.log_symm, (C,), order=1)
+
+    def test_log_symm_gradient_almost_double_degenerate(self):
+        C = self.R@np.diag(np.array([2.1, 2.1 + 1e-8, 3.0]))@self.R.T
+        check_grads(TensorMath.log_symm, (C,), order=1, eps=1e-10)
+
+    # sqrt_symm_tests
+
+    def test_sqrt_symm(self):
+        key = jax.random.PRNGKey(0)
+        F = jax.random.uniform(key, (3,3), minval=1e-8, maxval=10.0)
+        C = F.T@F
+        U = TensorMath.sqrt_symm(C)
+        self.assertArrayNear(U@U, C, 12)
+
+    def test_sqrt_symm_scaled_identity(self):
+        val = 1.2
+        C = np.diag(np.array([val, val, val]))
+        sqrtVal = np.sqrt(val)
+        self.assertArrayNear(TensorMath.sqrt_symm(C), np.diag(np.array([sqrtVal, sqrtVal, sqrtVal])), 12)
+
+    def test_sqrt_symm_double_eigs(self):
+        val1 = 2.0
+        val2 = 0.5
+        C = self.R@np.diag(np.array([val1, val2, val1]))@self.R.T
+        sqrt1 = np.sqrt(val1)
+        sqrt = np.sqrt(val2)
+        diagSqrt = np.diag(np.array([sqrt1, sqrt, sqrt1]))
+
+        sqrtCExpected = self.R@diagSqrt@self.R.T
+        self.assertArrayNear(TensorMath.sqrt_symm(C), sqrtCExpected, 12)
+
+    def test_sqrt_symm_gradient_scaled_identity(self):
+        val = 1.2
+        C = np.diag(np.array([val, val, val]))
+        check_grads(TensorMath.sqrt_symm, (C,), order=1)
+
+    def test_sqrt_symm_gradient_double_eigs(self):
+        val1 = 2.0
+        val2 = 0.5
+        C = self.R@np.diag(np.array([val1, val2, val1]))@self.R.T
+        check_grads(TensorMath.sqrt_symm, (C,), order=1)
+
+    def test_sqrt_symm_gradient_distinct_eigenvalues(self):
+        key = jax.random.PRNGKey(0)
+        F = jax.random.uniform(key, (3,3), minval=1e-8, maxval=10.0)
+        C = F.T@F
+        check_grads(TensorMath.sqrt_symm, (C,), order=1)
+
+    def test_sqrt_symm_gradient_almost_double_degenerate(self):
+        C = self.R@np.diag(np.array([2.1, 2.1 + 1e-8, 3.0]))@self.R.T
+        check_grads(TensorMath.sqrt_symm, (C,), order=1, eps=1e-10)
+
+    ### exp_symm tests
+    def test_exp_symm_at_identity(self):
+        I = TensorMath.exp_symm(np.zeros((3, 3)))
+        self.assertArrayNear(I, np.identity(3), 12)
+
+    def test_exp_symm_scaled_identity(self):
+        val = 1.2
+        C = np.diag(np.array([val, val, val]))
+        expVal = np.exp(val)
+        self.assertArrayNear(TensorMath.exp_symm(C), np.diag(np.array([expVal, expVal, expVal])), 12)
+
+    def test_exp_symm_double_eigs(self):
+        val1 = 2.0
+        val2 = 0.5
+        C = self.R@np.diag(np.array([val1, val2, val1]))@self.R.T
+        exp1 = np.exp(val1)
+        exp2 = np.exp(val2)
+        diagExp = np.diag(np.array([exp1, exp2, exp1]))
+        expCExpected = self.R@diagExp@self.R.T
+        self.assertArrayNear(TensorMath.exp_symm(C), expCExpected, 12)
+
+    def test_exp_symm_gradient_scaled_identity(self):
+        val = 1.2
+        C = np.diag(np.array([val, val, val]))
+        check_grads(TensorMath.exp_symm, (C,), order=1)
+
+    def test_exp_symm_gradient_double_eigs(self):
+        val1 = 2.0
+        val2 = 0.5
+        C = self.R@np.diag(np.array([val1, val2, val1]))@self.R.T
+        check_grads(TensorMath.exp_symm, (C,), order=1)
+
+    def test_exp_symm_gradient_distinct_eigenvalues(self):
+        key = jax.random.PRNGKey(0)
+        F = jax.random.uniform(key, (3,3), minval=1e-8, maxval=10.0)
+        C = F.T@F
+        check_grads(TensorMath.exp_symm, (C,), order=1)
+
+    def test_sqrt_symm_gradient_almost_double_degenerate(self):
+        C = self.R@np.diag(np.array([2.1, 2.1 + 1e-8, 3.0]))@self.R.T
+        check_grads(TensorMath.exp_symm, (C,), order=1, eps=1e-10)
+
     ### mtk_pow tests ###
 
     
@@ -235,13 +336,6 @@ class TensorMathFixture(TestFixture):
         self.assertArrayNear(U, TensorMath.sym(U), 14)
         # RU = F
         self.assertArrayNear(R@U, F, 14)
-
-    def test_tensor_sqrt(self):
-        eigvals = np.array([2., 0.5, 2.])
-        C = R@np.diag(eigvals)@R.T
-        U = TensorMath.mtk_sqrt(C)
-        self.assertArrayNear(U, TensorMath.sym(U), 14)
-        self.assertArrayNear(U@U, C, 14)
 
 
 if __name__ == '__main__':

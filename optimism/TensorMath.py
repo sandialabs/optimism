@@ -82,7 +82,7 @@ def right_polar_decomposition(F):
              U : right stretch matrix
     """
     C = F.T@F
-    U = mtk_sqrt(C)
+    U = sqrt_symm(C)
     R = F@inv(U)
     return R, U
 
@@ -385,13 +385,17 @@ def mtk_log_sqrt_jvp(Cpack, Hpack):
         
     return logSqrtC, sol
 
-
 @partial(jax.custom_jvp, nondiff_argnums=(1,))
 def mtk_pow(A,m):
     lam,V = eigen_sym33_unit(A)
     return V @ np.diag(np.power(lam,m)) @ V.T
 
 
+# BT 11/22/2023
+# This implementation is wrong - it's reusing the relative_log_difference 
+# function where it should be using one particular to the power function.
+# I don't know how to compute that while avoiding catastrophic 
+# cancellation errors. Someone should fix this if they know how.
 @mtk_pow.defjvp
 def mtk_pow_jvp(m, Cpack, Hpack):
     C, = Cpack
@@ -477,82 +481,84 @@ def relative_log_difference(lam1, lam2):
                     relative_log_difference_no_tolerance_check(lam1, lamFake),
                     relative_log_difference_taylor(lam1, lam2))
 
-#
-# We should consider deprecating the following functions and use the mtk ones exclusively
-#
 
-def logh(A):
-    d,V = np.linalg.eigh(A)
-    return logh_from_eigen(d,V)
+def symmetric_matrix_function(A, func):
+    """Create a function on symmetric matrices from a scalar function."""
+    lam, V = eigen_sym33_unit(A)
+    return V@np.diag(func(lam))@V.T
 
+def _symmetric_matrix_function_jvp_helper(func, relative_difference, primals, tangents):
+    C, = primals
+    Cdot, = tangents
 
-def logh_from_eigen(eVals, eVecs):
-    return eVecs@np.diag(np.log(eVals))@eVecs.T
+    lam, V = eigen_sym33_unit(C)
+    primal_out = V@np.diag(func(lam))@V.T
 
-# C must be symmetric!
-@jax.custom_jvp
-def log_sqrt(C):
-    return 0.5*logh(C)
+    df = jax.jacfwd(func)
+    h_diag = jax.vmap(df)(lam)
+    def rd(x1, x2):
+        x2_safe = np.where(x2 == x1, x1 + 1.0, x2)
+        return np.where(x2 == x1, df(x1), relative_difference(x1, x2_safe))
+    h12 = rd(lam[0], lam[1])
+    h23 = rd(lam[1], lam[2])
+    h31 = rd(lam[2], lam[0])
+    h = np.array([[h_diag[0], h12, h31],
+                  [h12, h_diag[1], h23],
+                  [h31, h23, h_diag[2]]])
+    W = V.T@sym(Cdot)@V
+    h = h*W
 
-@log_sqrt.defjvp
-def log_jvp(Cpack, Hpack):
-    C, = Cpack
-    H, = Hpack
+    t00 = V[0].T@h@V[0]
+    t11 = V[1].T@h@V[1]
+    t22 = V[2].T@h@V[2]
+    t01 = V[0].T@h@V[1]
+    t12 = V[1].T@h@V[2]
+    t20 = V[2].T@h@V[0]
 
-    logSqrtC = log_sqrt(C)
-    lam,V = np.linalg.eigh(C)
-    
-    lam1 = lam[0]
-    lam2 = lam[1]
-    lam3 = lam[2]
-    
-    e1 = V[:,0]
-    e2 = V[:,1]
-    e3 = V[:,2]
-    
-    hHat = 0.5 * (V.T @ H @ V)
-
-    l1111 = hHat[0,0] / lam1
-    l2222 = hHat[1,1] / lam2
-    l3333 = hHat[2,2] / lam3
-    
-    l1212 = 0.5*(hHat[0,1]+hHat[1,0]) * relative_log_difference(lam1, lam2)
-    l2323 = 0.5*(hHat[1,2]+hHat[2,1]) * relative_log_difference(lam2, lam3)
-    l3131 = 0.5*(hHat[2,0]+hHat[0,2]) * relative_log_difference(lam3, lam1)
-
-    t00 = l1111 * e1[0] * e1[0] + l2222 * e2[0] * e2[0] + l3333 * e3[0] * e3[0] + \
-        2 * l1212 * e1[0] * e2[0] + \
-        2 * l2323 * e2[0] * e3[0] + \
-        2 * l3131 * e3[0] * e1[0]
-    t11 = l1111 * e1[1] * e1[1] + l2222 * e2[1] * e2[1] + l3333 * e3[1] * e3[1] + \
-        2 * l1212 * e1[1] * e2[1] + \
-        2 * l2323 * e2[1] * e3[1] + \
-        2 * l3131 * e3[1] * e1[1]
-    t22 = l1111 * e1[2] * e1[2] + l2222 * e2[2] * e2[2] + l3333 * e3[2] * e3[2] + \
-        2 * l1212 * e1[2] * e2[2] + \
-        2 * l2323 * e2[2] * e3[2] + \
-        2 * l3131 * e3[2] * e1[2]
-
-    t01 = l1111 * e1[0] * e1[1] + l2222 * e2[0] * e2[1] + l3333 * e3[0] * e3[1] + \
-        l1212 * (e1[0] * e2[1] + e2[0] * e1[1]) + \
-        l2323 * (e2[0] * e3[1] + e3[0] * e2[1]) + \
-        l3131 * (e3[0] * e1[1] + e1[0] * e3[1])
-    t12 = l1111 * e1[1] * e1[2] + l2222 * e2[1] * e2[2] + l3333 * e3[1] * e3[2] + \
-        l1212 * (e1[1] * e2[2] + e2[1] * e1[2]) + \
-        l2323 * (e2[1] * e3[2] + e3[1] * e2[2]) + \
-        l3131 * (e3[1] * e1[2] + e1[1] * e3[2])
-    t20 = l1111 * e1[2] * e1[0] + l2222 * e2[2] * e2[0] + l3333 * e3[2] * e3[0] + \
-        l1212 * (e1[2] * e2[0] + e2[2] * e1[0]) + \
-        l2323 * (e2[2] * e3[0] + e3[2] * e2[0]) + \
-        l3131 * (e3[2] * e1[0] + e1[2] * e3[0])
-    
     sol = np.array([ [t00, t01, t20],
                      [t01, t11, t12],
                      [t20, t12, t22] ])
-        
-    return logSqrtC, sol
 
-def mtk_sqrt(A):
+    return primal_out, sol
+
+@jax.custom_jvp
+def sqrt_symm(A):
     """Square root of a symmetric positive semi-definite tensor."""
-    lam, V = eigen_sym33_unit(A)
-    return V @ np.diag(Math.safe_sqrt(lam)) @ V.T
+    return symmetric_matrix_function(A, Math.safe_sqrt)
+
+def _sqrt_relative_difference(lam1, lam2):
+    return 1/(np.sqrt(lam1) + np.sqrt(lam2))
+
+@sqrt_symm.defjvp
+def sqrt_symm_jvp(primals, tangents):
+    return _symmetric_matrix_function_jvp_helper(Math.safe_sqrt, _sqrt_relative_difference, primals, tangents)
+
+@jax.custom_jvp
+def exp_symm(A):
+    """Compute the matrix exponential of a symmetric matrix."""
+    return symmetric_matrix_function(A, np.exp)
+
+def _exp_relative_difference(lam1, lam2):
+    arg = lam1 - lam2
+    return np.exp(lam2)*np.expm1(arg)/arg
+
+@exp_symm.defjvp
+def exp_symm_jvp(primals, tangents):
+    return _symmetric_matrix_function_jvp_helper(np.exp, _exp_relative_difference, primals, tangents)
+
+@jax.custom_jvp
+def log_symm(A):
+    """Compute the matrix logarithm of a symmetric positive definite matrix."""
+    return symmetric_matrix_function(A, np.log)
+
+def _log_relative_difference(lam1, lam2):
+    arg = lam1/lam2 - 1
+    return (np.log1p(arg)/arg)/lam2
+
+@log_symm.defjvp
+def log_symm_jvp(primals, tangents):
+    return _symmetric_matrix_function_jvp_helper(np.log, _log_relative_difference, primals, tangents)
+
+def log_sqrt_symm(A):
+    """Compute matrix logarithm of the square root of a symmetric positive definite matrix."""
+    return 0.5*log_symm(A)
