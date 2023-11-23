@@ -487,6 +487,12 @@ def symmetric_matrix_function(A, func):
     lam, V = eigen_sym33_unit(A)
     return V@np.diag(func(lam))@V.T
 
+# Helper function to define the JVP for any matrix function created from a
+# scalar function func.
+# To use, you must provide a function 
+# relative_difference: lam1, lam2 -> (func(lam1) - func(lam2))/(lam1 - lam2)
+# Ideally, this should be formulated such that it does not suffer from cancellation
+# error as lam1 -> lam2.
 def _symmetric_matrix_function_jvp_helper(func, relative_difference, primals, tangents):
     C, = primals
     Cdot, = tangents
