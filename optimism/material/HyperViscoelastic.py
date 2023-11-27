@@ -109,18 +109,21 @@ def _eq_strain_energy(dispGrad, props):
     return Wdev + Wvol
 
 def _neq_strain_energy(dispGrad, stateOld, dt, props):
-    I = np.identity(3)
-    F = dispGrad + I
-    state_new = _compute_state_new(dispGrad, stateOld, dt, props)
-    # Fvs = state_new.reshape((NUM_PRONY_TERMS, 3, 3))
-    Fv_new = state_new.reshape((3, 3))
-
     G_neq = props[PROPS_G_neq]
     tau   = props[PROPS_TAU]
     eta   = G_neq * tau
 
-    Fe = F @ np.linalg.inv(Fv_new)
-    Ee = 0.5 * TensorMath.mtk_log_sqrt(Fe.T @ Fe)
+    Ee_trial = _compute_elastic_logarithmic_strain(dispGrad, stateOld)
+    state_inc = _compute_state_increment(Ee_trial, dt, props)
+
+    Ee = Ee_trial - state_inc # doesn't work
+    # # The below works - matches old implementation
+    # F = dispGrad + np.identity(3)
+    # Fv_old = stateOld.reshape((3, 3))
+    # Fv_new = linalg.expm(state_inc)@Fv_old
+    # Fe = F @ np.linalg.inv(Fv_new)
+    # Ee = 0.5 * TensorMath.mtk_log_sqrt(Fe.T @ Fe)
+
     Me = 2. * G_neq * Ee
     M_bar = TensorMath.norm_of_deviator_squared(Me)
     gamma_dot = M_bar / eta
@@ -128,80 +131,23 @@ def _neq_strain_energy(dispGrad, stateOld, dt, props):
     visco_energy = 0.5 * dt * eta * gamma_dot**2
 
     W_neq = G_neq * TensorMath.norm_of_deviator_squared(Ee) + visco_energy
-    # def vmap_body(n, Fv):
-    #     G_neq = props[PROPS_G_neq + 2 * n]
-    #     # tau   = props[PROPS_TAU   + 2 * n]
-
-    #     Fe = F @ np.linalg.inv(Fv)
-    #     Ee = 0.5 * TensorMath.mtk_log_sqrt(Fe.T @ Fe)
-
-    #     # viscous shearing
-    #     # Me = 2. * G_neq * Ee
-    #     # M_bar = TensorMath.norm_of_deviator_squared(Me)
-    #     # visco_energy = (dt / (G_neq * tau)) * M_bar**2
-
-    #     # still need another term I think
-    #     W_neq = G_neq * TensorMath.norm_of_deviator_squared(Ee) #+ visco_energy
-    #     return W_neq
-
-    # W_neq = np.sum(vmap(vmap_body, in_axes=(0, 0))(np.arange(NUM_PRONY_TERMS), Fvs))
 
     return W_neq
 
-# state update
 def _compute_state_new(dispGrad, stateOld, dt, props):
-    state_inc = _compute_state_increment(dispGrad, stateOld, dt, props)
-    # Fv_olds   = stateOld.reshape((NUM_PRONY_TERMS, 3, 3))
-    # Fv_incs   = state_inc.reshape((NUM_PRONY_TERMS, 3, 3))
-
-    # def vmap_body(n, Fv_old, Fv_inc):
-    #     Fv_new = Fv_inc @ Fv_old
-    #     return Fv_new.ravel()
-
-    # state_new = np.hstack(vmap(vmap_body, in_axes=(0, 0, 0))(np.arange(NUM_PRONY_TERMS), Fv_olds, Fv_incs))
+    Ee_trial = _compute_elastic_logarithmic_strain(dispGrad, stateOld)
+    state_inc = _compute_state_increment(Ee_trial, dt, props)
 
     Fv_old = stateOld.reshape((3, 3))
-    Fv_inc = state_inc.reshape((3, 3))
-    state_new = (Fv_inc @ Fv_old).ravel()
-    return state_new
+    Fv_new = linalg.expm(state_inc)@Fv_old
+    return Fv_new.ravel()
 
-def _compute_state_increment(dispGrad, stateOld, dt, props):
-    I = np.identity(3)
-    F = dispGrad + I
-    # Fv_olds = stateOld.reshape((NUM_PRONY_TERMS, 3, 3))
-
-    # def vmap_body(n, Fv_old):
-    #     # TODO add shift factor
-    #     G_neq = props[PROPS_G_neq + 2 * n]
-    #     tau   = props[PROPS_TAU + 2 * n]
-
-    #     # kinematics
-    #     Fe_trial = F @ np.linalg.inv(Fv_old)
-    #     Ee_trial = 0.5 * TensorMath.mtk_log_sqrt(Fe_trial.T @ Fe_trial)
-    #     Ee_dev = Ee_trial - (1. / 3.) * np.trace(Ee_trial) * I
-
-    #     # updates
-    #     integration_factor = 1. / (1. + dt / tau)
-
-    #     Me = 2.0 * G_neq * Ee_dev
-    #     Me = integration_factor * Me
-
-    #     Dv = (1. / (2. * G_neq * tau)) * Me
-    #     A  = dt * Dv
-
-    #     Fv_inc = linalg.expm(A)
-
-    #     return Fv_inc.ravel()
-
-    # state_inc = np.hstack(vmap(vmap_body, in_axes=(0, 0))(np.arange(NUM_PRONY_TERMS), Fv_olds))
-
-    Fv_old = stateOld.reshape((3, 3))
+def _compute_state_increment(elasticStrain, dt, props):
     G_neq = props[PROPS_G_neq]
     tau   = props[PROPS_TAU]
 
-    Fe_trial = F @ np.linalg.inv(Fv_old)
-    Ee_trial = 0.5 * TensorMath.mtk_log_sqrt(Fe_trial.T @ Fe_trial)
-    Ee_dev = Ee_trial - (1. / 3.) * np.trace(Ee_trial) * I
+    # Ee_dev = elasticStrain - (1. / 3.) * np.trace(elasticStrain) * np.identity(3)
+    Ee_dev = TensorMath.compute_deviatoric_tensor(elasticStrain)
 
     integration_factor = 1. / (1. + dt / tau)
 
@@ -209,8 +155,12 @@ def _compute_state_increment(dispGrad, stateOld, dt, props):
     Me = integration_factor * Me
 
     Dv = (1. / (2. * G_neq * tau)) * Me
-    A  = dt * Dv
+    return dt * Dv
 
-    Fv_inc = linalg.expm(A)
+def _compute_elastic_logarithmic_strain(dispGrad, stateOld):
+    F = dispGrad + np.identity(3)
+    Fv_old = stateOld.reshape((3, 3))
 
-    return Fv_inc.ravel()
+    Fe_trial = F @ np.linalg.inv(Fv_old)
+
+    return 0.5 * TensorMath.mtk_log_sqrt(Fe_trial.T @ Fe_trial)
