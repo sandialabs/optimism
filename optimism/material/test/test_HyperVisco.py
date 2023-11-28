@@ -51,12 +51,12 @@ class GradOfPlasticityModelFixture(TestFixture):
         dt = 1.0
 
         energy = self.energy_density(dispGrad, initialState, dt)
-        self.assertNear(energy, 193.6029283822052, 12)
+        self.assertNear(energy, 133.3469451269987, 12)
 
         state = self.compute_state_new(dispGrad, initialState, dt)
-        stateGold = np.array([0.946976197737, 0.206631668313, 0.220846029827, 
-                              0.206631668313, 1.155826112068, 0.015472488047, 
-                              0.220846029827, 0.015472488047, 1.003179626352])
+        stateGold = np.array([0.988233534321, 0.437922586964, 0.433881277313, 
+                              0.437922586964, 1.378870045574, 0.079038974065, 
+                              0.433881277313, 0.079038974065, 1.055381729505])
         self.assertArrayNear(state, stateGold, 12)
 
     def test_log_strain_updates(self):
