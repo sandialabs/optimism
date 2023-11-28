@@ -489,7 +489,7 @@ def symmetric_matrix_function(A, func):
 
 # Helper function to define the JVP for any matrix function created from a
 # scalar function func.
-# To use, you must provide a function 
+# To use, you must provide the function
 # relative_difference: lam1, lam2 -> (func(lam1) - func(lam2))/(lam1 - lam2)
 # Ideally, this should be formulated such that it does not suffer from cancellation
 # error as lam1 -> lam2.
@@ -503,7 +503,7 @@ def _symmetric_matrix_function_jvp_helper(func, relative_difference, primals, ta
     df = jax.jacfwd(func)
     h_diag = jax.vmap(df)(lam)
     def rd(x1, x2):
-        x2_safe = np.where(x2 == x1, x1 + 1.0, x2)
+        x2_safe = np.where(x2 == x1, x2 + 1.0, x2)
         return np.where(x2 == x1, df(x1), relative_difference(x1, x2_safe))
     h12 = rd(lam[0], lam[1])
     h23 = rd(lam[1], lam[2])
@@ -512,14 +512,14 @@ def _symmetric_matrix_function_jvp_helper(func, relative_difference, primals, ta
                   [h12, h_diag[1], h23],
                   [h31, h23, h_diag[2]]])
     W = V.T@sym(Cdot)@V
-    h = h*W
+    h *= W
 
     t00 = V[0].T@h@V[0]
     t11 = V[1].T@h@V[1]
     t22 = V[2].T@h@V[2]
-    t01 = V[0].T@h@V[1]
-    t12 = V[1].T@h@V[2]
-    t20 = V[2].T@h@V[0]
+    t01 = 0.5*(V[0].T@h@V[1] + V[1].T@h@V[0])
+    t12 = 0.5*(V[1].T@h@V[2] + V[2].T@h@V[1])
+    t20 = 0.5*(V[2].T@h@V[0] + V[0].T@h@V[2])
 
     sol = np.array([ [t00, t01, t20],
                      [t01, t11, t12],
@@ -558,8 +558,10 @@ def log_symm(A):
     return symmetric_matrix_function(A, np.log)
 
 def _log_relative_difference(lam1, lam2):
-    arg = lam1/lam2 - 1
-    return (np.log1p(arg)/arg)/lam2
+    lams = np.array([lam1, lam2])
+    i = np.argsort(np.abs(lams))
+    arg = lams[i[0]]/lams[i[1]] - 1
+    return (np.log1p(arg)/arg)/lams[i[1]]
 
 @log_symm.defjvp
 def log_symm_jvp(primals, tangents):
