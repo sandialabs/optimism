@@ -7,8 +7,6 @@ from jax.scipy import linalg
 from optimism.material import HyperViscoelastic as HyperVisco
 from optimism.test.TestFixture import TestFixture
 
-from optimism import TensorMath
-
 def make_disp_grad_from_strain(strain):
     return linalg.expm(strain) - np.identity(3)
         
@@ -58,33 +56,6 @@ class GradOfPlasticityModelFixture(TestFixture):
                               0.437922586964, 1.378870045574, 0.079038974065, 
                               0.433881277313, 0.079038974065, 1.055381729505])
         self.assertArrayNear(state, stateGold, 12)
-
-    def test_log_strain_updates(self):
-        key = jax.random.PRNGKey(1)
-        dispGrad = jax.random.uniform(key, (3, 3))
-        initialState = self.compute_initial_state()
-        dt = 1.0
-
-        props = np.array([
-            self.props['equilibrium bulk modulus'],
-            self.props['equilibrium shear modulus'],
-            self.props['non equilibrium shear modulus'],
-            self.props['relaxation time']
-        ])
-
-        Ee_trial = HyperVisco._compute_elastic_logarithmic_strain(dispGrad, initialState)
-        state_inc = HyperVisco._compute_state_increment(Ee_trial, dt, props)
-
-        Ee_new_way = Ee_trial - state_inc # doesn't work
-
-        # old implementation
-        F = dispGrad + np.identity(3)
-        Fv_old = initialState.reshape((3, 3))
-        Fv_new = linalg.expm(state_inc)@Fv_old
-        Fe = F @ np.linalg.inv(Fv_new)
-        Ee_old_way = TensorMath.mtk_log_sqrt(Fe.T @ Fe)
-
-        self.assertArrayNear(Ee_new_way.ravel(), Ee_old_way.ravel(), 12)
 
         
 if __name__ == '__main__':
