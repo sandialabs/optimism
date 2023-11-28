@@ -7,6 +7,8 @@ from jax.scipy import linalg
 from optimism.material import HyperViscoelastic as HyperVisco
 from optimism.test.TestFixture import TestFixture
 
+from optimism import TensorMath
+
 def make_disp_grad_from_strain(strain):
     return linalg.expm(strain) - np.identity(3)
         
@@ -57,24 +59,32 @@ class GradOfPlasticityModelFixture(TestFixture):
                               0.220846029827, 0.015472488047, 1.003179626352])
         self.assertArrayNear(state, stateGold, 12)
 
+    def test_log_strain_updates(self):
+        key = jax.random.PRNGKey(1)
+        dispGrad = jax.random.uniform(key, (3, 3))
+        initialState = self.compute_initial_state()
+        dt = 1.0
 
-    # def test_elastic_energy(self):
-    #     strainBelowYield = 0.5*self.props['yield strength']/self.props['elastic modulus']
-        
-    #     strain = strainBelowYield*np.diag(np.array([1.0, -self.props['poisson ratio'], -self.props['poisson ratio']]))
-    #     dispGrad = make_disp_grad_from_strain(strain)
-    #     dt = 1.0
-        
-    #     state = self.compute_initial_state()
+        props = np.array([
+            self.props['equilibrium bulk modulus'],
+            self.props['equilibrium shear modulus'],
+            self.props['non equilibrium shear modulus'],
+            self.props['relaxation time']
+        ])
 
-    #     energy = self.energy_density(dispGrad, state, dt)
-    #     WExact = 0.5*self.props['elastic modulus']*strainBelowYield**2
-    #     self.assertNear(energy, WExact, 12)
+        Ee_trial = HyperVisco._compute_elastic_logarithmic_strain(dispGrad, initialState)
+        state_inc = HyperVisco._compute_state_increment(Ee_trial, dt, props)
 
-    #     F = dispGrad + np.identity(3)
-    #     kirchhoffStress = self.stress_func(dispGrad, state, dt) @ F.T
-    #     kirchhoffstressExact = np.zeros((3,3)).at[0,0].set(self.props['elastic modulus']*strainBelowYield)
-    #     self.assertArrayNear(kirchhoffStress, kirchhoffstressExact, 12)
+        Ee_new_way = Ee_trial - state_inc # doesn't work
+
+        # old implementation
+        F = dispGrad + np.identity(3)
+        Fv_old = initialState.reshape((3, 3))
+        Fv_new = linalg.expm(state_inc)@Fv_old
+        Fe = F @ np.linalg.inv(Fv_new)
+        Ee_old_way = TensorMath.mtk_log_sqrt(Fe.T @ Fe)
+
+        self.assertArrayNear(Ee_new_way.ravel(), Ee_old_way.ravel(), 12)
 
         
 if __name__ == '__main__':
