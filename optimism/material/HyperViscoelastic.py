@@ -78,18 +78,6 @@ def _make_properties(properties):
         properties['relaxation time']
     ])
 
-    # props = np.hstack((props, properties['number of prony terms']))
-
-    # for n in range(1, properties['number of prony terms'] + 1):
-    #     print('Prony branch %s properties' % n)
-    #     print('  Shear modulus   = %s' % properties['non equilibrium shear modulus %s' % n])
-    #     print('  Relaxation time = %s' % properties['relaxation time %s' % n])
-    #     props = np.hstack(
-    #         (props, np.array([properties['non equilibrium shear modulus %s' % n],
-    #                           properties['relaxation time %s' % n]])))
-
-    
-
     return props
 
 def _energy_density(dispGrad, state, dt, props):
@@ -97,7 +85,6 @@ def _energy_density(dispGrad, state, dt, props):
     W_neq = _neq_strain_energy(dispGrad, state, dt, props)
     return W_eq + W_neq
 
-# TODO generalize to arbitrary strain energy density
 def _eq_strain_energy(dispGrad, props):
     K, G = props[PROPS_K_eq], props[PROPS_G_eq]
     F = dispGrad + np.eye(3)
@@ -115,14 +102,7 @@ def _neq_strain_energy(dispGrad, stateOld, dt, props):
 
     Ee_trial = _compute_elastic_logarithmic_strain(dispGrad, stateOld)
     state_inc = _compute_state_increment(Ee_trial, dt, props)
-
-    Ee = Ee_trial - state_inc # doesn't work
-    # # The below works - matches old implementation
-    # F = dispGrad + np.identity(3)
-    # Fv_old = stateOld.reshape((3, 3))
-    # Fv_new = linalg.expm(state_inc)@Fv_old
-    # Fe = F @ np.linalg.inv(Fv_new)
-    # Ee = 0.5 * TensorMath.mtk_log_sqrt(Fe.T @ Fe)
+    Ee = Ee_trial - state_inc 
 
     Me = 2. * G_neq * Ee
     M_bar = TensorMath.norm_of_deviator_squared(Me)
@@ -130,9 +110,7 @@ def _neq_strain_energy(dispGrad, stateOld, dt, props):
     # visco_energy = (dt / (G_neq * tau)) * M_bar**2
     visco_energy = 0.5 * dt * eta * gamma_dot**2
 
-    W_neq = G_neq * TensorMath.norm_of_deviator_squared(Ee) + visco_energy
-
-    return W_neq
+    return G_neq * TensorMath.norm_of_deviator_squared(Ee) + visco_energy
 
 def _compute_state_new(dispGrad, stateOld, dt, props):
     Ee_trial = _compute_elastic_logarithmic_strain(dispGrad, stateOld)
@@ -143,24 +121,15 @@ def _compute_state_new(dispGrad, stateOld, dt, props):
     return Fv_new.ravel()
 
 def _compute_state_increment(elasticStrain, dt, props):
-    G_neq = props[PROPS_G_neq]
     tau   = props[PROPS_TAU]
-
-    # Ee_dev = elasticStrain - (1. / 3.) * np.trace(elasticStrain) * np.identity(3)
-    Ee_dev = TensorMath.compute_deviatoric_tensor(elasticStrain)
-
     integration_factor = 1. / (1. + dt / tau)
 
-    Me = 2.0 * G_neq * Ee_dev
-    Me = integration_factor * Me
-
-    Dv = (1. / (2. * G_neq * tau)) * Me
-    return dt * Dv
+    Ee_dev = TensorMath.compute_deviatoric_tensor(elasticStrain)
+    return dt * integration_factor * Ee_dev / tau
 
 def _compute_elastic_logarithmic_strain(dispGrad, stateOld):
     F = dispGrad + np.identity(3)
     Fv_old = stateOld.reshape((3, 3))
 
     Fe_trial = F @ np.linalg.inv(Fv_old)
-
-    return 0.5 * TensorMath.mtk_log_sqrt(Fe_trial.T @ Fe_trial)
+    return TensorMath.mtk_log_sqrt(Fe_trial.T @ Fe_trial)
