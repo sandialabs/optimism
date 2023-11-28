@@ -36,10 +36,13 @@ def create_material_model_functions(properties):
     )
 
 def _make_properties(properties):
-    assert 'equilibrium bulk modulus' in properties.keys()
-    assert 'equilibrium shear modulus' in properties.keys()
-    assert 'non equilibrium shear modulus' in properties.keys()
-    assert 'relaxation time' in properties.keys()
+
+    print('Equilibrium properties')
+    print('  Bulk modulus    = %s' % properties['equilibrium bulk modulus'])
+    print('  Shear modulus   = %s' % properties['equilibrium shear modulus'])
+    print('Prony branch properties')
+    print('  Shear modulus   = %s' % properties['non equilibrium shear modulus'])
+    print('  Relaxation time = %s' % properties['relaxation time'])
 
     props = np.array([
         properties['equilibrium bulk modulus'],
@@ -71,8 +74,8 @@ def _neq_strain_energy(dispGrad, stateOld, dt, props):
     eta   = G_neq * tau
 
     Ee_trial = _compute_elastic_logarithmic_strain(dispGrad, stateOld)
-    state_inc = _compute_state_increment(Ee_trial, dt, props)
-    Ee = Ee_trial - state_inc 
+    delta_Ev = _compute_state_increment(Ee_trial, dt, props)
+    Ee = Ee_trial - delta_Ev 
 
     Me = 2. * G_neq * Ee
     M_bar = TensorMath.norm_of_deviator_squared(Me)
@@ -84,10 +87,10 @@ def _neq_strain_energy(dispGrad, stateOld, dt, props):
 
 def _compute_state_new(dispGrad, stateOld, dt, props):
     Ee_trial = _compute_elastic_logarithmic_strain(dispGrad, stateOld)
-    state_inc = _compute_state_increment(Ee_trial, dt, props)
+    delta_Ev = _compute_state_increment(Ee_trial, dt, props)
 
     Fv_old = stateOld.reshape((3, 3))
-    Fv_new = linalg.expm(state_inc)@Fv_old
+    Fv_new = linalg.expm(delta_Ev)@Fv_old
     return Fv_new.ravel()
 
 def _compute_state_increment(elasticStrain, dt, props):
