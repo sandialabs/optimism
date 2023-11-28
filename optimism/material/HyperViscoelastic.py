@@ -1,11 +1,8 @@
 import jax.numpy as np
-from jax import vmap
 from jax.scipy import linalg
 from optimism import TensorMath
 from optimism.material.MaterialModel import MaterialModel
 
-
-# props
 PROPS_K_eq  = 0
 PROPS_G_eq  = 1
 PROPS_G_neq = 2
@@ -13,31 +10,20 @@ PROPS_TAU   = 3
 
 NUM_PRONY_TERMS = -1
 
-# isvs
 VISCOUS_DISTORTION = slice(0, 9)
 
 def create_material_model_functions(properties):
     
-    # prop processing
     density = properties.get('density')
     props = _make_properties(properties)
 
-    # energy function wrapper
     def energy_density(dispGrad, state, dt):
         return _energy_density(dispGrad, state, dt, props)
 
-    # wrapper for state var ics
     def compute_initial_state(shape=(1,)):
-        # num_prony_terms = properties['number of prony terms']
-
-        # def vmap_body(_):
-        #     return np.identity(3).ravel()
-
-        # state = np.hstack(vmap(vmap_body, in_axes=(0,))(np.arange(num_prony_terms)))
         state = np.identity(3).ravel()
         return state
 
-    # update state vars wrapper
     def compute_state_new(dispGrad, state, dt):
         state = _compute_state_new(dispGrad, state, dt, props)
         return state
@@ -49,28 +35,12 @@ def create_material_model_functions(properties):
         density
     )
 
-# implementation
 def _make_properties(properties):
-    # assert properties['number of prony terms'] > 0, 'Need at least 1 prony term'
     assert 'equilibrium bulk modulus' in properties.keys()
     assert 'equilibrium shear modulus' in properties.keys()
-    # for n in range(1, properties['number of prony terms'] + 1):
-    #     assert 'non equilibrium shear modulus %s' % n in properties.keys()
-    #     assert 'relaxation time %s' % n in properties.keys()
     assert 'non equilibrium shear modulus' in properties.keys()
     assert 'relaxation time' in properties.keys()
 
-    print('Equilibrium properties')
-    print('  Bulk modulus    = %s' % properties['equilibrium bulk modulus'])
-    print('  Shear modulus   = %s' % properties['equilibrium shear modulus'])
-    print('Prony branch properties')
-    print('  Shear modulus   = %s' % properties['non equilibrium shear modulus'])
-    print('  Relaxation time = %s' % properties['relaxation time'])
-    # this is dirty, fuck jax (can't use an int from a jax numpy array or else jit tries to trace that)
-    # global NUM_PRONY_TERMS
-    # NUM_PRONY_TERMS = properties['number of prony terms']
-
-    # first pack equilibrium properties
     props = np.array([
         properties['equilibrium bulk modulus'],
         properties['equilibrium shear modulus'],
