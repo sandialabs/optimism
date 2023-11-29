@@ -497,8 +497,12 @@ def _symmetric_matrix_function_jvp_helper(func, relative_difference, primals, ta
     C, = primals
     Cdot, = tangents
 
+    # it is tempting to compute the primal output here as 
+    # V@np.diag(func(lam))@V.T
+    # and avoid the cost of doing the eigendecomp twice.
+    # Hoever, this will not attach the custom jvp to the primal output
+    # computation, making higher order derivatives wrong!
     lam, V = eigen_sym33_unit(C)
-    primal_out = V@np.diag(func(lam))@V.T
 
     df = jax.jacfwd(func)
     h_diag = jax.vmap(df)(lam)
@@ -525,7 +529,7 @@ def _symmetric_matrix_function_jvp_helper(func, relative_difference, primals, ta
                      [t01, t11, t12],
                      [t20, t12, t22] ])
 
-    return primal_out, sol
+    return sol
 
 @jax.custom_jvp
 def sqrt_symm(A):
@@ -537,7 +541,8 @@ def _sqrt_relative_difference(lam1, lam2):
 
 @sqrt_symm.defjvp
 def sqrt_symm_jvp(primals, tangents):
-    return _symmetric_matrix_function_jvp_helper(Math.safe_sqrt, _sqrt_relative_difference, primals, tangents)
+    primal_out = sqrt_symm(*primals)
+    return primal_out, _symmetric_matrix_function_jvp_helper(Math.safe_sqrt, _sqrt_relative_difference, primals, tangents)
 
 @jax.custom_jvp
 def exp_symm(A):
@@ -550,7 +555,8 @@ def _exp_relative_difference(lam1, lam2):
 
 @exp_symm.defjvp
 def exp_symm_jvp(primals, tangents):
-    return _symmetric_matrix_function_jvp_helper(np.exp, _exp_relative_difference, primals, tangents)
+    primal_out = exp_symm(*primals)
+    return primal_out, _symmetric_matrix_function_jvp_helper(np.exp, _exp_relative_difference, primals, tangents)
 
 @jax.custom_jvp
 def log_symm(A):
@@ -565,7 +571,8 @@ def _log_relative_difference(lam1, lam2):
 
 @log_symm.defjvp
 def log_symm_jvp(primals, tangents):
-    return _symmetric_matrix_function_jvp_helper(np.log, _log_relative_difference, primals, tangents)
+    primal_out = log_symm(*primals)
+    return primal_out, _symmetric_matrix_function_jvp_helper(np.log, _log_relative_difference, primals, tangents)
 
 def log_sqrt_symm(A):
     """Compute matrix logarithm of the square root of a symmetric positive definite matrix."""
