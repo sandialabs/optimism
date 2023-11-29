@@ -237,6 +237,11 @@ class TensorMathFixture(TestFixture):
 
     ### mtk_pow tests ###
 
+    def test_pow_symm_gradient_distinct_eigenvalues(self):
+        key = jax.random.PRNGKey(0)
+        F = jax.random.uniform(key, (3,3), minval=1e-8, maxval=10.0)
+        C = F.T@F
+        check_grads(TensorMath.mtk_pow, (C, 0.25), order=1)
     
     def test_pow_scaled_identity(self):
         m = 0.25
