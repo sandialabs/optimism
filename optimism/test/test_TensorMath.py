@@ -49,62 +49,6 @@ class TensorMathFixture(TestFixture):
         self.assertArrayNear(C, vecs@np.diag(d)@vecs.T, 13)
         self.assertArrayNear(vecs@vecs.T, np.identity(3), 13)
 
-        
-    ### mtk_log_sqrt tests ###
-        
-        
-    def test_log_sqrt_scaled_identity(self):
-        val = 1.2
-        C = np.diag(np.array([val, val, val]))
-
-        logSqrtVal = np.log(np.sqrt(val))
-        self.assertArrayNear(TensorMath.mtk_log_sqrt(C), np.diag(np.array([logSqrtVal, logSqrtVal, logSqrtVal])), 12)
-
-
-    def test_log_sqrt_double_eigs(self):
-        val1 = 2.0
-        val2 = 0.5
-        C = R@np.diag(np.array([val1, val2, val1]))@R.T
-
-        logSqrt1 = np.log(np.sqrt(val1))
-        logSqrt2 = np.log(np.sqrt(val2))
-        diagLogSqrt = np.diag(np.array([logSqrt1, logSqrt2, logSqrt1]))
-
-        logSqrtCExpected = R@diagLogSqrt@R.T
-        self.assertArrayNear(TensorMath.mtk_log_sqrt(C), logSqrtCExpected, 12)
-
-        
-    def test_log_sqrt_squared_grad_scaled_identity(self):
-        val = 1.2
-        C = np.diag(np.array([val, val, val]))
-
-        def log_squared(A):
-            lg = TensorMath.mtk_log_sqrt(A)
-            return np.tensordot(lg, lg)
-        check_grads(log_squared, (C,), order=1)
-        
-        
-    def test_log_sqrt_squared_grad_double_eigs(self):
-        val1 = 2.0
-        val2 = 0.5
-        C = R@np.diag(np.array([val1, val2, val1]))@R.T
-
-        def log_squared(A):
-            lg = TensorMath.mtk_log_sqrt(A)
-            return np.tensordot(lg, lg)
-        check_grads(log_squared, (C,), order=1)
-
-        
-    def test_log_sqrt_squared_grad_rand(self):
-        key = jax.random.PRNGKey(0)
-        F = jax.random.uniform(key, (3,3), minval=1e-8, maxval=10.0)
-        C = F.T@F
-
-        def log_squared(A):
-            lg = TensorMath.mtk_log_sqrt(A)
-            return np.tensordot(lg, lg)
-        check_grads(log_squared, (C,), order=1)
-
     # log_symm tests
 
     def test_log_symm_scaled_identity(self):

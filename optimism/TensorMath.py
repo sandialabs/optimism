@@ -321,70 +321,8 @@ def cos_of_acos_divided_by_3(x):
     return numer/denom
 
 
-@jax.custom_jvp
-def mtk_log_sqrt(A):
-    lam,V = eigen_sym33_unit(A)
-    return V @ np.diag(0.5*np.log(lam)) @ V.T
-
-
-@mtk_log_sqrt.defjvp
-def _mtk_log_sqrt_jvp(Cpack, Hpack):
-    C, = Cpack
-    H, = Hpack
-
-    logSqrtC = mtk_log_sqrt(C)
-    lam,V = eigen_sym33_unit(C)
-    
-    lam1 = lam[0]
-    lam2 = lam[1]
-    lam3 = lam[2]
-    
-    e1 = V[:,0]
-    e2 = V[:,1]
-    e3 = V[:,2]
-    
-    hHat = 0.5 * (V.T @ H @ V)
-
-    l1111 = hHat[0,0] / lam1
-    l2222 = hHat[1,1] / lam2
-    l3333 = hHat[2,2] / lam3
-    
-    l1212 = 0.5*(hHat[0,1]+hHat[1,0]) * _relative_log_difference(lam1, lam2)
-    l2323 = 0.5*(hHat[1,2]+hHat[2,1]) * _relative_log_difference(lam2, lam3)
-    l3131 = 0.5*(hHat[2,0]+hHat[0,2]) * _relative_log_difference(lam3, lam1)
-
-    t00 = l1111 * e1[0] * e1[0] + l2222 * e2[0] * e2[0] + l3333 * e3[0] * e3[0] + \
-        2 * l1212 * e1[0] * e2[0] + \
-        2 * l2323 * e2[0] * e3[0] + \
-        2 * l3131 * e3[0] * e1[0]
-    t11 = l1111 * e1[1] * e1[1] + l2222 * e2[1] * e2[1] + l3333 * e3[1] * e3[1] + \
-        2 * l1212 * e1[1] * e2[1] + \
-        2 * l2323 * e2[1] * e3[1] + \
-        2 * l3131 * e3[1] * e1[1]
-    t22 = l1111 * e1[2] * e1[2] + l2222 * e2[2] * e2[2] + l3333 * e3[2] * e3[2] + \
-        2 * l1212 * e1[2] * e2[2] + \
-        2 * l2323 * e2[2] * e3[2] + \
-        2 * l3131 * e3[2] * e1[2]
-
-    t01 = l1111 * e1[0] * e1[1] + l2222 * e2[0] * e2[1] + l3333 * e3[0] * e3[1] + \
-        l1212 * (e1[0] * e2[1] + e2[0] * e1[1]) + \
-        l2323 * (e2[0] * e3[1] + e3[0] * e2[1]) + \
-        l3131 * (e3[0] * e1[1] + e1[0] * e3[1])
-    t12 = l1111 * e1[1] * e1[2] + l2222 * e2[1] * e2[2] + l3333 * e3[1] * e3[2] + \
-        l1212 * (e1[1] * e2[2] + e2[1] * e1[2]) + \
-        l2323 * (e2[1] * e3[2] + e3[1] * e2[2]) + \
-        l3131 * (e3[1] * e1[2] + e1[1] * e3[2])
-    t20 = l1111 * e1[2] * e1[0] + l2222 * e2[2] * e2[0] + l3333 * e3[2] * e3[0] + \
-        l1212 * (e1[2] * e2[0] + e2[2] * e1[0]) + \
-        l2323 * (e2[2] * e3[0] + e3[2] * e2[0]) + \
-        l3131 * (e3[2] * e1[0] + e1[2] * e3[0])
-    
-    sol = np.array([ [t00, t01, t20],
-                     [t01, t11, t12],
-                     [t20, t12, t22] ])
-        
-    return logSqrtC, sol
-
+# This is an alternative way of computing the relative difference in the log of the eigenvalues.
+# We're using a different method, but let's keep these functions for reference.
 
 def _relative_log_difference_taylor(lam1, lam2):
     # Compute a more accurate (mtk::log(lam1) - log(lam2)) / (lam1-lam2) as lam1 -> lam2
