@@ -144,7 +144,7 @@ class TensorMathFixture(TestFixture):
 
     def test_log_symm_gradient_almost_double_degenerate(self):
         C = self.R@np.diag(np.array([2.1, 2.1 + 1e-8, 3.0]))@self.R.T
-        check_grads(TensorMath.log_symm, (C,), order=1, eps=1e-10)
+        check_grads(TensorMath.log_symm, (C,), order=1, atol=1e-16, eps=1e-10)
 
     # sqrt_symm_tests
 
@@ -234,71 +234,53 @@ class TensorMathFixture(TestFixture):
     def test_sqrt_symm_gradient_almost_double_degenerate(self):
         C = self.R@np.diag(np.array([2.1, 2.1 + 1e-8, 3.0]))@self.R.T
         check_grads(TensorMath.exp_symm, (C,), order=1, eps=1e-10)
+    
+    # pow_symm tests
 
-    ### mtk_pow tests ###
+    def test_pow_symm_scaled_identity(self):
+        val = 1.2
+        C = val*np.identity(3)
+        m = 3
+        powVal = np.power(val, m)
+        self.assertArrayNear(TensorMath.pow_symm(C, m), np.diag(np.array([powVal, powVal, powVal])), 12)
+
+    def test_pow_symm_double_eigs(self):
+        val1 = 2.0
+        val2 = 0.5
+        C = self.R@np.diag(np.array([val1, val2, val1]))@self.R.T
+        m = 0.25
+        pow1 = np.power(val1, m)
+        pow2 = np.power(val2, m)
+        diagPow = np.diag(np.array([pow1, pow2, pow1]))
+        powCExpected = self.R@diagPow@self.R.T
+        self.assertArrayNear(TensorMath.pow_symm(C, m), powCExpected, 12)
+
+    def test_pow_symm_gradient_scaled_identity(self):
+        val = 1.2
+        C = np.diag(np.array([val, val, val]))
+        m = 3
+        check_grads(lambda A: TensorMath.pow_symm(A, m), (C,), order=1)
+
+    def test_pow_symm_gradient_double_eigs(self):
+        val1 = 2.0
+        val2 = 0.5
+        C = self.R@np.diag(np.array([val1, val2, val1]))@self.R.T
+        m = 3
+        check_grads(lambda A: TensorMath.pow_symm(A, m), (C,), order=1)
 
     def test_pow_symm_gradient_distinct_eigenvalues(self):
         key = jax.random.PRNGKey(0)
         F = jax.random.uniform(key, (3,3), minval=1e-8, maxval=10.0)
         C = F.T@F
-        check_grads(TensorMath.mtk_pow, (C, 0.25), order=1)
-    
-    def test_pow_scaled_identity(self):
         m = 0.25
-        val = 1.2
-        C = np.diag(np.array([val, val, val]))
+        check_grads(lambda A: TensorMath.pow_symm(C, m), (C,), order=1)
 
-        powVal = np.power(val, m)
-        self.assertArrayNear(TensorMath.mtk_pow(C,m), np.diag(np.array([powVal, powVal, powVal])), 12)
-
-
-    def test_pow_double_eigs(self):
+    @unittest.expectedFailure
+    def test_pow_symm_gradient_almost_double_degenerate(self):
+        C = self.R@np.diag(np.array([2.1, 2.1 + 1e-8, 3.0]))@self.R.T
         m = 0.25
-        val1 = 2.1
-        val2 = 0.6
-        C = R@np.diag(np.array([val1, val2, val1]))@R.T
+        check_grads(lambda A: TensorMath.pow_symm(A, 0.25), (C,), order=1, atol=1e-16, eps=1e-10)
 
-        powVal1 = np.power(val1, m)
-        powVal2 = np.power(val2, m)
-        diagLogSqrt = np.diag(np.array([powVal1, powVal2, powVal1]))
-
-        logSqrtCExpected = R@diagLogSqrt@R.T
-
-        self.assertArrayNear(TensorMath.mtk_pow(C,m), logSqrtCExpected, 12)
-
-        
-    def test_pow_squared_grad_scaled_identity(self):
-        val = 1.2
-        C = np.diag(np.array([val, val, val]))
-
-        def pow_squared(A):
-            m = 0.25
-            lg = TensorMath.mtk_pow(A, m)
-            return np.tensordot(lg, lg)
-        check_grads(pow_squared, (C,), order=1)
-
-
-    def test_pow_squared_grad_double_eigs(self):
-        val1 = 2.0
-        val2 = 0.5
-        C = R@np.diag(np.array([val1, val2, val1]))@R.T
-
-        def pow_squared(A):
-            m=0.25
-            lg = TensorMath.mtk_pow(A, m)
-            return np.tensordot(lg, lg)
-        check_grads(pow_squared, (C,), order=1)
-
-    def test_pow_squared_grad_rand(self):
-        key = jax.random.PRNGKey(0)
-        F = jax.random.uniform(key, (3,3), minval=1e-8, maxval=10.0)
-        C = F.T@F
-
-        def pow_squared(A):
-            m=0.25
-            lg = TensorMath.mtk_pow(A, m)
-            return np.tensordot(lg, lg)
-        check_grads(pow_squared, (C,), order=1)
 
     def test_determinant(self):
         A = np.array([[5/9, 4/7, 2/11],

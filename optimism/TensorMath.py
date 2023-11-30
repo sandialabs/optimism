@@ -577,3 +577,38 @@ def log_symm_jvp(primals, tangents):
 def log_sqrt_symm(A):
     """Compute matrix logarithm of the square root of a symmetric positive definite matrix."""
     return 0.5*log_symm(A)
+
+@jax.custom_jvp
+def pow_symm(A, m):
+    """Raise a symmetric matrix to a power.
+    
+    Compute m-fold iterated matrix multiplication of A. Works correctly with
+    negative powers, but recall that the matrix must be invertible
+    (or else a matrix of inf or nan will result). This function is not
+    differentiable in the `m` argument.
+    
+    Arguments:
+    A: (array) symmetric matrix to raise to a power
+    m: (float or int) power
+    
+    .. note:: The derivative of this function is inaccurate on matrices
+    with nearly degenerate eigenvalues. We lack a high-quality implementation
+    of the relative difference of the eigenvalue function. (The derivative of
+    matrices with exactly equal eigenvalues is computed correctly).
+    """
+    return symmetric_matrix_function(A, lambda x: np.power(x, m))
+
+# This function loses precision when lam1 -> lam2.
+# Please replace with a numerically stable implmentation if you know how!
+def _pow_relative_difference(lam1, lam2, m):
+    lams = np.array([lam1, lam2])
+    i = np.argsort(np.abs(lams))
+    lam_small, lam_big = lams[i]
+    arg = lam_small/lam_big
+    return lam_big**(m-1)*(arg**m - 1)/(arg - 1)
+
+@pow_symm.defjvp
+def pow_symm_jvp(primals, tangents):
+    A, m = primals
+    dA, dm = tangents
+    return pow_symm(A, m), _symmetric_matrix_function_jvp_helper(lambda x: np.power(x, m), lambda l1, l2: _pow_relative_difference(l1, l2, m), (A,), (dA,))
