@@ -328,7 +328,7 @@ def mtk_log_sqrt(A):
 
 
 @mtk_log_sqrt.defjvp
-def mtk_log_sqrt_jvp(Cpack, Hpack):
+def _mtk_log_sqrt_jvp(Cpack, Hpack):
     C, = Cpack
     H, = Hpack
 
@@ -349,9 +349,9 @@ def mtk_log_sqrt_jvp(Cpack, Hpack):
     l2222 = hHat[1,1] / lam2
     l3333 = hHat[2,2] / lam3
     
-    l1212 = 0.5*(hHat[0,1]+hHat[1,0]) * relative_log_difference(lam1, lam2)
-    l2323 = 0.5*(hHat[1,2]+hHat[2,1]) * relative_log_difference(lam2, lam3)
-    l3131 = 0.5*(hHat[2,0]+hHat[0,2]) * relative_log_difference(lam3, lam1)
+    l1212 = 0.5*(hHat[0,1]+hHat[1,0]) * _relative_log_difference(lam1, lam2)
+    l2323 = 0.5*(hHat[1,2]+hHat[2,1]) * _relative_log_difference(lam2, lam3)
+    l3131 = 0.5*(hHat[2,0]+hHat[0,2]) * _relative_log_difference(lam3, lam1)
 
     t00 = l1111 * e1[0] * e1[0] + l2222 * e2[0] * e2[0] + l3333 * e3[0] * e3[0] + \
         2 * l1212 * e1[0] * e2[0] + \
@@ -386,7 +386,7 @@ def mtk_log_sqrt_jvp(Cpack, Hpack):
     return logSqrtC, sol
 
 
-def relative_log_difference_taylor(lam1, lam2):
+def _relative_log_difference_taylor(lam1, lam2):
     # Compute a more accurate (mtk::log(lam1) - log(lam2)) / (lam1-lam2) as lam1 -> lam2
     third2 = 2.0 / 3.0
     fifth2 = 2.0 / 5.0
@@ -401,16 +401,16 @@ def relative_log_difference_taylor(lam1, lam2):
     return (2.0 + third2 * frac2 + fifth2 * frac4 + seventh2 * frac4 * frac2 + ninth2 * frac4 * frac4) / (lam1 + lam2)
 
 
-def relative_log_difference_no_tolerance_check(lam1, lam2):
+def _relative_log_difference_no_tolerance_check(lam1, lam2):
   return np.log(lam1 / lam2) / (lam1 - lam2)
 
 
-def relative_log_difference(lam1, lam2):
+def _relative_log_difference(lam1, lam2):
     haveLargeDiff = np.abs(lam1 - lam2) > 0.05 * np.minimum(lam1, lam2)
     lamFake = np.where(haveLargeDiff, lam2, 2.0*lam2)
     return np.where(haveLargeDiff,
-                    relative_log_difference_no_tolerance_check(lam1, lamFake),
-                    relative_log_difference_taylor(lam1, lam2))
+                    _relative_log_difference_no_tolerance_check(lam1, lamFake),
+                    _relative_log_difference_taylor(lam1, lam2))
 
 
 def symmetric_matrix_function(A, func):
@@ -471,7 +471,7 @@ def _sqrt_relative_difference(lam1, lam2):
     return 1/(np.sqrt(lam1) + np.sqrt(lam2))
 
 @sqrt_symm.defjvp
-def sqrt_symm_jvp(primals, tangents):
+def _sqrt_symm_jvp(primals, tangents):
     primal_out = sqrt_symm(*primals)
     return primal_out, _symmetric_matrix_function_jvp_helper(Math.safe_sqrt, _sqrt_relative_difference, primals, tangents)
 
@@ -485,7 +485,7 @@ def _exp_relative_difference(lam1, lam2):
     return np.exp(lam2)*np.expm1(arg)/arg
 
 @exp_symm.defjvp
-def exp_symm_jvp(primals, tangents):
+def _exp_symm_jvp(primals, tangents):
     primal_out = exp_symm(*primals)
     return primal_out, _symmetric_matrix_function_jvp_helper(np.exp, _exp_relative_difference, primals, tangents)
 
@@ -501,7 +501,7 @@ def _log_relative_difference(lam1, lam2):
     return (np.log1p(arg)/arg)/lams[i[1]]
 
 @log_symm.defjvp
-def log_symm_jvp(primals, tangents):
+def _log_symm_jvp(primals, tangents):
     primal_out = log_symm(*primals)
     return primal_out, _symmetric_matrix_function_jvp_helper(np.log, _log_relative_difference, primals, tangents)
 
@@ -539,7 +539,7 @@ def _pow_relative_difference(lam1, lam2, m):
     return lam_big**(m-1)*(arg**m - 1)/(arg - 1)
 
 @pow_symm.defjvp
-def pow_symm_jvp(primals, tangents):
+def _pow_symm_jvp(primals, tangents):
     A, m = primals
     dA, dm = tangents
     return pow_symm(A, m), _symmetric_matrix_function_jvp_helper(lambda x: np.power(x, m), lambda l1, l2: _pow_relative_difference(l1, l2, m), (A,), (dA,))
