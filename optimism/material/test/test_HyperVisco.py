@@ -11,7 +11,7 @@ def make_disp_grad_from_strain(strain):
     return linalg.expm(strain) - np.identity(3)
         
 
-class GradOfPlasticityModelFixture(TestFixture):
+class HyperViscoModelFixture(TestFixture):
     def setUp(self):
     
         G_eq = 0.855 # MPa
