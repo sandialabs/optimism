@@ -237,6 +237,6 @@ def compute_elastic_linear_strain(dispGrad, state):
 def compute_elastic_seth_hill_strain(dispGrad, state):
     m=0.25
     C = dispGrad.T@dispGrad
-    strain = (TensorMath.mtk_pow(C,m) - np.identity(3)) / (2*m)
+    strain = (TensorMath.pow_symm(C,m) - np.identity(3)) / (2*m)
     plasticStrain = state[PLASTIC_STRAIN].reshape((3,3))
     return strain - plasticStrain

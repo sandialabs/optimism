@@ -307,8 +307,8 @@ def eigen_sym33_unit(tensor):
 # 6 and 5 indicate the polynomial order in the numerator and denominator.
 def cos_of_acos_divided_by_3(x):
     
-    x2 = x*x;
-    x4 = x2*x2;
+    x2 = x*x
+    x4 = x2*x2
 
     numer = 0.866025403784438713 + 2.12714890259493060 * x + \
         ( ( 1.89202064815951569  + 0.739603278343401613 * x ) * x2 + \
@@ -384,75 +384,6 @@ def mtk_log_sqrt_jvp(Cpack, Hpack):
                      [t20, t12, t22] ])
         
     return logSqrtC, sol
-
-@partial(jax.custom_jvp, nondiff_argnums=(1,))
-def mtk_pow(A,m):
-    lam,V = eigen_sym33_unit(A)
-    return V @ np.diag(np.power(lam,m)) @ V.T
-
-
-# BT 11/22/2023
-# This implementation is wrong - it's reusing the relative_log_difference 
-# function where it should be using one particular to the power function.
-# I don't know how to compute that while avoiding catastrophic 
-# cancellation errors. Someone should fix this if they know how.
-@mtk_pow.defjvp
-def mtk_pow_jvp(m, Cpack, Hpack):
-    C, = Cpack
-    H, = Hpack
-
-    powC = mtk_pow(C,m)
-    lam,V = eigen_sym33_unit(C)
-    
-    lam1 = lam[0]
-    lam2 = lam[1]
-    lam3 = lam[2]
-    
-    e1 = V[:,0]
-    e2 = V[:,1]
-    e3 = V[:,2]
-    
-    hHat = m * (V.T @ H @ V)
-
-    l1111 = hHat[0,0] * np.power(lam1, m-1)
-    l2222 = hHat[1,1] * np.power(lam2, m-1)
-    l3333 = hHat[2,2] * np.power(lam3, m-1)
-    
-    l1212 = 0.5*(hHat[0,1]+hHat[1,0]) * relative_log_difference(lam1, lam2)
-    l2323 = 0.5*(hHat[1,2]+hHat[2,1]) * relative_log_difference(lam2, lam3)
-    l3131 = 0.5*(hHat[2,0]+hHat[0,2]) * relative_log_difference(lam3, lam1)
-
-    t00 = l1111 * e1[0] * e1[0] + l2222 * e2[0] * e2[0] + l3333 * e3[0] * e3[0] + \
-        2 * l1212 * e1[0] * e2[0] + \
-        2 * l2323 * e2[0] * e3[0] + \
-        2 * l3131 * e3[0] * e1[0]
-    t11 = l1111 * e1[1] * e1[1] + l2222 * e2[1] * e2[1] + l3333 * e3[1] * e3[1] + \
-        2 * l1212 * e1[1] * e2[1] + \
-        2 * l2323 * e2[1] * e3[1] + \
-        2 * l3131 * e3[1] * e1[1]
-    t22 = l1111 * e1[2] * e1[2] + l2222 * e2[2] * e2[2] + l3333 * e3[2] * e3[2] + \
-        2 * l1212 * e1[2] * e2[2] + \
-        2 * l2323 * e2[2] * e3[2] + \
-        2 * l3131 * e3[2] * e1[2]
-
-    t01 = l1111 * e1[0] * e1[1] + l2222 * e2[0] * e2[1] + l3333 * e3[0] * e3[1] + \
-        l1212 * (e1[0] * e2[1] + e2[0] * e1[1]) + \
-        l2323 * (e2[0] * e3[1] + e3[0] * e2[1]) + \
-        l3131 * (e3[0] * e1[1] + e1[0] * e3[1])
-    t12 = l1111 * e1[1] * e1[2] + l2222 * e2[1] * e2[2] + l3333 * e3[1] * e3[2] + \
-        l1212 * (e1[1] * e2[2] + e2[1] * e1[2]) + \
-        l2323 * (e2[1] * e3[2] + e3[1] * e2[2]) + \
-        l3131 * (e3[1] * e1[2] + e1[1] * e3[2])
-    t20 = l1111 * e1[2] * e1[0] + l2222 * e2[2] * e2[0] + l3333 * e3[2] * e3[0] + \
-        l1212 * (e1[2] * e2[0] + e2[2] * e1[0]) + \
-        l2323 * (e2[2] * e3[0] + e3[2] * e2[0]) + \
-        l3131 * (e3[2] * e1[0] + e1[2] * e3[0])
-    
-    sol = np.array([ [t00, t01, t20],
-                     [t01, t11, t12],
-                     [t20, t12, t22] ])
-        
-    return powC, sol
 
 
 def relative_log_difference_taylor(lam1, lam2):
