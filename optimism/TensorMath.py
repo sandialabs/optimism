@@ -1,6 +1,5 @@
 """Provide differentiable operations on 3x3 tensors."""
 
-from functools import partial
 import jax
 import jax.numpy as np
 
@@ -59,8 +58,8 @@ def norm_of_deviator_squared(tensor):
 def norm_of_deviator(tensor):
     return norm( deviator(tensor) )
 
-def mises_invariant(stress):
-    return np.sqrt(1.5)*norm_of_deviator(stress)
+def mises_invariant(S):
+    return np.sqrt(1.5)*norm_of_deviator(S)
 
 def triaxiality(A):
     mean_normal = trace(A)/3.0
@@ -413,6 +412,7 @@ def _sqrt_symm_jvp(primals, tangents):
     primal_out = sqrt_symm(*primals)
     return primal_out, _symmetric_matrix_function_jvp_helper(Math.safe_sqrt, _sqrt_relative_difference, primals, tangents)
 
+
 @jax.custom_jvp
 def exp_symm(A):
     """Compute the matrix exponential of a symmetric matrix."""
@@ -426,6 +426,7 @@ def _exp_relative_difference(lam1, lam2):
 def _exp_symm_jvp(primals, tangents):
     primal_out = exp_symm(*primals)
     return primal_out, _symmetric_matrix_function_jvp_helper(np.exp, _exp_relative_difference, primals, tangents)
+
 
 @jax.custom_jvp
 def log_symm(A):
@@ -443,9 +444,11 @@ def _log_symm_jvp(primals, tangents):
     primal_out = log_symm(*primals)
     return primal_out, _symmetric_matrix_function_jvp_helper(np.log, _log_relative_difference, primals, tangents)
 
+
 def log_sqrt_symm(A):
     """Compute matrix logarithm of the square root of a symmetric positive definite matrix."""
     return 0.5*log_symm(A)
+
 
 @jax.custom_jvp
 def pow_symm(A, m):
@@ -453,13 +456,14 @@ def pow_symm(A, m):
     
     Compute m-fold iterated matrix multiplication of A. Works correctly with
     negative powers, but recall that the matrix must be invertible
-    (or else a matrix of inf or nan will result). This function is not
-    differentiable in the `m` argument.
+    (or else a matrix of inf or nan will result).
     
     Arguments:
     A: (array) symmetric matrix to raise to a power
     m: (float or int) power
     
+    .. note:: This function is not differentiable in the `m` argument.
+
     .. note:: The derivative of this function is inaccurate on matrices
     with nearly degenerate eigenvalues. We lack a high-quality implementation
     of the relative difference of the eigenvalue function. (The derivative of
