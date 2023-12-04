@@ -43,7 +43,7 @@ def are_positive_weights(QuadratureRuleFactory, degree):
     
 class TestQuadratureRules(TestFixture.TestFixture):
     endpoints = (0.0, 1.0)     # better if the quadrature rule module provided this
-    max_degree_2D = 6
+    max_degree_2D = 10
     max_degree_1D = 25
 
 
@@ -87,13 +87,14 @@ class TestQuadratureRules(TestFixture.TestFixture):
 
     def test_triangle_quadrature_exactness(self):
         for degree in range(self.max_degree_2D + 1):
-            qr = QuadratureRule.create_quadrature_rule_on_triangle(degree)
-            for i in range(degree + 1):
-                for j in range(degree + 1 - i):
-                    monomial = qr.xigauss[:,0]**i * qr.xigauss[:,1]**j
-                    quadratureAnswer = np.sum(monomial * qr.wgauss)
-                    exactAnswer = integrate_2D_monomial_on_triangle(i, j)
-                    self.assertNear(quadratureAnswer, exactAnswer, 14)
+            with self.subTest(i=degree):
+                qr = QuadratureRule.create_quadrature_rule_on_triangle(degree)
+                for i in range(degree + 1):
+                    for j in range(degree + 1 - i):
+                        monomial = qr.xigauss[:,0]**i * qr.xigauss[:,1]**j
+                        quadratureAnswer = np.sum(monomial * qr.wgauss)
+                        exactAnswer = integrate_2D_monomial_on_triangle(i, j)
+                        self.assertNear(quadratureAnswer, exactAnswer, 14)
             
 if __name__ == '__main__':
     unittest.main()
