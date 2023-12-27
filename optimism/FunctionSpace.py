@@ -9,7 +9,7 @@ from optimism import Interpolants
 from optimism import Mesh
 
 
-FunctionSpace = namedtuple('FunctionSpace', ['shapes', 'vols', 'shapeGrads', 'mesh', 'quadratureRule'])
+FunctionSpace = namedtuple('FunctionSpace', ['shapes', 'vols', 'shapeGrads', 'mesh', 'quadratureRule', 'isAxisymmetric'])
 FunctionSpace.__doc__ = \
     """Data needed for calculus on functions in the discrete function space.
 
@@ -29,6 +29,8 @@ FunctionSpace.__doc__ = \
         mesh: The ``Mesh`` object of the domain.
         quadratureRule: The ``QuadratureRule`` on which to sample the shape
             functions.
+        isAxisymmetric: boolean indicating if the function space data are
+            axisymmetric.
     """
 
 EssentialBC = namedtuple('EssentialBC', ['nodeSet', 'component'])
@@ -95,11 +97,13 @@ def construct_function_space_from_parent_element(mesh, shapeOnRef, quadratureRul
 
     if mode2D == 'cartesian':
         el_vols = compute_element_volumes
+        isAxisymmetric = False
     elif mode2D == 'axisymmetric':
         el_vols = compute_element_volumes_axisymmetric
+        isAxisymmetric = True
     vols = jax.vmap(el_vols, (None, 0, None, 0, None))(mesh.coords, mesh.conns, mesh.parentElement, shapes, quadratureRule.wgauss)
 
-    return FunctionSpace(shapes, vols, shapeGrads, mesh, quadratureRule)
+    return FunctionSpace(shapes, vols, shapeGrads, mesh, quadratureRule, isAxisymmetric)
 
 
 def map_element_shape_grads(coordField, nodeOrdinals, parentElement, shapeGradients):
@@ -165,7 +169,7 @@ def construct_weighted_function_space(mesh, quadratureRule, quadratureWeights=1.
     vols = np.reshape( vols, (vols.shape[0], 1) )
     vols = vols * quadratureWeights
         
-    return FunctionSpace(shapes, vols, shapeGrads, mesh, quadratureRule)
+    return FunctionSpace(shapes, vols, shapeGrads, mesh, quadratureRule, isAxisymmetric=False)
 
 
 def default_modify_element_gradient(elemGrads, elemShapes, elemVols, elemNodalDisps, elemNodalCoords):
