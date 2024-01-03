@@ -16,8 +16,10 @@ def construct_function_space_for_adjoint(coords, mesh, quadratureRule, mode2D='c
 
     if mode2D == 'cartesian':
         el_vols = compute_element_volumes
+        isAxisymmetric = False
     elif mode2D == 'axisymmetric':
         el_vols = compute_element_volumes_axisymmetric
+        isAxisymmetric = True
     vols = vmap(el_vols, (None, 0, None, 0, None))(coords, mesh.conns, mesh.parentElement, shapes, quadratureRule.wgauss)
 
     # unpack mesh and remake a mesh to make sure we get all the AD
@@ -25,4 +27,4 @@ def construct_function_space_for_adjoint(coords, mesh, quadratureRule, mode2D='c
                      parentElement=mesh.parentElement, parentElement1d=mesh.parentElement1d, blocks=mesh.blocks,
                      nodeSets=mesh.nodeSets, sideSets=mesh.sideSets)
 
-    return FunctionSpace.FunctionSpace(shapes, vols, shapeGrads, mesh, quadratureRule)
+    return FunctionSpace.FunctionSpace(shapes, vols, shapeGrads, mesh, quadratureRule, isAxisymmetric)
