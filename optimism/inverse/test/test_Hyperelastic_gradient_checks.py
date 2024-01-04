@@ -186,32 +186,29 @@ class NeoHookeanGlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
         self.compute_objective_function = self.strain_energy_objective
         self.compute_gradient = self.strain_energy_gradient
 
-        initialStepSize = 1e-5
-        numSteps = 4
+        stepSize = 1e-7
 
-        errors = self.compute_finite_difference_errors(initialStepSize, numSteps, self.initialMesh.coords.ravel())
-        self.assertFiniteDifferenceCheckHasVShape(errors)
+        error = self.compute_finite_difference_error(stepSize, self.initialMesh.coords.ravel())
+        self.assertLessEqual(error, 1e-7)
 
     @unittest.expectedFailure
     def test_non_self_adjoint_gradient_without_adjoint_solve(self):
         self.compute_objective_function = self.total_work_objective
         self.compute_gradient = self.total_work_gradient_just_jax
 
-        initialStepSize = 1e-5
-        numSteps = 4
+        stepSize = 1e-7
 
-        errors = self.compute_finite_difference_errors(initialStepSize, numSteps, self.initialMesh.coords.ravel())
-        self.assertFiniteDifferenceCheckHasVShape(errors)
+        error = self.compute_finite_difference_error(stepSize, self.initialMesh.coords.ravel())
+        self.assertLessEqual(error, 1e-7)
 
     def test_non_self_adjoint_gradient_with_adjoint_solve(self):
         self.compute_objective_function = self.total_work_objective
         self.compute_gradient = self.total_work_gradient_with_adjoint
 
-        initialStepSize = 1e-5
-        numSteps = 4
+        stepSize = 1e-7
 
-        errors = self.compute_finite_difference_errors(initialStepSize, numSteps, self.initialMesh.coords.ravel())
-        self.assertFiniteDifferenceCheckHasVShape(errors)
+        error = self.compute_finite_difference_error(stepSize, self.initialMesh.coords.ravel())
+        self.assertLessEqual(error, 1e-7)
 
 
 

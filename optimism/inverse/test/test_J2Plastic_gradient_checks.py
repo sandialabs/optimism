@@ -287,11 +287,10 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
         self.compute_objective_function = self.total_work_objective
         self.compute_gradient = self.total_work_gradient
 
-        initialStepSize = 1e-5
-        numSteps = 4
+        stepSize = 1e-7
 
-        errors = self.compute_finite_difference_errors(initialStepSize, numSteps, self.initialMesh.coords.ravel())
-        self.assertFiniteDifferenceCheckHasVShape(errors)
+        error = self.compute_finite_difference_error(stepSize, self.initialMesh.coords.ravel())
+        self.assertLessEqual(error, 1e-7)
 
     def test_target_curve_gradient_with_adjoint_solve(self):
         self.compute_objective_function = self.target_curve_objective
@@ -300,11 +299,10 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
         self.targetSteps = [1, 2]
         self.targetForces = [4.5, 5.5] # [4.542013626078756, 5.7673988583067555] actual forces
 
-        initialStepSize = 1e-6
-        numSteps = 4
+        stepSize = 1e-8
 
-        errors = self.compute_finite_difference_errors(initialStepSize, numSteps, self.initialMesh.coords.ravel())
-        self.assertFiniteDifferenceCheckHasVShape(errors)
+        error = self.compute_finite_difference_error(stepSize, self.initialMesh.coords.ravel())
+        self.assertLessEqual(error, 1e-6)
 
 
         

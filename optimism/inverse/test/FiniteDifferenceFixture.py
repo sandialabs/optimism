@@ -16,7 +16,24 @@ class FiniteDifferenceFixture(MeshFixture):
         normVector = directionVector / numpy.linalg.norm(directionVector)
 
         return np.array(normVector)
-    
+
+    def compute_finite_difference_error(self, stepSize, initialParameters):
+        storedState = self.forward_solve(initialParameters)
+        originalObjective = self.compute_objective_function(storedState, initialParameters) 
+        gradient = self.compute_gradient(storedState, initialParameters) 
+
+        directionVector = self.build_direction_vector(initialParameters.shape[0])
+        directionalDerivative = np.tensordot(directionVector, gradient, axes=1)
+
+        perturbedParameters = initialParameters + stepSize * directionVector
+        storedState = self.forward_solve(perturbedParameters)
+        perturbedObjective = self.compute_objective_function(storedState, perturbedParameters) 
+
+        fd_value = (perturbedObjective - originalObjective) / stepSize
+        error = abs(directionalDerivative - fd_value)
+        
+        return error
+
     def compute_finite_difference_errors(self, stepSize, steps, initialParameters, printOutput=True):
         storedState = self.forward_solve(initialParameters)
         originalObjective = self.compute_objective_function(storedState, initialParameters) 
