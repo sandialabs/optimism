@@ -1,6 +1,6 @@
-from optimism.test.MeshFixture import *
+from optimism.test.MeshFixture import MeshFixture
 from collections import namedtuple
-import numpy
+import numpy as np
 
 class FiniteDifferenceFixture(MeshFixture):
     def assertFiniteDifferenceCheckHasVShape(self, errors, tolerance=1e-6):
@@ -11,9 +11,9 @@ class FiniteDifferenceFixture(MeshFixture):
 
     def build_direction_vector(self, numDesignVars, seed=123):
 
-        numpy.random.seed(seed)
-        directionVector = numpy.random.uniform(-1.0, 1.0, numDesignVars)
-        normVector = directionVector / numpy.linalg.norm(directionVector)
+        np.random.seed(seed)
+        directionVector = np.random.uniform(-1.0, 1.0, numDesignVars)
+        normVector = directionVector / np.linalg.norm(directionVector)
 
         return np.array(normVector)
 
