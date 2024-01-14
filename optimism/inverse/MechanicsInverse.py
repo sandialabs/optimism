@@ -17,13 +17,9 @@ PathDependentResidualInverseFunctions = namedtuple('PathDependentResidualInverse
 ResidualInverseFunctions = namedtuple('ResidualInverseFunctions',
                                      ['residual_jac_coords_vjp'])
 
-def _compute_quadrature_point_field_gradient(u, shapeGrad):
-    dg = np.tensordot(u, shapeGrad, axes=[0,0])
-    return dg
-
 def _compute_element_field_gradient(U, elemShapeGrads, elemConnectivity, modify_element_gradient):
     elemNodalDisps = U[elemConnectivity]
-    elemGrads = vmap(_compute_quadrature_point_field_gradient, (None, 0))(elemNodalDisps, elemShapeGrads)
+    elemGrads = vmap(FunctionSpace.compute_quadrature_point_field_gradient, (None, 0))(elemNodalDisps, elemShapeGrads)
     elemGrads = modify_element_gradient(elemGrads)
     return elemGrads
 
