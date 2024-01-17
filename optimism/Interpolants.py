@@ -69,7 +69,7 @@ def get_lobatto_nodes_1d(degree):
     p = onp.polynomial.Legendre.basis(degree, domain=[0.0, 1.0])
     dp = p.deriv()
     xInterior = dp.roots()
-    xn = np.hstack(([0.0], xInterior, [1.0]))
+    xn = np.hstack((np.array([0.0]), xInterior, np.array([1.0])))
     return xn
 
 
