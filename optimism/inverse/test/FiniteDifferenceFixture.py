@@ -1,6 +1,6 @@
 from optimism.test.MeshFixture import MeshFixture
 from collections import namedtuple
-import numpy as np
+import numpy as onp
 
 class FiniteDifferenceFixture(MeshFixture):
     def assertFiniteDifferenceCheckHasVShape(self, errors, tolerance=1e-6):
@@ -11,11 +11,11 @@ class FiniteDifferenceFixture(MeshFixture):
 
     def build_direction_vector(self, numDesignVars, seed=123):
 
-        np.random.seed(seed)
-        directionVector = np.random.uniform(-1.0, 1.0, numDesignVars)
-        normVector = directionVector / np.linalg.norm(directionVector)
+        onp.random.seed(seed)
+        directionVector = onp.random.uniform(-1.0, 1.0, numDesignVars)
+        normVector = directionVector / onp.linalg.norm(directionVector)
 
-        return np.array(normVector)
+        return onp.array(normVector)
 
     def compute_finite_difference_error(self, stepSize, initialParameters):
         storedState = self.forward_solve(initialParameters)
@@ -23,7 +23,7 @@ class FiniteDifferenceFixture(MeshFixture):
         gradient = self.compute_gradient(storedState, initialParameters) 
 
         directionVector = self.build_direction_vector(initialParameters.shape[0])
-        directionalDerivative = np.tensordot(directionVector, gradient, axes=1)
+        directionalDerivative = onp.tensordot(directionVector, gradient, axes=1)
 
         perturbedParameters = initialParameters + stepSize * directionVector
         storedState = self.forward_solve(perturbedParameters)
@@ -40,7 +40,7 @@ class FiniteDifferenceFixture(MeshFixture):
         gradient = self.compute_gradient(storedState, initialParameters) 
 
         directionVector = self.build_direction_vector(initialParameters.shape[0])
-        directionalDerivative = np.tensordot(directionVector, gradient, axes=1)
+        directionalDerivative = onp.tensordot(directionVector, gradient, axes=1)
 
         fd_values = []
         errors = []
