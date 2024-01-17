@@ -105,4 +105,4 @@ def _compute_elastic_logarithmic_strain(dispGrad, stateOld):
     Fv_old = stateOld.reshape((3, 3))
 
     Fe_trial = F @ np.linalg.inv(Fv_old)
-    return TensorMath.mtk_log_sqrt(Fe_trial.T @ Fe_trial)
+    return TensorMath.log_sqrt_symm(Fe_trial.T @ Fe_trial)
