@@ -28,11 +28,16 @@ def create_material_model_functions(properties):
         state = _compute_state_new(dispGrad, state, dt, props)
         return state
 
+    def compute_material_qoi(dispGrad, state, dt):
+        state = _compute_dissipation(dispGrad, state, dt, props)
+        return state
+
     return MaterialModel(
         energy_density, 
         compute_initial_state,
         compute_state_new,
-        density
+        density,
+        compute_material_qoi
     )
 
 def _make_properties(properties):
@@ -84,6 +89,20 @@ def _neq_strain_energy(dispGrad, stateOld, dt, props):
     visco_energy = 0.5 * dt * eta * gamma_dot**2
 
     return G_neq * TensorMath.norm_of_deviator_squared(Ee) + visco_energy
+
+def _compute_dissipation(dispGrad, stateOld, dt, props):
+    G_neq = props[PROPS_G_neq]
+    tau   = props[PROPS_TAU]
+    eta   = G_neq * tau
+
+    Ee_trial = _compute_elastic_logarithmic_strain(dispGrad, stateOld)
+    delta_Ev = _compute_state_increment(Ee_trial, dt, props)
+    Ee = Ee_trial - delta_Ev 
+
+    Me = 2. * G_neq * Ee
+    Me_dev = TensorMath.compute_deviatoric_tensor(Me)
+
+    return 0.5 * np.tensordot(Me, Me_dev) / eta
 
 def _compute_state_new(dispGrad, stateOld, dt, props):
     Ee_trial = _compute_elastic_logarithmic_strain(dispGrad, stateOld)

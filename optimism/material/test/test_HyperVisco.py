@@ -30,6 +30,7 @@ class HyperViscoModelFixture(TestFixture):
         self.energy_density = jax.jit(materialModel.compute_energy_density)
         self.compute_state_new = materialModel.compute_state_new
         self.compute_initial_state = materialModel.compute_initial_state
+        self.compute_material_qoi = materialModel.compute_material_qoi
         
     def test_zero_point(self):
         dispGrad = np.zeros((3,3))
@@ -41,6 +42,9 @@ class HyperViscoModelFixture(TestFixture):
 
         state = self.compute_state_new(dispGrad, initialState, dt)
         self.assertArrayNear(state, np.eye(3).ravel(), 12)
+
+        dissipatedEnergy = self.compute_material_qoi(dispGrad, initialState, dt)
+        self.assertNear(dissipatedEnergy, 0.0, 12)
 
     def test_regression_nonzero_point(self):
         key = jax.random.PRNGKey(1)
@@ -56,6 +60,9 @@ class HyperViscoModelFixture(TestFixture):
                               0.437922586964, 1.378870045574, 0.079038974065, 
                               0.433881277313, 0.079038974065, 1.055381729505])
         self.assertArrayNear(state, stateGold, 12)
+
+        dissipatedEnergy = self.compute_material_qoi(dispGrad, initialState, dt)
+        self.assertNear(dissipatedEnergy, 0.0, 12)
 
         
 if __name__ == '__main__':
