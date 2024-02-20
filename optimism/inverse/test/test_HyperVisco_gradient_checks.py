@@ -46,7 +46,7 @@ class HyperViscoGlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
 
         self.dispMax = 0.1
         self.dt = 0.1
-        self.steps = 2
+        self.steps = 20
 
     def get_ubcs(self, disp):
         V = np.zeros(self.mesh.coords.shape)
@@ -121,7 +121,8 @@ class HyperViscoGlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
 
         nodal_forces = jax.jit(jax.grad(energy_function_all_dofs, argnums=0))
 
-        val = 0.0
+        totalWork = 0.0
+        dissipation = []
         for step in range(1, self.steps+1):
             Uu = storedState[step][0]
             Uu_prev = storedState[step-1][0]
@@ -130,15 +131,18 @@ class HyperViscoGlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
             ivs = p.state_data
             ivs_prev = p_prev.state_data
 
+            totalWork += self.total_work_increment(Uu, Uu_prev, ivs, ivs_prev, p, p_prev, parameters, nodal_forces)
+
+            print(f"\n total work step {step}: {totalWork}")
             print(f"\n strain energy step {step}: {energy_function(Uu, p, parameters)}")
 
-            val += self.total_work_increment(Uu, Uu_prev, ivs, ivs_prev, p, p_prev, parameters, nodal_forces)
+            dissipation.append( self.dt * (totalWork - energy_function(Uu, p, parameters) ) )
 
-        print(f"\n total work: {val}")
-        val -= energy_function(storedState[-1][0], storedState[-1][1], parameters)
-        print(f"\n strain energy: {energy_function(storedState[-1][0], storedState[-1][1], parameters)}")
+        # print(f"\n total work: {val}")
+        # val -= energy_function(storedState[-1][0], storedState[-1][1], parameters)
+        # print(f"\n strain energy: {energy_function(storedState[-1][0], storedState[-1][1], parameters)}")
 
-        return val
+        return np.sum(np.array(dissipation))
 
     def dissipated_energy_objective(self, storedState, parameters):
         parameters = parameters.reshape(self.mesh.coords.shape)
