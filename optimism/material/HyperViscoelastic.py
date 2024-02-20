@@ -29,8 +29,7 @@ def create_material_model_functions(properties):
         return state
 
     def compute_material_qoi(dispGrad, state, dt):
-        state = _compute_dissipation(dispGrad, state, dt, props)
-        return state
+        return _compute_dissipation(dispGrad, state, dt, props)
 
     return MaterialModel(
         energy_density, 
