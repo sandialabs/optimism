@@ -3,13 +3,13 @@ import unittest
 import jax
 import jax.numpy as np
 from jax.scipy import linalg
+from matplotlib import pyplot as plt
 
 from optimism.material import HyperViscoelastic as HyperVisco
 from optimism.test.TestFixture import TestFixture
+from optimism.material import MaterialUniaxialSimulator
 
-def make_disp_grad_from_strain(strain):
-    return linalg.expm(strain) - np.identity(3)
-        
+plotting=False
 
 class HyperViscoModelFixture(TestFixture):
     def setUp(self):
@@ -62,7 +62,80 @@ class HyperViscoModelFixture(TestFixture):
         self.assertArrayNear(state, stateGold, 12)
 
         dissipatedEnergy = self.compute_material_qoi(dispGrad, initialState, dt)
-        self.assertNear(dissipatedEnergy, 0.0, 12)
+        self.assertNear(dissipatedEnergy, 8.186677722954062, 12)
+
+class HyperViscoUniaxial(TestFixture):
+
+    def setUp(self):
+        G_eq = 0.855 # MPa
+        K_eq = 1000*G_eq # MPa
+        G_neq_1 = 5.0
+        tau_1   = 0.1
+        self.props = {
+            'equilibrium bulk modulus'     : K_eq,
+            'equilibrium shear modulus'    : G_eq,
+            'non equilibrium shear modulus': G_neq_1,
+            'relaxation time'              : tau_1,
+        } 
+        self.mat = HyperVisco.create_material_model_functions(self.props)
+        self.totalTime = 1.0e1*tau_1
+
+    def test_dissipated_energy_cycle(self):
+        # cyclic loading
+        stages = 2
+        maxStrain = 2.0e-2
+        maxTime = self.totalTime
+        steps = 20
+        strainInc = maxStrain/(steps-1)
+        dt=maxTime/(steps-1)
+
+        maxTime *= stages
+        steps *= stages
+
+        t0 = self.totalTime
+        def cyclic_constant_true_strain_rate(t):
+            outval = []
+            for tval in t:
+                if tval <= t0:
+                    outval.append( (tval / dt) * strainInc )
+                else:
+                    outval.append( ( (maxTime - tval) / dt) * strainInc )
+            return np.array(outval)
+
+        uniaxial = MaterialUniaxialSimulator.run(self.mat, cyclic_constant_true_strain_rate, maxTime, steps=steps, tol=1e-8)
+
+        # compute internal energy 
+        intEnergies = []
+        intEnergies.append(0.0)
+        for step in range(1,steps): 
+            F_diff = uniaxial.strainHistory[step] - uniaxial.strainHistory[step-1]
+            P_sum = uniaxial.stressHistory[step] + uniaxial.stressHistory[step-1]
+            intEnergies.append(0.5 * np.tensordot(P_sum,F_diff))
+        internalEnergyHistory = np.cumsum(np.array(intEnergies))
+        
+        # compute dissipated energy
+        timePoints = np.linspace(0.0, maxTime, num=steps)
+        dt = timePoints[1] - timePoints[0]
+        dissipatedEnergies = []
+        dissipatedEnergies.append(0.0)
+        compute_dissipation = jax.jit(self.mat.compute_material_qoi)
+        for step in range(1,steps): 
+            dissipatedEnergies.append( dt * compute_dissipation(uniaxial.strainHistory[step], uniaxial.internalVariableHistory[step], dt) )
+        dissipatedEnergyHistory = np.cumsum(np.array(dissipatedEnergies))
+        
+        # plot energies
+        if plotting:
+            plt.figure()
+            plt.plot(uniaxial.time, internalEnergyHistory, marker='o', fillstyle='none')
+            plt.plot(uniaxial.time, uniaxial.energyHistory, marker='x', fillstyle='none')
+            plt.plot(uniaxial.time, dissipatedEnergyHistory, marker='v', fillstyle='none')
+            plt.plot(uniaxial.time, uniaxial.energyHistory + np.cumsum(np.array(dissipatedEnergies)), marker='s', fillstyle='none')
+            plt.xlabel('Time')
+            plt.ylabel('Energy')
+            plt.legend(["Internal", "Free", "Dissipated", "Free + Dissipated"], loc=0, frameon=True)
+            plt.savefig('energy_histories.png')
+
+        self.assertArrayNear(dissipatedEnergyHistory, internalEnergyHistory - uniaxial.energyHistory, 5)
 
         
 if __name__ == '__main__':
