@@ -34,8 +34,7 @@ def newton_step(residual, linear_op, x, settings=Settings(1e-2,100), precond=Non
     # it is allowed to modify the output in place.
     A = LinearOperator((sz,sz),
                        lambda v: onp.array(linear_op(v)))
-    r = residual(x)
-    rNorm = np.linalg.norm(r)
+    r = onp.array(residual(x))
 
     numIters = 0
     def callback(xk):
@@ -52,7 +51,7 @@ def newton_step(residual, linear_op, x, settings=Settings(1e-2,100), precond=Non
     else:
         M = None
         
-    dx, exitcode = gmres(A, onp.array(r), tol=relTol*rNorm, atol=0, M=M, callback_type='legacy', callback=callback, maxiter=maxIters)
+    dx, exitcode = gmres(A, r, rtol=relTol, atol=0, M=M, callback_type='legacy', callback=callback, maxiter=maxIters)
     print('Number of GMRES iters = ', numIters)
         
     return -dx, exitcode
