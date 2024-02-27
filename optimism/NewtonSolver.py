@@ -45,14 +45,14 @@ def newton_step(residual, linear_op, x, settings=Settings(1e-2,100), precond=Non
     relTol = settings.relative_gmres_tol
     maxIters = settings.max_gmres_iters
     
-    if precond==None:
-        dx, exitcode = gmres(A, onp.array(r), tol=relTol*rNorm, atol=0, callback_type='legacy', callback=callback, maxiter=maxIters)
-    else:
+    if precond is not None:
         # Another copy to a plain numpy array, see comment for A above.
         M = LinearOperator((sz,sz),
                            lambda v: onp.array(precond(v)))
-        dx, exitcode = gmres(A, onp.array(r), tol=relTol*rNorm, atol=0, M=M, callback_type='legacy', callback=callback, maxiter=maxIters)
+    else:
+        M = None
         
+    dx, exitcode = gmres(A, onp.array(r), tol=relTol*rNorm, atol=0, M=M, callback_type='legacy', callback=callback, maxiter=maxIters)
     print('Number of GMRES iters = ', numIters)
         
     return -dx, exitcode
