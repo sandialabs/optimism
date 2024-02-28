@@ -171,7 +171,7 @@ class CornerSlide(MeshFixture):
             p = Objective.Params( p[0].at[0].set(forceRatio) )
             print('force ratio = ', forceRatio)
             
-            Uu = AlSolver.augmented_lagrange_solve(objective, Uu, p, alSettings, settings)
+            Uu = AlSolver.augmented_lagrange_solve(objective, Uu, p, alSettings, settings, useWarmStart=False)
 
             outputForce.append(forceRatio)
             outputDisp.append( np.average(self.create_field(Uu, p)[:,0]) )
