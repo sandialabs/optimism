@@ -76,9 +76,11 @@ def linear_strain(dispGrad):
 
 
 def log_strain(dispGrad):
+    # Compute the deviatoric and spherical parts separately
+    # to preserve the sign of J.
+    Jm1 = TensorMath.detpIm1(dispGrad)
+    traceStrain = np.log1p(Jm1)
     F = dispGrad + np.eye(3)
-    J = np.linalg.det(F)
-    traceStrain = np.log(J)
-    CIso = J**(-2.0/3.0)*F.T@F
-    devStrain = TensorMath.mtk_log_sqrt(CIso)
-    return devStrain + traceStrain/3.0*np.identity(3)
+    C = F.T@F
+    strain = TensorMath.log_sqrt_symm(C)
+    return TensorMath.dev(strain) + traceStrain/3.0*np.identity(3)

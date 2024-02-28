@@ -84,7 +84,7 @@ def compute_logarithmic_elastic_strain(dispGrad, state):
     Fp = state[PLASTIC_STRAIN].reshape((3,3))
     FeT = solve(Fp.T, F.T)
     Ce = FeT@FeT.T
-    return TensorMath.mtk_log_sqrt(Ce)
+    return TensorMath.log_sqrt_symm(Ce)
 
 
 def compute_state_increment(elasticTrialStrain, stateOld, props):

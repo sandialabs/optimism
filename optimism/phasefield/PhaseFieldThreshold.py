@@ -140,8 +140,8 @@ def compute_linear_strain(dispGrad):
 
 def compute_logarithmic_strain(dispGrad):
     F = dispGrad + np.identity(3)
-    J = np.linalg.det(F)
-    traceE = np.log(J)
-    CIso = J**(-2.0/3.0)*F.T@F
-    devE = TensorMath.mtk_log_sqrt(CIso)
-    return devE + traceE/3.0*np.identity(3)
+    Jm1 = TensorMath.detpIm1(dispGrad)
+    traceE = np.log1p(Jm1)
+    C = F.T@F
+    E = TensorMath.log_sqrt_symm(C)
+    return TensorMath.dev(E) + traceE/3.0*np.identity(3)

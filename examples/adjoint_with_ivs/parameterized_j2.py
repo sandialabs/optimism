@@ -220,7 +220,7 @@ def compute_elastic_logarithmic_strain(dispGrad, state):
     Je = np.linalg.det(FeT) # = J since this model is isochoric plasticity
     traceEe = np.log(Je)
     CeIso = Je**(-2./3.)*FeT@FeT.T
-    EeDev = TensorMath.mtk_log_sqrt(CeIso) 
+    EeDev = TensorMath.log_sqrt_symm(CeIso)
     return EeDev + traceEe/3.0*np.identity(3)
 
 

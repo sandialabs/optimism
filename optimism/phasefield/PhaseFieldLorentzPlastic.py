@@ -1,6 +1,3 @@
-from sys import float_info
-from jax.scipy.linalg import solve, expm
-
 from optimism.JaxConfig import *
 from optimism.phasefield.PhaseFieldMaterialModel import MaterialModel
 from optimism.material.J2Plastic import compute_flow_direction
@@ -136,7 +133,7 @@ def compute_state_new_finite_deformations(dispGrad, phase, phaseGrad, stateOld, 
     stateInc = compute_state_increment(elasticTrialStrain, phase, stateOld, dt, props, hardeningModel)
     eqpsNew = stateOld[STATE_EQPS] + stateInc[STATE_EQPS]
     FpOld = np.reshape(stateOld[STATE_PLASTIC_STRAIN], (3,3))
-    FpNew = expm(stateInc[STATE_PLASTIC_STRAIN].reshape((3,3)))@FpOld
+    FpNew = TensorMath.exp_symm(stateInc[STATE_PLASTIC_STRAIN].reshape((3,3)))@FpOld
     elasticStrainNew = elasticTrialStrain - stateInc[STATE_PLASTIC_STRAIN].reshape((3,3))
     return np.hstack((eqpsNew, FpNew.ravel()))
 
@@ -277,17 +274,15 @@ def compute_elastic_linear_strain(dispGrad, plasticStrain):
 
 
 def compute_elastic_logarithmic_strain(dispGrad, Fp):
-    F = dispGrad + np.eye(3)
-    FeT = solve(Fp.T, F.T)
-
     # Compute the deviatoric and spherical parts separately
     # to preserve the sign of J. Want to let solver sense and
     # deal with inverted elements.
-    
-    Je = np.linalg.det(FeT) # = J since this model is isochoric plasticity
-    traceEe = np.log(Je)
-    CeIso = Je**(-2./3.)*FeT@FeT.T
-    EeDev = TensorMath.mtk_log_sqrt(CeIso) 
+    Je_minus_1 = TensorMath.detpIm1(dispGrad) # J = Je since this model is isochoric plasticity
+    traceEe = np.log1p(Je_minus_1)
+    F = dispGrad + np.eye(3)
+    Fe = F@TensorMath.inv(Fp)
+    Ce = Fe.T@Fe
+    EeDev = TensorMath.dev(TensorMath.log_sqrt_symm(Ce))
     return EeDev + traceEe/3.0*np.identity(3)
 
 

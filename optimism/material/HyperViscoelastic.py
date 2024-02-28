@@ -97,7 +97,7 @@ def _compute_state_increment(elasticStrain, dt, props):
     tau   = props[PROPS_TAU]
     integration_factor = 1. / (1. + dt / tau)
 
-    Ee_dev = TensorMath.compute_deviatoric_tensor(elasticStrain)
+    Ee_dev = TensorMath.dev(elasticStrain)
     return dt * integration_factor * Ee_dev / tau # dt * D
 
 def _compute_elastic_logarithmic_strain(dispGrad, stateOld):
@@ -105,4 +105,4 @@ def _compute_elastic_logarithmic_strain(dispGrad, stateOld):
     Fv_old = stateOld.reshape((3, 3))
 
     Fe_trial = F @ np.linalg.inv(Fv_old)
-    return TensorMath.mtk_log_sqrt(Fe_trial.T @ Fe_trial)
+    return TensorMath.log_sqrt_symm(Fe_trial.T @ Fe_trial)
