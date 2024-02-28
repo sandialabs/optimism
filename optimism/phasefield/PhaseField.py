@@ -106,7 +106,7 @@ def plane_strain_gradient(gradU):
     dispGrad2D, phaseGrad2D = unpack_gradients_2D(gradU)
     dispGrad = tensor_2D_to_3D(dispGrad2D)
     phaseGrad = np.hstack((phaseGrad2D,0.0))
-    return np.row_stack((dispGrad,phaseGrad))
+    return np.vstack((dispGrad,phaseGrad))
 
 
 def plane_strain_element_gradient_transformation(elemGrads, elemShapes, elemVols, elemNodalDofs, elemNodalCoords):
@@ -119,7 +119,7 @@ def axisymmetric_gradient(gradU, U, coord):
     dispGrad = tensor_2D_to_3D(dispGrad2D)
     dispGrad = dispGrad.at[2,2].set(disp[0]/coord[0])
     phaseGrad = np.hstack((phaseGrad2D,0.0))
-    return np.row_stack((dispGrad, phaseGrad))
+    return np.vstack((dispGrad, phaseGrad))
 
 
 def axisymmetric_element_gradient_transformation(elemGrads, elemShapes, elemVols, elemNodalDofs, elemNodalCoords):
