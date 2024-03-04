@@ -241,7 +241,7 @@ def create_multi_block_mechanics_functions(functionSpace, mode2D, materialModels
         return _compute_initial_state_multi_block(fs, materialModels)
 
     
-    return MechanicsFunctions(compute_strain_energy, jit(compute_updated_internal_variables), jit(compute_element_stiffnesses), jit(compute_output_energy_densities_and_stresses), compute_initial_state)
+    return MechanicsFunctions(compute_strain_energy, jit(compute_updated_internal_variables), jit(compute_element_stiffnesses), jit(compute_output_energy_densities_and_stresses), compute_initial_state, None)
 
 
 ######
