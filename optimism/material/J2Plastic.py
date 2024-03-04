@@ -1,6 +1,5 @@
 import jax
 import jax.numpy as np
-from jax.scipy import linalg
 
 from optimism.material.MaterialModel import MaterialModel
 from optimism.material import Hardening
@@ -107,7 +106,7 @@ def compute_state_new_finite_deformations(dispGrad, stateOld, dt, props, hardeni
     stateInc = compute_state_increment(elasticTrialStrain, stateOld, dt, props, hardening_model)
     eqpsNew = stateOld[EQPS] + stateInc[EQPS]
     FpOld = np.reshape(stateOld[PLASTIC_DISTORTION], (3,3))
-    FpNew = linalg.expm(stateInc[PLASTIC_DISTORTION].reshape((3,3)))@FpOld
+    FpNew = TensorMath.exp_symm(stateInc[PLASTIC_DISTORTION].reshape((3,3)))@FpOld
     return np.hstack((eqpsNew, FpNew.ravel()))
 
 
@@ -212,19 +211,17 @@ def update_state(elasticTrialStrain, stateOld, dt, props, hardening_model):
 
 
 def compute_elastic_logarithmic_strain(dispGrad, state):
-    F = dispGrad + np.eye(3)
-    Fp = state[PLASTIC_DISTORTION].reshape((3,3))
-    FeT = linalg.solve(Fp.T, F.T)
-
     # Compute the deviatoric and spherical parts separately
     # to preserve the sign of J. Want to let solver sense and
     # deal with inverted elements.
-    
-    Je = np.linalg.det(FeT) # = J since this model is isochoric plasticity
-    traceEe = np.log(Je)
-    CeIso = Je**(-2./3.)*FeT@FeT.T
-    EeDev = TensorMath.mtk_log_sqrt(CeIso) 
-    return EeDev + traceEe/3.0*np.identity(3)
+    Je_minus_1 = TensorMath.detpIm1(dispGrad) # J = Je since this model is isochoric plasticity
+    traceEe = np.log1p(Je_minus_1)
+    F = dispGrad + np.eye(3)
+    Fp = state[PLASTIC_DISTORTION].reshape((3,3))
+    Fe = F@TensorMath.inv(Fp)
+    Ce = Fe.T@Fe
+    Ee = TensorMath.log_sqrt_symm(Ce)
+    return TensorMath.dev(Ee) + traceEe/3.0*np.identity(3)
 
 
 def compute_elastic_linear_strain(dispGrad, state):
@@ -237,6 +234,6 @@ def compute_elastic_linear_strain(dispGrad, state):
 def compute_elastic_seth_hill_strain(dispGrad, state):
     m=0.25
     C = dispGrad.T@dispGrad
-    strain = (TensorMath.mtk_pow(C,m) - np.identity(3)) / (2*m)
+    strain = (TensorMath.pow_symm(C,m) - np.identity(3)) / (2*m)
     plasticStrain = state[PLASTIC_STRAIN].reshape((3,3))
     return strain - plasticStrain

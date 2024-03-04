@@ -1,4 +1,3 @@
-from sys import float_info
 from jax.lax import while_loop
 from jax import custom_jvp
 
