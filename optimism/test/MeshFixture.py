@@ -1,13 +1,6 @@
 # fea data structures
 from optimism.Mesh import *
 from optimism import Surface
-from optimism import QuadratureRule
-
-# solver
-from optimism.EquationSolver import newton_solve
-
-# timing utils
-from optimism.Timer import Timer
 
 # testing utils
 from optimism.test.TestFixture import *
