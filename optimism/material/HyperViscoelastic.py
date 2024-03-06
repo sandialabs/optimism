@@ -96,9 +96,10 @@ def _compute_dissipation(dispGrad, stateOld, dt, props):
 
     Ee_trial = _compute_elastic_logarithmic_strain(dispGrad, stateOld)
     delta_Ev = _compute_state_increment(Ee_trial, dt, props)
-    Ee = Ee_trial - delta_Ev 
+    Ee = TensorMath.dev(Ee_trial) - delta_Ev 
 
     Me = 2. * G_neq * Ee
+
     return 0.5 * np.tensordot(Me, Me) / eta
 
 def _compute_state_new(dispGrad, stateOld, dt, props):

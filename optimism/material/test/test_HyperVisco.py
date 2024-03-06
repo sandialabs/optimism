@@ -9,7 +9,7 @@ from optimism.material import HyperViscoelastic as HyperVisco
 from optimism.test.TestFixture import TestFixture
 from optimism.material import MaterialUniaxialSimulator
 
-plotting=False
+plotting=True
 
 class HyperViscoModelFixture(TestFixture):
     def setUp(self):
@@ -62,13 +62,13 @@ class HyperViscoModelFixture(TestFixture):
         self.assertArrayNear(state, stateGold, 12)
 
         dissipatedEnergy = self.compute_material_qoi(dispGrad, initialState, dt)
-        self.assertNear(dissipatedEnergy, 8.186677722954062, 12)
+        self.assertNear(dissipatedEnergy, 0.8653744383204761, 12)
 
 class HyperViscoUniaxial(TestFixture):
 
     def setUp(self):
         G_eq = 0.855 # MPa
-        K_eq = 1000*G_eq # MPa
+        K_eq = 1*G_eq # MPa - artificially low bulk modulus so that volumetric strain energy doesn't drown out the dissipation (which is deviatoric)
         G_neq_1 = 5.0
         tau_1   = 0.1
         self.props = {
