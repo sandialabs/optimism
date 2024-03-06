@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from optimism.JaxConfig import *
 
 from optimism.contact import EdgeCpp
-from optimism.contact import SmoothMinMax
+from optimism import SmoothFunctions
 from optimism.test.TestFixture import TestFixture
 
 doPlotting=False
@@ -141,7 +141,7 @@ class TestEdgeIntersection(TestFixture):
         x = np.linspace(0.,1.,N)
         y = 0.5
 
-        func = grad(SmoothMinMax.safe_min,2)
+        func = grad(SmoothFunctions.min,2)
         
         for eps in np.linspace(1e-5, 1e-1, 3):
             m = vmap(func, (0,None,None))(x,y,eps)
