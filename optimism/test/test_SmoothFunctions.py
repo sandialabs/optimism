@@ -3,7 +3,7 @@ from jax import grad
 from optimism.test.TestFixture import TestFixture, unittest
 
 
-class TestSmoothMinMax(TestFixture):
+class TestSmoothFunctions(TestFixture):
 
     def test_min(self):
         tol = 0.2

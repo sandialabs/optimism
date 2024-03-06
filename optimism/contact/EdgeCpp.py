@@ -1,6 +1,6 @@
 from optimism.JaxConfig import *
 from optimism import Surface
-from optimism.contact import SmoothMinMax
+from optimism import SmoothFunctions
 
 def norm_squared(vec):
     return vec[0]*vec[0] + vec[1]*vec[1]
@@ -81,7 +81,7 @@ def smooth_distance(twoEdges, p, smoothingTol):
     crossN = np.abs(cross(n0, n1))
     tol = np.where(crossN > 1e-14, crossN*smoothingTol, 0.0)
     #sign = 1.0
-    return sign*SmoothMinMax.safe_min(sign*pd0, sign*pd1, tol)
+    return sign*SmoothFunctions.min(sign*pd0, sign*pd1, tol)
 
 
     
