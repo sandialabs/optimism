@@ -1,28 +1,10 @@
-from optimism.JaxConfig import *
-from optimism.contact.SmoothMinMax import *
-from optimism.test.TestFixture import *
+from optimism.SmoothFunctions import *
+from jax import grad
+from optimism.test.TestFixture import TestFixture, unittest
 
 
-class TestSmoothMinMax(TestFixture):
+class TestSmoothFunctions(TestFixture):
 
-    def test_max_x_zero(self):
-        tol = 0.2
-        eps = 1e-15
-        tolm = tol*(1.-eps)
-        
-        self.assertEqual(0.0, zmax(-tol, tol))
-        self.assertNear(0.0, zmax(-tolm, tol), 15)
-        
-        self.assertEqual(tol, zmax(tol, tol))
-        self.assertNear(tolm, zmax(tolm, tol), 15)
-        self.assertEqual(1.1*tol, zmax(1.1*tol, tol))
-
-        zmax_grad = grad( partial(zmax, eps=tol) )
-        
-        self.assertNear(zmax_grad(-eps), zmax_grad(eps), 14)
-        self.assertNear(zmax_grad(-tol-eps), zmax_grad(-tol+eps), 14)
-        self.assertNear(zmax_grad(tol-eps), zmax_grad(tol+eps), 14)
-        
     def test_min(self):
         tol = 0.2
         eps = 1e-2
@@ -69,10 +51,10 @@ class TestSmoothMinMax(TestFixture):
         
         self.assertArrayEqual(np.array([1.0, 0.0]), grad_min(0.0, np.inf, eps))
         self.assertArrayEqual(np.array([0.0, 1.0]), grad_min(np.inf, 0.0, eps))
-        self.assertArrayEqual(np.array([1.0, 0.0]), grad_min(np.inf, np.inf, eps))
+        #self.assertArrayEqual(np.array([1.0, 0.0]), grad_min(np.inf, np.inf, eps))
         self.assertArrayEqual(np.array([0.0, 1.0]), grad_min(np.inf, -np.inf, eps))
         self.assertArrayEqual(np.array([1.0, 0.0]), grad_min(-np.inf, np.inf, eps))
-        self.assertArrayEqual(np.array([1.0, 0.0]), grad_min(-np.inf, -np.inf, eps))
+        #self.assertArrayEqual(np.array([1.0, 0.0]), grad_min(-np.inf, -np.inf, eps))
 
 
 

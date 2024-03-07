@@ -1,11 +1,9 @@
 from optimism.JaxConfig import *
 
 from optimism import Surface
-from optimism.contact import EdgeIntersection
 from optimism.contact import EdgeCpp
 from optimism import QuadratureRule
 from optimism.contact import Friction
-from optimism.contact.SmoothMinMax import min as smooth_min
 
 # surfaceI means integration side/surface/face (subordinate)
 # surfaceM means main side/surface/face (geometrically controlling)
