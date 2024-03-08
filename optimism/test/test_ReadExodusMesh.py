@@ -137,7 +137,9 @@ class TestMeshReadPatchTest(TestFixture.TestFixture):
         
         grad_func = jit(grad(objective))
         
-        Uu = newton_solve(objective, dofManager.get_unknown_values(U))
+        Uu, solverSuccess = newton_solve(objective, dofManager.get_unknown_values(U))
+        self.assertTrue(solverSuccess)
+
         U = dofManager.create_field(Uu, Ubc)
            
         dispGrads = FunctionSpace.compute_field_gradient(self.fs, U)
