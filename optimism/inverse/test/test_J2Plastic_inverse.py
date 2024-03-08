@@ -164,7 +164,7 @@ class J2GlobalMeshUpdateGradsFixture(MeshFixture):
             return cls.mechFuncs.compute_strain_energy(U, internalVariables)
 
         objective = Objective.Objective(compute_energy, UuGuess, p)
-        cls.Uu = EqSolver.nonlinear_equation_solve(objective, UuGuess, p, EqSolver.get_settings(), useWarmStart=False)
+        cls.Uu, solverSuccess = EqSolver.nonlinear_equation_solve(objective, UuGuess, p, EqSolver.get_settings(), useWarmStart=False)
         U = cls.dofManager.create_field(cls.Uu, cls.Ubc)
         cls.ivs = cls.mechFuncs.compute_updated_internal_variables(U, cls.ivs_prev)
 
