@@ -272,8 +272,9 @@ class TestTrustRegionSPGFixture(TestFixture.TestFixture):
 
     def no_test_cgunbound(self):
         settings = EquationSolver.get_settings()
-        sol = EquationSolver.nonlinear_equation_solve(self.obj, self.x, self.p,
-                                                      settings, useWarmStart=False)
+        sol, solverSuccess = EquationSolver.nonlinear_equation_solve(self.obj, self.x, self.p,
+                                                                     settings, useWarmStart=False)
+        self.assertTrue(solverSuccess)
         self.assertNear(np.linalg.norm(self.obj.gradient(sol)), 0, 7)
 
 
@@ -313,8 +314,9 @@ class TestTrustRegionSPGRosenbrock(TestFixture.TestFixture):
 
     def no_test_steihaug_on_rosenbrock(self):
         settings = EquationSolver.get_settings()
-        sol = EquationSolver.nonlinear_equation_solve(self.obj, self.x, self.p,
-                                                      settings, useWarmStart=False)
+        sol, solverSuccess = EquationSolver.nonlinear_equation_solve(self.obj, self.x, self.p,
+                                                                     settings, useWarmStart=False)
+        self.assertTrue(solverSuccess)
         print('sol', sol)
         
         

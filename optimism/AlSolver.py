@@ -42,20 +42,21 @@ norm = np.linalg.norm
 
 
 def solve_sub_step(alObjective, x, ncpErrorOld, alSettings, subSettings, sub_problem_solver, sub_problem_callback=None):
-    x = sub_problem_solver(alObjective, x, subSettings, sub_problem_callback)
+    x, solverSuccess = sub_problem_solver(alObjective, x, subSettings, sub_problem_callback)
     
     c = alObjective.constraint(x)
     kappa = alObjective.kappa
     alObjective.lam = np.maximum(alObjective.lam-kappa*c, 0.0)
     
     ncpError = np.abs( alObjective.ncp(x) )
-    poorProgress = ncpError > alSettings.target_constraint_decrease_factor * ncpErrorOld
+    # check if each constraint is making progress, or if they are already small relative to the specificed constraint tolerances
+    poorProgress = ncpError > np.maximum(alSettings.target_constraint_decrease_factor * ncpErrorOld, 10 * alSettings.tol / np.sqrt(len(ncpError)))
 
-    if (np.any(poorProgress)):
+    if (np.any(poorProgress) and solverSuccess):
         print('Poor progress on ncp detected, increasing some penalty parameters')
         alObjective.kappa = kappa.at[poorProgress].set(alSettings.penalty_scaling*kappa[poorProgress])
         
-    return x, ncpError
+    return x, ncpError, solverSuccess
 
 
 def linear_update(alObjective, x, rhs_func, alSettings):
@@ -168,13 +169,13 @@ def augmented_lagrange_solve(alObjective, x, p, alSettings, subSettings,
             alObjective.update_precond(x)
 
         if not alSettings.use_newton_only:
-            x, ncpError = solve_sub_step(alObjective,
-                                         x,
-                                         ncpError,
-                                         alSettings,
-                                         settings,
-                                         sub_problem_solver,
-                                         sub_problem_callback)
+            x, ncpError, solverSuccess = solve_sub_step(alObjective,
+                                                        x,
+                                                        ncpError,
+                                                        alSettings,
+                                                        settings,
+                                                        sub_problem_solver,
+                                                        sub_problem_callback)
             
             forceErrorNorm = norm(alObjective.gradient(x))
             print('force error = ', forceErrorNorm)
@@ -187,6 +188,5 @@ def augmented_lagrange_solve(alObjective, x, p, alSettings, subSettings,
                 return x
 
     raise NameError('Loadstep failed to converge in', maxAlIters, 'iterations.')
-        
     return x
 

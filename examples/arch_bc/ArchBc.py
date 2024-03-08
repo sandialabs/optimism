@@ -156,10 +156,10 @@ class ContactArch(MeshFixture):
 
             disp -= maxDisp/steps
             p = Objective.param_index_update(p, 0, disp)
-            Uu = EqSolver.nonlinear_equation_solve(objective,
-                                                   Uu,
-                                                   p,
-                                                   self.trSettings)
+            Uu, solverSuccess = EqSolver.nonlinear_equation_solve(objective,
+                                                                  Uu,
+                                                                  p,
+                                                                  self.trSettings)
             
             self.write_output(Uu, p, i)
 

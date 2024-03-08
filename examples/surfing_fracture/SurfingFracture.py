@@ -462,11 +462,11 @@ class SurfingProblem:
                 print("------------------------------")
                 
                 print("Minimizing disp: objective = ", dispObjective.get_value(UuDisp))
-                UuDisp = EqSolver.nonlinear_equation_solve(dispObjective,
-                                                           UuDisp,
-                                                           p,
-                                                           dispSettings,
-                                                           useWarmStart=False)
+                UuDisp, solverSuccess = EqSolver.nonlinear_equation_solve(dispObjective,
+                                                                          UuDisp,
+                                                                          p,
+                                                                          dispSettings,
+                                                                          useWarmStart=False)
                 
                 Uu = Uu.at[self.dispIds].set(UuDisp)
                 print("Minimized disp: objective = ", dispObjective.get_value(UuDisp))

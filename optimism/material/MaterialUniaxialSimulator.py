@@ -74,7 +74,7 @@ def run(materialModel, strain_history, maxTime, steps=10):
         print(f'Step {i}')
         p = Objective.param_index_update(p, 0, uniaxialStrainHistory[i])
 
-        freeStrains = EqSolver.nonlinear_equation_solve(o, freeStrains, p, solverSettings, useWarmStart=True)
+        freeStrains, solverSuccess = EqSolver.nonlinear_equation_solve(o, freeStrains, p, solverSettings, useWarmStart=True)
         strain = makeStrainTensor_(freeStrains, p)
         internalVariables = update(strain, internalVariables, dt)
         energyDensity,stress = converged_energy_density_and_stress(strain, internalVariables, dt)
