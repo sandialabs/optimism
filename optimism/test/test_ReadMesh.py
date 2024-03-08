@@ -124,6 +124,7 @@ class TestMeshReadPatchTest(TestFixture.TestFixture):
         
         Uu, solverSuccess = newton_solve(objective, dofManager.get_unknown_values(U))
         self.assertTrue(solverSuccess)
+
         U = dofManager.create_field(Uu, Ubc)
             
         dispGrads = FunctionSpace.compute_field_gradient(self.fs, U)
@@ -157,9 +158,10 @@ class TestMeshReadPatchTest(TestFixture.TestFixture):
             return internalPotential + loadPotential
         
         with Timer(name="NewtonSolve"):
-            Uu = newton_solve(objective, dofManager.get_unknown_values(U))
+            Uu, solverSuccess = newton_solve(objective, dofManager.get_unknown_values(U))
+            self.assertTrue(solverSuccess)
 
-            U = dofManager.create_field(Uu, Ubc)
+        U = dofManager.create_field(Uu, Ubc)
 
         # exact solution
         modulus1 = (1.0 - self.nu**2)/self.E
