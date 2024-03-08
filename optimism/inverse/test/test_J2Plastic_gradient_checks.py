@@ -75,7 +75,7 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
 
         for step in range(1, self.steps+1):
             p = Objective.param_index_update(p, 0, step*Ubc_inc)
-            Uu = EqSolver.nonlinear_equation_solve(self.objective, Uu, p, EqSolver.get_settings(), useWarmStart=False)
+            Uu, solverSuccess = EqSolver.nonlinear_equation_solve(self.objective, Uu, p, EqSolver.get_settings(), useWarmStart=False)
             U = self.dofManager.create_field(Uu, p.bc_data)
             ivs = mechFuncs.compute_updated_internal_variables(U, p.state_data)
             p = Objective.param_index_update(p, 1, ivs)
