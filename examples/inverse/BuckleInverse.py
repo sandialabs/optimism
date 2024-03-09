@@ -221,7 +221,7 @@ class Buckle:
             endDispOrTraction = maxDispOrTraction*(i+1)/N
 
             p = Objective.param_index_update(p, 0, np.array([endDispOrTraction, 0.0]))
-            self.Uu = EquationSolver.nonlinear_equation_solve(self.objective, self.Uu, p, settings)
+            self.Uu, solverSuccess = EquationSolver.nonlinear_equation_solve(self.objective, self.Uu, p, settings)
 
             # post process
             print('step ', i)

@@ -278,7 +278,7 @@ def trust_region_least_squares_solve(objective, x, settings):
             print_banner(oy, modelObjective, cgIters, trSize, stepType, True)
             if settings.check_stability:
                 objective.check_stability(y)
-            return y
+            return y, True
         
         modelImprove = o - modelObjective
         realImprove = o - oy
@@ -300,11 +300,10 @@ def trust_region_least_squares_solve(objective, x, settings):
             o = oy
             J.update( objective.hessian(x) )
 
-
     print("Reached the maximum number of trust region iterations or trust region is too small.")
     if settings.check_stability:
         objective.check_stability(x)
-    return x
+    return x, False
 
 
 def is_converged(objective, x, realO, modelO, realRes, modelRes, cgIters, trSize, settings):
@@ -369,7 +368,7 @@ def trust_region_minimize(objective, x, settings, callback=None):
     # this could potentially return an unstable solution
     if is_converged(objective, x, 0.0, 0.0, g, g, 0, trSize, settings):
         if callback: callback(x, objective)
-        return x
+        return x, True
 
     cumulativeCgIters=0
     
@@ -427,7 +426,7 @@ def trust_region_minimize(objective, x, settings, callback=None):
             if is_converged(objective, y, realObjective, modelObjective,
                             gy, g + Jd, cgIters, trSizeUsed, settings):
                 if callback: callback(y, objective)
-                return y
+                return y, True
         
             modelImprove = -modelObjective
             realImprove = -realObjective
@@ -490,14 +489,14 @@ def trust_region_minimize(objective, x, settings, callback=None):
                 else:
                     print("The trust region is still too small.  Accepting, but be careful.")
                     if callback: callback(x, objective)
-                    return x
+                    return x, False
                     
     print("Reached the maximum number of trust region iterations.")
     if settings.check_stability:
         objective.check_stability(x)
 
         if callback: callback(x, objective)
-    return x
+    return x, False
 
 
 def newton(objective, x, settings, callback=None):
@@ -546,12 +545,12 @@ def newton(objective, x, settings, callback=None):
         o = objective.value(x)
         if is_converged(objective, x, o, o,
                         g, g, 1, np.inf, settings):
-            return x
+            return x, True
 
     print("Reached the maximum number of newton iterations.")
     if settings.check_stability:
         objective.check_stability(x)
-    return x
+    return x, False
 
 
 # This solve uses a different interface.  There is no globalization yet
@@ -579,7 +578,7 @@ def newton_solve(objective_func, solution, maxSteps=1):
             with Timer(name="LinearSolve"):
                 solution = solution - np.reshape(np.linalg.solve(hess,gradients), gradShape)
                 
-    return solution
+    return solution, True
 
 
 def nonlinear_equation_solve(objective, x0, p, settings,
@@ -603,7 +602,7 @@ def nonlinear_equation_solve(objective, x0, p, settings,
     if updatePrecond:
         objective.update_precond(xBar0)
         
-    xBar = solver_algorithm(objective, xBar0, settings, callback=callback)
+    xBar, solverSuccess = solver_algorithm(objective, xBar0, settings, callback=callback)
     
-    return objective.invScaling * xBar
+    return objective.invScaling * xBar, solverSuccess
     

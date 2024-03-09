@@ -73,7 +73,7 @@ class NeoHookeanGlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
 
         for step in range(1, self.steps+1):
             p = Objective.param_index_update(p, 0, step*Ubc_inc)
-            Uu = EqSolver.nonlinear_equation_solve(self.objective, Uu, p, EqSolver.get_settings(), useWarmStart=False)
+            Uu, solverSuccess = EqSolver.nonlinear_equation_solve(self.objective, Uu, p, EqSolver.get_settings(), useWarmStart=False)
             storedState.append((Uu, p))
         
         return storedState

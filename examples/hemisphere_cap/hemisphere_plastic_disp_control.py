@@ -156,8 +156,7 @@ class TractionArch():
 
             disp += maxDisp/steps
             p = Objective.param_index_update(p, 0, disp)
-            Uu = EqSolver.nonlinear_equation_solve(objective, Uu, p, self.trSettings)
-
+            Uu, solverSuccess = EqSolver.nonlinear_equation_solve(objective, Uu, p, self.trSettings)
             
             U = self.dofManager.create_field(Uu, self.get_ubcs(p))
             ivs = self.bvpFuncs.\
@@ -175,7 +174,7 @@ class TractionArch():
 
                 disp -= maxDisp/steps
                 p = Objective.param_index_update(p, 0, disp)
-                Uu = EqSolver.nonlinear_equation_solve(objective, Uu, p, self.trSettings)
+                Uu, solverSuccess = EqSolver.nonlinear_equation_solve(objective, Uu, p, self.trSettings)
 
                 U = self.dofManager.create_field(Uu, self.get_ubcs(p))
                 ivs = self.bvpFuncs.\

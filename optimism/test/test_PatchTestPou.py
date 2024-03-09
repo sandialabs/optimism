@@ -227,7 +227,8 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
 
             return totalEnergy
 
-        Uu = newton_solve(objective_poly, self.dofManager.get_unknown_values(0.0*self.UTarget))
+        Uu, solverSuccess = newton_solve(objective_poly, self.dofManager.get_unknown_values(0.0*self.UTarget))
+        self.assertTrue(solverSuccess)
 
         self.write_output(Uu, Ubc, 0)
 

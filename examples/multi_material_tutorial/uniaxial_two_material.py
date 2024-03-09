@@ -144,7 +144,7 @@ appliedDisp = L*0.003
 p = Objective.param_index_update(p, 0, appliedDisp)
 
 # Find unknown displacements by minimizing the objective
-Uu = EquationSolver.nonlinear_equation_solve(objective, Uu, p, solverSettings)
+Uu, solverSuccess = EquationSolver.nonlinear_equation_solve(objective, Uu, p, solverSettings)
 
 # update the state variables in the new equilibrium configuration
 U = create_field(Uu, p)

@@ -254,8 +254,9 @@ class TestTrustRegionSPGFixture(TestFixture.TestFixture):
     def test_trust_region_spg_on_unbounded_problem(self):
         lb = np.full(self.x.shape, -np.inf)
         ub = np.full(self.x.shape, np.inf)
-        sol = TrustRegionSPG.solve(self.obj, self.x, self.p, lb, ub,
-                                   self.settings, useWarmStart=False)
+        sol, solverSuccess = TrustRegionSPG.solve(self.obj, self.x, self.p, lb, ub,
+                                                  self.settings, useWarmStart=False)
+        self.assertTrue(solverSuccess)
         self.assertNear(np.linalg.norm(self.obj.gradient(sol)), 0, 7)
 
         # BT: This solver is converging to the same point as the
@@ -272,8 +273,9 @@ class TestTrustRegionSPGFixture(TestFixture.TestFixture):
 
     def no_test_cgunbound(self):
         settings = EquationSolver.get_settings()
-        sol = EquationSolver.nonlinear_equation_solve(self.obj, self.x, self.p,
-                                                      settings, useWarmStart=False)
+        sol, solverSuccess = EquationSolver.nonlinear_equation_solve(self.obj, self.x, self.p,
+                                                                     settings, useWarmStart=False)
+        self.assertTrue(solverSuccess)
         self.assertNear(np.linalg.norm(self.obj.gradient(sol)), 0, 7)
 
 
@@ -304,17 +306,18 @@ class TestTrustRegionSPGRosenbrock(TestFixture.TestFixture):
     def test_spg_on_rosenbrock(self):
         lb = np.full(self.x.shape, -np.inf)
         ub = np.full(self.x.shape, np.inf)
-        sol = TrustRegionSPG.solve(self.obj, self.x, self.p, lb, ub,
-                                   self.settings, useWarmStart=False)
-        #print('sol', sol)
+        sol, solverSuccess = TrustRegionSPG.solve(self.obj, self.x, self.p, lb, ub,
+                                                  self.settings, useWarmStart=False)
+        self.assertTrue(solverSuccess)
         self.assertNear(np.linalg.norm(self.obj.gradient(sol)), 0, 7)
         self.assertArrayNear(sol, np.ones(sol.shape), 4)
 
 
     def no_test_steihaug_on_rosenbrock(self):
         settings = EquationSolver.get_settings()
-        sol = EquationSolver.nonlinear_equation_solve(self.obj, self.x, self.p,
-                                                      settings, useWarmStart=False)
+        sol, solverSuccess = EquationSolver.nonlinear_equation_solve(self.obj, self.x, self.p,
+                                                                     settings, useWarmStart=False)
+        self.assertTrue(solverSuccess)
         print('sol', sol)
         
         

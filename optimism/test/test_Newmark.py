@@ -184,11 +184,11 @@ class DynamicsFixture(MeshFixture.MeshFixture):
         UuPredicted, Vu = self.dynamicsFunctions.predict(Uu, Vu, Au, dt)
         objective.p = Objective.param_index_update(objective.p, 5, UuPredicted)
 
-        Uu = EquationSolver.nonlinear_equation_solve(objective,
-                                                     UuPredicted,
-                                                     objective.p,
-                                                     trSettings,
-                                                     useWarmStart=False)
+        Uu, solverSuccess = EquationSolver.nonlinear_equation_solve(objective,
+                                                                    UuPredicted,
+                                                                    objective.p,
+                                                                    trSettings,
+                                                                    useWarmStart=False)
 
         UuCorrection = Uu - UuPredicted
         Vu, Au = self.dynamicsFunctions.correct(UuCorrection, Vu, Au, dt)
@@ -299,11 +299,11 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
 
             # The predictor value is exact.
             # Choose a bad initial guess (zero) to force an actual solve.
-            Uu = EquationSolver.nonlinear_equation_solve(objective,
-                                                         dofManager.get_unknown_values(UPrediction),
-                                                         objective.p,
-                                                         trSettings,
-                                                         useWarmStart=False)
+            Uu, solverSuccess = EquationSolver.nonlinear_equation_solve(objective,
+                                                                        dofManager.get_unknown_values(UPrediction),
+                                                                        objective.p,
+                                                                        trSettings,
+                                                                        useWarmStart=False)
 
             U = dofManager.create_field(Uu, dofManager.get_bc_values(V*t))
             UCorrection = U - UPrediction
@@ -365,11 +365,11 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
 
             # The predictor value is exact.
             # Choose a bad initial guess (zero) to force an actual solve.
-            Uu = EquationSolver.nonlinear_equation_solve(objective,
-                                                         dofManager.get_unknown_values(UPrediction),
-                                                         objective.p,
-                                                         trSettings,
-                                                         useWarmStart=False)
+            Uu, solverSuccess = EquationSolver.nonlinear_equation_solve(objective,
+                                                                        dofManager.get_unknown_values(UPrediction),
+                                                                        objective.p,
+                                                                        trSettings,
+                                                                        useWarmStart=False)
 
             U = dofManager.create_field(Uu)
             UCorrection = U - UPrediction
