@@ -8,6 +8,7 @@ from scipy.sparse import linalg
 from optimism import EquationSolver as EqSolver
 from optimism import QuadratureRule
 from optimism import FunctionSpace
+from optimism import Interpolants
 from optimism import Mechanics
 from optimism import Objective
 from optimism import Mesh
@@ -17,6 +18,11 @@ from optimism.inverse.test.FiniteDifferenceFixture import FiniteDifferenceFixtur
 
 from optimism.inverse import MechanicsInverse
 from optimism.inverse import AdjointFunctionSpace
+from collections import namedtuple
+
+EnergyFunctions = namedtuple('EnergyFunctions',
+                            ['energy_function_coords',
+                             'nodal_forces'])
 
 class NeoHookeanGlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
     def setUp(self):
@@ -78,17 +84,28 @@ class NeoHookeanGlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
         
         return storedState
 
-    def strain_energy_objective(self, storedState, parameters):
-        coords = parameters.reshape(self.mesh.coords.shape)
-        adjoint_func_space = AdjointFunctionSpace.construct_function_space_for_adjoint(coords, self.mesh, self.quadRule)
-        mech_funcs = Mechanics.create_mechanics_functions(adjoint_func_space, mode2D='plane strain', materialModel=self.materialModel)
+    def setup_energy_functions(self):
+        shapeOnRef = Interpolants.compute_shapes(self.mesh.parentElement, self.quadRule.xigauss)
+
+        def energy_function_all_dofs(U, p, coords):
+            adjoint_func_space = AdjointFunctionSpace.construct_function_space_for_adjoint(coords, shapeOnRef, self.mesh, self.quadRule)
+            mech_funcs = Mechanics.create_mechanics_functions(adjoint_func_space, mode2D='plane strain', materialModel=self.materialModel)
+            ivs = p.state_data
+            return mech_funcs.compute_strain_energy(U, ivs)
 
         def energy_function_coords(Uu, p, coords):
             U = self.dofManager.create_field(Uu, p.bc_data)
-            internal_vars = p[1]
-            return mech_funcs.compute_strain_energy(U, internal_vars)
+            return energy_function_all_dofs(U, p, coords)
 
-        return energy_function_coords(storedState[-1][0], storedState[-1][1], parameters) 
+        nodal_forces = jax.grad(energy_function_all_dofs, argnums=0)
+
+        return EnergyFunctions(energy_function_coords, jax.jit(nodal_forces))
+
+    def strain_energy_objective(self, storedState, parameters):
+        parameters = parameters.reshape(self.mesh.coords.shape)
+        energyFuncs = self.setup_energy_functions()
+
+        return energyFuncs.energy_function_coords(storedState[-1][0], storedState[-1][1], parameters) 
 
     def strain_energy_gradient(self, storedState, parameters):
         return jax.grad(self.strain_energy_objective, argnums=1)(storedState, parameters)
@@ -108,14 +125,7 @@ class NeoHookeanGlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
 
     def total_work_objective(self, storedState, parameters):
         parameters = parameters.reshape(self.mesh.coords.shape)
-
-        def energy_function_all_dofs(U, p, coords):
-            adjoint_func_space = AdjointFunctionSpace.construct_function_space_for_adjoint(coords, self.mesh, self.quadRule)
-            mech_funcs = Mechanics.create_mechanics_functions(adjoint_func_space, mode2D='plane strain',materialModel=self.materialModel)
-            internal_vars = p[1]
-            return mech_funcs.compute_strain_energy(U, internal_vars)
-
-        nodal_forces = jax.jit(jax.grad(energy_function_all_dofs, argnums=0))
+        energyFuncs = self.setup_energy_functions()
 
         val = 0.0
         for step in range(1, self.steps+1):
@@ -123,7 +133,7 @@ class NeoHookeanGlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
             Uu_prev = storedState[step-1][0]
             p = storedState[step][1]
             p_prev = storedState[step-1][1]
-            val += self.total_work_increment(Uu, Uu_prev, p, p_prev, parameters, nodal_forces)
+            val += self.total_work_increment(Uu, Uu_prev, p, p_prev, parameters, energyFuncs.nodal_forces)
 
         return val
 
@@ -131,22 +141,8 @@ class NeoHookeanGlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
         return jax.grad(self.total_work_objective, argnums=1)(storedState, parameters)
 
     def total_work_gradient_with_adjoint(self, storedState, parameters):
-        def energy_function_coords(Uu, p, coords):
-            adjoint_func_space = AdjointFunctionSpace.construct_function_space_for_adjoint(coords, self.mesh, self.quadRule)
-            mech_funcs = Mechanics.create_mechanics_functions(adjoint_func_space, mode2D='plane strain', materialModel=self.materialModel)
-            U = self.dofManager.create_field(Uu, p.bc_data)
-            internal_vars = p[1]
-            return mech_funcs.compute_strain_energy(U, internal_vars)
-
-        def energy_function_all_dofs(U, p, coords):
-            adjoint_func_space = AdjointFunctionSpace.construct_function_space_for_adjoint(coords, self.mesh, self.quadRule)
-            mech_funcs = Mechanics.create_mechanics_functions(adjoint_func_space, mode2D='plane strain',materialModel=self.materialModel)
-            internal_vars = p[1]
-            return mech_funcs.compute_strain_energy(U, internal_vars)
-
-        nodal_forces = jax.jit(jax.grad(energy_function_all_dofs, argnums=0))
-
-        residualInverseFuncs = MechanicsInverse.create_residual_inverse_functions(energy_function_coords)
+        energyFuncs = self.setup_energy_functions()
+        residualInverseFuncs = MechanicsInverse.create_residual_inverse_functions(energyFuncs.energy_function_coords)
 
         compute_df = jax.grad(self.total_work_increment, (0, 1, 4))
 
@@ -161,7 +157,7 @@ class NeoHookeanGlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
             Uu_prev = storedState[step-1][0]
             p_prev = storedState[step-1][1]
 
-            df_du, df_dun, df_dx = compute_df(Uu, Uu_prev, p, p_prev, parameters, nodal_forces)
+            df_du, df_dun, df_dx = compute_df(Uu, Uu_prev, p, p_prev, parameters, energyFuncs.nodal_forces)
 
             adjointLoad -= df_du
 
