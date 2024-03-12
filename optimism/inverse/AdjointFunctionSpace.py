@@ -6,7 +6,9 @@ from optimism.FunctionSpace import compute_element_volumes_axisymmetric
 from optimism.FunctionSpace import map_element_shape_grads
 from jax import vmap
 
-def construct_function_space_for_adjoint(coords, shapeOnRef, mesh, quadratureRule, mode2D='cartesian'):
+def construct_function_space_for_adjoint(coords, mesh, quadratureRule, mode2D='cartesian'):
+
+    shapeOnRef = Interpolants.compute_shapes(mesh.parentElement, quadratureRule.xigauss)
 
     shapes = vmap(lambda elConns, elShape: elShape, (0, None))(mesh.conns, shapeOnRef.values)
 
