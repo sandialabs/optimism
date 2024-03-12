@@ -8,6 +8,7 @@ from scipy.sparse import linalg
 from optimism import EquationSolver as EqSolver
 from optimism import QuadratureRule
 from optimism import FunctionSpace
+from optimism import Interpolants
 from optimism import Mechanics
 from optimism import Objective
 from optimism import Mesh
@@ -17,6 +18,11 @@ from optimism.inverse.test.FiniteDifferenceFixture import FiniteDifferenceFixtur
 
 from optimism.inverse import MechanicsInverse
 from optimism.inverse import AdjointFunctionSpace
+from collections import namedtuple
+
+EnergyFunctions = namedtuple('EnergyFunctions',
+                            ['energy_function_coords',
+                             'nodal_forces'])
 
 class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
     def setUp(self):
@@ -83,6 +89,22 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
 
         return storedState
 
+    def setup_energy_functions(self):
+        shapeOnRef = Interpolants.compute_shapes(self.mesh.parentElement, self.quadRule.xigauss)
+
+        def energy_function_all_dofs(U, ivs, coords):
+            adjoint_func_space = AdjointFunctionSpace.construct_function_space_for_adjoint(coords, shapeOnRef, self.mesh, self.quadRule)
+            mech_funcs = Mechanics.create_mechanics_functions(adjoint_func_space, mode2D='plane strain', materialModel=self.materialModel)
+            return mech_funcs.compute_strain_energy(U, ivs)
+
+        def energy_function_coords(Uu, p, ivs, coords):
+            U = self.dofManager.create_field(Uu, p.bc_data)
+            return energy_function_all_dofs(U, ivs, coords)
+
+        nodal_forces = jax.grad(energy_function_all_dofs, argnums=0)
+
+        return EnergyFunctions(energy_function_coords, jax.jit(nodal_forces))
+
     def total_work_increment(self, Uu, Uu_prev, ivs, ivs_prev, p, p_prev, coordinates, nodal_forces):
         index = (self.mesh.nodeSets['left'], 1) # arbitrarily choosing left side nodeset for reaction force
 
@@ -98,13 +120,7 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
 
     def total_work_objective(self, storedState, parameters):
         parameters = parameters.reshape(self.mesh.coords.shape)
-
-        def energy_function_all_dofs(U, ivs, coords):
-            adjoint_func_space = AdjointFunctionSpace.construct_function_space_for_adjoint(coords, self.mesh, self.quadRule)
-            mech_funcs = Mechanics.create_mechanics_functions(adjoint_func_space, mode2D='plane strain',materialModel=self.materialModel)
-            return mech_funcs.compute_strain_energy(U, ivs)
-
-        nodal_forces = jax.jit(jax.grad(energy_function_all_dofs, argnums=0))
+        energyFuncs = self.setup_energy_functions()
 
         val = 0.0
         for step in range(1, self.steps+1):
@@ -115,31 +131,18 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
             ivs = p.state_data
             ivs_prev = p_prev.state_data
 
-            val += self.total_work_increment(Uu, Uu_prev, ivs, ivs_prev, p, p_prev, parameters, nodal_forces)
+            val += self.total_work_increment(Uu, Uu_prev, ivs, ivs_prev, p, p_prev, parameters, energyFuncs.nodal_forces)
 
         return val
 
     def total_work_gradient(self, storedState, parameters):
-
-        def energy_function_coords(Uu, p, ivs_prev, coords):
-            adjoint_func_space = AdjointFunctionSpace.construct_function_space_for_adjoint(coords, self.mesh, self.quadRule)
-            mech_funcs = Mechanics.create_mechanics_functions(adjoint_func_space, mode2D='plane strain', materialModel=self.materialModel)
-            U = self.dofManager.create_field(Uu, p.bc_data)
-            return mech_funcs.compute_strain_energy(U, ivs_prev)
-
-        def energy_function_all_dofs(U, ivs, coords):
-            adjoint_func_space = AdjointFunctionSpace.construct_function_space_for_adjoint(coords, self.mesh, self.quadRule)
-            mech_funcs = Mechanics.create_mechanics_functions(adjoint_func_space, mode2D='plane strain',materialModel=self.materialModel)
-            return mech_funcs.compute_strain_energy(U, ivs)
-
-        nodal_forces = jax.jit(jax.grad(energy_function_all_dofs, argnums=0))
-
         functionSpace = FunctionSpace.construct_function_space(self.mesh, self.quadRule)
+        energyFuncs = self.setup_energy_functions()
         ivsUpdateInverseFuncs = MechanicsInverse.create_ivs_update_inverse_functions(functionSpace,
                                                                                      "plane strain",
                                                                                      self.materialModel)
 
-        residualInverseFuncs = MechanicsInverse.create_path_dependent_residual_inverse_functions(energy_function_coords)
+        residualInverseFuncs = MechanicsInverse.create_path_dependent_residual_inverse_functions(energyFuncs.energy_function_coords)
 
         compute_df = jax.grad(self.total_work_increment, (0, 1, 2, 3, 6))
 
@@ -158,7 +161,7 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
 
             dc_dcn = ivsUpdateInverseFuncs.ivs_update_jac_ivs_prev(self.dofManager.create_field(Uu, p.bc_data), ivs_prev)
 
-            df_du, df_dun, df_dc, df_dcn, df_dx = compute_df(Uu, Uu_prev, ivs, ivs_prev, p, p_prev, parameters, nodal_forces)
+            df_du, df_dun, df_dc, df_dcn, df_dx = compute_df(Uu, Uu_prev, ivs, ivs_prev, p, p_prev, parameters, energyFuncs.nodal_forces)
 
             mu += df_dc
             adjointLoad -= df_du
@@ -206,41 +209,22 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
 
     def target_curve_objective(self, storedState, parameters):
         parameters = parameters.reshape(self.mesh.coords.shape)
-
-        def energy_function_all_dofs(U, ivs, coords):
-            adjoint_func_space = AdjointFunctionSpace.construct_function_space_for_adjoint(coords, self.mesh, self.quadRule)
-            mech_funcs = Mechanics.create_mechanics_functions(adjoint_func_space, mode2D='plane strain',materialModel=self.materialModel)
-            return mech_funcs.compute_strain_energy(U, ivs)
-
-        nodal_forces = jax.jit(jax.grad(energy_function_all_dofs, argnums=0))
+        energyFuncs = self.setup_energy_functions()
 
         uSteps = np.stack([storedState[i][0] for i in range(0, self.steps+1)], axis=0)
         ivsSteps = np.stack([storedState[i][1].state_data for i in range(0, self.steps+1)], axis=0)
         bcsSteps = np.stack([storedState[i][1].bc_data for i in range(0, self.steps+1)], axis=0)
 
-        return self.compute_L2_norm_difference(uSteps, ivsSteps, bcsSteps, parameters, nodal_forces) 
+        return self.compute_L2_norm_difference(uSteps, ivsSteps, bcsSteps, parameters, energyFuncs.nodal_forces) 
 
     def target_curve_gradient(self, storedState, parameters):
-
-        def energy_function_coords(Uu, p, ivs_prev, coords):
-            adjoint_func_space = AdjointFunctionSpace.construct_function_space_for_adjoint(coords, self.mesh, self.quadRule)
-            mech_funcs = Mechanics.create_mechanics_functions(adjoint_func_space, mode2D='plane strain', materialModel=self.materialModel)
-            U = self.dofManager.create_field(Uu, p.bc_data)
-            return mech_funcs.compute_strain_energy(U, ivs_prev)
-
-        def energy_function_all_dofs(U, ivs, coords):
-            adjoint_func_space = AdjointFunctionSpace.construct_function_space_for_adjoint(coords, self.mesh, self.quadRule)
-            mech_funcs = Mechanics.create_mechanics_functions(adjoint_func_space, mode2D='plane strain',materialModel=self.materialModel)
-            return mech_funcs.compute_strain_energy(U, ivs)
-
-        nodal_forces = jax.jit(jax.grad(energy_function_all_dofs, argnums=0))
-
         functionSpace = FunctionSpace.construct_function_space(self.mesh, self.quadRule)
+        energyFuncs = self.setup_energy_functions()
         ivsUpdateInverseFuncs = MechanicsInverse.create_ivs_update_inverse_functions(functionSpace,
                                                                                      "plane strain",
                                                                                      self.materialModel)
 
-        residualInverseFuncs = MechanicsInverse.create_path_dependent_residual_inverse_functions(energy_function_coords)
+        residualInverseFuncs = MechanicsInverse.create_path_dependent_residual_inverse_functions(energyFuncs.energy_function_coords)
 
         parameters = parameters.reshape(self.mesh.coords.shape)
 
@@ -248,7 +232,7 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
         uSteps = np.stack([storedState[i][0] for i in range(0, self.steps+1)], axis=0)
         ivsSteps = np.stack([storedState[i][1].state_data for i in range(0, self.steps+1)], axis=0)
         bcsSteps = np.stack([storedState[i][1].bc_data for i in range(0, self.steps+1)], axis=0)
-        df_du, df_dc, gradient = jax.grad(self.compute_L2_norm_difference, (0, 1, 3))(uSteps, ivsSteps, bcsSteps, parameters, nodal_forces) 
+        df_du, df_dc, gradient = jax.grad(self.compute_L2_norm_difference, (0, 1, 3))(uSteps, ivsSteps, bcsSteps, parameters, energyFuncs.nodal_forces) 
 
         mu = np.zeros(ivsSteps[0].shape) 
         adjointLoad = np.zeros(uSteps[0].shape)

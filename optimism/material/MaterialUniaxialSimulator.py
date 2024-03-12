@@ -29,7 +29,7 @@ internalVariableHistory: array
 """
 
 
-def run(materialModel, strain_history, maxTime, steps=10):
+def run(materialModel, strain_history, maxTime, steps=10, tol=1e-3):
     """ Generates the uniaxial response of a given material
     Args
     ----
@@ -57,7 +57,7 @@ def run(materialModel, strain_history, maxTime, steps=10):
         strain = makeStrainTensor_(freeStrains, p)
         return energy_density(strain, p[1], dt)
 
-    uniaxialTolerance=1e-3
+    uniaxialTolerance=tol
     solverSettings = EqSolver.get_settings(tol=uniaxialTolerance)
     internalVariables =  materialModel.compute_initial_state()
     freeStrains = np.zeros(2)
