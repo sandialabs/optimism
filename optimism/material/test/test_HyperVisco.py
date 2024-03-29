@@ -53,7 +53,7 @@ class HyperViscoModelFixture(TestFixture):
         dt = 1.0
 
         energy = self.energy_density(dispGrad, initialState, dt)
-        self.assertNear(energy, 133.3469451269987, 12)
+        self.assertNear(energy, 133.4634466468207, 12)
 
         state = self.compute_state_new(dispGrad, initialState, dt)
         stateGold = np.array([0.988233534321, 0.437922586964, 0.433881277313, 
@@ -78,6 +78,7 @@ class HyperViscoUniaxial(TestFixture):
             'relaxation time'              : tau_1,
         } 
         self.mat = HyperVisco.create_material_model_functions(self.props)
+
         self.totalTime = 1.0e1*tau_1
 
     def test_dissipated_energy_cycle(self):
@@ -85,7 +86,7 @@ class HyperViscoUniaxial(TestFixture):
         stages = 2
         maxStrain = 2.0e-2
         maxTime = self.totalTime
-        steps = 20
+        steps = 100
         strainInc = maxStrain/(steps-1)
         dt=maxTime/(steps-1)
 
@@ -112,6 +113,26 @@ class HyperViscoUniaxial(TestFixture):
             P_sum = uniaxial.stressHistory[step] + uniaxial.stressHistory[step-1]
             intEnergies.append(0.5 * np.tensordot(P_sum,F_diff))
         internalEnergyHistory = np.cumsum(np.array(intEnergies))
+
+        # compute free energy
+        hyperVisco_props = HyperVisco._make_properties(self.props)
+        def free_energy(dispGrad, state, dt):
+            W_eq  = HyperVisco._eq_strain_energy(dispGrad, hyperVisco_props)
+
+            Ee_trial = HyperVisco._compute_elastic_logarithmic_strain(dispGrad, state)
+            delta_Ev = HyperVisco._compute_state_increment(Ee_trial, dt, hyperVisco_props)
+            Ee = Ee_trial - delta_Ev 
+
+            W_neq = HyperVisco._neq_strain_energy(Ee, hyperVisco_props)
+
+            return W_eq + W_neq
+
+        compute_free_energy = jax.jit(free_energy)
+        freeEnergies = []
+        freeEnergies.append(0.0)
+        for step in range(1,steps): 
+            freeEnergies.append( compute_free_energy(uniaxial.strainHistory[step], uniaxial.internalVariableHistory[step-1], dt) )
+        freeEnergyHistory = np.array(freeEnergies)
         
         # compute dissipated energy
         timePoints = np.linspace(0.0, maxTime, num=steps)
@@ -120,22 +141,23 @@ class HyperViscoUniaxial(TestFixture):
         dissipatedEnergies.append(0.0)
         compute_dissipation = jax.jit(self.mat.compute_material_qoi)
         for step in range(1,steps): 
-            dissipatedEnergies.append( dt * compute_dissipation(uniaxial.strainHistory[step], uniaxial.internalVariableHistory[step], dt) )
+            dissipatedEnergies.append( compute_dissipation(uniaxial.strainHistory[step], uniaxial.internalVariableHistory[step-1], dt) )
         dissipatedEnergyHistory = np.cumsum(np.array(dissipatedEnergies))
         
         # plot energies
         if plotting:
             plt.figure()
             plt.plot(uniaxial.time, internalEnergyHistory, marker='o', fillstyle='none')
-            plt.plot(uniaxial.time, uniaxial.energyHistory, marker='x', fillstyle='none')
+            plt.plot(uniaxial.time, freeEnergyHistory, marker='x', fillstyle='none')
             plt.plot(uniaxial.time, dissipatedEnergyHistory, marker='v', fillstyle='none')
-            plt.plot(uniaxial.time, uniaxial.energyHistory + np.cumsum(np.array(dissipatedEnergies)), marker='s', fillstyle='none')
+            plt.plot(uniaxial.time, freeEnergyHistory + dissipatedEnergyHistory, marker='s', fillstyle='none')
+
             plt.xlabel('Time')
-            plt.ylabel('Energy')
+            plt.ylabel('Energy Density (MPa)')
             plt.legend(["Internal", "Free", "Dissipated", "Free + Dissipated"], loc=0, frameon=True)
             plt.savefig('energy_histories.png')
 
-        self.assertArrayNear(dissipatedEnergyHistory, internalEnergyHistory - uniaxial.energyHistory, 5)
+        self.assertArrayNear(dissipatedEnergyHistory, internalEnergyHistory - freeEnergyHistory, 5)
 
         
 if __name__ == '__main__':
