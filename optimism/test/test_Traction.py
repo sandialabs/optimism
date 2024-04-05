@@ -70,7 +70,8 @@ class TractionPatch(MeshFixture.MeshFixture):
             return internalPotential + loadPotential
         
         with Timer(name="NewtonSolve"):
-            Uu = newton_solve(objective, dofManager.get_unknown_values(self.UTarget))
+            Uu, solverSuccess = newton_solve(objective, dofManager.get_unknown_values(self.UTarget))
+            self.assertTrue(solverSuccess)
 
         U = dofManager.create_field(Uu, Ubc)
             

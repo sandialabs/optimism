@@ -9,7 +9,7 @@ from optimism import WarmStart
 def nonlinear_solve(mechanicalEnergy, settings, UuGuess, designParams):
     p = Objective.param_index_update(mechanicalEnergy.p, 2, designParams)
     return EquationSolver.nonlinear_equation_solve(mechanicalEnergy,
-                                                   UuGuess, p, settings)
+                                                   UuGuess, p, settings)[0]
 
 
 def nonlinear_solve_f(mechanicalEnergy, settings, UuGuess, designParams):
@@ -23,13 +23,13 @@ def nonlinear_solve_b(mechanicalEnergy, settings, rdata, v):
     
     hess_vec_func = lambda w: mechanicalEnergy.hessian_vec(Uu, w)
     
-    results = EquationSolver.solve_trust_region_minimization(0.0*Uu,
-                                                             v,
-                                                             hess_vec_func,
-                                                             mechanicalEnergy.apply_precond,
-                                                             lambda x: x,
-                                                             np.inf,
-                                                             settings)
+    results,_ = EquationSolver.solve_trust_region_minimization(0.0*Uu,
+                                                               v,
+                                                               hess_vec_func,
+                                                               mechanicalEnergy.apply_precond,
+                                                               lambda x: x,
+                                                               np.inf,
+                                                               settings)
     
     lam = results[0]
     return (np.zeros_like(Uu)*v[0], mechanicalEnergy.vec_jacobian_p2(Uu, lam)[0])
@@ -45,11 +45,11 @@ def nonlinear_solve_with_state(mechanicalEnergy, settings, UuGuess, p):
     mechanicalEnergy.update_precond(UuGuess)
     UuGuess += WarmStart.warm_start_increment_jax_safe(mechanicalEnergy, UuGuess, p[0])
 
-    Uu = EquationSolver.nonlinear_equation_solve(mechanicalEnergy,
-                                                 UuGuess,
-                                                 p,
-                                                 settings,
-                                                 useWarmStart=False)
+    Uu, solverSuccess = EquationSolver.nonlinear_equation_solve(mechanicalEnergy,
+                                                                UuGuess,
+                                                                p,
+                                                                settings,
+                                                                useWarmStart=False)
     return Uu
 
 

@@ -154,7 +154,7 @@ class EulerBeam(MeshFixture):
             print('LOAD STEP ', i)
             force += maxForce/steps
             p = Objective.param_index_update(p, 0, force)
-            Uu = EqSolver.nonlinear_equation_solve(objective, Uu, p, self.trSettings, solver_algorithm=solver)
+            Uu, solverSuccess = EqSolver.nonlinear_equation_solve(objective, Uu, p, self.trSettings, solver_algorithm=solver)
 
             self.write_output(Uu, p, i)
 
@@ -165,7 +165,7 @@ class EulerBeam(MeshFixture):
                 print('LOAD STEP ', i)
                 force -= maxForce/steps
                 p = Objective.param_index_update(p, 0, force)
-                Uu = EqSolver.nonlinear_equation_solve(objective, Uu, p, self.trSettings, solver_algorithm=solver)
+                Uu, solverSuccess = EqSolver.nonlinear_equation_solve(objective, Uu, p, self.trSettings, solver_algorithm=solver)
 
                 self.write_output(Uu, p, i)
 

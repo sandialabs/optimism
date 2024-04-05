@@ -132,8 +132,7 @@ def run():
         appliedK += 1.0
         p = Objective.param_index_update(p, 0, appliedK)
 
-        Uu = EquationSolver.nonlinear_equation_solve(objective, Uu, p, solverSettings)
-
+        Uu, solverSuccess = EquationSolver.nonlinear_equation_solve(objective, Uu, p, solverSettings)
         
         Wu = np.zeros_like(Uu)
         _, configForcesOnUnknowns = sensit(Wu, Uu, p, mesh)

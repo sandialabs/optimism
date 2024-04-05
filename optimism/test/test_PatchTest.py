@@ -62,7 +62,8 @@ class LinearPatchTestLinearElements(MeshFixture.MeshFixture):
             return self.compute_energy(U, self.internals)
         
         with Timer(name="NewtonSolve"):
-            Uu = newton_solve(objective, dofManager.get_unknown_values(self.U))
+            Uu, solverSuccess = newton_solve(objective, dofManager.get_unknown_values(self.U))
+            self.assertTrue(solverSuccess)
 
         self.U = dofManager.create_field(Uu, Ubc)
             
@@ -97,9 +98,10 @@ class LinearPatchTestLinearElements(MeshFixture.MeshFixture):
             return internalPotential + loadPotential
         
         with Timer(name="NewtonSolve"):
-            Uu = newton_solve(objective, dofManager.get_unknown_values(self.U))
+            Uu, solverSuccess = newton_solve(objective, dofManager.get_unknown_values(self.U))
+            self.assertTrue(solverSuccess)
 
-            self.U = dofManager.create_field(Uu, Ubc)
+        self.U = dofManager.create_field(Uu, Ubc)
 
         # exact solution
         modulus1 = (1.0 - nu**2)/E
@@ -153,7 +155,8 @@ class LinearPatchTestQuadraticElements(MeshFixture.MeshFixture):
             return self.compute_energy(U, self.internals)
         
         with Timer(name="NewtonSolve"):
-            Uu = newton_solve(objective, dofManager.get_unknown_values(self.UTarget))
+            Uu, solverSuccess = newton_solve(objective, dofManager.get_unknown_values(self.UTarget))
+            self.assertTrue(solverSuccess)
 
         U = dofManager.create_field(Uu, Ubc)
             
@@ -186,7 +189,8 @@ class LinearPatchTestQuadraticElements(MeshFixture.MeshFixture):
             return self.compute_energy(U, self.internals)
         
         with Timer(name="NewtonSolve"):
-            Uu = newton_solve(objective, dofManager.get_unknown_values(self.UTarget))
+            Uu, solverSuccess = newton_solve(objective, dofManager.get_unknown_values(self.UTarget))
+            self.assertTrue(solverSuccess)
 
         U = dofManager.create_field(Uu, Ubc)
             
@@ -249,7 +253,8 @@ class QuadraticPatchTestQuadraticElements(MeshFixture.MeshFixture):
             return self.compute_energy(U, self.internals) + constant_body_force_potential(U, self.internals, self.b)
         
         with Timer(name="NewtonSolve"):
-            Uu = newton_solve(objective, 0.0*self.dofManager.get_unknown_values(self.UTarget))
+            Uu, solverSuccess = newton_solve(objective, 0.0*self.dofManager.get_unknown_values(self.UTarget))
+            self.assertTrue(solverSuccess)
 
         U = self.dofManager.create_field(Uu, Ubc)
 

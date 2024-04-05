@@ -197,7 +197,7 @@ class TractionArch():
 
             force += maxForce/steps
             p = Objective.param_index_update(p, 0, force)
-            Uu = EqSolver.nonlinear_equation_solve(objective, Uu, p, self.trSettings)
+            Uu, solverSuccess = EqSolver.nonlinear_equation_solve(objective, Uu, p, self.trSettings)
 
             U = self.dofManager.create_field(Uu, self.get_ubcs(p))
             ivs = self.bvpFuncs.compute_updated_internal_variables(U, p[1])
@@ -214,7 +214,7 @@ class TractionArch():
 
                 force -= maxForce/steps
                 p = Objective.param_index_update(p, 0, force)
-                Uu = EqSolver.nonlinear_equation_solve(objective, Uu, p, self.trSettings)
+                Uu, solverSuccess = EqSolver.nonlinear_equation_solve(objective, Uu, p, self.trSettings)
 
                 U = self.dofManager.create_field(Uu, self.get_ubcs(p))
                 ivs = self.bvpFuncs.compute_updated_internal_variables(U, p[1])

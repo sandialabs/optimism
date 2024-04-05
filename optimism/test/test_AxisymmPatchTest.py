@@ -68,7 +68,7 @@ class AxisymmPatchTest(MeshFixture.MeshFixture):
             U = dofManager.create_field(Uu, Ubc)
             return self.compute_energy(U, self.internals)
         
-        Uu = newton_solve(objective, dofManager.get_unknown_values(V))
+        Uu, solverSuccess = newton_solve(objective, dofManager.get_unknown_values(V))
 
         U = dofManager.create_field(Uu, Ubc)
             

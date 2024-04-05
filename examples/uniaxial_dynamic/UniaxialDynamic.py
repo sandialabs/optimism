@@ -208,11 +208,11 @@ class UniaxialDynamic:
             #print('Predicted Vx = \n', self.create_field(Vu,p)[:,0])
             p = Objective.param_index_update(p, 5, UuPredicted)
 
-            Uu = EquationSolver.nonlinear_equation_solve(objective,
-                                                         Uu,
-                                                         p,
-                                                         solverSettings,
-                                                         useWarmStart=False)
+            Uu, solverSuccess = EquationSolver.nonlinear_equation_solve(objective,
+                                                                        Uu,
+                                                                        p,
+                                                                        solverSettings,
+                                                                        useWarmStart=False)
 
             UuCorrection = Uu - UuPredicted
             #print('Corrected Ux = \n', self.create_field(UuCorrection,p)[:,0])

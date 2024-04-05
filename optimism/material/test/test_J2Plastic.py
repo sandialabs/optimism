@@ -311,8 +311,9 @@ class PlasticityOnMesh(MeshFixture):
         
         objective = Objective.Objective(compute_energy, UuGuess, p)
         
-        Uu = EqSolver.nonlinear_equation_solve(objective, UuGuess, p, EqSolver.get_settings(), useWarmStart=False)
-
+        Uu, solverSuccess = EqSolver.nonlinear_equation_solve(objective, UuGuess, p, EqSolver.get_settings(), useWarmStart=False)
+        self.assertTrue(solverSuccess)
+        
         U = dofManager.create_field(Uu, Ubc)
 
         dispGrads = FunctionSpace.compute_field_gradient(fs, U)

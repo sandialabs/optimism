@@ -342,7 +342,7 @@ def bound_constrained_trust_region_minimize(objective, x, bounds, settings, call
     if is_converged(objective, x, 0.0, 0.0, prevOptimality, prevOptimality, 0,
                     trSize, settings):
         if callback: callback(x, objective)
-        return x
+        return x, True
 
     # Set guess for first cauchy point step length
     gHg = g@objective.hessian_vec(x, g)
@@ -391,7 +391,7 @@ def bound_constrained_trust_region_minimize(objective, x, bounds, settings, call
                         realOptimality, modelOptimality, spgIters, trSizeUsed,
                         settings):
             if callback: callback(y, objective)
-            return y
+            return y, True
         
         modelImprove = -modelObjective
         realImprove = -realObjective
@@ -445,14 +445,14 @@ def bound_constrained_trust_region_minimize(objective, x, bounds, settings, call
             else:
                 print("The trust region is still too small.  Accepting, but be careful.")
                 if callback: callback(x, objective)
-                return x
+                return x, False
                     
     print("Reached the maximum number of trust region iterations.")
     if settings.check_stability:
         objective.check_stability(x)
 
         if callback: callback(x, objective)
-    return x
+    return x, False
 
 
 def solve(objective, x0, p, lowerBounds, upperBounds, settings, callback=None,
@@ -477,8 +477,8 @@ def solve(objective, x0, p, lowerBounds, upperBounds, settings, callback=None,
 
     bounds = np.column_stack((lBar, uBar))
         
-    xBar = bound_constrained_trust_region_minimize(objective, xBar0, bounds, settings,
+    xBar, solverSuccess = bound_constrained_trust_region_minimize(objective, xBar0, bounds, settings,
                                                    callback=callback)
     
-    return objective.invScaling * xBar
+    return objective.invScaling * xBar, solverSuccess
     
