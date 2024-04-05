@@ -127,7 +127,7 @@ class ShearTest(MeshFixture):
             disp = self.maxDisp * np.sin(2.0 * np.pi * self.freq * time)
 
             p = Objective.param_index_update(p, 0, disp)
-            Uu = EqSolver.nonlinear_equation_solve(self.objective, Uu, p, EqSolver.get_settings(), useWarmStart=False)
+            Uu, solverSuccess = EqSolver.nonlinear_equation_solve(self.objective, Uu, p, EqSolver.get_settings(), useWarmStart=False)
             U = create_field(Uu, p.bc_data)
             ivs = mechFuncs.compute_updated_internal_variables(U, p.state_data, self.dt)
             p = Objective.param_index_update(p, 1, ivs)
