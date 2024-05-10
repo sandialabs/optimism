@@ -31,13 +31,11 @@ def create_material_model_functions(properties):
     def compute_material_qoi(dispGrad, state, dt):
         return _compute_dissipation(dispGrad, state, dt, props)
 
-    return MaterialModel(
-        energy_density, 
-        compute_initial_state,
-        compute_state_new,
-        density,
-        compute_material_qoi
-    )
+    return MaterialModel(compute_energy_density = energy_density,
+                         compute_initial_state = compute_initial_state,
+                         compute_state_new = compute_state_new,
+                         compute_material_qoi = compute_material_qoi,
+                         density = density)
 
 def _make_properties(properties):
 
