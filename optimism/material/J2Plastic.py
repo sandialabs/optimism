@@ -76,10 +76,14 @@ def create_material_model_functions(properties):
 
     density = properties.get('density')
 
-    return MaterialModel(energy_density_function,
-                         compute_initial_state,
-                         compute_state_new_function,
-                         density)
+    def compute_material_qoi(dispGrad, state, dt):
+        return _compute_dissipation(dispGrad, state, dt, props, hardeningModel)
+
+    return MaterialModel(compute_energy_density = energy_density_function,
+                         compute_initial_state = compute_initial_state,
+                         compute_state_new = compute_state_new_function,
+                         compute_material_qoi = compute_material_qoi,
+                         density = density)
 
 
 def make_properties(E, nu, Y0):
@@ -237,3 +241,12 @@ def compute_elastic_seth_hill_strain(dispGrad, state):
     strain = (TensorMath.pow_symm(C,m) - np.identity(3)) / (2*m)
     plasticStrain = state[PLASTIC_STRAIN].reshape((3,3))
     return strain - plasticStrain
+
+def _compute_dissipation(dispGrad, stateOld, dt, props, hardeningModel):
+    elasticTrialStrain = compute_elastic_logarithmic_strain(dispGrad, stateOld)
+    stateInc = compute_state_increment(elasticTrialStrain, stateOld, dt, props, hardeningModel)
+    Ee = TensorMath.dev(elasticTrialStrain) - stateInc[PLASTIC_DISTORTION].reshape((3,3))
+    Me = 2. * props[PROPS_MU] * Ee
+    N = compute_flow_direction(elasticTrialStrain)
+
+    return stateInc[EQPS] * np.tensordot(Me, N)

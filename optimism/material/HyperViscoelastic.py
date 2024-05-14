@@ -28,12 +28,14 @@ def create_material_model_functions(properties):
         state = _compute_state_new(dispGrad, state, dt, props)
         return state
 
-    return MaterialModel(
-        energy_density, 
-        compute_initial_state,
-        compute_state_new,
-        density
-    )
+    def compute_material_qoi(dispGrad, state, dt):
+        return _compute_dissipation(dispGrad, state, dt, props)
+
+    return MaterialModel(compute_energy_density = energy_density,
+                         compute_initial_state = compute_initial_state,
+                         compute_state_new = compute_state_new,
+                         compute_material_qoi = compute_material_qoi,
+                         density = density)
 
 def _make_properties(properties):
 
@@ -55,8 +57,15 @@ def _make_properties(properties):
 
 def _energy_density(dispGrad, state, dt, props):
     W_eq  = _eq_strain_energy(dispGrad, props)
-    W_neq = _neq_strain_energy(dispGrad, state, dt, props)
-    return W_eq + W_neq
+
+    Ee_trial = _compute_elastic_logarithmic_strain(dispGrad, state)
+    delta_Ev = _compute_state_increment(Ee_trial, dt, props)
+    Ee = Ee_trial - delta_Ev 
+    
+    W_neq = _neq_strain_energy(Ee, props)
+    Psi = _incremental_dissipated_energy(Ee, dt, props)
+
+    return W_eq + W_neq + Psi
 
 def _eq_strain_energy(dispGrad, props):
     K, G = props[PROPS_K_eq], props[PROPS_G_eq]
@@ -68,22 +77,26 @@ def _eq_strain_energy(dispGrad, props):
     Wdev = 0.5 * G * (I1Bar - 3.0)
     return Wdev + Wvol
 
-def _neq_strain_energy(dispGrad, stateOld, dt, props):
+def _neq_strain_energy(elasticStrain, props):
+    G_neq = props[PROPS_G_neq]
+    return G_neq * TensorMath.norm_of_deviator_squared(elasticStrain)
+
+def _incremental_dissipated_energy(elasticStrain, dt, props):
     G_neq = props[PROPS_G_neq]
     tau   = props[PROPS_TAU]
     eta   = G_neq * tau
 
-    Ee_trial = _compute_elastic_logarithmic_strain(dispGrad, stateOld)
+    Me = 2. * G_neq * elasticStrain
+    M_bar = TensorMath.norm_of_deviator_squared(Me)
+
+    return 0.5 * dt * M_bar / eta
+
+def _compute_dissipation(dispGrad, state, dt, props):
+    Ee_trial = _compute_elastic_logarithmic_strain(dispGrad, state)
     delta_Ev = _compute_state_increment(Ee_trial, dt, props)
     Ee = Ee_trial - delta_Ev 
-
-    Me = 2. * G_neq * Ee
-    M_bar = TensorMath.norm_of_deviator_squared(Me)
-    gamma_dot = M_bar / eta
-    # visco_energy = (dt / (G_neq * tau)) * M_bar**2
-    visco_energy = 0.5 * dt * eta * gamma_dot**2
-
-    return G_neq * TensorMath.norm_of_deviator_squared(Ee) + visco_energy
+    
+    return _incremental_dissipated_energy(Ee, dt, props)
 
 def _compute_state_new(dispGrad, stateOld, dt, props):
     Ee_trial = _compute_elastic_logarithmic_strain(dispGrad, stateOld)

@@ -27,10 +27,10 @@ def create_material_functions(properties):
 
     density = properties.get('density')
 
-    return MaterialModel(strain_energy,
-                         make_initial_state,
-                         compute_state_new,
-                         density)
+    return MaterialModel(compute_energy_density = strain_energy,
+                         compute_initial_state = make_initial_state,
+                         compute_state_new = compute_state_new,
+                         density = density)
 
 def _make_properties(K, mu, Jm):
     return np.array([K, mu, Jm])

@@ -13,7 +13,9 @@ MechanicsFunctions = namedtuple('MechanicsFunctions',
                                  'compute_updated_internal_variables',
                                  'compute_element_stiffnesses',
                                  'compute_output_energy_densities_and_stresses',
-                                 'compute_initial_state'])
+                                 'compute_initial_state',
+                                 'integrated_material_qoi',
+                                 'compute_output_material_qoi'])
 
 
 DynamicsFunctions = namedtuple('DynamicsFunctions',
@@ -240,7 +242,7 @@ def create_multi_block_mechanics_functions(functionSpace, mode2D, materialModels
         return _compute_initial_state_multi_block(fs, materialModels)
 
     
-    return MechanicsFunctions(compute_strain_energy, jit(compute_updated_internal_variables), jit(compute_element_stiffnesses), jit(compute_output_energy_densities_and_stresses), compute_initial_state)
+    return MechanicsFunctions(compute_strain_energy, jit(compute_updated_internal_variables), jit(compute_element_stiffnesses), jit(compute_output_energy_densities_and_stresses), compute_initial_state, None, None)
 
 
 ######
@@ -292,7 +294,20 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel,
         shape = Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule), 1
         return np.tile(materialModel.compute_initial_state(), shape)
 
-    return MechanicsFunctions(compute_strain_energy, jit(compute_updated_internal_variables), jit(compute_element_stiffnesses), jit(compute_output_energy_densities_and_stresses), compute_initial_state)
+    def lagrangian_qoi(U, gradU, Q, X, dt):
+        return materialModel.compute_material_qoi(gradU, Q, dt)
+
+    def integrated_material_qoi(U, stateVariables, dt=0.0):
+
+        return FunctionSpace.integrate_over_block(fs, U, stateVariables, dt, 
+                                                  lagrangian_qoi,
+                                                  slice(None),
+                                                  modify_element_gradient=modify_element_gradient)
+
+    def compute_output_material_qoi(U, stateVariables, dt=0.0):
+        return FunctionSpace.evaluate_on_block(fs, U, stateVariables, dt, lagrangian_qoi, slice(None), modify_element_gradient=modify_element_gradient)
+
+    return MechanicsFunctions(compute_strain_energy, jit(compute_updated_internal_variables), jit(compute_element_stiffnesses), jit(compute_output_energy_densities_and_stresses), compute_initial_state, integrated_material_qoi, jit(compute_output_material_qoi))
 
 
 def _compute_kinetic_energy(functionSpace, V, internals, density):
