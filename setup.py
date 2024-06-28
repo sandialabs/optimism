@@ -10,7 +10,8 @@ setuptools.setup(
                       'matplotlib', # this is not strictly necessary
                       'netcdf4',
                       'metis',
-                      'equinox'],
+                      'equinox',
+                      'jaxtyping'],
     #tests_require=[], # could put chex and pytest here
     extras_require={'sparse': ['scikit-sparse'],
                     'test': ['pytest', 'pytest-cov', 'pytest-xdist']},

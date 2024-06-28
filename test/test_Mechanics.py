@@ -41,7 +41,7 @@ class MechanicsFunctionsFixture(MeshFixture.MeshFixture):
     def test_internal_variables_initialization_on_multi_block(self):
         nQuadPoints = QuadratureRule.len(self.quadRule)
         internals = Mechanics._compute_initial_state_multi_block(self.fs, self.blockModels)
-        self.assertEqual(internals.shape, (Mesh.num_elements(self.mesh), nQuadPoints, 10))
+        self.assertEqual(internals.shape, (self.mesh.num_elements, nQuadPoints, 10))
         self.assertArrayEqual(internals[0, 0], np.zeros(J2Plastic.NUM_STATE_VARS))
         self.assertArrayEqual(internals[4, 0], np.array([0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]))
 

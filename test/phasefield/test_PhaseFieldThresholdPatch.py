@@ -61,7 +61,7 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
                                                                     "plane strain",
                                                                     materialModel)
 
-        self.nElements = Mesh.num_elements(self.mesh)
+        self.nElements = self.mesh.num_elements
         self.nQuadPtsPerElem = QuadratureRule.len(quadRule)
         self.stateVars = self.bvpFunctions.compute_initial_state()
 

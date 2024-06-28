@@ -81,7 +81,7 @@ class TestFunctionSpaceSingleQuadPointFixture(MeshFixture.MeshFixture):
         self.fs = FunctionSpace.construct_function_space(self.mesh,
                                                          self.quadratureRule)
 
-        nElements = Mesh.num_elements(self.mesh)
+        nElements = self.mesh.num_elements
         nQuadPoints = QuadratureRule.len(self.quadratureRule)
         self.state = np.zeros((nElements,nQuadPoints,1))
         self.dt = 0.0
@@ -89,13 +89,13 @@ class TestFunctionSpaceSingleQuadPointFixture(MeshFixture.MeshFixture):
 
     def test_element_volume_single_point_quadrature(self):
         elementVols = np.sum(self.fs.vols, axis=1)
-        nElements = Mesh.num_elements(self.mesh)
+        nElements = self.mesh.num_elements
         self.assertArrayNear(elementVols, np.ones(nElements)*0.5/((self.Nx-1)*(self.Ny-1)), 14)
 
 
     def test_linear_reproducing_single_point_quadrature(self):
         dispGrads = FunctionSpace.compute_field_gradient(self.fs, self.U)
-        nElements = Mesh.num_elements(self.mesh)
+        nElements = self.mesh.num_elements
         npts = self.quadratureRule.xigauss.shape[0]
         exact = np.tile(self.targetDispGrad, (nElements, npts, 1, 1))
         self.assertTrue(np.allclose(dispGrads, exact))
@@ -150,7 +150,7 @@ class TestFunctionSpaceMultiQuadPointFixture(MeshFixture.MeshFixture):
                                                       lambda x : self.targetDispGrad.dot(x))
         # function space
         self.fs = FunctionSpace.construct_function_space(self.mesh, self.quadratureRule)
-        nElements = Mesh.num_elements(self.mesh)
+        nElements = self.mesh.num_elements
         nQuadPoints = QuadratureRule.len(self.quadratureRule)
         self.state = np.zeros((nElements,nQuadPoints,))
         self.dt = 0.0
@@ -158,13 +158,13 @@ class TestFunctionSpaceMultiQuadPointFixture(MeshFixture.MeshFixture):
 
     def test_element_volume_multi_point_quadrature(self):
         elementVols = np.sum(self.fs.vols, axis=1)
-        nElements = Mesh.num_elements(self.mesh)
+        nElements = self.mesh.num_elements
         self.assertArrayNear(elementVols, np.ones(nElements)*0.5/((self.Nx-1)*(self.Ny-1)), 14)
 
 
     def test_linear_reproducing_multi_point_quadrature(self):
         dispGrads = FunctionSpace.compute_field_gradient(self.fs, self.U)
-        nElements = Mesh.num_elements(self.mesh)
+        nElements = self.mesh.num_elements
         npts = self.quadratureRule.xigauss.shape[0]
         exact = np.tile(self.targetDispGrad, (nElements, npts, 1, 1))
         self.assertTrue(np.allclose(dispGrads, exact))
@@ -203,7 +203,7 @@ class TestFunctionSpaceMultiQuadPointFixture(MeshFixture.MeshFixture):
 
 
     def test_integrate_over_half_block(self):
-        nElements = Mesh.num_elements(self.mesh)
+        nElements = self.mesh.num_elements
         # this test will only work with an even number of elements
         # put this in so that if test is modified to odd number,
         # we understand why it fails
@@ -220,7 +220,7 @@ class TestFunctionSpaceMultiQuadPointFixture(MeshFixture.MeshFixture):
 
 
     def test_integrate_over_half_block_indices(self):
-        nElements = Mesh.num_elements(self.mesh)
+        nElements = self.mesh.num_elements
         # this test will only work with an even number of elements
         # put this in so that if test is modified to odd number,
         # we understand why it fails
@@ -268,7 +268,7 @@ class ParameterizationTestSuite(MeshFixture.MeshFixture):
                                                       lambda x : np.array([0.0, x[0]]))
         # function space
         self.fs = FunctionSpace.construct_function_space(self.mesh, self.quadratureRule)
-        nElements = Mesh.num_elements(self.mesh)
+        nElements = self.mesh.num_elements
         nQuadPoints = QuadratureRule.len(self.quadratureRule)
         self.state = np.zeros((nElements,nQuadPoints,))
         self.dt = 0.0
@@ -278,7 +278,7 @@ class ParameterizationTestSuite(MeshFixture.MeshFixture):
             return np.average(v, axis=0)
 
         xc = jax.vmap(lambda conn, coords: centroid(coords[conn, :]), (0, None))(self.mesh.conns, self.mesh.coords)
-        weights = np.ones(Mesh.num_elements(self.mesh), dtype=np.float64)
+        weights = np.ones(self.mesh.num_elements, dtype=np.float64)
         weights = weights.at[xc[:,0] < self.xRange[1]/2].set(2.0)
         f = FunctionSpace.integrate_over_block(self.fs, self.U, self.state, self.dt, lambda u, dudx, q, x, dt, p: p, self.mesh.blocks['block'], weights)
         exact = 1.5*self.xRange[1]*self.yRange[1]
