@@ -36,19 +36,20 @@ class MechanicsFunctionsFixture(MeshFixture.MeshFixture):
         materialModel0 = Neohookean.create_material_model_functions(props)
         materialModel1 = J2Plastic.create_material_model_functions(props)
         self.blockModels = {'block0': materialModel0, 'block1': materialModel1}
+        self.mech_funcs = Mechanics.MechanicsFunctionsMultiBlock(self.fs, self.blockModels, Mechanics.plane_strain_gradient_transformation)
 
 
     def test_internal_variables_initialization_on_multi_block(self):
         nQuadPoints = QuadratureRule.len(self.quadRule)
-        internals = Mechanics._compute_initial_state_multi_block(self.fs, self.blockModels)
+        internals = self.mech_funcs.compute_initial_state()
         self.assertEqual(internals.shape, (self.mesh.num_elements, nQuadPoints, 10))
         self.assertArrayEqual(internals[0, 0], np.zeros(J2Plastic.NUM_STATE_VARS))
         self.assertArrayEqual(internals[4, 0], np.array([0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]))
 
     def test_internal_variables_update_on_multi_block(self):
-        internals = Mechanics._compute_initial_state_multi_block(self.fs, self.blockModels)
+        internals = self.mech_funcs.compute_initial_state()
         dt = 1.0
-        internalsNew = Mechanics._compute_updated_internal_variables_multi_block(self.fs, self.U, internals, dt, self.blockModels, Mechanics.plane_strain_gradient_transformation)
+        internalsNew = self.mech_funcs.compute_updated_internal_variables(self.U, internals, dt)
         self.assertEqual(internals.shape, internalsNew.shape)
         self.assertGreater(internalsNew[4,0,J2Plastic.EQPS], 0.05)
 
