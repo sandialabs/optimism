@@ -1,18 +1,27 @@
 from collections import namedtuple
+from jax.lax import switch
+from jaxtyping import Array, Float
+import equinox as eqx
+import jax.numpy as np
 import math
 import numpy as onp
 import scipy.special
 
-import jax.numpy as np
-from jax.lax import switch
 
-
-QuadratureRule = namedtuple('QuadratureRule', ['xigauss', 'wgauss'])
-QuadratureRule.__doc__ = """Quadrature rule points and weights.
+class QuadratureRule(eqx.Module):
+    """Quadrature rule points and weights.
     A ``namedtuple`` containing ``xigauss``, a numpy array of the
     coordinates of the sample points in the reference domain, and
     ``wgauss``, a numpy array with the weights.
     """
+    xigauss: Float[Array, "nq nd"]
+    wgauss: Float[Array, "nq"]
+
+    # TODO maybe there's a better way?
+    # TODO below is just so we don't have to change any tests for now
+    def __iter__(self):
+        yield self.xigauss
+        yield self.wgauss
 
 def len(quadRule):
     """Gets the number of points in a quadrature rule."""
@@ -37,7 +46,7 @@ def create_quadrature_rule_1D(degree):
 
     n = math.ceil((degree + 1)/2)
     xi, w = scipy.special.roots_sh_legendre(n)
-    return QuadratureRule(xi, w)
+    return QuadratureRule(np.array(xi), np.array(w))
 
 
 def eval_at_iso_points(xigauss, field):
@@ -186,7 +195,7 @@ def create_quadrature_rule_on_triangle(degree):
     else:
         raise ValueError("Quadrature of precision this high is not implemented.")
 
-    return QuadratureRule(xi, w)
+    return QuadratureRule(np.array(xi), np.array(w))
 
 
 def create_padded_quadrature_rule_1D(degree):
@@ -230,6 +239,7 @@ def _gauss_quad_1D_3pt(_):
     w  = np.array([ 0.5555555555555557,  0.8888888888888888,  0.5555555555555557,
                     0.,                  0.])
     return xi,w
+
 
 def _gauss_quad_1D_4pt(_):
     xi = np.array([-0.8611363115940526 , -0.33998104358485626,  0.33998104358485626,

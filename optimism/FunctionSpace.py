@@ -1,16 +1,16 @@
 from collections import namedtuple
-import numpy as onp
-
-import jax
-import jax.numpy as np
 from jax.scipy.linalg import solve
-
+from jaxtyping import Array, Float
 from optimism import Interpolants
 from optimism import Mesh
+from optimism import QuadratureRule
+import equinox as eqx
+import jax
+import jax.numpy as np
+import numpy as onp
 
 
-FunctionSpace = namedtuple('FunctionSpace', ['shapes', 'vols', 'shapeGrads', 'mesh', 'quadratureRule', 'isAxisymmetric'])
-FunctionSpace.__doc__ = \
+class FunctionSpace(eqx.Module):
     """Data needed for calculus on functions in the discrete function space.
 
     In describing the shape of the attributes, ``ne`` is the number of
@@ -32,8 +32,17 @@ FunctionSpace.__doc__ = \
         isAxisymmetric: boolean indicating if the function space data are
             axisymmetric.
     """
+    shapes: Float[Array, "ne nqpe npe"]
+    vols: Float[Array, "ne nqpe"]
+    shapeGrads: Float[Array, "ne nqpe npe nd"]
+    mesh: any
+    quadratureRule: QuadratureRule.QuadratureRule
+    isAxisymmetric: bool
 
-EssentialBC = namedtuple('EssentialBC', ['nodeSet', 'component'])
+
+class EssentialBC(eqx.Module):
+    nodeSet: str
+    component: int
 
 
 def construct_function_space(mesh, quadratureRule, mode2D='cartesian'):
@@ -354,9 +363,12 @@ def integrate_function_on_edges(functionSpace, func, U, quadRule, edges):
     return np.sum(integrate_on_edges(functionSpace, func, U, quadRule, edges))
 
 
+# TODO
+# getting some error when making this a child of eqx.Module
 class DofManager:
     def __init__(self, functionSpace, dim, EssentialBCs):
-        self.fieldShape = Mesh.num_nodes(functionSpace.mesh), dim
+        # self.fieldShape = Mesh.num_nodes(functionSpace.mesh), dim
+        self.fieldShape = functionSpace.mesh.num_nodes, dim
         self.isBc = onp.full(self.fieldShape, False, dtype=bool)
         for ebc in EssentialBCs:
             self.isBc[functionSpace.mesh.nodeSets[ebc.nodeSet], ebc.component] = True
