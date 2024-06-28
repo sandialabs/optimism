@@ -5,6 +5,7 @@ from optimism import Mechanics
 from optimism.EquationSolver import newton_solve
 from optimism import QuadratureRule
 from . import MeshFixture
+import equinox as eqx
 
 
 E = 1.0
@@ -38,7 +39,7 @@ class AxisymmPatchTest(MeshFixture.MeshFixture):
             Mechanics.create_mechanics_functions(self.fs,
                                                  "axisymmetric",
                                                  materialModel)
-        self.compute_energy = jit(mcxFuncs.compute_strain_energy)
+        self.compute_energy = eqx.filter_jit(mcxFuncs.compute_strain_energy)
         self.internals = mcxFuncs.compute_initial_state()
 
 
@@ -63,7 +64,7 @@ class AxisymmPatchTest(MeshFixture.MeshFixture):
         V = V.at[self.mesh.nodeSets['top'],1].set(self.targetDispGrad[1,1])
         Ubc = dofManager.get_bc_values(V)
         
-        @jit
+        @eqx.filter_jit
         def objective(Uu):
             U = dofManager.create_field(Uu, Ubc)
             return self.compute_energy(U, self.internals)
