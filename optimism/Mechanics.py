@@ -57,7 +57,7 @@ class MechanicsFunctions(eqx.Module):
         dgQuadPointRavel = dispGrads.reshape(dispGrads.shape[0]*dispGrads.shape[1],*dispGrads.shape[2:])
         stQuadPointRavel = state.reshape(state.shape[0]*state.shape[1],*state.shape[2:])
         statesNew = vmap(self.mat_model.compute_state_new, (0, 0, None))(dgQuadPointRavel, stQuadPointRavel, dt)
-        return statesNew.reshape(states.shape)
+        return statesNew.reshape(state.shape)
 
     @eqx.filter_jit
     def compute_output_material_qoi(self, U, state, dt=0.0):
@@ -80,35 +80,146 @@ class MechanicsFunctions(eqx.Module):
     # TODO there's probably some cleanup that can be done
     def _compute_element_stiffnesses(self, U, state, dt):
         f =  jax.vmap(self._compute_element_stiffness_from_global_fields,
-                (None, None, 0, None, 0, 0, 0, 0))
+                (None, None, 0, None, 0, 0, 0, 0, None))
 
                 # (None, None, 0, None, 0, 0, 0, 0, None, None))
         fs = self.fspace
-        return f(U, fs.mesh.coords, state, dt, fs.mesh.conns, fs.shapes, fs.shapeGrads, fs.vols)#,
+        return f(U, fs.mesh.coords, state, dt, fs.mesh.conns, fs.shapes, fs.shapeGrads, fs.vols, self.L)#,
                 # self.L, self.modify_element_gradient)
 
-    def _compute_element_stiffness_from_global_fields(self, U, coords, elInternals, dt, elConn, elShapes, elShapeGrads, elVols):#, lagrangian_density, modify_element_gradient):
+    def _compute_element_stiffness_from_global_fields(self, U, coords, elInternals, dt, elConn, elShapes, elShapeGrads, elVols, func):#, lagrangian_density, modify_element_gradient):
         elDisp = U[elConn,:]
         elCoords = coords[elConn,:]
         return self.element_hess_func(elDisp, elCoords, elInternals, dt, elShapes, elShapeGrads,
-                                elVols, self.L, self.modify_element_gradient)
+                                elVols, func, self.modify_element_gradient)
 
     def _lagrangian_qoi(self, U, gradU, Q, X, dt):
         return self.mat_model.compute_material_qoi(gradU, Q, dt)
 
 
 
-DynamicsFunctions = namedtuple('DynamicsFunctions',
-                               ['compute_algorithmic_energy',
-                                'compute_updated_internal_variables',
-                                'compute_element_hessians',
-                                'compute_output_energy_densities_and_stresses',
-                                'compute_output_kinetic_energy',
-                                'compute_output_strain_energy',
-                                'compute_initial_state',
-                                'compute_element_masses', # not used for time integration, provided for convenience (spectral analysis, eg)
-                                'predict',
-                                'correct'])
+# DynamicsFunctions = namedtuple('DynamicsFunctions',
+#                                ['compute_algorithmic_energy',
+#                                 'compute_updated_internal_variables',
+#                                 'compute_element_hessians',
+#                                 'compute_output_energy_densities_and_stresses',
+#                                 'compute_output_kinetic_energy',
+#                                 'compute_output_strain_energy',
+#                                 'compute_initial_state',
+#                                 'compute_element_masses', # not used for time integration, provided for convenience (spectral analysis, eg)
+#                                 'predict',
+#                                 'correct'])
+
+# TODO sprinkle in some filter_jits
+class DynamicsFunctions(MechanicsFunctions):
+    fspace: FunctionSpace.FunctionSpace
+    mat_model: any # TODO type this
+    modify_element_gradient: Callable
+    #
+    element_hess_func: Callable
+    L: Callable
+    output_constitutive: Callable
+    #
+    newmark_parameters: any # get type right
+
+    def __init__(
+        self, 
+        fspace, mat_model, modify_element_gradient, newmark_parameters,
+    ):
+        # super().__init__(fspace, mat_model, modify_element_gradient)
+        self.fspace = fspace
+        self.mat_model = mat_model
+        self.modify_element_gradient = modify_element_gradient
+        self.newmark_parameters = newmark_parameters
+        #
+        self.element_hess_func = hessian(FunctionSpace.integrate_element_from_local_field)
+        self.L = strain_energy_density_to_lagrangian_density(mat_model.compute_energy_density)
+        self.output_constitutive = jax.value_and_grad(self.L, 1)
+
+    # public methods
+    def compute_algorithmic_energy(self, U, UPredicted, stateVariables, dt):
+        return self.compute_newmark_lagrangian(U, UPredicted, stateVariables,
+                                          self.mat_model.density, dt, self.newmark_parameters.beta)
+    
+    def compute_element_hessians(self, U, UPredicted, stateVariables, dt):
+        return self._compute_newmark_element_hessians(
+            U, UPredicted, stateVariables, self.mat_model.density, dt, 
+            self.newmark_parameters.beta, self.mat_model.compute_energy_density, self.modify_element_gradient
+        )
+
+    def compute_element_masses(self):
+        V = np.zeros_like(self.fspace.mesh.coords)
+        stateVariables = np.zeros((self.fspace.mesh.num_elements, QuadratureRule.len(self.fspace.quadratureRule)))
+        return self._compute_element_masses(V, stateVariables, self.mat_model.density, self.modify_element_gradient)
+
+    def compute_newmark_lagrangian(self, U, UPredicted, internals, density, dt, newmarkBeta):
+        # We can't quite fuse these kernels because KE uses the velocity field and
+        # the strain energy uses the displacements. If profiling suggests fusing
+        # is beneficial, we could add the time derivative field to the Lagrangian
+        # density definition.
+
+        def lagrangian_density(W, gradW, Q, X, dtime):
+            return self._kinetic_energy_density(W, density)
+        KE =  FunctionSpace.integrate_over_block(self.fspace, U - UPredicted, internals, dt,
+                                                lagrangian_density, slice(None))
+        KE *= 1 / (newmarkBeta*dt**2)
+
+        lagrangian_density = strain_energy_density_to_lagrangian_density(self.mat_model.compute_energy_density)
+        SE = FunctionSpace.integrate_over_block(self.fspace, U, internals, dt, lagrangian_density,
+                                                slice(None), modify_element_gradient=self.modify_element_gradient)
+        return SE + KE
+
+    def compute_output_kinetic_energy(self, V):
+        stateVariables = np.zeros((self.fspace.mesh.num_elements, QuadratureRule.len(self.fspace.quadratureRule)))
+        return self._compute_kinetic_energy(V, stateVariables, self.mat_model.density)
+
+    def compute_output_potential_densities_and_stresses(self, U, stateVariables, dt):
+        return FunctionSpace.evaluate_on_block(self.fspace, U, stateVariables, dt, self.output_constitutive, slice(None), modify_element_gradient=self.modify_element_gradient)
+
+    def compute_output_strain_energy(self, U, stateVariables, dt):
+        return self.compute_strain_energy(U, stateVariables, dt)
+
+    # newmark methods
+    def correct(self, UCorrection, V, A, dt):
+        A = UCorrection/(self.newmark_parameters.beta*dt*dt)
+        V += dt*self.newmark_parameters.gamma*A
+        return V, A
+
+    def predict(self, U, V, A, dt):
+        U += dt*V + 0.5*dt*dt*(1.0 - 2.0*self.newmark_parameters.beta)*A
+        V += dt*(1.0 - self.newmark_parameters.gamma)*A
+        return U, V
+
+    # private methods
+    def _compute_kinetic_energy(self, V, internals, density):
+        def lagrangian_density(U, gradU, Q, X, dt):
+            return self._kinetic_energy_density(U, density)
+        unused = 0.0
+        return FunctionSpace.integrate_over_block(self.fspace, V, internals, unused, lagrangian_density, slice(None))
+
+    def _compute_element_masses(self, U, internals, density):
+        def lagrangian_density(V, gradV, Q, X, dt):
+            return self._kinetic_energy_density(V, density)
+        f = vmap(self._compute_element_stiffness_from_global_fields, (None, None, 0, None, 0 ,0 ,0 ,0, None))
+        fs = self.fspace
+        unusedDt = 0.0
+        return f(U, fs.mesh.coords, internals, unusedDt, fs.mesh.conns, fs.shapes, fs.shapeGrads,
+                fs.vols, lagrangian_density)
+
+    def _compute_newmark_element_hessians(self, U, UPredicted, internals, density, dt, newmarkBeta, strain_energy_density, modify_element_gradient):
+        def lagrangian_density(W, gradW, Q, X, dtime):
+            return self._kinetic_energy_density(W, density)/(newmarkBeta*dtime**2) + strain_energy_density(gradW, Q, dtime)
+        f =  vmap(self._compute_element_stiffness_from_global_fields,
+                (None, None, 0, None, 0, 0, 0, 0, None)
+        )
+        fs = self.fspace
+        UAlgorithmic = U - UPredicted
+        return f(UAlgorithmic, fs.mesh.coords, internals, dt, fs.mesh.conns, fs.shapes, fs.shapeGrads, fs.vols,
+                lagrangian_density)
+
+    def _kinetic_energy_density(self, V, density):
+        # assumes spatially homogeneous density
+        return 0.5*density*np.dot(V, V)
 
 NewmarkParameters = namedtuple('NewmarkParameters', ['gamma', 'beta'], defaults=[0.5, 0.25])
 
@@ -317,57 +428,6 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel,
     return MechanicsFunctions(functionSpace, materialModel, modify_element_gradient)
 
 
-def _compute_kinetic_energy(functionSpace, V, internals, density):
-    def lagrangian_density(U, gradU, Q, X, dt):
-        return kinetic_energy_density(U, density)
-    unused = 0.0
-    return FunctionSpace.integrate_over_block(functionSpace, V, internals, unused, lagrangian_density, slice(None))
-
-
-def _compute_element_masses(functionSpace, U, internals, density, modify_element_gradient):
-    def lagrangian_density(V, gradV, Q, X, dt):
-        return kinetic_energy_density(V, density)
-    f = vmap(compute_element_stiffness_from_global_fields, (None, None, 0, None, 0 ,0 ,0 ,0, None, None))
-    fs = functionSpace
-    unusedDt = 0.0
-    return f(U, fs.mesh.coords, internals, unusedDt, fs.mesh.conns, fs.shapes, fs.shapeGrads,
-             fs.vols, lagrangian_density, modify_element_gradient)
-
-
-def kinetic_energy_density(V, density):
-    # assumes spatially homogeneous density
-    return 0.5*density*np.dot(V, V)
-
-
-def compute_newmark_lagrangian(functionSpace, U, UPredicted, internals, density, dt, newmarkBeta, strain_energy_density, modify_element_gradient):
-    # We can't quite fuse these kernels because KE uses the velocity field and
-    # the strain energy uses the displacements. If profiling suggests fusing
-    # is beneficial, we could add the time derivative field to the Lagrangian
-    # density definition.
-
-    def lagrangian_density(W, gradW, Q, X, dtime):
-        return kinetic_energy_density(W, density)
-    KE =  FunctionSpace.integrate_over_block(functionSpace, U - UPredicted, internals, dt,
-                                             lagrangian_density, slice(None))
-    KE *= 1 / (newmarkBeta*dt**2)
-
-    lagrangian_density = strain_energy_density_to_lagrangian_density(strain_energy_density)
-    SE = FunctionSpace.integrate_over_block(functionSpace, U, internals, dt, lagrangian_density,
-                                            slice(None), modify_element_gradient=modify_element_gradient)
-    return SE + KE
-
-
-def _compute_newmark_element_hessians(functionSpace, U, UPredicted, internals, density, dt, newmarkBeta, strain_energy_density, modify_element_gradient):
-    def lagrangian_density(W, gradW, Q, X, dtime):
-        return kinetic_energy_density(W, density)/(newmarkBeta*dtime**2) + strain_energy_density(gradW, Q, dtime)
-    f =  vmap(compute_element_stiffness_from_global_fields,
-              (None, None, 0, None, 0, 0, 0, 0, None, None))
-    fs = functionSpace
-    UAlgorithmic = U - UPredicted
-    return f(UAlgorithmic, fs.mesh.coords, internals, dt, fs.mesh.conns, fs.shapes, fs.shapeGrads, fs.vols,
-             lagrangian_density, modify_element_gradient)
-
-
 def parse_2D_to_3D_gradient_transformation(mode2D):
     if mode2D == 'plane strain':
         grad_2D_to_3D = plane_strain_gradient_transformation
@@ -401,61 +461,9 @@ def create_dynamics_functions(functionSpace, mode2D, materialModel, newmarkParam
     modify_element_gradient = define_pressure_projection_gradient_tranformation(
         pressureProjectionDegree, modify_element_gradient)
 
-    def compute_algorithmic_energy(U, UPredicted, stateVariables, dt):
-        return compute_newmark_lagrangian(functionSpace, U, UPredicted, stateVariables,
-                                          materialModel.density, dt, newmarkParameters.beta,
-                                          materialModel.compute_energy_density,
-                                          modify_element_gradient)
-    
-    def compute_updated_internal_variables(U, stateVariables, dt):
-        return _compute_updated_internal_variables(fs, U, stateVariables, dt, materialModel.compute_state_new, modify_element_gradient)
-    
-    def compute_element_hessians(U, UPredicted, stateVariables, dt):
-        return _compute_newmark_element_hessians(
-            functionSpace, U, UPredicted, stateVariables, materialModel.density, dt, 
-            newmarkParameters.beta, materialModel.compute_energy_density, modify_element_gradient)
-
-    output_lagrangian = strain_energy_density_to_lagrangian_density(materialModel.compute_energy_density)
-    output_constitutive = value_and_grad(output_lagrangian, 1)
-    def compute_output_potential_densities_and_stresses(U, stateVariables, dt):
-        return FunctionSpace.evaluate_on_block(fs, U, stateVariables, dt, output_constitutive, slice(None), modify_element_gradient=modify_element_gradient)
-
-    def compute_kinetic_energy(V):
-        stateVariables = np.zeros((fs.mesh.num_elements, QuadratureRule.len(fs.quadratureRule)))
-        return _compute_kinetic_energy(functionSpace, V, stateVariables, materialModel.density)
-
-    def compute_output_strain_energy(U, stateVariables, dt):
-        return _compute_strain_energy(functionSpace, U, stateVariables, dt, materialModel.compute_energy_density, modify_element_gradient)
-
-    def compute_initial_state():
-        shape = fs.mesh.num_elements, QuadratureRule.len(fs.quadratureRule), 1
-        return np.tile(materialModel.compute_initial_state(), shape)
-
-    def compute_element_masses():
-        V = np.zeros_like(fs.mesh.coords)
-        stateVariables = np.zeros((fs.mesh.num_elements, QuadratureRule.len(fs.quadratureRule)))
-        return _compute_element_masses(functionSpace, V, stateVariables, materialModel.density, modify_element_gradient)
-
-    def predict(U, V, A, dt):
-        U += dt*V + 0.5*dt*dt*(1.0 - 2.0*newmarkParameters.beta)*A
-        V += dt*(1.0 - newmarkParameters.gamma)*A
-        return U, V
-
-    def correct(UCorrection, V, A, dt):
-        A = UCorrection/(newmarkParameters.beta*dt*dt)
-        V += dt*newmarkParameters.gamma*A
-        return V, A
-
-    return DynamicsFunctions(compute_algorithmic_energy,
-                             jit(compute_updated_internal_variables),
-                             jit(compute_element_hessians),
-                             jit(compute_output_potential_densities_and_stresses),
-                             jit(compute_kinetic_energy),
-                             jit(compute_output_strain_energy),
-                             compute_initial_state,
-                             jit(compute_element_masses),
-                             jit(predict),
-                             jit(correct))
+    return DynamicsFunctions(
+        functionSpace, materialModel, modify_element_gradient, newmarkParameters,
+    )
 
 
 def compute_traction_potential_energy(fs, U, quadRule, edges, load):
