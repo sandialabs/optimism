@@ -25,3 +25,5 @@ loads
 .coverage
 spack.lock
 .spack-env/
+*.npz
+*.vtk
