@@ -1,13 +1,12 @@
-import numpy as onp
-from optimism.JaxConfig import *
+from jaxtyping import Array, Float
 from optimism import Interpolants
+from optimism.JaxConfig import *
+from typing import Dict, Optional
+import equinox as eqx
+import numpy as onp
 
 
-Mesh = namedtuple('Mesh', ['coords','conns','simplexNodesOrdinals',
-                           'parentElement', 'parentElement1d', 'blocks',
-                           'nodeSets', 'sideSets'],
-                  defaults=(None,None,None))
-Mesh.__doc__ = \
+class Mesh(eqx.Module):
     """Triangle mesh representing a domain.
 
     Attributes:
@@ -26,6 +25,26 @@ Mesh.__doc__ = \
             number of the edge within that element. For example, triangle
             elements will have edge 0, 1, or 2 for this entry.
     """
+    coords: Float[Array, "nn nd"]
+    conns: Float[Array, "ne nnpe"]
+    simplexNodesOrdinals: Float[Array, "ne 3"]
+    # TODO finish out the typing below
+    parentElement: any
+    parentElement1d: any
+    blocks: Optional[Dict[str, Float]] = None
+    nodeSets: Optional[Dict[str, Float]] = None
+    sideSets: Optional[Dict[str, Float]] = None
+
+    def get_blocks(self, blockNames):
+        return tuple(mesh.blocks[name] for name in blockNames)
+
+    @property
+    def num_elements(self):
+        return self.conns.shape[0]
+
+    @property 
+    def num_nodes(self):
+        return self.coords.shape[0]
 
 
 def create_structured_mesh_data(Nx, Ny, xExtent, yExtent):
@@ -64,8 +83,8 @@ def construct_structured_mesh(Nx, Ny, xExtent, yExtent, elementOrder=1, useBubbl
     return mesh
 
 
-def get_blocks(mesh, blockNames):
-    return tuple(mesh.blocks[name] for name in blockNames)
+# def get_blocks(mesh, blockNames):
+#     return tuple(mesh.blocks[name] for name in blockNames)
 
     
 def combine_nodesets(set1, set2, nodeOffset):
@@ -109,15 +128,16 @@ def combine_blocks(set1, set2, elemOffset):
 def combine_mesh(m1, m2):
     # need to implement block combining
     
-    mesh1,disp1 = m1
-    mesh2,disp2 = m2
+    mesh1, disp1 = m1
+    mesh2, disp2 = m2
 
     # Only handle 2 linear element meshes
     assert mesh1.parentElement.degree == 1
     assert mesh2.parentElement.degree == 1
 
     numNodes1 = mesh1.coords.shape[0]
-    numElems1 = num_elements(mesh1)
+    # numElems1 = num_elements(mesh1)
+    numElems1 = mesh1.num_elements
 
     coords = np.concatenate((mesh1.coords, mesh2.coords), axis=0)
     conns = np.concatenate((mesh1.conns, mesh2.conns+numNodes1), axis=0)
@@ -217,7 +237,8 @@ def create_higher_order_mesh_from_simplex_mesh(mesh, order, useBubbleElement=Fal
     else:
         basis = Interpolants.make_parent_element_2d(order)
 
-    conns = np.zeros((num_elements(mesh), basis.coordinates.shape[0]), dtype=np.int_)
+    # conns = np.zeros((num_elements(mesh), basis.coordinates.shape[0]), dtype=np.int_)
+    conns = np.zeros((mesh.num_elements, basis.coordinates.shape[0]), dtype=np.int_)
 
     # step 1/3: vertex nodes
     conns = conns.at[:,basis.vertexNodes].set(mesh.conns)
@@ -298,8 +319,8 @@ def create_nodesets_from_sidesets(mesh):
     return nodeSets
 
 
-def num_elements(mesh):
-    return mesh.conns.shape[0]
+# def num_elements(mesh):
+#     return mesh.conns.shape[0]
 
 
 def num_nodes(mesh):
