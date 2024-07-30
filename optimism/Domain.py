@@ -91,6 +91,11 @@ class Problem(eqx.Module):
     Uu,_ = EqSolver.nonlinear_equation_solve(self.objective, Uu, p, self.eq_settings)
     return Uu, p
 
+  def setup(self):
+    Uu = self.domain.create_unknowns()
+    p = Objective.Params(0.0, self.domain.mech_funcs.compute_initial_state())
+    return Uu, p
+
 
 def plot_solution(domain, dispField, plotName, p):
   writer = VTKWriter.VTKWriter(domain.mesh, baseFileName=plotName)
