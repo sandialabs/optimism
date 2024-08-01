@@ -122,16 +122,16 @@ class MechanicsFunctionsMultiBlock(eqx.Module):
     def compute_element_stiffnesses(self, U, state, dt=0.0):
         fs, blockModels = self.fspace, self.mat_models
         # fs = functionSpace
-        nen = Interpolants.num_nodes(functionSpace.mesh.parentElement)
-        elementHessians = np.zeros((functionSpace.mesh.num_elements, nen, 2, nen, 2))
+        nen = Interpolants.num_nodes(fs.mesh.parentElement)
+        elementHessians = np.zeros((fs.mesh.num_elements, nen, 2, nen, 2))
 
         for blockKey in blockModels:
             materialModel = blockModels[blockKey]
             L = strain_energy_density_to_lagrangian_density(materialModel.compute_energy_density)
-            elemIds = functionSpace.mesh.blocks[blockKey]
+            elemIds = fs.mesh.blocks[blockKey]
             f =  vmap(self._compute_element_stiffness_from_global_fields,
-                    (None, None, 0, 0, 0, 0, 0, None))
-            blockHessians = f(U, fs.mesh.coords, stateVariables[elemIds], fs.mesh.conns[elemIds],
+                    (None, None, 0, None, 0, 0, 0, 0, None))
+            blockHessians = f(U, fs.mesh.coords, state[elemIds], dt, fs.mesh.conns[elemIds],
                             fs.shapes[elemIds], fs.shapeGrads[elemIds], fs.vols[elemIds],
                             L)
             elementHessians = elementHessians.at[elemIds].set(blockHessians)
@@ -421,7 +421,8 @@ def create_dynamics_functions(functionSpace, mode2D, materialModel, newmarkParam
     )
  
     
-def create_mechanics_functions(functionSpace, mode2D, materialModel, 
+# TODO remove this
+def create_mechanics_functions_old(functionSpace, mode2D, materialModel, 
                                pressureProjectionDegree=None):
     fs = functionSpace
 
@@ -444,13 +445,29 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel,
 
     return MechanicsFunctions(functionSpace, [materialModel], modify_element_gradient)
 
+# TODO deprecate this eventually after fixing tests and examples
+def create_mechanics_functions(functionSpace, mode2D, materialModel, pressureProjectionDegree=None):
+    # just make it a multi-block problem but make the name for the mat model
+    # the same name as the only block in the mesh
+    print(functionSpace.mesh.blocks)
+    print(functionSpace.mesh)
+    materialModels = {
+        list(functionSpace.mesh.blocks.keys())[0]: materialModel
+    }
+    return create_multi_block_mechanics_functions(
+        functionSpace, mode2D, materialModels, 
+        pressureProjectionDegree=pressureProjectionDegree
+    )
+
 
 def create_multi_block_mechanics_functions(functionSpace, mode2D, materialModels, pressureProjectionDegree=None):
     fs = functionSpace
 
     if mode2D == 'plane strain':
-         grad_2D_to_3D = plane_strain_gradient_transformation
+        grad_2D_to_3D = plane_strain_gradient_transformation
     elif mode2D == 'axisymmetric':
+        grad_2D_to_3D = axisymmetric_element_gradient_transformation
+    else:
         raise NotImplementedError
 
     modify_element_gradient = grad_2D_to_3D
@@ -464,6 +481,7 @@ def create_multi_block_mechanics_functions(functionSpace, mode2D, materialModels
             return grad_2D_to_3D(elemGrads, elemVols)
     
     return MechanicsFunctionsMultiBlock(functionSpace, materialModels, modify_element_gradient)
+
 
 # oddballs, where should y'all go?
 def compute_traction_potential_energy(fs, U, quadRule, edges, load):

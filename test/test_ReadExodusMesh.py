@@ -16,6 +16,8 @@ from optimism.EquationSolver import newton_solve
 from optimism import QuadratureRule
 from . import TestFixture
 from optimism import Mechanics
+from optimism.Domain import Domain
+from optimism import Objective
 
 haveNetCDF = 'netCDF4' in sys.modules
 skipMessage = 'netCDF4 not installed, exodus reader disabled'
@@ -101,14 +103,15 @@ class TestMeshReadPatchTest(TestFixture.TestFixture):
 
         self.E = 1.0
         self.nu = 0.3
-        props = {'elastic modulus': self.E,
-                 'poisson ratio': self.nu}
-        materialModel = MaterialModel.create_material_model_functions(props)
-
-        mechBvp = Mechanics.create_mechanics_functions(self.fs,
-                                                       "plane strain",
-                                                       materialModel)
-
+        props = {
+            'elastic modulus': self.E,
+            'poisson ratio': self.nu
+        }
+        self.materialModels = {
+            'left_half': MaterialModel.create_material_model_functions(props),
+            'right_half': MaterialModel.create_material_model_functions(props)
+        }
+        mechBvp = Mechanics.create_multi_block_mechanics_functions(self.fs, 'plane strain', self.materialModels)
         self.compute_strain_energy = mechBvp.compute_strain_energy
         self.internalVariables = mechBvp.compute_initial_state()
 
@@ -126,8 +129,9 @@ class TestMeshReadPatchTest(TestFixture.TestFixture):
 
         targetDispGrad = np.array([[0.1, -0.2],[0.4, -0.1]]) 
         U = self.mesh.coords@targetDispGrad.T
+        fieldDim = U.shape[1]
         
-        dofManager = FunctionSpace.DofManager(self.fs, dim=2, EssentialBCs=ebcs)
+        dofManager = FunctionSpace.DofManager(self.fs, fieldDim, ebcs)
             
         # Uu is U_unconstrained
         Ubc = dofManager.get_bc_values(U)
@@ -142,7 +146,7 @@ class TestMeshReadPatchTest(TestFixture.TestFixture):
         self.assertTrue(solverSuccess)
 
         U = dofManager.create_field(Uu, Ubc)
-           
+            
         dispGrads = FunctionSpace.compute_field_gradient(self.fs, U)
         ne, nqpe = self.fs.vols.shape
         for dg in dispGrads.reshape(ne*nqpe,2,2):
