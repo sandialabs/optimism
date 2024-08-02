@@ -268,10 +268,21 @@ class DynamicsFunctions(MechanicsFunctions):
                                           self.mat_models[0].density, dt, self.newmark_parameters.beta)
     
     def compute_element_hessians(self, U, UPredicted, stateVariables, dt):
-        return self._compute_newmark_element_hessians(
-            U, UPredicted, stateVariables, self.mat_models[0].density, dt, 
-            self.newmark_parameters.beta, self.mat_models[0].compute_energy_density, self.modify_element_gradient
-        )
+        fs, blockModels = self.fspace, self.mat_models
+        nen = Interpolants.num_nodes(fs.mesh.parentElement)
+        elementHessians = np.zeros((fs.mesh.num_elements, nen, 2, nen, 2))
+
+        for blockKey, blockModel in blockModels.items():
+            elemIds = fs.mesh.blocks[blockKey]
+            blockHessians = self._compute_newmark_element_hessians(
+                U, UPredicted, stateVariables, 
+                blockModel.density, dt, self.newmark_parameters.beta,
+                blockModel.compute_energy_density, self.modify_element_gradient,
+                elemIds
+            )
+            elementHessians = elementHessians.at[elemIds].set(blockHessians)
+
+        return elementHessians
 
     def compute_element_masses(self):
         V = np.zeros_like(self.fspace.mesh.coords)
@@ -301,7 +312,6 @@ class DynamicsFunctions(MechanicsFunctions):
         ke = 0.0
         for blockKey, blockModel in blockModels.items():
             elemIds = fs.mesh.blocks[blockKey]
-            materialModel = blockModels[blockKey]
             ke = ke + self._compute_kinetic_energy(V, stateVariables[elemIds], blockModel.density)
         return ke
 
@@ -338,7 +348,7 @@ class DynamicsFunctions(MechanicsFunctions):
         return f(U, fs.mesh.coords, internals, unusedDt, fs.mesh.conns, fs.shapes, fs.shapeGrads,
                 fs.vols, lagrangian_density)
 
-    def _compute_newmark_element_hessians(self, U, UPredicted, internals, density, dt, newmarkBeta, strain_energy_density, modify_element_gradient):
+    def _compute_newmark_element_hessians(self, U, UPredicted, internals, density, dt, newmarkBeta, strain_energy_density, modify_element_gradient, elemIds):
         def lagrangian_density(W, gradW, Q, X, dtime):
             return self._kinetic_energy_density(W, density)/(newmarkBeta*dtime**2) + strain_energy_density(gradW, Q, dtime)
         f =  vmap(self._compute_element_stiffness_from_global_fields,
@@ -346,8 +356,11 @@ class DynamicsFunctions(MechanicsFunctions):
         )
         fs = self.fspace
         UAlgorithmic = U - UPredicted
-        return f(UAlgorithmic, fs.mesh.coords, internals, dt, fs.mesh.conns, fs.shapes, fs.shapeGrads, fs.vols,
-                lagrangian_density)
+        return f(
+            UAlgorithmic, fs.mesh.coords, internals[elemIds], dt, 
+            fs.mesh.conns[elemIds], fs.shapes[elemIds], fs.shapeGrads[elemIds], fs.vols[elemIds],
+            lagrangian_density
+        )
 
     def _kinetic_energy_density(self, V, density):
         # assumes spatially homogeneous density
