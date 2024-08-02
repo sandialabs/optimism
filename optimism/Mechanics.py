@@ -11,95 +11,95 @@ import equinox as eqx
 import functools
 import jax
 
-# TODO add types to Callable's for improved autodocing
-# TODO once all the equinox stuff is hooked up reconsider jitting by default here
-class MechanicsFunctions(eqx.Module):
-    fspace: FunctionSpace.FunctionSpace
-    mat_models: List[any] # TODO type this
-    modify_element_gradient: Callable
-    element_hess_func: Callable
-    L: Callable
-    output_constitutive: Callable
+# # TODO add types to Callable's for improved autodocing
+# # TODO once all the equinox stuff is hooked up reconsider jitting by default here
+# class MechanicsFunctions(eqx.Module):
+#     fspace: FunctionSpace.FunctionSpace
+#     mat_models: List[any] # TODO type this
+#     modify_element_gradient: Callable
+#     element_hess_func: Callable
+#     L: Callable
+#     output_constitutive: Callable
 
-    def __init__(self, fspace, mat_models, modify_element_gradient):
-        self.fspace = fspace
-        self.mat_models = mat_models
-        self.modify_element_gradient = modify_element_gradient
-        self.element_hess_func = hessian(FunctionSpace.integrate_element_from_local_field)
-        self.L = strain_energy_density_to_lagrangian_density(mat_models[0].compute_energy_density)
-        self.output_constitutive = jax.value_and_grad(self.L, 1)
+#     def __init__(self, fspace, mat_models, modify_element_gradient):
+#         self.fspace = fspace
+#         self.mat_models = mat_models
+#         self.modify_element_gradient = modify_element_gradient
+#         self.element_hess_func = hessian(FunctionSpace.integrate_element_from_local_field)
+#         self.L = strain_energy_density_to_lagrangian_density(mat_models[0].compute_energy_density)
+#         self.output_constitutive = jax.value_and_grad(self.L, 1)
 
-    # public methods
-    @eqx.filter_jit
-    def compute_element_stiffnesses(self, U, state, dt=0.0):
-        return self._compute_element_stiffnesses(U, state, dt)
+#     # public methods
+#     @eqx.filter_jit
+#     def compute_element_stiffnesses(self, U, state, dt=0.0):
+#         return self._compute_element_stiffnesses(U, state, dt)
 
-    def compute_initial_state(self):
-        shape = self.fspace.mesh.num_elements, QuadratureRule.len(self.fspace.quadratureRule), 1
-        return np.tile(self.mat_models[0].compute_initial_state(), shape)
+#     def compute_initial_state(self):
+#         shape = self.fspace.mesh.num_elements, QuadratureRule.len(self.fspace.quadratureRule), 1
+#         return np.tile(self.mat_models[0].compute_initial_state(), shape)
 
-    @eqx.filter_jit
-    def compute_output_energy_densities_and_stresses(self, U, state, dt=0.0):
-        return FunctionSpace.evaluate_on_block(fs, U, state, dt, self.output_constitutive, slice(None), modify_element_gradient=modify_element_gradient)
+#     @eqx.filter_jit
+#     def compute_output_energy_densities_and_stresses(self, U, state, dt=0.0):
+#         return FunctionSpace.evaluate_on_block(fs, U, state, dt, self.output_constitutive, slice(None), modify_element_gradient=modify_element_gradient)
 
-    def compute_strain_energy(self, U, state, dt=0.0):
-        L = strain_energy_density_to_lagrangian_density(self.mat_models[0].compute_energy_density)
-        return FunctionSpace.integrate_over_block(
-            self.fspace, U, state, dt, L,
-            slice(None),
-            modify_element_gradient=self.modify_element_gradient
-        )
+#     def compute_strain_energy(self, U, state, dt=0.0):
+#         L = strain_energy_density_to_lagrangian_density(self.mat_models[0].compute_energy_density)
+#         return FunctionSpace.integrate_over_block(
+#             self.fspace, U, state, dt, L,
+#             slice(None),
+#             modify_element_gradient=self.modify_element_gradient
+#         )
 
-    @eqx.filter_jit
-    def compute_updated_internal_variables(self, U, state, dt=0.0):
-        dispGrads = FunctionSpace.compute_field_gradient(self.fspace, U, self.modify_element_gradient)
-        dgQuadPointRavel = dispGrads.reshape(dispGrads.shape[0]*dispGrads.shape[1],*dispGrads.shape[2:])
-        stQuadPointRavel = state.reshape(state.shape[0]*state.shape[1],*state.shape[2:])
-        statesNew = vmap(self.mat_models[0].compute_state_new, (0, 0, None))(dgQuadPointRavel, stQuadPointRavel, dt)
-        return statesNew.reshape(state.shape)
+#     @eqx.filter_jit
+#     def compute_updated_internal_variables(self, U, state, dt=0.0):
+#         dispGrads = FunctionSpace.compute_field_gradient(self.fspace, U, self.modify_element_gradient)
+#         dgQuadPointRavel = dispGrads.reshape(dispGrads.shape[0]*dispGrads.shape[1],*dispGrads.shape[2:])
+#         stQuadPointRavel = state.reshape(state.shape[0]*state.shape[1],*state.shape[2:])
+#         statesNew = vmap(self.mat_models[0].compute_state_new, (0, 0, None))(dgQuadPointRavel, stQuadPointRavel, dt)
+#         return statesNew.reshape(state.shape)
 
-    @eqx.filter_jit
-    def compute_output_material_qoi(self, U, state, dt=0.0):
-        return FunctionSpace.evaluate_on_block(
-            self.fspace, U, state, dt, 
-            self._lagrangian_qoi, 
-            slice(None), 
-            modify_element_gradient=self.modify_element_gradient
-        )
+#     @eqx.filter_jit
+#     def compute_output_material_qoi(self, U, state, dt=0.0):
+#         return FunctionSpace.evaluate_on_block(
+#             self.fspace, U, state, dt, 
+#             self._lagrangian_qoi, 
+#             slice(None), 
+#             modify_element_gradient=self.modify_element_gradient
+#         )
 
-    def integrated_material_qoi(self, U, state, dt=0.0):
-        return FunctionSpace.integrate_over_block(
-            self.fspace, U, state, dt, 
-            self._lagrangian_qoi,
-            slice(None),
-            modify_element_gradient=self.modify_element_gradient
-        )
+#     def integrated_material_qoi(self, U, state, dt=0.0):
+#         return FunctionSpace.integrate_over_block(
+#             self.fspace, U, state, dt, 
+#             self._lagrangian_qoi,
+#             slice(None),
+#             modify_element_gradient=self.modify_element_gradient
+#         )
 
-    # private methods
-    # TODO there's probably some cleanup that can be done
-    def _compute_element_stiffnesses(self, U, state, dt):
-        f =  jax.vmap(self._compute_element_stiffness_from_global_fields,
-                (None, None, 0, None, 0, 0, 0, 0, None))
+#     # private methods
+#     # TODO there's probably some cleanup that can be done
+#     def _compute_element_stiffnesses(self, U, state, dt):
+#         f =  jax.vmap(self._compute_element_stiffness_from_global_fields,
+#                 (None, None, 0, None, 0, 0, 0, 0, None))
 
-                # (None, None, 0, None, 0, 0, 0, 0, None, None))
-        fs = self.fspace
-        return f(U, fs.mesh.coords, state, dt, fs.mesh.conns, fs.shapes, fs.shapeGrads, fs.vols, self.L)#,
-                # self.L, self.modify_element_gradient)
+#                 # (None, None, 0, None, 0, 0, 0, 0, None, None))
+#         fs = self.fspace
+#         return f(U, fs.mesh.coords, state, dt, fs.mesh.conns, fs.shapes, fs.shapeGrads, fs.vols, self.L)#,
+#                 # self.L, self.modify_element_gradient)
 
-    def _compute_element_stiffness_from_global_fields(self, U, coords, elInternals, dt, elConn, elShapes, elShapeGrads, elVols, func):#, lagrangian_density, modify_element_gradient):
-        elDisp = U[elConn,:]
-        elCoords = coords[elConn,:]
-        return self.element_hess_func(elDisp, elCoords, elInternals, dt, elShapes, elShapeGrads,
-                                elVols, func, self.modify_element_gradient)
+#     def _compute_element_stiffness_from_global_fields(self, U, coords, elInternals, dt, elConn, elShapes, elShapeGrads, elVols, func):#, lagrangian_density, modify_element_gradient):
+#         elDisp = U[elConn,:]
+#         elCoords = coords[elConn,:]
+#         return self.element_hess_func(elDisp, elCoords, elInternals, dt, elShapes, elShapeGrads,
+#                                 elVols, func, self.modify_element_gradient)
 
-    def _lagrangian_qoi(self, U, gradU, Q, X, dt):
-        return self.mat_models[0].compute_material_qoi(gradU, Q, dt)
+#     def _lagrangian_qoi(self, U, gradU, Q, X, dt):
+#         return self.mat_models[0].compute_material_qoi(gradU, Q, dt)
 
 
 # TODO eventually deprecate this and make multi blocks the default
-class MechanicsFunctionsMultiBlock(eqx.Module):
+class MechanicsFunctions(eqx.Module):
     fspace: FunctionSpace.FunctionSpace
-    mat_models: List[any] # TODO type this
+    mat_models: any # TODO type this
     modify_element_gradient: Callable
     element_hess_func: Callable
     Ls: Dict[str, Callable]
@@ -241,25 +241,26 @@ class MechanicsFunctionsMultiBlock(eqx.Module):
 # TODO we can clean up some of those private methods below
 class DynamicsFunctions(MechanicsFunctions):
     fspace: FunctionSpace.FunctionSpace
-    mat_models: List[any] # TODO type this
+    mat_models: any # TODO type this
     modify_element_gradient: Callable
     element_hess_func: Callable
-    L: Callable
-    output_constitutive: Callable
+    Ls: Callable
+    output_constitutives: Callable
     newmark_parameters: any # get type right
 
     def __init__(
         self, 
         fspace, mat_models, modify_element_gradient, newmark_parameters,
     ):
-        self.fspace = fspace
-        self.mat_models = mat_models
-        self.modify_element_gradient = modify_element_gradient
+        super().__init__(fspace, mat_models, modify_element_gradient)
+        # self.fspace = fspace
+        # self.mat_models = mat_models
+        # self.modify_element_gradient = modify_element_gradient
         self.newmark_parameters = newmark_parameters
         #
-        self.element_hess_func = hessian(FunctionSpace.integrate_element_from_local_field)
-        self.L = strain_energy_density_to_lagrangian_density(mat_models[0].compute_energy_density)
-        self.output_constitutive = jax.value_and_grad(self.L, 1)
+        # self.element_hess_func = hessian(FunctionSpace.integrate_element_from_local_field)
+        # self.L = strain_energy_density_to_lagrangian_density(mat_models[0].compute_energy_density)
+        # self.output_constitutive = jax.value_and_grad(self.L, 1)
 
     # public methods
     def compute_algorithmic_energy(self, U, UPredicted, stateVariables, dt):
@@ -295,8 +296,14 @@ class DynamicsFunctions(MechanicsFunctions):
         return SE + KE
 
     def compute_output_kinetic_energy(self, V):
+        fs, blockModels = self.fspace, self.mat_models
         stateVariables = np.zeros((self.fspace.mesh.num_elements, QuadratureRule.len(self.fspace.quadratureRule)))
-        return self._compute_kinetic_energy(V, stateVariables, self.mat_models[0].density)
+        ke = 0.0
+        for blockKey, blockModel in blockModels.items():
+            elemIds = fs.mesh.blocks[blockKey]
+            materialModel = blockModels[blockKey]
+            ke = ke + self._compute_kinetic_energy(V, stateVariables[elemIds], blockModel.density)
+        return ke
 
     def compute_output_potential_densities_and_stresses(self, U, stateVariables, dt):
         return FunctionSpace.evaluate_on_block(self.fspace, U, stateVariables, dt, self.output_constitutive, slice(None), modify_element_gradient=self.modify_element_gradient)
@@ -409,15 +416,16 @@ def define_pressure_projection_gradient_tranformation(pressureProjectionDegree, 
 
 
 ###### constructors 
-def create_dynamics_functions(functionSpace, mode2D, materialModel, newmarkParameters, pressureProjectionDegree=None):
+def create_dynamics_functions(functionSpace, mode2D, materialModels, newmarkParameters, pressureProjectionDegree=None):
     fs = functionSpace
 
     modify_element_gradient = parse_2D_to_3D_gradient_transformation(mode2D)
     modify_element_gradient = define_pressure_projection_gradient_tranformation(
-        pressureProjectionDegree, modify_element_gradient)
+        pressureProjectionDegree, modify_element_gradient
+    )
 
     return DynamicsFunctions(
-        functionSpace, [materialModel], modify_element_gradient, newmarkParameters,
+        functionSpace, materialModels, modify_element_gradient, newmarkParameters,
     )
  
     
@@ -449,8 +457,6 @@ def create_mechanics_functions_old(functionSpace, mode2D, materialModel,
 def create_mechanics_functions(functionSpace, mode2D, materialModel, pressureProjectionDegree=None):
     # just make it a multi-block problem but make the name for the mat model
     # the same name as the only block in the mesh
-    print(functionSpace.mesh.blocks)
-    print(functionSpace.mesh)
     materialModels = {
         list(functionSpace.mesh.blocks.keys())[0]: materialModel
     }
@@ -463,12 +469,13 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel, pressurePro
 def create_multi_block_mechanics_functions(functionSpace, mode2D, materialModels, pressureProjectionDegree=None):
     fs = functionSpace
 
-    if mode2D == 'plane strain':
-        grad_2D_to_3D = plane_strain_gradient_transformation
-    elif mode2D == 'axisymmetric':
-        grad_2D_to_3D = axisymmetric_element_gradient_transformation
-    else:
-        raise NotImplementedError
+    # if mode2D == 'plane strain':
+    #     grad_2D_to_3D = plane_strain_gradient_transformation
+    # elif mode2D == 'axisymmetric':
+    #     grad_2D_to_3D = axisymmetric_element_gradient_transformation
+    # else:
+    #     raise NotImplementedError
+    grad_2D_to_3D = parse_2D_to_3D_gradient_transformation(mode2D)
 
     modify_element_gradient = grad_2D_to_3D
     if pressureProjectionDegree is not None:
@@ -480,7 +487,7 @@ def create_multi_block_mechanics_functions(functionSpace, mode2D, materialModels
             elemGrads = volume_average_J_gradient_transformation(elemGrads, elemVols, shapesJ)
             return grad_2D_to_3D(elemGrads, elemVols)
     
-    return MechanicsFunctionsMultiBlock(functionSpace, materialModels, modify_element_gradient)
+    return MechanicsFunctions(functionSpace, materialModels, modify_element_gradient)
 
 
 # oddballs, where should y'all go?
