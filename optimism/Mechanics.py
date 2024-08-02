@@ -253,20 +253,22 @@ class DynamicsFunctions(MechanicsFunctions):
         fspace, mat_models, modify_element_gradient, newmark_parameters,
     ):
         super().__init__(fspace, mat_models, modify_element_gradient)
-        # self.fspace = fspace
-        # self.mat_models = mat_models
-        # self.modify_element_gradient = modify_element_gradient
         self.newmark_parameters = newmark_parameters
-        #
-        # self.element_hess_func = hessian(FunctionSpace.integrate_element_from_local_field)
-        # self.L = strain_energy_density_to_lagrangian_density(mat_models[0].compute_energy_density)
-        # self.output_constitutive = jax.value_and_grad(self.L, 1)
 
     # public methods
     def compute_algorithmic_energy(self, U, UPredicted, stateVariables, dt):
-        return self.compute_newmark_lagrangian(U, UPredicted, stateVariables,
-                                          self.mat_models[0].density, dt, self.newmark_parameters.beta)
-    
+        # return self.compute_newmark_lagrangian(
+        #     U, UPredicted, stateVariables,
+        #     self.mat_models[0].density, dt, self.newmark_parameters.beta
+        # )
+        fs, blockModels = self.fspace, self.mat_models
+        L = 0.0
+        for blockKey, blockModel in blockModels.items():
+            elemIds = fs.mesh.blocks[blockKey]
+            L = L + self.compute_newmark_lagrangian(
+
+            )
+
     def compute_element_hessians(self, U, UPredicted, stateVariables, dt):
         fs, blockModels = self.fspace, self.mat_models
         nen = Interpolants.num_nodes(fs.mesh.parentElement)
@@ -297,13 +299,17 @@ class DynamicsFunctions(MechanicsFunctions):
 
         def lagrangian_density(W, gradW, Q, X, dtime):
             return self._kinetic_energy_density(W, density)
-        KE =  FunctionSpace.integrate_over_block(self.fspace, U - UPredicted, internals, dt,
-                                                lagrangian_density, slice(None))
+        KE = FunctionSpace.integrate_over_block(
+            self.fspace, U - UPredicted, internals, dt,
+            lagrangian_density, slice(None)
+        )
         KE *= 1 / (newmarkBeta*dt**2)
 
         lagrangian_density = strain_energy_density_to_lagrangian_density(self.mat_models[0].compute_energy_density)
-        SE = FunctionSpace.integrate_over_block(self.fspace, U, internals, dt, lagrangian_density,
-                                                slice(None), modify_element_gradient=self.modify_element_gradient)
+        SE = FunctionSpace.integrate_over_block(
+            self.fspace, U, internals, dt, lagrangian_density,
+            slice(None), modify_element_gradient=self.modify_element_gradient
+        )
         return SE + KE
 
     def compute_output_kinetic_energy(self, V):
@@ -333,6 +339,7 @@ class DynamicsFunctions(MechanicsFunctions):
         return U, V
 
     # private methods
+    # TODO this probably doesn't do the right thing for multiple blocks of differing materials
     def _compute_kinetic_energy(self, V, internals, density):
         def lagrangian_density(U, gradU, Q, X, dt):
             return self._kinetic_energy_density(U, density)
@@ -351,7 +358,7 @@ class DynamicsFunctions(MechanicsFunctions):
     def _compute_newmark_element_hessians(self, U, UPredicted, internals, density, dt, newmarkBeta, strain_energy_density, modify_element_gradient, elemIds):
         def lagrangian_density(W, gradW, Q, X, dtime):
             return self._kinetic_energy_density(W, density)/(newmarkBeta*dtime**2) + strain_energy_density(gradW, Q, dtime)
-        f =  vmap(self._compute_element_stiffness_from_global_fields,
+        f = vmap(self._compute_element_stiffness_from_global_fields,
                 (None, None, 0, None, 0, 0, 0, 0, None)
         )
         fs = self.fspace
