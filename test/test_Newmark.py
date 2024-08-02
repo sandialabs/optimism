@@ -252,14 +252,18 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
                  'density': 20.0}
         # density chosen to make kinetic energy and strain energy comparable
         # Want bugs in either to show up appreciably in error
-        materialModel = Neohookean.create_material_model_functions(props)
+        materialModels = {
+            'block': Neohookean.create_material_model_functions(props)
+        }
 
         newmarkParams = Mechanics.NewmarkParameters()
 
-        self.dynamics = Mechanics.create_dynamics_functions(self.fs, 'plane strain', materialModel, newmarkParams)
+        self.dynamics = Mechanics.create_dynamics_functions(self.fs, 'plane strain', materialModels, newmarkParams)
 
-        self.compute_stress = jax.jacfwd(materialModel.compute_energy_density)
-
+        # self.compute_stress = jax.jacfwd(materialModel.compute_energy_density)
+        self.compute_stresses = dict()
+        for blockKey, blockModel in materialModels.items():
+            self.compute_stresses[blockKey] = jax.jacfwd(blockModel.compute_energy_density)
 
     def test_patch_test(self):
         dt = 1.0
@@ -329,7 +333,7 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
                 dispGrad3D = np.zeros((3,3)).at[:2, :2].set(dispGrad)
                 q = np.array([0.0])
                 dt = 0.0
-                P = self.compute_stress(dispGrad3D, q, dt)[:2, :2]
+                P = self.compute_stresses['block'](dispGrad3D, q, dt)[:2, :2]
                 return np.dot(P, N)
             
             dt = t - p.time[1]
