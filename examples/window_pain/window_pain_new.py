@@ -1,8 +1,5 @@
-from optimism.material import Neohookean as MatModel
-from optimism.Domain import Domain, Problem
-from optimism.EquationSolver import get_settings
-from optimism.FunctionSpace import EssentialBC
-from optimism.ReadExodusMesh import read_exodus_mesh
+from optimism import *
+# from optimism.material import Neohookean as MatModel
 
 mesh = read_exodus_mesh('./geometry.g')
 
@@ -18,7 +15,9 @@ props = {
   'poisson ratio'  : 0.3,
   'version'        : 'coupled'
 }
-mat_model = MatModel.create_material_model_functions(props)
+mat_models = {
+  'block_1': Neohookean.create_material_model_functions(props)
+}
 
 eq_settings = get_settings(
   use_incremental_objective=False,
@@ -28,7 +27,7 @@ eq_settings = get_settings(
   tol=5e-8
 )
 
-domain = Domain(mesh, ebcs, mat_model, 'plane strain')
+domain = Domain(mesh, ebcs, mat_models, 'plane strain', disp_nset='nset_outer_top')
 problem = Problem(domain, eq_settings)
 
 # setup
@@ -39,6 +38,6 @@ disp = 0.0
 n_steps = 20
 ddisp = -0.2 / n_steps
 for n in range(n_steps):
-  print(f'Load step {n}')
+  print(f'Load step {n + 1}')
   disp += ddisp
-  Uu, p = problem.solve_load_step(Uu, p, n, disp)
+  Uu, p = problem.solve_load_step(Uu, p, n + 1, disp)
