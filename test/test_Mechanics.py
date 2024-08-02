@@ -36,7 +36,7 @@ class MechanicsFunctionsFixture(MeshFixture.MeshFixture):
         materialModel0 = Neohookean.create_material_model_functions(props)
         materialModel1 = J2Plastic.create_material_model_functions(props)
         self.blockModels = {'block0': materialModel0, 'block1': materialModel1}
-        self.mech_funcs = Mechanics.MechanicsFunctionsMultiBlock(self.fs, self.blockModels, Mechanics.plane_strain_gradient_transformation)
+        self.mech_funcs = Mechanics.MechanicsFunctions(self.fs, self.blockModels, Mechanics.plane_strain_gradient_transformation)
 
 
     def test_internal_variables_initialization_on_multi_block(self):
