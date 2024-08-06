@@ -4,6 +4,7 @@ from optimism.FunctionSpace import construct_function_space
 from optimism.Mechanics import MechanicsFunctions
 from optimism.Mechanics import create_multi_block_mechanics_functions
 from optimism.Mesh import Mesh
+from optimism.Objective import param_index_update
 from optimism.QuadratureRule import create_quadrature_rule_1D, create_quadrature_rule_on_triangle
 from typing import List, Optional
 import equinox as eqx
@@ -34,32 +35,47 @@ class Domain(eqx.Module):
     self.dof = DofManager(fspace, 2, ebcs)
 
   def assemble_sparse(self, Uu, p):
-    U = self.create_field(Uu, p)
+    U = self.update_field(Uu, p)
     state = p[1]
     element_stiffnesses = self.mech_funcs.compute_element_stiffnesses(U, state)
     fspace = self.mech_funcs.fspace
     return SparseMatrixAssembler.\
         assemble_sparse_stiffness_matrix(element_stiffnesses, fspace.mesh.conns, self.dof)
 
-  def create_field(self, Uu, p):
-    return self.dof.create_field(Uu, self.get_ubcs(p))
+  def create_field(self, Uu, Ubc):
+    return self.dof.create_field(Uu, Ubc)
 
   def create_unknowns(self):
     Uu = self.dof.get_unknown_values(np.zeros(self.mesh.coords.shape))
     return Uu
 
   def energy_function(self, Uu, p):
-    U = self.create_field(Uu, p)
+    U = self.update_field(Uu, p)
     state = p[1]
     return self.mech_funcs.compute_strain_energy(U, state)
 
-  # hardcoded for now TODO
+  def get_bc_values(self, U):
+    return self.dof.get_bc_values(U)
+
   def get_ubcs(self, p):
-    yLoc = p[0]
+    t = p[4] # use time
     V = np.zeros(self.mesh.coords.shape)
-    if self.disp_nset is not None:
-      index = (self.mesh.nodeSets[self.disp_nset], 1)
-      V = V.at[index].set(yLoc)
+    for bc in self.ebcs:
+      index = (self.mesh.nodeSets[bc.nodeSet], bc.component)
+      val = bc.func(t)
+      V = V.at[index].set(val)
     return self.dof.get_bc_values(V)
 
+  def get_unknown_values(self, U):
+    return self.dof.get_unknown_values(U)
 
+  def update_bcs(self, p):
+    return param_index_update(p, 0, self.get_ubcs(p))
+
+  def update_field(self, Uu, p):
+    Ubc = self.get_ubcs(p)
+    return self.create_field(Uu, Ubc)
+
+  def update_time(self, p, dt):
+    t = p[4]
+    return param_index_update(p, 4, t + dt)

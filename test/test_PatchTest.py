@@ -3,13 +3,15 @@ import equinox as eqx
 import jax
 import jax.numpy as np
 
+from optimism import Domain
 from optimism import FunctionSpace
 from optimism import Interpolants
 from optimism.material import LinearElastic as MatModel
 from optimism import Mesh
 from optimism import Mechanics
-from optimism.Timer import Timer
 from optimism.EquationSolver import newton_solve
+from optimism.Objective import Params
+from optimism.Timer import Timer
 from optimism import QuadratureRule
 from . import MeshFixture
 
@@ -110,7 +112,6 @@ class LinearPatchTestLinearElements(MeshFixture.MeshFixture):
                                    (modulus2*sigma[0, 0] + modulus1*sigma[1, 1])*self.mesh.coords[:,1]) )
         
         self.assertArrayNear(self.U, UExact, 14)
-
 
 
 class LinearPatchTestQuadraticElements(MeshFixture.MeshFixture):
@@ -265,5 +266,54 @@ class QuadraticPatchTestQuadraticElements(MeshFixture.MeshFixture):
         self.assertNear(np.linalg.norm(grad_func(Uu)), 0.0, 14)
         
         
+class LinearPatchTestLinearElementsNewAPI(MeshFixture.MeshFixture):
+    def setUp(self):
+        self.Nx = 7
+        self.Ny = 7
+        xRange = [0.,1.]
+        yRange = [0.,1.]
+        
+        self.targetDispGrad = np.array([[0.1, -0.2],[0.4, -0.1]]) 
+        
+        self.mesh, self.U = self.create_mesh_and_disp(self.Nx, self.Ny, xRange, yRange,
+                                                      lambda x : self.targetDispGrad.dot(x))
+
+    def test_dirichlet_patch_test(self):
+        ebcs = [
+            FunctionSpace.EssentialBC(nodeSet='all_boundary', component=0),
+            FunctionSpace.EssentialBC(nodeSet='all_boundary', component=1)
+        ]
+        mat_model = MatModel.create_material_model_functions(props)
+        domain = Domain(
+            self.mesh, ebcs, {'block': mat_model}, 'plane strain',
+            disp_nset='all_boundary', p_order=1, q_order=1
+        )
+        Ubc = domain.get_bc_values(self.U)
+        internals = domain.mech_funcs.compute_initial_state()
+
+        # Uu is U_unconstrained
+        def objective(Uu):
+            U = domain.create_field(Uu, Ubc)
+            return domain.mech_funcs.compute_strain_energy(U, internals)
+        
+        with Timer(name="NewtonSolve"):
+            Uu, solverSuccess = newton_solve(
+                eqx.filter_jit(objective),
+                domain.get_unknown_values(self.U)
+            )
+            self.assertTrue(solverSuccess)
+
+        self.U = domain.create_field(Uu, Ubc)
+            
+        dispGrads = FunctionSpace.compute_field_gradient(domain.mech_funcs.fspace, self.U)
+        ne, nqpe = domain.mech_funcs.fspace.vols.shape
+        for dg in dispGrads.reshape(ne*nqpe,2,2):
+            self.assertArrayNear(dg, self.targetDispGrad, 14)
+
+        grad_func = eqx.filter_jit(jax.grad(objective))
+        Uu = domain.get_unknown_values(self.U)
+        self.assertNear(np.linalg.norm(grad_func(Uu)), 0.0, 14)
+
+
 if __name__ == '__main__':
     unittest.main()
