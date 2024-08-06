@@ -4,6 +4,7 @@ from jaxtyping import Array, Float
 from optimism import Interpolants
 from optimism import Mesh
 from optimism import QuadratureRule
+from typing import Callable, Optional
 import equinox as eqx
 import jax
 import jax.numpy as np
@@ -43,6 +44,23 @@ class FunctionSpace(eqx.Module):
 class EssentialBC(eqx.Module):
     nodeSet: str
     component: int
+    func: Callable
+    markForWarmStart: bool
+
+    def __init__(
+        self, 
+        nodeSet: int, component: int, 
+        func: Optional[Callable] = None,
+        markForWarmStart: Optional[bool] = False
+    ) -> None:
+        self.nodeSet = nodeSet
+        self.component = component
+        if func is None:
+            func = lambda t: 0.0
+            markForWarmStart = False
+
+        self.func = func
+        self.markForWarmStart = markForWarmStart
 
 
 def construct_function_space(mesh, quadratureRule, mode2D='cartesian'):

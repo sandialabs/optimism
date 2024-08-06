@@ -1,13 +1,15 @@
 from optimism import *
 # from optimism.material import Neohookean as MatModel
+# import jax
+# jax.config.update("jax_debug_nans", True)
 
 mesh = read_exodus_mesh('./geometry.g')
-
+disp_func = lambda t: -0.2 * t
 ebcs = [
   EssentialBC(nodeSet='nset_outer_bottom', component=0),
   EssentialBC(nodeSet='nset_outer_bottom', component=1),
   EssentialBC(nodeSet='nset_outer_top', component=0),
-  EssentialBC(nodeSet='nset_outer_top', component=1)
+  EssentialBC(nodeSet='nset_outer_top', component=1, func=disp_func)
 ]
 
 props = {
@@ -34,10 +36,10 @@ problem = Problem(domain, eq_settings)
 Uu, p = problem.setup()
 
 # iterate over load steps
-disp = 0.0
-n_steps = 20
-ddisp = -0.2 / n_steps
+n_steps = 30
+dt = 1.0 / n_steps
 for n in range(n_steps):
   print(f'Load step {n + 1}')
-  disp += ddisp
-  Uu, p = problem.solve_load_step(Uu, p, n + 1, disp)
+  p = problem.update_time(p, dt)
+  p = problem.domain.update_bcs(p)
+  Uu, p = problem.solve_load_step(Uu, p, n + 1, useWarmStart=False)
