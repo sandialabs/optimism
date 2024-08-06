@@ -28,7 +28,19 @@ def read_exodus_mesh(fileName):
         return Mesh.Mesh(coords, conns, simplexNodesOrdinals, basis, basis1d,
                          blocks, nodeSets, sideSets)
         
-        
+
+def read_exodus_mesh_element_properties(fileName, varNames, blockNum=1):
+    varValues = []
+    with netCDF4.Dataset(fileName) as exData:
+        blockNames = _read_names_list(exData, 'eb_names')
+        if len(blockNames) > 1:
+            raise ValueError('Only single blocks are supported currently')
+
+        for name in varNames:
+            varValues.append(_read_block_variable_values(exData, blockNum - 1, name))
+
+    return np.hstack(varValues)
+
 def _read_coordinates(exodusDataset):
     nNodes = len(exodusDataset.dimensions['num_nodes'])
     nDims = len(exodusDataset.dimensions['num_dim'])
@@ -75,6 +87,13 @@ def _read_blocks(exodusDataset):
 
     conns = np.vstack(blockConns)
     return conns, blocks
+
+
+def _read_block_variable_values(exodusDataset, blockOrdinal, variableName):
+    key = variableName + str(blockOrdinal + 1)
+    record = exodusDataset.variables[key]
+    record.set_auto_mask(False)
+    return np.array(record[:])
 
 
 def _read_node_sets(exodusDataset):
