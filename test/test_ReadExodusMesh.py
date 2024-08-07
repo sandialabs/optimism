@@ -150,5 +150,19 @@ class TestMeshReadPatchTest(TestFixture.TestFixture):
         self.assertNear(np.linalg.norm(grad_func(Uu)), 0.0, 14)
 
 
+class TestMeshReadPropertiesTest(TestFixture.TestFixture):
+    def setUp(self):
+        self.props = ReadExodusMesh.read_exodus_mesh_element_properties(
+            pathlib.Path(__file__).parent.joinpath('read_material_property_test.exo'),
+            ['bulk', 'shear'], blockNum=1
+        )
+
+    def test_property_mins_and_maxs(self):
+        self.assertAlmostEqual(np.min(self.props, axis=0)[0], 0.26575326, 8)
+        self.assertAlmostEqual(np.min(self.props, axis=0)[1], 2.3917793, 8)
+        self.assertAlmostEqual(np.max(self.props, axis=0)[0], 1.38727616, 8)
+        self.assertAlmostEqual(np.max(self.props, axis=0)[1], 12.48548545, 8)
+
+
 if __name__ == '__main__':
     unittest.main()
