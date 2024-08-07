@@ -1,5 +1,6 @@
 from optimism.JaxConfig import *
 from optimism.SparseCholesky import SparseCholesky
+import equinox as eqx
 import numpy as onp
 from scipy.sparse import diags as sparse_diags
 from scipy.sparse import csc_matrix
@@ -84,7 +85,8 @@ class Objective:
         
         self.p = p
         
-        self.objective=jit(f)
+        # self.objective=jit(f)
+        self.objective = eqx.filter_jit(f)
         self.grad_x = jit(grad(f,0))
         self.grad_p = jit(grad(f,1))
         

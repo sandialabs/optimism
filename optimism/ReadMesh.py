@@ -21,7 +21,9 @@ def read_json_mesh(meshFileName):
         sides = np.array(exodusSideSets[key][1], dtype=int)
         sideSets[key] = np.column_stack((elements, sides))
 
-    blocks=None
+    blocks = {
+        'block_1': np.arange(connectivity.shape[0])
+    }
         
     return Mesh.construct_mesh_from_basic_data(coordinates, connectivity,
                                                blocks, nodeSets, sideSets)

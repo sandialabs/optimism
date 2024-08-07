@@ -1,15 +1,17 @@
 import unittest
-
+import equinox as eqx
 import jax
 import jax.numpy as np
 
+from optimism import Domain
 from optimism import FunctionSpace
 from optimism import Interpolants
 from optimism.material import LinearElastic as MatModel
 from optimism import Mesh
 from optimism import Mechanics
-from optimism.Timer import Timer
 from optimism.EquationSolver import newton_solve
+from optimism.Objective import Params
+from optimism.Timer import Timer
 from optimism import QuadratureRule
 from . import MeshFixture
 
@@ -45,7 +47,7 @@ class LinearPatchTestLinearElements(MeshFixture.MeshFixture):
             Mechanics.create_mechanics_functions(self.fs,
                                                  "plane strain",
                                                  materialModel)
-        self.compute_energy = jax.jit(mcxFuncs.compute_strain_energy)
+        self.compute_energy = eqx.filter_jit(mcxFuncs.compute_strain_energy)
         self.internals = mcxFuncs.compute_initial_state()
 
         
@@ -56,7 +58,7 @@ class LinearPatchTestLinearElements(MeshFixture.MeshFixture):
         Ubc = dofManager.get_bc_values(self.U)
         
         # Uu is U_unconstrained
-        @jax.jit
+        @eqx.filter_jit
         def objective(Uu):
             U = dofManager.create_field(Uu, Ubc)
             return self.compute_energy(U, self.internals)
@@ -72,7 +74,7 @@ class LinearPatchTestLinearElements(MeshFixture.MeshFixture):
         for dg in dispGrads.reshape(ne*nqpe,2,2):
             self.assertArrayNear(dg, self.targetDispGrad, 14)
 
-        grad_func = jax.jit(jax.grad(objective))
+        grad_func = eqx.filter_jit(jax.grad(objective))
         Uu = dofManager.get_unknown_values(self.U)
         self.assertNear(np.linalg.norm(grad_func(Uu)), 0.0, 14)
 
@@ -89,7 +91,7 @@ class LinearPatchTestLinearElements(MeshFixture.MeshFixture):
         traction_func = lambda x, n: np.dot(sigma, n)     
         quadRule = QuadratureRule.create_quadrature_rule_1D(degree=2)
         
-        @jax.jit
+        @eqx.filter_jit
         def objective(Uu):
             U = dofManager.create_field(Uu, Ubc)
             internalPotential = self.compute_energy(U, self.internals)
@@ -110,7 +112,6 @@ class LinearPatchTestLinearElements(MeshFixture.MeshFixture):
                                    (modulus2*sigma[0, 0] + modulus1*sigma[1, 1])*self.mesh.coords[:,1]) )
         
         self.assertArrayNear(self.U, UExact, 14)
-
 
 
 class LinearPatchTestQuadraticElements(MeshFixture.MeshFixture):
@@ -139,7 +140,7 @@ class LinearPatchTestQuadraticElements(MeshFixture.MeshFixture):
                                                  "plane strain",
                                                  materialModel)
 
-        self.compute_energy = jax.jit(mcxFuncs.compute_strain_energy)
+        self.compute_energy = eqx.filter_jit(mcxFuncs.compute_strain_energy)
         self.internals = mcxFuncs.compute_initial_state()
 
     
@@ -149,7 +150,7 @@ class LinearPatchTestQuadraticElements(MeshFixture.MeshFixture):
         dofManager = FunctionSpace.DofManager(self.fs, self.UTarget.shape[1], ebcs)
         Ubc = dofManager.get_bc_values(self.UTarget)
         
-        @jax.jit
+        @eqx.filter_jit
         def objective(Uu):
             U = dofManager.create_field(Uu, Ubc)
             return self.compute_energy(U, self.internals)
@@ -183,7 +184,7 @@ class LinearPatchTestQuadraticElements(MeshFixture.MeshFixture):
             elemGrads = Mechanics.volume_average_J_gradient_transformation(elemGrads, elemVols, shapesForJ)
             return Mechanics.plane_strain_gradient_transformation(elemGrads, elemShapes, elemVols, elemNodalDisps, elemNodalCoords)
 
-        @jax.jit
+        @eqx.filter_jit
         def objective(Uu):
             U = dofManager.create_field(Uu, Ubc)
             return self.compute_energy(U, self.internals)
@@ -199,7 +200,7 @@ class LinearPatchTestQuadraticElements(MeshFixture.MeshFixture):
         for dg in dispGrads.reshape(ne*nqpe,*dispGrads.shape[2:]):
             self.assertArrayNear(dg[:2,:2], self.targetDispGrad, 14)
 
-        grad_func = jax.jit(jax.grad(objective))
+        grad_func = eqx.filter_jit(jax.grad(objective))
         Uu = dofManager.get_unknown_values(U)
         self.assertNear(np.linalg.norm(grad_func(Uu)), 0.0, 14)
 
@@ -234,7 +235,7 @@ class QuadraticPatchTestQuadraticElements(MeshFixture.MeshFixture):
 
         mcxFuncs = Mechanics.create_mechanics_functions(self.fs, "plane strain", materialModel)
 
-        self.compute_energy = jax.jit(mcxFuncs.compute_strain_energy)
+        self.compute_energy = eqx.filter_jit(mcxFuncs.compute_strain_energy)
         self.internals = mcxFuncs.compute_initial_state()
 
     def test_dirichlet_patch_test_with_quadratic_elements(self):
@@ -265,5 +266,54 @@ class QuadraticPatchTestQuadraticElements(MeshFixture.MeshFixture):
         self.assertNear(np.linalg.norm(grad_func(Uu)), 0.0, 14)
         
         
+class LinearPatchTestLinearElementsNewAPI(MeshFixture.MeshFixture):
+    def setUp(self):
+        self.Nx = 7
+        self.Ny = 7
+        xRange = [0.,1.]
+        yRange = [0.,1.]
+        
+        self.targetDispGrad = np.array([[0.1, -0.2],[0.4, -0.1]]) 
+        
+        self.mesh, self.U = self.create_mesh_and_disp(self.Nx, self.Ny, xRange, yRange,
+                                                      lambda x : self.targetDispGrad.dot(x))
+
+    def test_dirichlet_patch_test(self):
+        ebcs = [
+            FunctionSpace.EssentialBC(nodeSet='all_boundary', component=0),
+            FunctionSpace.EssentialBC(nodeSet='all_boundary', component=1)
+        ]
+        mat_model = MatModel.create_material_model_functions(props)
+        domain = Domain(
+            self.mesh, ebcs, {'block': mat_model}, 'plane strain',
+            disp_nset='all_boundary', p_order=1, q_order=1
+        )
+        Ubc = domain.get_bc_values(self.U)
+        internals = domain.mech_funcs.compute_initial_state()
+
+        # Uu is U_unconstrained
+        def objective(Uu):
+            U = domain.create_field(Uu, Ubc)
+            return domain.mech_funcs.compute_strain_energy(U, internals)
+        
+        with Timer(name="NewtonSolve"):
+            Uu, solverSuccess = newton_solve(
+                eqx.filter_jit(objective),
+                domain.get_unknown_values(self.U)
+            )
+            self.assertTrue(solverSuccess)
+
+        self.U = domain.create_field(Uu, Ubc)
+            
+        dispGrads = FunctionSpace.compute_field_gradient(domain.mech_funcs.fspace, self.U)
+        ne, nqpe = domain.mech_funcs.fspace.vols.shape
+        for dg in dispGrads.reshape(ne*nqpe,2,2):
+            self.assertArrayNear(dg, self.targetDispGrad, 14)
+
+        grad_func = eqx.filter_jit(jax.grad(objective))
+        Uu = domain.get_unknown_values(self.U)
+        self.assertNear(np.linalg.norm(grad_func(Uu)), 0.0, 14)
+
+
 if __name__ == '__main__':
     unittest.main()
