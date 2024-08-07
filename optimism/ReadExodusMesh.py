@@ -1,8 +1,8 @@
-import netCDF4
-
 from optimism.JaxConfig import *
 from optimism import Mesh
 from optimism import Interpolants
+import netCDF4
+import numpy as onp
 
 exodusToNativeTri6NodeOrder = np.array([0, 3, 1, 5, 4, 2])
 
@@ -39,7 +39,8 @@ def read_exodus_mesh_element_properties(fileName, varNames, blockNum=1):
         for name in varNames:
             varValues.append(_read_block_variable_values(exData, blockNum - 1, name))
 
-    return np.hstack(varValues)
+    return np.vstack(varValues).T
+
 
 def _read_coordinates(exodusDataset):
     nNodes = len(exodusDataset.dimensions['num_nodes'])
@@ -90,7 +91,29 @@ def _read_blocks(exodusDataset):
 
 
 def _read_block_variable_values(exodusDataset, blockOrdinal, variableName):
-    key = variableName + str(blockOrdinal + 1)
+    # read element variables currently on mesh
+    record = exodusDataset.variables['name_elem_var']
+    record.set_auto_mask(False)
+
+    propNamesInMesh = []
+    for n in range(record.shape[0]):
+        propNamesInMesh.append(''.join(onp.char.decode(record[n, :])))
+
+    # make sure the requested variable is there
+    try:
+        idx = propNamesInMesh.index(variableName)
+    except:
+        string = f'Requested variable {variableName} not found on mesh.\n'
+        string += 'Available variables are:\n'
+        for name in propNamesInMesh:
+            string += f'  {name}\n'
+        print(string)
+        raise KeyError(string)
+
+    # get the name correct
+    key = f'vals_elem_var{idx + 1}eb{blockOrdinal + 1}'
+
+    # finally read the variable
     record = exodusDataset.variables[key]
     record.set_auto_mask(False)
     return np.array(record[:])
