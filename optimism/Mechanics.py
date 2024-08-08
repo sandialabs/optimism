@@ -109,7 +109,7 @@ def _compute_strain_energy_multi_block(functionSpace, UField, stateField, dt, bl
 
 
 # TODO add props
-def _compute_updated_internal_variables(functionSpace, U, states, dt, compute_state_new, modify_element_gradient):
+def _compute_updated_internal_variables(functionSpace, U, states, props, dt, compute_state_new, modify_element_gradient):
     dispGrads = FunctionSpace.compute_field_gradient(functionSpace, U, modify_element_gradient)
     dgQuadPointRavel = dispGrads.reshape(dispGrads.shape[0]*dispGrads.shape[1],*dispGrads.shape[2:])
     stQuadPointRavel = states.reshape(states.shape[0]*states.shape[1],*states.shape[2:])
@@ -281,8 +281,8 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel,
 
         
     # TODO add props
-    def compute_updated_internal_variables(U, stateVariables, dt=0.0):
-        return _compute_updated_internal_variables(fs, U, stateVariables, dt, materialModel.compute_state_new, modify_element_gradient)
+    def compute_updated_internal_variables(U, stateVariables, props, dt=0.0):
+        return _compute_updated_internal_variables(fs, U, stateVariables, props, dt, materialModel.compute_state_new, modify_element_gradient)
 
     
     def compute_element_stiffnesses(U, stateVariables, props, dt=0.0):
