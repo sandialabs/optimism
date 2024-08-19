@@ -11,15 +11,14 @@ PROPS_KAPPA  = 3
 PROPS_LAMBDA = 4
 
 
-def create_material_model_functions(properties):
+def create_material_model_functions(version = 'adagio'):
     
     energy_density = _adagio_neohookean
     #energy_density = _neohookean_3D_energy_density
-    if 'version' in properties:
-        if properties['version'] == 'adagio':
-            energy_density = _adagio_neohookean
-        elif properties['version'] == 'coupled':
-            energy_density = _neohookean_3D_energy_density
+    if version == 'adagio':
+        energy_density = _adagio_neohookean
+    elif version == 'coupled':
+        energy_density = _neohookean_3D_energy_density
 
     # TODO add props as input after internalVars
     def strain_energy(dispGrad, internalVars, props, dt):
@@ -33,7 +32,7 @@ def create_material_model_functions(properties):
         props = _make_properties(props[0], props[1])
         return _compute_state_new(dispGrad, internalVars, props)
 
-    density = properties.get('density')
+    density = 1.0 # properties.get('density')
 
     return MaterialModel(compute_energy_density = strain_energy,
                          compute_initial_state = make_initial_state,

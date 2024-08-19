@@ -184,6 +184,13 @@ def interpolate_to_points(functionSpace, nodalField):
     return jax.vmap(interpolate_to_element_points, (None, 0, 0))(nodalField, functionSpace.shapes, functionSpace.mesh.conns)
 
 
+def vmapPropValue(propArray):
+    numAxes = len(propArray.shape)
+    if numAxes > 1:
+        return 0
+    else:
+        return None
+
 def integrate_over_block(functionSpace, U, stateVars, props, dt, func, block,
                          *params, modify_element_gradient=default_modify_element_gradient):
     """Integrates a density function over a block of the mesh.
@@ -240,7 +247,8 @@ def evaluate_on_block(functionSpace, U, stateVars, props, dt, func, block,
       density functional ``func`` at every quadrature point in the block.
     """
     fs = functionSpace
-    compute_elem_values = jax.vmap(evaluate_on_element, (None, None, 0, None, None, 0, 0, 0, 0, None, None, *tuple(0 for p in params)))
+    
+    compute_elem_values = jax.vmap(evaluate_on_element, (None, None, 0, vmapPropValue(props), None, 0, 0, 0, 0, None, None, *tuple(0 for p in params)))
     
     blockValues = compute_elem_values(U, fs.mesh.coords, stateVars[block], props, dt, fs.shapes[block],
                                       fs.shapeGrads[block], fs.vols[block],
@@ -330,7 +338,7 @@ def evaluate_on_element(U, coords, elemStates, props, dt, elemShapes, elemShapeG
     elemVals = interpolate_to_element_points(U, elemShapes, elemConn)
     elemGrads = compute_element_field_gradient(U, coords, elemShapes, elemShapeGrads, elemVols, elemConn, modify_element_gradient)
     elemXs = interpolate_to_element_points(coords, elemShapes, elemConn)
-    vmapArgs = 0, 0, 0, None, 0, None, *tuple(None for p in params)
+    vmapArgs = 0, 0, 0, vmapPropValue(props), 0, None, *tuple(None for p in params)
     fVals = jax.vmap(kernelFunc, vmapArgs)(elemVals, elemGrads, elemStates, props, elemXs, dt, *params)
     return fVals
 
