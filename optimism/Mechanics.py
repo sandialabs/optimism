@@ -126,12 +126,15 @@ def _compute_strain_energy_multi_block(functionSpace, UField, stateField, dt, bl
 
 # TODO fix this, props wrong size
 def _compute_updated_internal_variables(functionSpace, U, states, props, dt, compute_state_new, modify_element_gradient):
-#    dispGrads = FunctionSpace.compute_field_gradient(functionSpace, U, modify_element_gradient)
-#    dgQuadPointRavel = dispGrads.reshape(dispGrads.shape[0]*dispGrads.shape[1],*dispGrads.shape[2:])
-#    stQuadPointRavel = states.reshape(states.shape[0]*states.shape[1],*states.shape[2:])
-#    statesNew = vmap(compute_state_new, (0, 0, vmapPropValue(props), None))(dgQuadPointRavel, stQuadPointRavel, props, dt)
-#    return statesNew.reshape(states.shape)
-    return states
+   dispGrads = FunctionSpace.compute_field_gradient(functionSpace, U, modify_element_gradient)
+   dgQuadPointRavel = dispGrads.reshape(dispGrads.shape[0]*dispGrads.shape[1],*dispGrads.shape[2:])
+   stQuadPointRavel = states.reshape(states.shape[0]*states.shape[1],*states.shape[2:])
+   props_edited = np.transpose(props)
+   props_edited_a = np.repeat(props_edited,3,axis=1)
+   props_edited_b = np.reshape(props_edited_a,(np.shape(props)[1],np.shape(props)[0],3))
+   statesNew = vmap(compute_state_new, (0, 0, vmapPropValue(props), None))(dgQuadPointRavel, stQuadPointRavel, props_edited_b, dt)
+   return statesNew.reshape(states.shape)
+    # return states
 
 # TODO add props
 def _compute_updated_internal_variables_multi_block(functionSpace, U, states, dt, blockModels, modify_element_gradient):

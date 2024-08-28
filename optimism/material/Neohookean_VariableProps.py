@@ -10,6 +10,22 @@ PROPS_MU     = 2
 PROPS_KAPPA  = 3
 PROPS_LAMBDA = 4
 
+constProps = {'Ec': 1.059, # MPa
+              'K': 0.01, # cm^2/(mW*s)
+              'b': 5.248, # unitless
+              'p_gel': 0.12, # unitless
+              'Ed': 3.321, 
+              'Er': 18959, 
+              'R': 8.314, 
+              'g1': 109603, # unitless
+              'g2': 722.2, # unitless
+              'xi': 3.73,# unitless
+              'C1': 61000, # unitless
+              'C2': 511.792, # K
+              'rmTemp': 100, # C
+              'tau': 0.001, # s
+              'NU': 0.48 # Poisson's ratio
+              }
 
 def create_material_model_functions(version = 'adagio'):
     
@@ -23,7 +39,7 @@ def create_material_model_functions(version = 'adagio'):
     # TODO add props as input after internalVars
     def strain_energy(dispGrad, internalVars, props, dt):
         del dt
-        props = _make_properties(props[0], props[1])
+        props = _make_properties(props)
         return energy_density(dispGrad, internalVars, props)
 
     # TODO add props as input
@@ -40,7 +56,11 @@ def create_material_model_functions(version = 'adagio'):
                          density = density)
 
 
-def _make_properties(E, nu):
+
+def _make_properties(props):
+    p = 1 - np.exp(-constProps['K']*props[0])
+    E = (constProps['Ec'] * np.exp(constProps['b'] * (p - constProps['p_gel']))) + constProps['Ed']
+    nu = props[1]
     mu = 0.5*E/(1.0 + nu)
     kappa = E / 3.0 / (1.0 - 2.0*nu)
     lamda = E*nu/(1 + nu)/(1 - 2*nu)
