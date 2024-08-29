@@ -10,6 +10,14 @@ PROPS_MU     = 2
 PROPS_KAPPA  = 3
 PROPS_LAMBDA = 4
 
+# constant props
+CONST_PROPS_EC = 0
+
+# a dict is fine for now, but we'll eventually want to 
+# move this into a np.array
+# dicts are slower to index then arrays which
+# for small things might not seem like a big slowdown
+# but can add up when the the thing is called millions of times
 constProps = {'Ec': 1.059, # MPa
               'K': 0.01, # cm^2/(mW*s)
               'b': 5.248, # unitless
@@ -45,7 +53,8 @@ def create_material_model_functions(version = 'adagio'):
     # TODO add props as input
     def compute_state_new(dispGrad, internalVars, props, dt):
         del dt
-        props = _make_properties(props[0], props[1])
+        # props = _make_properties(props[0], props[1])
+        props = _make_properties(props)
         return _compute_state_new(dispGrad, internalVars, props)
 
     density = 1.0 # properties.get('density')
@@ -60,6 +69,8 @@ def create_material_model_functions(version = 'adagio'):
 def _make_properties(props):
     p = 1 - np.exp(-constProps['K']*props[0])
     E = (constProps['Ec'] * np.exp(constProps['b'] * (p - constProps['p_gel']))) + constProps['Ed']
+    # we also want Poisson's ratio to be a "constant prop"
+    # otherwise that's additional "dead" properties Ryan has to deal with
     nu = props[1]
     mu = 0.5*E/(1.0 + nu)
     kappa = E / 3.0 / (1.0 - 2.0*nu)

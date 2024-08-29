@@ -7,6 +7,7 @@ from optimism import Mesh
 from optimism.TensorMath import tensor_2D_to_3D
 from optimism import QuadratureRule
 from optimism import Interpolants
+import jax
 
 MechanicsFunctions = namedtuple('MechanicsFunctions',
                                 ['compute_strain_energy',
@@ -74,12 +75,45 @@ def compute_element_stiffness_from_global_fields(U, coords, elInternals, props, 
                              elVols, lagrangian_density, modify_element_gradient)
 
 
+# TODO once we map thingst o equinox classes, make these methods bound to the class
+# TODO use jax.lax.cond below to make this jit safe
+# aprently this is unjittable
 def vmapPropValue(propArray):
     numAxes = len(propArray.shape)
     if numAxes > 1:
         return 0
     else:
         return None
+    # return 0
+    # jit safe
+    # return jax.lax.cond(numAxes > 1, lambda _: (0,), lambda _: (None,), numAxes) # do I need the numAxes on the end?
+
+
+def fixed_props_to_element_props(props, num_el):
+    num_axes = len(props.shape)
+    # below is not jittable either
+    # new_props = jax.lax.cond(
+    #     num_axes > 1, 
+    #     lambda x: (x,),
+    #     lambda x: (np.repeat(x.reshape((-1, 1)), num_el, axis=1),),
+    #     props
+    # )
+    if num_axes > 1:
+        new_props = props
+    else:
+        new_props = np.repeat(props.reshape((-1, 1)), num_el, axis=1)
+    return new_props
+
+
+def tile_props(props, n_el, n_q):
+    num_axes = len(props.shape)
+    if num_axes > 1:
+        tile_axes = (1, n_q, 1)
+        new_props = np.tile(props, tile_axes)
+        new_props = new_props.reshape((new_props.shape[0] * new_props.shape[1], new_props.shape[2]))
+    else:
+        new_props = props
+    return new_props
 
 # Note this is for the case where properties are constant across a block
 def _compute_element_stiffnesses(U, internals, props, dt, functionSpace, compute_energy_density, modify_element_gradient):
@@ -126,14 +160,29 @@ def _compute_strain_energy_multi_block(functionSpace, UField, stateField, dt, bl
 
 # TODO fix this, props wrong size
 def _compute_updated_internal_variables(functionSpace, U, states, props, dt, compute_state_new, modify_element_gradient):
-   dispGrads = FunctionSpace.compute_field_gradient(functionSpace, U, modify_element_gradient)
-   dgQuadPointRavel = dispGrads.reshape(dispGrads.shape[0]*dispGrads.shape[1],*dispGrads.shape[2:])
-   stQuadPointRavel = states.reshape(states.shape[0]*states.shape[1],*states.shape[2:])
-   props_edited = np.transpose(props)
-   props_edited_a = np.repeat(props_edited,3,axis=1)
-   props_edited_b = np.reshape(props_edited_a,(np.shape(props)[1],np.shape(props)[0],3))
-   statesNew = vmap(compute_state_new, (0, 0, vmapPropValue(props), None))(dgQuadPointRavel, stQuadPointRavel, props_edited_b, dt)
-   return statesNew.reshape(states.shape)
+    # U -> (n_nodes, n_dims) -> Nodal field
+    # state -> (n_els, n_quadrature_points, n_states) -> Quadrature field
+    dispGrads = FunctionSpace.compute_field_gradient(functionSpace, U, modify_element_gradient)
+    # dispGrads -> (n_els, n_quadrature_points, n_dims, n_dims) -> Quadrature field
+    dgQuadPointRavel = dispGrads.reshape(dispGrads.shape[0]*dispGrads.shape[1],*dispGrads.shape[2:])
+    # dgQuadPointRavel -> (n_els * n_quadrature_points, n_dims, n_dims) -> Quadrature field
+    stQuadPointRavel = states.reshape(states.shape[0]*states.shape[1],*states.shape[2:])
+    # new stuff below
+    # really what we need to do is switch on whether props are already element based
+    # so we have to check the sizes to see if it's (np,) which would be the case of
+    # fixed properties for elements in teh block or (ne, np) which is the case for
+    # element bound properties. Then based on this we either have 
+    # repeat (np,) to be (ne, np) or do nothing and then
+    # repeat so things are (ne, nq, np) then flatten to be (ne * nq, np)
+    prop_vmap_axes = vmapPropValue(props) # -> 0 - vmap over all quadrature points for properties or None - don't vmap over quadrature points for properties
+    new_props = tile_props(props, dispGrads.shape[0], dispGrads.shape[1]) # -> (n_els * n_quadrature_pts, n_props) or (n_props,)
+    statesNew = vmap(compute_state_new, (0, 0, prop_vmap_axes, None))(dgQuadPointRavel, stQuadPointRavel, new_props, dt)
+    # what lucas did below
+    #    props_edited = np.transpose(props)
+    #    props_edited_a = np.repeat(props_edited,3,axis=1)
+    #    props_edited_b = np.reshape(props_edited_a,(np.shape(props)[1],np.shape(props)[0],3))
+    #    statesNew = vmap(compute_state_new, (0, 0, vmapPropValue(props), None))(dgQuadPointRavel, stQuadPointRavel, props_edited_b, dt)
+    return statesNew.reshape(states.shape)
     # return states
 
 # TODO add props
