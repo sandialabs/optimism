@@ -43,7 +43,7 @@ class Problem(eqx.Module):
     return Uu, p
 
   # TODO could probably have a better name
-  def setup(self):
+  def initialize_solution(self):
     Uu = self.domain.create_unknowns()
     p = Objective.Params(
       bc_data=np.zeros((np.sum(self.domain.dof.isBc),)),
