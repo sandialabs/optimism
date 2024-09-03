@@ -85,7 +85,6 @@ class Objective:
         
         self.p = p
         
-        # self.objective=jit(f)
         self.objective = eqx.filter_jit(f)
         self.grad_x = jit(grad(f,0))
         self.grad_p = jit(grad(f,1))
