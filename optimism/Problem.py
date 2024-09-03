@@ -57,7 +57,7 @@ class Problem(eqx.Module):
   # state variables, element quantities, etc.
   # Should probably make a post-processor class
   # that is abstract but has derivable ones for e.g. exodus, vtk, etc.
-  def plot_solution(self, Uu, p, plotBaseName, stepNum):
+  def write_solution_to_vtk(self, Uu, p, plotBaseName, stepNum):
     # dispField = self.domain.create_field(Uu, p)
     dispField = self.domain.update_field(Uu, p)
     plotName = f'{plotBaseName}-{str(stepNum).zfill(6)}'
