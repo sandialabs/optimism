@@ -14,10 +14,6 @@ class Problem(eqx.Module):
   def __init__(self, domain, eq_settings):
     self.domain = domain
     Uu = domain.create_unknowns()
-    # p = Objective.Params(
-    #   0.0, 
-    #   domain.mech_funcs.compute_initial_state()
-    # )
     p = Objective.Params(
       bc_data=np.zeros((np.sum(self.domain.dof.isBc),)),
       state_data=domain.mech_funcs.compute_initial_state(),
