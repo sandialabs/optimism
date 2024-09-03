@@ -198,6 +198,7 @@ class DynamicsFunctions(MechanicsFunctions):
 
         return elementHessians
 
+    @eqx.filter_jit
     def compute_element_masses(self):
         V = np.zeros_like(self.fspace.mesh.coords)
         stateVariables = np.zeros((
