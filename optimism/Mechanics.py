@@ -36,7 +36,6 @@ class MechanicsFunctions(eqx.Module):
     @eqx.filter_jit
     def compute_element_stiffnesses(self, U, state, dt=0.0):
         fs, blockModels = self.fspace, self.mat_models
-        # fs = functionSpace
         nen = Interpolants.num_nodes(fs.mesh.parentElement)
         elementHessians = np.zeros((fs.mesh.num_elements, nen, 2, nen, 2))
 
