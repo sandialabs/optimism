@@ -248,6 +248,7 @@ class DynamicsFunctions(MechanicsFunctions):
             ke = ke + self._compute_kinetic_energy(V, stateVariables[elemIds], blockModel.density)
         return ke
 
+    @eqx.filter_jit
     def compute_output_potential_densities_and_stresses(self, U, stateVariables, dt):
         return FunctionSpace.evaluate_on_block(self.fspace, U, stateVariables, dt, self.output_constitutive, slice(None), modify_element_gradient=self.modify_element_gradient)
 
