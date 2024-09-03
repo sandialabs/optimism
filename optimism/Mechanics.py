@@ -181,6 +181,7 @@ class DynamicsFunctions(MechanicsFunctions):
             )
         return L
 
+    @eqx.filter_jit
     def compute_element_hessians(self, U, UPredicted, stateVariables, dt):
         fs, blockModels = self.fspace, self.mat_models
         nen = Interpolants.num_nodes(fs.mesh.parentElement)
