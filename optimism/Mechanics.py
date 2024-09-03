@@ -251,6 +251,7 @@ class DynamicsFunctions(MechanicsFunctions):
     def compute_output_potential_densities_and_stresses(self, U, stateVariables, dt):
         return FunctionSpace.evaluate_on_block(self.fspace, U, stateVariables, dt, self.output_constitutive, slice(None), modify_element_gradient=self.modify_element_gradient)
 
+    @eqx.filter_jit
     def compute_output_strain_energy(self, U, stateVariables, dt):
         return self.compute_strain_energy(U, stateVariables, dt)
 
