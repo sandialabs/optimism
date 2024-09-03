@@ -239,6 +239,7 @@ class DynamicsFunctions(MechanicsFunctions):
         )
         return SE + KE
 
+    @eqx.filter_jit
     def compute_output_kinetic_energy(self, V):
         fs, blockModels = self.fspace, self.mat_models
         stateVariables = np.zeros((self.fspace.mesh.num_elements, QuadratureRule.len(self.fspace.quadratureRule)))
