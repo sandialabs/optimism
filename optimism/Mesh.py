@@ -237,7 +237,6 @@ def create_higher_order_mesh_from_simplex_mesh(mesh, order, useBubbleElement=Fal
     else:
         basis = Interpolants.make_parent_element_2d(order)
 
-    # conns = np.zeros((num_elements(mesh), basis.coordinates.shape[0]), dtype=np.int_)
     conns = np.zeros((mesh.num_elements, basis.coordinates.shape[0]), dtype=np.int_)
 
     # step 1/3: vertex nodes
