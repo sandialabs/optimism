@@ -1,5 +1,5 @@
 import unittest
-
+import equinox as eqx
 import jax
 import jax.numpy as np
 
@@ -43,7 +43,7 @@ class TractionPatch(MeshFixture.MeshFixture):
         mcxFuncs = Mechanics.create_mechanics_functions(
             self.fs, "plane strain", materialModel)
 
-        self.compute_energy = jax.jit(mcxFuncs.compute_strain_energy)
+        self.compute_energy = eqx.filter_jit(mcxFuncs.compute_strain_energy)
         self.internals = mcxFuncs.compute_initial_state()
         
         dummyInternals = materialModel.compute_initial_state()
@@ -80,7 +80,7 @@ class TractionPatch(MeshFixture.MeshFixture):
         for dg in dispGrads.reshape(ne*nqpe,2,2):
             self.assertArrayNear(dg, self.targetDispGrad, 14)
 
-        grad_func = jax.jit(jax.grad(objective))
+        grad_func = eqx.filter_jit(jax.grad(objective))
         Uu = dofManager.get_unknown_values(U)
         self.assertNear(np.linalg.norm(grad_func(Uu)), 0.0, 14)
 

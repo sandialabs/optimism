@@ -13,3 +13,10 @@ config.update("jax_platforms", "cpu")
 #config.update("jax_disable_jit", True)
 
 del config
+
+from .material import *
+from .Domain import Domain
+from .EquationSolver import get_settings
+from .FunctionSpace import EssentialBC
+from .Problem import Problem
+from .ReadExodusMesh import read_exodus_mesh

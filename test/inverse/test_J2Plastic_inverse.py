@@ -180,7 +180,7 @@ class J2GlobalMeshUpdateGradsFixture(MeshFixture):
         update_internal_variables_derivs = jax.jacfwd(update_internal_vars_test, (0,1))
         dc_du, dc_dc_n = update_internal_variables_derivs(Uu, self.ivs_prev)
 
-        nElems = Mesh.num_elements(self.mesh)
+        nElems = self.mesh.num_elements
         nQpsPerElem = QuadratureRule.len(self.quadRule)
         nIntVars = 10
         nFreeDofs = Uu.shape[0]
@@ -204,11 +204,11 @@ class J2GlobalMeshUpdateGradsFixture(MeshFixture):
         U = self.dofManager.create_field(self.Uu, self.Ubc)
         dc_du, dc_dc_n = update_internal_variables_derivs(U, self.ivs_prev)
 
-        nElems = Mesh.num_elements(self.mesh)
+        nElems = self.mesh.num_elements
         nQpsPerElem = QuadratureRule.len(self.quadRule)
         nIntVars = 10
         nDims = 2
-        nNodes = Mesh.num_nodes(self.mesh)
+        nNodes = self.mesh.num_nodes
 
         self.assertEqual(dc_du.shape, (nElems,nQpsPerElem,nIntVars,nNodes,nDims))
         self.assertEqual(dc_dc_n.shape, (nElems,nQpsPerElem,nIntVars,nElems,nQpsPerElem,nIntVars))
@@ -251,7 +251,7 @@ class J2GlobalMeshUpdateGradsFixture(MeshFixture):
         U = self.dofManager.create_field(self.Uu, self.Ubc)
         dc_dc_n = ivsUpdateInverseFuncs.ivs_update_jac_ivs_prev(U, self.ivs_prev)
 
-        nElems = Mesh.num_elements(self.mesh)
+        nElems = self.mesh.num_elements
         nQpsPerElem = QuadratureRule.len(self.quadRule)
         nIntVars = 10
 
