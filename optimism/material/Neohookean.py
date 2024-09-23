@@ -23,12 +23,12 @@ def create_material_model_functions(properties):
             energy_density = _neohookean_3D_energy_density
 
     # TODO add props as input after internalVars
-    def strain_energy(dispGrad, internalVars, dt):
+    def strain_energy(dispGrad, internalVars, props, dt):
         del dt
         return energy_density(dispGrad, internalVars, props)
 
     # TODO add props as input
-    def compute_state_new(dispGrad, internalVars, dt):
+    def compute_state_new(dispGrad, internalVars, props, dt):
         del dt
         return _compute_state_new(dispGrad, internalVars, props)
 

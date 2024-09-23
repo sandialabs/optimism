@@ -12,28 +12,59 @@ PROPS_LAMBDA = 4
 
 # constant props
 CONST_PROPS_EC = 0
+CONST_PROPS_K = 1
+CONST_PROPS_B = 2
+CONST_PROPS_PGEL = 3
+CONST_PROPS_ED = 4
+CONST_PROPS_ER = 5
+CONST_PROPS_R = 6
+CONST_PROPS_G1 = 7
+CONST_PROPS_G2 = 8
+CONST_PROPS_XI = 9
+CONST_PROPS_C1 = 10
+CONST_PROPS_C2 = 11
+CONST_PROPS_RMTEMP = 12
+CONST_PROPS_TAU = 13
+CONST_PROPS_NU = 14
 
 # a dict is fine for now, but we'll eventually want to 
 # move this into a np.array
 # dicts are slower to index then arrays which
 # for small things might not seem like a big slowdown
 # but can add up when the the thing is called millions of times
-constProps = {'Ec': 1.059, # MPa
-              'K': 0.01, # cm^2/(mW*s)
-              'b': 5.248, # unitless
-              'p_gel': 0.12, # unitless
-              'Ed': 3.321, 
-              'Er': 18959, 
-              'R': 8.314, 
-              'g1': 109603, # unitless
-              'g2': 722.2, # unitless
-              'xi': 3.73,# unitless
-              'C1': 61000, # unitless
-              'C2': 511.792, # K
-              'rmTemp': 100, # C
-              'tau': 0.001, # s
-              'NU': 0.48 # Poisson's ratio
-              }
+
+constProps = [1.059, # MPa
+              0.01, # cm^2/(mW*s)
+              5.248, # unitless
+              0.12, # unitless
+              3.321, 
+              18959, 
+              8.314, 
+              109603, # unitless
+              722.2, # unitless
+              3.73,# unitless
+              61000, # unitless
+              511.792, # K
+              100, # C
+              0.001, # s
+              0.48 # Poisson's ratio
+              ]
+# constProps = {'Ec': 1.059, # MPa
+#               'K': 0.01, # cm^2/(mW*s)
+#               'b': 5.248, # unitless
+#               'p_gel': 0.12, # unitless
+#               'Ed': 3.321, 
+#               'Er': 18959, 
+#               'R': 8.314, 
+#               'g1': 109603, # unitless
+#               'g2': 722.2, # unitless
+#               'xi': 3.73,# unitless
+#               'C1': 61000, # unitless
+#               'C2': 511.792, # K
+#               'rmTemp': 100, # C
+#               'tau': 0.001, # s
+#               'NU': 0.48 # Poisson's ratio
+#               }
 
 def create_material_model_functions(version = 'adagio'):
     
@@ -67,11 +98,11 @@ def create_material_model_functions(version = 'adagio'):
 
 
 def _make_properties(props):
-    p = 1 - np.exp(-constProps['K']*props[0])
-    E = (constProps['Ec'] * np.exp(constProps['b'] * (p - constProps['p_gel']))) + constProps['Ed']
+    p = 1 - np.exp(-constProps[CONST_PROPS_K]*props[0])
+    E = (constProps[CONST_PROPS_EC] * np.exp(constProps[CONST_PROPS_B] * (p - constProps[CONST_PROPS_PGEL]))) + constProps[CONST_PROPS_ED]
     # we also want Poisson's ratio to be a "constant prop"
     # otherwise that's additional "dead" properties Ryan has to deal with
-    nu = props[1]
+    nu = constProps[CONST_PROPS_NU]
     mu = 0.5*E/(1.0 + nu)
     kappa = E / 3.0 / (1.0 - 2.0*nu)
     lamda = E*nu/(1 + nu)/(1 - 2*nu)
