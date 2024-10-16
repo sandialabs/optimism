@@ -338,7 +338,8 @@ def evaluate_on_element(U, coords, elemStates, props, dt, elemShapes, elemShapeG
     elemVals = interpolate_to_element_points(U, elemShapes, elemConn)
     elemGrads = compute_element_field_gradient(U, coords, elemShapes, elemShapeGrads, elemVols, elemConn, modify_element_gradient)
     elemXs = interpolate_to_element_points(coords, elemShapes, elemConn)
-    vmapArgs = 0, 0, 0, vmapPropValue(props), 0, None, *tuple(None for p in params)
+    # vmapArgs = 0, 0, 0, vmapPropValue(props), 0, None, *tuple(None for p in params)
+    vmapArgs = 0, 0, 0, None, 0, None, *tuple(None for p in params)
     fVals = jax.vmap(kernelFunc, vmapArgs)(elemVals, elemGrads, elemStates, props, elemXs, dt, *params)
     return fVals
 

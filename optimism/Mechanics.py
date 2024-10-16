@@ -384,13 +384,14 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel,
     return MechanicsFunctions(compute_strain_energy, jit(compute_updated_internal_variables), jit(compute_element_stiffnesses), jit(compute_output_energy_densities_and_stresses), compute_initial_state, integrated_material_qoi, jit(compute_output_material_qoi))
 
 
+# TODO need to update this for props. Eigen won't work otherwise
 def _compute_kinetic_energy(functionSpace, V, internals, density):
     def lagrangian_density(U, gradU, Q, X, dt):
         return kinetic_energy_density(U, density)
     unused = 0.0
     return FunctionSpace.integrate_over_block(functionSpace, V, internals, unused, lagrangian_density, slice(None))
 
-
+# TODO need to update this for props. Eigen won't work otherwise
 def _compute_element_masses(functionSpace, U, internals, density, modify_element_gradient):
     def lagrangian_density(V, gradV, Q, X, dt):
         return kinetic_energy_density(V, density)
@@ -525,6 +526,7 @@ def create_dynamics_functions(functionSpace, mode2D, materialModel, newmarkParam
                              jit(correct))
 
 
+# TODO need to update this for props. Eigen won't work otherwise
 def compute_traction_potential_energy(fs, U, quadRule, edges, load):
     """Compute potential energy of surface tractions.
 

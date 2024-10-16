@@ -2,8 +2,8 @@ from collections import namedtuple
 from jax import grad
 from jax import jit
 from optimism import EquationSolver
-from plato_optimism import exodus_writer as ExodusWriter
-from plato_optimism import GradUtilities
+# from plato_optimism import exodus_writer as ExodusWriter
+# from plato_optimism import GradUtilities
 from optimism import FunctionSpace
 from optimism import Interpolants
 from optimism import Mechanics
@@ -12,20 +12,18 @@ from optimism import Objective
 from optimism import QuadratureRule
 from optimism import ReadExodusMesh
 from optimism import SparseMatrixAssembler
+from optimism import VTKWriter
 from optimism.FunctionSpace import DofManager
 from optimism.FunctionSpace import EssentialBC
 from optimism.inverse import MechanicsInverse
 from optimism.inverse import AdjointFunctionSpace
+from optimism.material import Neohookean_VariableProps
 from optimism.material import HyperViscoelastic_VariableProps
 import jax.numpy as np
 import numpy as onp
 from scipy.sparse import linalg
 from typing import Callable, NamedTuple
 
-
-# EnergyFunctions = namedtuple('EnergyFunctions',
-#                             ['energy_function_coords',
-#                              'nodal_forces'])
 
 class EnergyFunctions(NamedTuple):
     energy_function_coords: Callable
@@ -55,16 +53,27 @@ class ElementPropertyOptimization:
         K_eq = 1000*G_eq # MPa
         G_neq_1 = 4.0*G_eq
         tau_1   = 0.1
-        props = {
+        constant_props = {
             'equilibrium bulk modulus'     : K_eq,
             'equilibrium shear modulus'    : G_eq,
             'non equilibrium shear modulus': G_neq_1,
             'relaxation time'              : tau_1,
         } 
-        varProps = ReadExodusMesh.read_exodus_mesh_element_properties(self.input_mesh, ['light_dose', 'nu'], blockNum=1)
-        self.mat_model = HyperViscoelastic_VariableProps.create_material_model_functions(varProps, props)
+        varProps = ReadExodusMesh.read_exodus_mesh_element_properties(self.input_mesh, ['light_dose'], blockNum=1)
+        # print(varProps.shape)
+        # assert False
 
-        self.props = np.array([2, 0.48])
+        # props = {
+        #     'youngs modulus': 1.0,
+        #     'poisson ratio': 0.3
+        # }
+        
+        self.mat_model = HyperViscoelastic_VariableProps.create_material_model_functions(constant_props)
+        # constant_props = {
+        #     'density': 1.0
+        # }
+        # self.mat_model = Neohookean_VariableProps.create_material_model_functions(constant_props, 'adagio')
+
         self.eq_settings = EquationSolver.get_settings(
             use_incremental_objective=False,
             max_trust_iters=100,
@@ -95,7 +104,7 @@ class ElementPropertyOptimization:
         # really this will be handed off from plato
         # using exodus as a surrogate for now.
         # Might need some reshape operation here 
-        self.props = ReadExodusMesh.read_exodus_mesh_element_properties(self.input_mesh, ['light_dose', 'nu'], blockNum=1)
+        self.props = ReadExodusMesh.read_exodus_mesh_element_properties(self.input_mesh, ['light_dose'], blockNum=1)
         # TODO
         self.mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(origMesh, order=2, createNodeSetsFromSideSets=True)
 
@@ -142,28 +151,54 @@ class ElementPropertyOptimization:
             with open(self.plot_file,'wb') as f:
                 np.savez(f, force=force, displacement=disp)
 
-        def save_exodus_outputs(Uu, p, exo, step):
-            exo.put_time(step, step)
+        # def save_exodus_outputs(Uu, p, exo, step):
+        def save_exodus_outputs(Uu, p, step):
+            # exo.put_time(step, step)
             U = self.create_field(Uu, p.bc_data)
-            ExodusWriter.write_exodus_nodal_outputs(
-                exo,
-                node_variable_names=['disp_x', 'disp_y'], 
-                node_variable_values=[U[:, 0], U[:, 1]], 
-                time_step=step
-            )
+            # ExodusWriter.write_exodus_nodal_outputs(
+            #     exo,
+            #     node_variable_names=['disp_x', 'disp_y'], 
+            #     node_variable_values=[U[:, 0], U[:, 1]], 
+            #     time_step=step
+            # )
 
-            energyDensities = mech_funcs.compute_output_energy_densities_and_stresses(U, p.state_data, p.prop_data, self.dt)[0]
-            # dissipationEnergyDensities = mech_funcs.compute_output_material_qoi(U, p.state_data, self.dt)
-            # cellDissipationEnergyDensities = FunctionSpace.project_quadrature_field_to_element_field(func_space, dissipationEnergyDensities)
-            cellEnergyDensities = FunctionSpace.project_quadrature_field_to_element_field(func_space, energyDensities)
-            ExodusWriter.write_exodus_element_outputs(
-                exo,
-                # element_variable_names=['strain energy density', 'dissipation density'],
-                element_variable_names=['strain energy density'],
-                # element_variable_values=[cellEnergyDensities, cellDissipationEnergyDensities], 
-                element_variable_values=[cellEnergyDensities],
-                time_step=step, block_id=1
-            )
+            # energyDensities = mech_funcs.compute_output_energy_densities_and_stresses(U, p.state_data, p.prop_data, self.dt)[0]
+            # # dissipationEnergyDensities = mech_funcs.compute_output_material_qoi(U, p.state_data, self.dt)
+            # # cellDissipationEnergyDensities = FunctionSpace.project_quadrature_field_to_element_field(func_space, dissipationEnergyDensities)
+            # cellEnergyDensities = FunctionSpace.project_quadrature_field_to_element_field(func_space, energyDensities)
+            # ExodusWriter.write_exodus_element_outputs(
+            #     exo,
+            #     # element_variable_names=['strain energy density', 'dissipation density'],
+            #     element_variable_names=['strain energy density'],
+            #     # element_variable_values=[cellEnergyDensities, cellDissipationEnergyDensities], 
+            #     element_variable_values=[cellEnergyDensities],
+            #     time_step=step, block_id=1
+            # )
+            plotName = 'output-'+str(step).zfill(3)
+            writer = VTKWriter.VTKWriter(self.mesh, baseFileName=plotName)
+
+            writer.add_nodal_field(name='displacement', nodalData=U, fieldType=VTKWriter.VTKFieldType.VECTORS)
+
+            # bcs = np.array(self.dofManager.isBc, dtype=int)
+            # writer.add_nodal_field(name='bcs', nodalData=bcs, fieldType=VTKWriter.VTKFieldType.VECTORS, dataType=VTKWriter.VTKDataType.INT)
+
+            # Ubc = self.get_ubcs(p)
+            # internalVariables = p[1]
+            # rxnBc = self.compute_bc_reactions(Uu, Ubc, p)
+            # reactions = np.zeros(U.shape).at[self.dofManager.isBc].set(rxnBc)
+            # writer.add_nodal_field(name='reactions', nodalData=reactions, fieldType=VTKWriter.VTKFieldType.VECTORS)
+
+            # energyDensities, stresses = mech_funcs.compute_output_energy_densities_and_stresses(U, internalVariables)
+            # cellEnergyDensities = FunctionSpace.project_quadrature_field_to_element_field(self.fs, energyDensities)
+            # cellStresses = FunctionSpace.project_quadrature_field_to_element_field(self.fs, stresses)
+            # writer.add_cell_field(name='strain_energy_density',
+            #                     cellData=cellEnergyDensities,
+            #                     fieldType=VTKWriter.VTKFieldType.SCALARS)
+            # writer.add_cell_field(name='piola_stress',
+            #                     cellData=cellStresses,
+            #                     fieldType=VTKWriter.VTKFieldType.TENSORS)
+
+            writer.write()
 
         # problem set up
         Uu = self.dof_manager.get_unknown_values(np.zeros(self.mesh.coords.shape))
@@ -174,16 +209,17 @@ class ElementPropertyOptimization:
 
         # set up output mesh
         if self.writeOutput:
-            ExodusWriter.copy_exodus_mesh(self.input_mesh, self.output_file)
-            exo = ExodusWriter.setup_exodus_database(
-                self.output_file,
-                num_node_variables=2, 
-                num_element_variables=1, 
-                node_variable_names=['disp_x', 'disp_y'], 
-                # element_variable_names=['strain energy density', 'dissipation density']
-                element_variable_names=['strain energy density']
-            )
-            save_exodus_outputs(Uu, p, exo, 1)
+            # ExodusWriter.copy_exodus_mesh(self.input_mesh, self.output_file)
+            # exo = ExodusWriter.setup_exodus_database(
+            #     self.output_file,
+            #     num_node_variables=2, 
+            #     num_element_variables=1, 
+            #     node_variable_names=['disp_x', 'disp_y'], 
+            #     # element_variable_names=['strain energy density', 'dissipation density']
+            #     element_variable_names=['strain energy density']
+            # )
+            # save_exodus_outputs(Uu, p, exo, 1)
+            save_exodus_outputs(Uu, p, 1)
 
         # loop over load steps
         disp = 0.
@@ -203,7 +239,7 @@ class ElementPropertyOptimization:
             print('LOAD STEP ', globalStep)
             disp -= disp_inc
             p = Objective.param_index_update(p, 0, disp)
-            Uu, solverSuccess = EquationSolver.nonlinear_equation_solve(self.objective, Uu, p, self.eq_settings)
+            Uu, solverSuccess = EquationSolver.nonlinear_equation_solve(self.objective, Uu, p, self.eq_settings, useWarmStart=False)
 
             U = self.create_field(Uu, p.bc_data)
             ivs = mech_funcs.compute_updated_internal_variables(U, p.state_data, p.prop_data, self.dt)
@@ -212,7 +248,8 @@ class ElementPropertyOptimization:
             self.state.append((Uu, p))
 
             if self.writeOutput:
-              save_exodus_outputs(Uu, p, exo, globalStep + 1)
+                save_exodus_outputs(Uu, p, globalStep + 1)
+            #   save_exodus_outputs(Uu, p, exo, globalStep + 1)
             
             globalStep += 1
 

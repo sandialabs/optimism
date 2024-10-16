@@ -1,48 +1,80 @@
+import jax
 import jax.numpy as np
 from jax.scipy import linalg
 from optimism import TensorMath
 from optimism.material.MaterialModel import MaterialModel
 
-PROPS_K_eq  = 0
-PROPS_G_eq  = 1
-PROPS_G_neq = 2
-PROPS_TAU   = 3
+PROPS_K_eq     = 0
+PROPS_G_eq     = 1
+PROPS_G_neq    = 2
+PROPS_TAU      = 3
+PROPS_Krate    = 4
+PROPS_Er       = 5
+PROPS_R        = 6
+PROPS_g1       = 7
+PROPS_g2       = 8
+PROPS_eta      = 9
+PROPS_C1       = 10
+PROPS_C2       = 11
+PROPS_pgel     = 12
+PROPS_refRelax = 13
 
-PROPS_Krate    = 0
-PROPS_Er       = 1
-PROPS_R        = 2
-PROPS_g1       = 3
-PROPS_g2       = 4
-PROPS_eta      = 5
-PROPS_C1       = 6
-PROPS_C2       = 7
-PROPS_pgel     = 8
-PROPS_refRelax = 9
-constGlass = [0.01, 18959, 8.3145, 109603, 722.20, 3.73, 61000, 511.792, 0.12, 0.1]
+# PROPS_Krate    = 0
+# PROPS_Er       = 1
+# PROPS_R        = 2
+# PROPS_g1       = 3
+# PROPS_g2       = 4
+# PROPS_eta      = 5
+# PROPS_C1       = 6
+# PROPS_C2       = 7
+# PROPS_pgel     = 8
+# PROPS_refRelax = 9
+constGlass = [
+    0.01, 
+    18959, 
+    8.3145, 
+    109603, 
+    722.20, 
+    3.73, 
+    61000, 
+    511.792, 
+    0.12, 
+    0.1
+]
 
 NUM_PRONY_TERMS = -1
 
 VISCOUS_DISTORTION = slice(0, 9)
 
-def create_material_model_functions(variableProps, properties):
-    
-    density = properties.get('density')
-    props = _make_properties(variableProps, properties)
-    variableProps = _make_variable_properties(variableProps, properties)
 
-    def energy_density(dispGrad, state, variableProps, dt):
-        return _energy_density(dispGrad, state, variableProps, dt, props)
+def create_material_model_functions(const_props):
+    density = const_props.get('density')
+    const_props = [
+        const_props['equilibrium bulk modulus'],
+        const_props['equilibrium shear modulus'],
+        const_props['non equilibrium shear modulus'],
+        const_props['relaxation time']
+    ]
+    const_props.extend(constGlass)
+
+    def energy_density(dispGrad, state, props, dt):
+        # jax.debug.print("props = {props}", props=props)
+        props = _make_properties(props, const_props)
+        # jax.debug.print("props = {props}", props=props)
+        return _energy_density(dispGrad, state, props, dt, props)
 
     def compute_initial_state(shape=(1,)):
         state = np.identity(3).ravel()
         return state
 
-    def compute_state_new(dispGrad, state, variableProps, dt):
-        state = _compute_state_new(dispGrad, state, variableProps, dt, props)
+    def compute_state_new(dispGrad, state, props, dt):
+        props = _make_properties(props, const_props)
+        state = _compute_state_new(dispGrad, state, props, dt, props)
         return state
 
-    def compute_material_qoi(dispGrad, state, variableProps, dt):
-        return _compute_dissipation(dispGrad, state, variableProps, dt, props)
+    def compute_material_qoi(dispGrad, state, props, dt):
+        props = _make_properties(props, const_props)
+        return _compute_dissipation(dispGrad, state, props, dt, props)
 
     return MaterialModel(compute_energy_density = energy_density,
                          compute_initial_state = compute_initial_state,
@@ -50,38 +82,59 @@ def create_material_model_functions(variableProps, properties):
                          compute_material_qoi = compute_material_qoi,
                          density = density)
 
-def _make_variable_properties(variableProperties, properties):
+def _make_properties(variableProperties, constGlass):
     
+    # p = 1 - np.exp(-constGlass[PROPS_Krate] * variableProperties[0])
+    # thetaGlass = constGlass[PROPS_Er]/(constGlass[PROPS_R] * np.log((constGlass[PROPS_g1]*((1-p)**constGlass[PROPS_eta])) + constGlass[PROPS_g2]))
+    # refGlass = constGlass[PROPS_Er]/(constGlass[PROPS_R] * np.log((constGlass[PROPS_g1]*((1-constGlass[PROPS_pgel])**constGlass[PROPS_eta])) + constGlass[PROPS_g2]))
+    # WLF = -(constGlass[PROPS_C1]*(thetaGlass - refGlass))/(constGlass[PROPS_C2] + (thetaGlass - refGlass))
+    # shiftFactor = 10**WLF
+    # relaxTime = constGlass[PROPS_refRelax]*shiftFactor
+    
+    # variableProps = np.array([relaxTime])
     p = 1 - np.exp(-constGlass[PROPS_Krate] * variableProperties[0])
     thetaGlass = constGlass[PROPS_Er]/(constGlass[PROPS_R] * np.log((constGlass[PROPS_g1]*((1-p)**constGlass[PROPS_eta])) + constGlass[PROPS_g2]))
     refGlass = constGlass[PROPS_Er]/(constGlass[PROPS_R] * np.log((constGlass[PROPS_g1]*((1-constGlass[PROPS_pgel])**constGlass[PROPS_eta])) + constGlass[PROPS_g2]))
     WLF = -(constGlass[PROPS_C1]*(thetaGlass - refGlass))/(constGlass[PROPS_C2] + (thetaGlass - refGlass))
     shiftFactor = 10**WLF
+    jax.debug.print("thetaGlass = {thetaGlass}", thetaGlass=thetaGlass)
+    jax.debug.print("refGlass = {refGlass}", refGlass=refGlass)
+    jax.debug.print("ref = {ref}", ref=constGlass[PROPS_refRelax])
+    jax.debug.print("shift = {shift}", shift=shiftFactor)
+    jax.debug.print("WLF = {WLF}", WLF=WLF)
     relaxTime = constGlass[PROPS_refRelax]*shiftFactor
     
-    variableProps = np.array([relaxTime])
+    # variableProps = np.array([relaxTime])
 
-    return variableProps
+    # return variableProps
 
-def _make_properties(variableProperties, properties):
+    props = np.array([
+        constGlass[PROPS_K_eq], 
+        constGlass[PROPS_G_eq],
+        constGlass[PROPS_G_neq],
+        relaxTime
+    ])
+    return props
 
-    print('Equilibrium properties')
-    print('  Bulk modulus    = %s' % properties['equilibrium bulk modulus'])
-    print('  Shear modulus   = %s' % properties['equilibrium shear modulus'])
-    print('Prony branch properties')
-    print('  Shear modulus   = %s' % properties['non equilibrium shear modulus'])
-    print('  Relaxation time = %s' % properties['relaxation time'])
+# def _make_properties(variableProperties, properties):
+
+#     print('Equilibrium properties')
+#     print('  Bulk modulus    = %s' % properties['equilibrium bulk modulus'])
+#     print('  Shear modulus   = %s' % properties['equilibrium shear modulus'])
+#     print('Prony branch properties')
+#     print('  Shear modulus   = %s' % properties['non equilibrium shear modulus'])
+#     print('  Relaxation time = %s' % properties['relaxation time'])
 
     
 
-    props = np.array([
-        properties['equilibrium bulk modulus'],
-        properties['equilibrium shear modulus'],
-        properties['non equilibrium shear modulus'],
-        properties['relaxation time']
-    ])
+#     props = np.array([
+#         properties['equilibrium bulk modulus'],
+#         properties['equilibrium shear modulus'],
+#         properties['non equilibrium shear modulus'],
+#         properties['relaxation time']
+#     ])
 
-    return props
+#     return props
 
 def _energy_density(dispGrad, state, variableProps, dt, props):
     W_eq  = _eq_strain_energy(dispGrad, props)
@@ -111,7 +164,7 @@ def _neq_strain_energy(elasticStrain, props):
 
 def _incremental_dissipated_energy(elasticStrain, variableProps, dt, props):
     G_neq = props[PROPS_G_neq]
-    tau   = variableProps #props[PROPS_TAU]
+    tau   = props[PROPS_TAU]
     eta   = G_neq * tau
 
     Me = 2. * G_neq * elasticStrain
@@ -135,9 +188,11 @@ def _compute_state_new(dispGrad, stateOld, variableProps, dt, props):
     return Fv_new.ravel()
 
 def _compute_state_increment(elasticStrain,variableProps, dt, props):
-    tau   = variableProps #props[PROPS_TAU]
+    # tau   = variableProps #props[PROPS_TAU]
+    tau = props[PROPS_TAU]
     integration_factor = 1. / (1. + dt / tau)
-
+    # jax.debug.print("tau = {tau}", tau=tau)
+    # jax.debug.print("integration_factor = {integration_factor}", integration_factor=integration_factor)
     Ee_dev = TensorMath.dev(elasticStrain)
     return dt * integration_factor * Ee_dev / tau # dt * D
 

@@ -33,62 +33,55 @@ CONST_PROPS_NU = 14
 # for small things might not seem like a big slowdown
 # but can add up when the the thing is called millions of times
 
-constProps = [1.059, # MPa
-              0.01, # cm^2/(mW*s)
-              5.248, # unitless
-              0.12, # unitless
-              3.321, 
-              18959, 
-              8.314, 
-              109603, # unitless
-              722.2, # unitless
-              3.73,# unitless
-              61000, # unitless
-              511.792, # K
-              100, # C
-              0.001, # s
-              0.48 # Poisson's ratio
-              ]
-# constProps = {'Ec': 1.059, # MPa
-#               'K': 0.01, # cm^2/(mW*s)
-#               'b': 5.248, # unitless
-#               'p_gel': 0.12, # unitless
-#               'Ed': 3.321, 
-#               'Er': 18959, 
-#               'R': 8.314, 
-#               'g1': 109603, # unitless
-#               'g2': 722.2, # unitless
-#               'xi': 3.73,# unitless
-#               'C1': 61000, # unitless
-#               'C2': 511.792, # K
-#               'rmTemp': 100, # C
-#               'tau': 0.001, # s
-#               'NU': 0.48 # Poisson's ratio
-#               }
+# TODO make these inputs to the material model
+# we probably want to come up with a way
+# to specify required properties and
+# then pick and choose which ones to make variable
+# this is fine for now though since really for this
+# model it and class of materials we're interested in
+# it only makes sense to change the modulus
+constProps = [
+    1.059, # MPa
+    0.01, # cm^2/(mW*s)
+    5.248, # unitless
+    0.12, # unitless
+    3.321, 
+    18959, 
+    8.314, 
+    109603, # unitless
+    722.2, # unitless
+    3.73,# unitless
+    61000, # unitless
+    511.792, # K
+    100, # C
+    0.001, # s
+    0.48 # Poisson's ratio
+]
 
-def create_material_model_functions(version = 'adagio'):
-    
-    energy_density = _adagio_neohookean
-    #energy_density = _neohookean_3D_energy_density
+# TODO need to clean up const_props handling
+# probably best way to go is to read in a dict
+# and convert to an array on construction
+def create_material_model_functions(const_props, version = 'adagio'):
+    # TODO convert const_props from dict to list/np.array here
+
     if version == 'adagio':
         energy_density = _adagio_neohookean
     elif version == 'coupled':
         energy_density = _neohookean_3D_energy_density
+    else:
+        raise ValueError('Supported versions are \'adagio\' and \'couple\'')
 
-    # TODO add props as input after internalVars
     def strain_energy(dispGrad, internalVars, props, dt):
         del dt
-        props = _make_properties(props)
+        props = _make_properties(props, const_props)
         return energy_density(dispGrad, internalVars, props)
 
-    # TODO add props as input
     def compute_state_new(dispGrad, internalVars, props, dt):
         del dt
-        # props = _make_properties(props[0], props[1])
-        props = _make_properties(props)
+        props = _make_properties(props, const_props)
         return _compute_state_new(dispGrad, internalVars, props)
 
-    density = 1.0 # properties.get('density')
+    density = const_props.get('density')
 
     return MaterialModel(compute_energy_density = strain_energy,
                          compute_initial_state = make_initial_state,
@@ -96,8 +89,7 @@ def create_material_model_functions(version = 'adagio'):
                          density = density)
 
 
-
-def _make_properties(props):
+def _make_properties(props, const_props):
     p = 1 - np.exp(-constProps[CONST_PROPS_K]*props[0])
     E = (constProps[CONST_PROPS_EC] * np.exp(constProps[CONST_PROPS_B] * (p - constProps[CONST_PROPS_PGEL]))) + constProps[CONST_PROPS_ED]
     # we also want Poisson's ratio to be a "constant prop"
