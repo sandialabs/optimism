@@ -27,3 +27,8 @@ spack.lock
 .spack-env/
 *.npz
 *.vtk
+
+# docs stuff
+build/
+docs/source/modules.rst
+docs/source/optimism.*

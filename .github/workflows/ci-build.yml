@@ -36,6 +36,18 @@ jobs:
           pip install -e ".[sparse,test]"
           python -m pytest -n auto optimism --cov=optimism -Wignore
           # we can also add the flag -n auto for parallel testing
+      - name: docs
+        run: |
+          pip install -e ".[docs,sparse,test]"
+          cd docs
+          sphinx-apidoc -o source/ ../optimism -P
+          make html
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/build/html  # Adjust this if your output directory is different
+          publish_branch: gh-pages  # The branch to deploy to
       - name: codecov
         uses: codecov/codecov-action@v4
         with:
