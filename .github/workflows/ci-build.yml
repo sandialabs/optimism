@@ -37,7 +37,6 @@ jobs:
           python -m pytest -n auto optimism --cov=optimism -Wignore
           # we can also add the flag -n auto for parallel testing
       - name: docs
-        uses: actions/upload-artifact@v3
         run: |
           pip install -e ".[docs,sparse,test]"
           cd docs
