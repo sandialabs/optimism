@@ -13,8 +13,8 @@ from optimism import Mechanics
 from optimism import Mesh
 from optimism import Objective
 from optimism import QuadratureRule
-from ..TestFixture import TestFixture
-from ..MeshFixture import MeshFixture
+from optimism.test.TestFixture import TestFixture
+from optimism.test.MeshFixture import MeshFixture
 
 
 plotting=False

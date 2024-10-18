@@ -12,8 +12,8 @@ from optimism import Objective
 from optimism import QuadratureRule
 from optimism import TensorMath
 
-from ..TestFixture import TestFixture
-from ..MeshFixture import MeshFixture
+from optimism.test.TestFixture import TestFixture
+from optimism.test.MeshFixture import MeshFixture
 
 from optimism.inverse import MechanicsInverse
 

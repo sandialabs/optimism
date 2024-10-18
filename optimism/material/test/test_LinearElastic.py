@@ -5,7 +5,7 @@ import jax
 import jax.numpy as np
 
 from optimism.material import LinearElastic
-from .. import TestFixture
+from optimism.test import TestFixture
 
 class TestLinearElasticMaterial(TestFixture.TestFixture):
     def setUp(self):

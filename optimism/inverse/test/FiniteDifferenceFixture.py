@@ -1,4 +1,4 @@
-from ..MeshFixture import MeshFixture
+from optimism.test.MeshFixture import MeshFixture
 from collections import namedtuple
 import numpy as onp
 

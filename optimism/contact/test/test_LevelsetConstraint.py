@@ -9,7 +9,7 @@ from optimism.material import LinearElastic
 from optimism.contact import Friction
 from optimism.contact import Levelset
 from optimism.contact import LevelsetConstraint
-from ..MeshFixture import MeshFixture, defaultProps
+from optimism.test.MeshFixture import MeshFixture, defaultProps
 from optimism import Mechanics
 from optimism import FunctionSpace
 from optimism import QuadratureRule

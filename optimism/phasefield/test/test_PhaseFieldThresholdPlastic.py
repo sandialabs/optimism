@@ -6,8 +6,8 @@ from scipy.spatial.transform import Rotation as R
 from optimism.JaxConfig import *
 from optimism import EquationSolver as EqSolver
 from optimism import Objective
-from ..TestFixture import TestFixture
-from ..MeshFixture import MeshFixture
+from optimism.test.TestFixture import TestFixture
+from optimism.test.MeshFixture import MeshFixture
 from optimism.phasefield import PhaseFieldThresholdPlastic as Model
 from optimism import SparseMatrixAssembler
 from optimism import TensorMath

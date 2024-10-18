@@ -5,7 +5,7 @@ from optimism.JaxConfig import *
 
 from optimism.contact import EdgeCpp
 from optimism import SmoothFunctions
-from ..TestFixture import TestFixture
+from optimism.test.TestFixture import TestFixture
 
 doPlotting=False
 

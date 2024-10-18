@@ -4,7 +4,7 @@ import jax.numpy as np
 
 from optimism.material import MaterialUniaxialSimulator
 from optimism.material import LinearElastic
-from ..TestFixture import TestFixture
+from optimism.test.TestFixture import TestFixture
 
 
 class MaterialUniaxialSimulatorFixture(TestFixture):

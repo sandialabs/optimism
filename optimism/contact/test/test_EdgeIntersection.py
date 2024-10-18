@@ -3,7 +3,7 @@ import unittest
 
 from optimism.JaxConfig import *
 from optimism.contact import EdgeIntersection
-from ..TestFixture import TestFixture
+from optimism.test.TestFixture import TestFixture
 
 
 class TestEdgeIntersection(TestFixture):
