@@ -34,7 +34,7 @@ jobs:
       - name: pytest
         run: |
           pip install -e ".[sparse,test]"
-          python -m pytest -n auto test --cov=optimism -Wignore
+          python -m pytest -n auto optimism --cov=optimism -Wignore
           # we can also add the flag -n auto for parallel testing
       - name: codecov
         uses: codecov/codecov-action@v4
