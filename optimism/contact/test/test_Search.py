@@ -5,7 +5,7 @@ from optimism import Surface
 from optimism import QuadratureRule
 from optimism.contact import Search
 from optimism.contact import EdgeIntersection
-from ..MeshFixture import MeshFixture
+from optimism.test.MeshFixture import MeshFixture
 
 
 def get_best_overlap_vector(mesh, edge, listOfEdges):

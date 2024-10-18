@@ -5,7 +5,7 @@ from optimism import QuadratureRule
 from optimism import Surface
 from optimism.contact import EdgeIntersection
 from optimism import FunctionSpace
-from ..MeshFixture import MeshFixture
+from optimism.test.MeshFixture import MeshFixture
 from optimism.contact import Contact
 from matplotlib import pyplot as plt
 

@@ -1,6 +1,6 @@
 from optimism.JaxConfig import *
 from optimism import Mesh
-from ..MeshFixture import MeshFixture
+from optimism.test.MeshFixture import MeshFixture
 from optimism.contact import MortarContact
 import unittest
 

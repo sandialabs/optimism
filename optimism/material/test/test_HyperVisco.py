@@ -6,7 +6,7 @@ from jax.scipy import linalg
 from matplotlib import pyplot as plt
 
 from optimism.material import HyperViscoelastic as HyperVisco
-from ..TestFixture import TestFixture
+from optimism.test.TestFixture import TestFixture
 from optimism.material import MaterialUniaxialSimulator
 from optimism.TensorMath import deviator
 from optimism.TensorMath import log_symm

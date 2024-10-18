@@ -3,7 +3,7 @@ import unittest
 import jax
 
 from optimism.material import Hardening
-from ..TestFixture import TestFixture
+from optimism.test.TestFixture import TestFixture
 
 class RateSensitivityFixture(TestFixture):
     def test_power_law_scales_correctly(self):

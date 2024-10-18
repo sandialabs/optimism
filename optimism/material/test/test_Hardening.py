@@ -3,7 +3,7 @@ import unittest
 from optimism.JaxConfig import *
 from optimism.material import J2Plastic
 from optimism.material import Hardening
-from ..TestFixture import TestFixture
+from optimism.test.TestFixture import TestFixture
 
 
 E = 100.0

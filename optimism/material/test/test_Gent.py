@@ -6,7 +6,7 @@ import jax
 import jax.numpy as np
 
 from optimism.material import Gent
-from .. import TestFixture
+from optimism.test import TestFixture
 
 
 class TestGentMaterial(TestFixture.TestFixture):

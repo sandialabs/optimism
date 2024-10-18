@@ -1,13 +1,14 @@
 from matplotlib import pyplot as plt
 from jax import random
 from scipy.spatial.transform import Rotation as R
+import unittest
 
 from optimism.JaxConfig import *
 from optimism import EquationSolver as EqSolver
 from optimism import Objective
-from .. import TestFixture
-from ..MeshFixture import MeshFixture
-from optimism.phasefield import PhaseFieldThreshold as Model
+from optimism.test import TestFixture
+from optimism.test.MeshFixture import MeshFixture
+from optimism.phasefield import PhaseFieldLorentzPlastic as Model
 from optimism import SparseMatrixAssembler
 from optimism import TensorMath
 from optimism import Mesh
@@ -16,22 +17,29 @@ from optimism import Mesh
 plotting=False
 
 
-class PhaseFieldThresholdModelFixture(TestFixture.TestFixture):
+class GradOfPlasticPhaseFieldModelFixture(TestFixture.TestFixture):
     
     def setUp(self):
         self.E = 100.0
         self.nu = 0.321
         self.Gc = 40.0
+        self.psiC = 0.5*self.E
         self.l = 1.0
+        self.Y0 = 0.3*self.E
+        self.H = 1.0e-2*self.E
         props = {'elastic modulus': self.E,
                  'poisson ratio': self.nu,
                  'critical energy release rate': self.Gc,
+                 'critical strain energy density': self.psiC,
                  'regularization length': self.l,
+                 'yield strength': self.Y0,
+                 'hardening model': 'linear',
+                 'hardening modulus': self.H,
                  'kinematics': 'large deformations'}
         self.model = Model.create_material_model_functions(props)
         self.flux_func = grad(self.model.compute_energy_density, (0,1,2))
         self.internalVariables = self.model.compute_initial_state()
-        self.dt = 0.0 # unused - material has no rate dependence
+        self.dt = 1.0
 
 
     def test_zero_point(self):
@@ -55,7 +63,6 @@ class PhaseFieldThresholdModelFixture(TestFixture.TestFixture):
         phase = random.uniform(subkey)
         key,subkey = random.split(key)
         phaseGrad = random.uniform(subkey, (3,))
-        dt = 0.0
         energy = self.model.compute_energy_density(dispGrad, phase, phaseGrad, self.internalVariables, self.dt)
         
         Q = R.random(random_state=1234).as_matrix()
@@ -67,24 +74,42 @@ class PhaseFieldThresholdModelFixture(TestFixture.TestFixture):
         self.assertNear(energy, energyStar, 12)
 
 
-    def test_uniaxial_energy(self):
-        strain = 0.1 # engineering strain
-        F = np.diag(np.exp(strain*np.array([1.0, -self.nu, -self.nu])))
-        dispGrad =  F - np.identity(3)
-        phase = 0.15
+    def test_elastic_energy(self):
+        strainBelowYield = 0.5*self.Y0/self.E # engineering strain
+        dispGrad = np.diag(np.exp(strainBelowYield*np.array([1.0, -self.nu, -self.nu])))-np.identity(3)
+        phase = 0.0
         phaseGrad = np.zeros(3)
 
         energy = self.model.compute_energy_density(dispGrad, phase, phaseGrad, self.internalVariables, self.dt)
-
-        g = (1.0 - phase)**2
-        energyExact = g*0.5*self.E*strain**2 + 3/8*self.Gc/self.l*phase
+        energyExact = 0.5*self.E*strainBelowYield**2
         self.assertNear(energy, energyExact, 12)
 
         piolaStress,_,_ = self.flux_func(dispGrad, phase, phaseGrad, self.internalVariables, self.dt)
-        kStress = piolaStress@(dispGrad + np.identity(3)).T
-        kStressExact = np.zeros((3,3)).at[0,0].set(g*self.E*strain)
-        self.assertArrayNear(kStress, kStressExact, 12)
+        mandelStress = piolaStress@(dispGrad + np.identity(3)).T
+        stressExact = np.zeros((3,3)).at[0,0].set(self.E*strainBelowYield)
+        self.assertArrayNear(mandelStress, stressExact, 12)
 
+
+    def test_plastic_stress(self):
+    
+        strain11 = 1.1*self.Y0/self.E
+        eqps = (self.E*strain11 - self.Y0)/(self.H + self.E)
+        elasticStrain11 = strain11 - eqps
+        lateralStrain = -self.nu*elasticStrain11 - 0.5*eqps
+        strains = np.array([strain11, lateralStrain, lateralStrain])
+        dispGrad = np.diag(np.exp(strains)) - np.identity(3)
+        phase = 0.0
+        phaseGrad = np.zeros(3)
+
+        energyExact = 0.5*self.E*elasticStrain11**2 + self.Y0*eqps + 0.5*self.H*eqps**2
+        energy = self.model.compute_energy_density(dispGrad, phase, phaseGrad, self.internalVariables, self.dt)
+        self.assertNear(energy, energyExact, 12)
+        
+        stress,_,_ = self.flux_func(dispGrad, phase, phaseGrad, self.internalVariables, self.dt)
+        mandelStress = stress@(dispGrad + np.identity(3)).T
+        mandelStress11Exact = self.E*(strain11 - eqps)
+        self.assertNear(mandelStress[0,0], mandelStress11Exact, 12)      
+        
 
 if __name__ == '__main__':
-    TestFixture.unittest.main()
+    unittest.main()

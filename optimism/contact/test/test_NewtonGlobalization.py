@@ -1,7 +1,7 @@
 from numpy.random import rand
 
 from optimism.JaxConfig import *
-from ..TestFixture import *
+from optimism.test.TestFixture import *
 from optimism.NewtonSolver import *
 from optimism import AlSolver
 from optimism.Objective import Objective

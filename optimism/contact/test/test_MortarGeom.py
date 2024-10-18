@@ -1,4 +1,4 @@
-from ..TestFixture import *
+from optimism.test.TestFixture import *
 from optimism import QuadratureRule
 from optimism.contact import MortarContact
 import jax

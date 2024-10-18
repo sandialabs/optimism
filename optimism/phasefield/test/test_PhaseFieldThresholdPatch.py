@@ -5,7 +5,7 @@ from optimism.JaxConfig import *
 from optimism.phasefield import PhaseFieldThreshold as material
 from optimism.phasefield import PhaseField
 from optimism.phasefield import MaterialPointSimulator
-from .. import MeshFixture
+from optimism.test import MeshFixture
 from optimism import Mesh
 from optimism import AlSolver
 from optimism import EquationSolver as EqSolver
