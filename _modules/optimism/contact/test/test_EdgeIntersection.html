@@ -1,0 +1,291 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.contact.test.test_EdgeIntersection &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.contact.test.test_EdgeIntersection</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.contact.test.test_EdgeIntersection</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">optimism.contact</span> <span class="kn">import</span> <span class="n">EdgeIntersection</span>
+<span class="kn">from</span> <span class="nn">optimism.test.TestFixture</span> <span class="kn">import</span> <span class="n">TestFixture</span>
+
+
+<div class="viewcode-block" id="TestEdgeIntersection">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection">[docs]</a>
+<span class="k">class</span> <span class="nc">TestEdgeIntersection</span><span class="p">(</span><span class="n">TestFixture</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TestEdgeIntersection.setUp">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span><span class="o">-</span><span class="mf">1.</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.</span><span class="p">,</span><span class="o">-</span><span class="mf">1.</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">raySmoothing</span> <span class="o">=</span> <span class="mf">1e-5</span></div>
+
+
+        
+<div class="viewcode-block" id="TestEdgeIntersection.get_edge">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.get_edge">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">v1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">v2</span><span class="p">])</span></div>
+
+
+    
+<div class="viewcode-block" id="TestEdgeIntersection.get_ray">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.get_ray">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_ray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normal</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">normal</span><span class="p">])</span> </div>
+
+
+
+<div class="viewcode-block" id="TestEdgeIntersection.compute_ray_trace">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.compute_ray_trace">[docs]</a>
+    <span class="k">def</span> <span class="nf">compute_ray_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normal</span><span class="p">):</span>
+        <span class="n">edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_edge</span><span class="p">()</span>
+        <span class="n">ray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ray</span><span class="p">(</span><span class="n">normal</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">EdgeIntersection</span><span class="o">.</span><span class="n">compute_valid_ray_trace_distance_smoothed</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">ray</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">raySmoothing</span><span class="p">)</span></div>
+
+
+        
+<div class="viewcode-block" id="TestEdgeIntersection.test_valid_intersection">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_valid_intersection">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_valid_intersection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">normal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">])</span>
+        
+        <span class="n">rayLength</span><span class="p">,</span><span class="n">edgeParCoord</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_ray_trace</span><span class="p">(</span><span class="n">normal</span><span class="p">)</span>
+                                                        
+        <span class="n">pointOnEdge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v1</span> <span class="o">+</span> <span class="n">edgeParCoord</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v2</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">v1</span><span class="p">)</span>
+        <span class="n">pointOnRay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">+</span> <span class="n">rayLength</span><span class="o">*</span><span class="n">normal</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayEqual</span><span class="p">(</span><span class="n">pointOnEdge</span><span class="p">,</span> <span class="n">pointOnRay</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayEqual</span><span class="p">(</span><span class="n">pointOnEdge</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">edgeParCoord</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rayLength</span> <span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestEdgeIntersection.test_valid_intersection_on_edge">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_valid_intersection_on_edge">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_valid_intersection_on_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">normal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">1.</span><span class="p">])</span>
+
+        <span class="n">rayLength</span><span class="p">,</span><span class="n">edgeParCoord</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_ray_trace</span><span class="p">(</span><span class="n">normal</span><span class="p">)</span>
+        <span class="n">pointOnEdge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v1</span> <span class="o">+</span> <span class="n">edgeParCoord</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v2</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">v1</span><span class="p">)</span>
+        <span class="n">pointOnRay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">+</span> <span class="n">rayLength</span><span class="o">*</span><span class="n">normal</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayEqual</span><span class="p">(</span><span class="n">pointOnEdge</span><span class="p">,</span> <span class="n">pointOnRay</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayEqual</span><span class="p">(</span><span class="n">pointOnEdge</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">edgeParCoord</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">rayLength</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span></div>
+
+
+        
+<div class="viewcode-block" id="TestEdgeIntersection.test_smooth_gradient_on_either_side_of_right_edge">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_smooth_gradient_on_either_side_of_right_edge">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_smooth_gradient_on_either_side_of_right_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ray_trace</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">normal</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_ray_trace</span><span class="p">(</span><span class="n">normal</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ray_trace_grad</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">ray_trace</span><span class="p">)</span>
+
+        <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-15</span>
+        <span class="n">normalIn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="n">eps</span><span class="p">,</span><span class="mf">1.</span><span class="p">])</span>
+        <span class="n">normalOut</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">+</span><span class="n">eps</span><span class="p">,</span><span class="mf">1.</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">ray_trace</span><span class="p">(</span><span class="n">normalIn</span><span class="p">),</span> <span class="n">ray_trace</span><span class="p">(</span><span class="n">normalOut</span><span class="p">),</span> <span class="mi">13</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">ray_trace_grad</span><span class="p">(</span><span class="n">normalIn</span><span class="p">),</span> <span class="n">ray_trace_grad</span><span class="p">(</span><span class="n">normalOut</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span></div>
+
+
+        
+<div class="viewcode-block" id="TestEdgeIntersection.test_smooth_gradient_on_either_side_of_left_edge">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_smooth_gradient_on_either_side_of_left_edge">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_smooth_gradient_on_either_side_of_left_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ray_trace</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">normal</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_ray_trace</span><span class="p">(</span><span class="n">normal</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ray_trace_grad</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">ray_trace</span><span class="p">)</span>
+
+        <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-15</span>
+        <span class="n">normalIn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span><span class="n">eps</span><span class="p">])</span>
+        <span class="n">normalOut</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span><span class="o">-</span><span class="n">eps</span><span class="p">])</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">ray_trace</span><span class="p">(</span><span class="n">normalIn</span><span class="p">),</span> <span class="n">ray_trace</span><span class="p">(</span><span class="n">normalOut</span><span class="p">),</span> <span class="mi">13</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">ray_trace_grad</span><span class="p">(</span><span class="n">normalIn</span><span class="p">),</span> <span class="n">ray_trace_grad</span><span class="p">(</span><span class="n">normalOut</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span></div>
+
+        
+
+<div class="viewcode-block" id="TestEdgeIntersection.test_limit_of_ray_smoothing">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_limit_of_ray_smoothing">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_limit_of_ray_smoothing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ray_trace</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">normal</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_ray_trace</span><span class="p">(</span><span class="n">normal</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">normalRight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.99</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">raySmoothing</span><span class="p">,</span> <span class="mf">1.</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">ray_trace</span><span class="p">(</span><span class="n">normalRight</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">ray_trace</span><span class="p">(</span><span class="n">normalRight</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+
+        <span class="n">normalMoreRight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.99999</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">raySmoothing</span><span class="p">,</span> <span class="mf">1.</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">ray_trace</span><span class="p">(</span><span class="n">normalMoreRight</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">ray_trace</span><span class="p">(</span><span class="n">normalMoreRight</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        
+        <span class="n">normalWayRight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.01</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">raySmoothing</span><span class="p">,</span> <span class="mf">1.</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">ray_trace</span><span class="p">(</span><span class="n">normalWayRight</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">)</span>
+
+        <span class="n">normalLeft</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.99</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">raySmoothing</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">ray_trace</span><span class="p">(</span><span class="n">normalLeft</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">ray_trace</span><span class="p">(</span><span class="n">normalLeft</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+
+        <span class="n">normalMoreLeft</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.99999</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">raySmoothing</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">ray_trace</span><span class="p">(</span><span class="n">normalMoreLeft</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">ray_trace</span><span class="p">(</span><span class="n">normalMoreLeft</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        
+        <span class="n">normalWayLeft</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.01</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">raySmoothing</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">ray_trace</span><span class="p">(</span><span class="n">normalWayLeft</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">)</span></div>
+
+        
+        
+<div class="viewcode-block" id="TestEdgeIntersection.get_ray_length_arg_x">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.get_ray_length_arg_x">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_ray_length_arg_x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xComp</span><span class="p">):</span>
+        <span class="n">sol</span> <span class="o">=</span> <span class="n">EdgeIntersection</span><span class="o">.</span><span class="n">compute_intersection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_edge</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ray</span><span class="p">([</span><span class="n">xComp</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">sol</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+    
+<div class="viewcode-block" id="TestEdgeIntersection.get_ray_length_arg_y">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.get_ray_length_arg_y">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_ray_length_arg_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yComp</span><span class="p">):</span>
+        <span class="n">sol</span> <span class="o">=</span> <span class="n">EdgeIntersection</span><span class="o">.</span><span class="n">compute_intersection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_edge</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ray</span><span class="p">([</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">yComp</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">sol</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+    
+<div class="viewcode-block" id="TestEdgeIntersection.test_plot">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_plot">[docs]</a>
+    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skip</span>
+    <span class="k">def</span> <span class="nf">test_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="mi">150</span>
+        <span class="n">xcomp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+        <span class="n">rays</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_ray_length_arg_x</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xcomp</span><span class="p">]</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xcomp</span><span class="p">,</span> <span class="n">rays</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+        
+<div class="viewcode-block" id="TestEdgeIntersection.test_plot2">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_plot2">[docs]</a>
+    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skip</span>
+    <span class="k">def</span> <span class="nf">test_plot2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="mi">150</span>
+        <span class="n">ycomp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+        <span class="n">rays</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_ray_length_arg_y</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ycomp</span><span class="p">]</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ycomp</span><span class="p">,</span> <span class="n">rays</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="n">rayDer</span> <span class="o">=</span> <span class="p">[</span><span class="n">jit</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_ray_length_arg_y</span><span class="p">))(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ycomp</span><span class="p">]</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ycomp</span><span class="p">,</span> <span class="n">rayDer</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+</div>
+
+
+        
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,94 @@
+optimism.material package
+=========================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   optimism.material.test
+
+Submodules
+----------
+
+optimism.material.Gent module
+-----------------------------
+
+.. automodule:: optimism.material.Gent
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.material.Hardening module
+----------------------------------
+
+.. automodule:: optimism.material.Hardening
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.material.HyperViscoelastic module
+------------------------------------------
+
+.. automodule:: optimism.material.HyperViscoelastic
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.material.J2Plastic module
+----------------------------------
+
+.. automodule:: optimism.material.J2Plastic
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.material.LinearElastic module
+--------------------------------------
+
+.. automodule:: optimism.material.LinearElastic
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.material.MaterialModel module
+--------------------------------------
+
+.. automodule:: optimism.material.MaterialModel
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.material.MaterialUniaxialSimulator module
+--------------------------------------------------
+
+.. automodule:: optimism.material.MaterialUniaxialSimulator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.material.Neohookean module
+-----------------------------------
+
+.. automodule:: optimism.material.Neohookean
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+Module contents
+---------------
+
+.. automodule:: optimism.material
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:

@@ -1,0 +1,482 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.material.test.test_J2Plastic &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.material.test.test_J2Plastic</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.material.test.test_J2Plastic</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">jax.scipy</span> <span class="kn">import</span> <span class="n">linalg</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">EquationSolver</span> <span class="k">as</span> <span class="n">EqSolver</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">FunctionSpace</span>
+<span class="kn">from</span> <span class="nn">optimism.material</span> <span class="kn">import</span> <span class="n">J2Plastic</span> <span class="k">as</span> <span class="n">J2</span>
+<span class="kn">from</span> <span class="nn">optimism.material</span> <span class="kn">import</span> <span class="n">MaterialUniaxialSimulator</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mechanics</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Objective</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">QuadratureRule</span>
+<span class="kn">from</span> <span class="nn">optimism.test.TestFixture</span> <span class="kn">import</span> <span class="n">TestFixture</span>
+<span class="kn">from</span> <span class="nn">optimism.test.MeshFixture</span> <span class="kn">import</span> <span class="n">MeshFixture</span>
+
+
+<span class="n">plotting</span><span class="o">=</span><span class="kc">False</span>
+
+
+<div class="viewcode-block" id="make_disp_grad_from_strain">
+<a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.make_disp_grad_from_strain">[docs]</a>
+<span class="k">def</span> <span class="nf">make_disp_grad_from_strain</span><span class="p">(</span><span class="n">strain</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">linalg</span><span class="o">.</span><span class="n">expm</span><span class="p">(</span><span class="n">strain</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span></div>
+
+        
+
+<div class="viewcode-block" id="GradOfPlasticityModelFixture">
+<a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture">[docs]</a>
+<span class="k">class</span> <span class="nc">GradOfPlasticityModelFixture</span><span class="p">(</span><span class="n">TestFixture</span><span class="p">):</span>
+<div class="viewcode-block" id="GradOfPlasticityModelFixture.setUp">
+<a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    
+        <span class="n">E</span> <span class="o">=</span> <span class="mf">100.0</span>
+        <span class="n">poisson</span> <span class="o">=</span> <span class="mf">0.321</span>
+        <span class="n">Y0</span> <span class="o">=</span> <span class="mf">0.3</span><span class="o">*</span><span class="n">E</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="mf">1.0e-2</span><span class="o">*</span><span class="n">E</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">props</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">:</span> <span class="n">E</span><span class="p">,</span>
+                      <span class="s1">&#39;poisson ratio&#39;</span><span class="p">:</span> <span class="n">poisson</span><span class="p">,</span>
+                      <span class="s1">&#39;yield strength&#39;</span><span class="p">:</span> <span class="n">Y0</span><span class="p">,</span>
+                      <span class="s1">&#39;hardening model&#39;</span><span class="p">:</span> <span class="s1">&#39;linear&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;hardening modulus&#39;</span><span class="p">:</span> <span class="n">H</span><span class="p">}</span>
+
+        <span class="n">materialModel</span> <span class="o">=</span> <span class="n">J2</span><span class="o">.</span><span class="n">create_material_model_functions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">energy_density</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">materialModel</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stress_func</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_density</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compute_state_new</span> <span class="o">=</span> <span class="n">materialModel</span><span class="o">.</span><span class="n">compute_state_new</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tangents_func</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">hessian</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energy_density</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compute_initial_state</span> <span class="o">=</span> <span class="n">materialModel</span><span class="o">.</span><span class="n">compute_initial_state</span></div>
+
+        
+<div class="viewcode-block" id="GradOfPlasticityModelFixture.test_zero_point">
+<a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.test_zero_point">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_zero_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dispGrad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+        <span class="n">energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+
+        <span class="n">stress</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stress_func</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">stress</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)),</span> <span class="mi">12</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="GradOfPlasticityModelFixture.test_elastic_energy">
+<a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.test_elastic_energy">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_elastic_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">strainBelowYield</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;yield strength&#39;</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">]</span>
+        
+        <span class="n">strain</span> <span class="o">=</span> <span class="n">strainBelowYield</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;poisson ratio&#39;</span><span class="p">],</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;poisson ratio&#39;</span><span class="p">]]))</span>
+        <span class="n">dispGrad</span> <span class="o">=</span> <span class="n">make_disp_grad_from_strain</span><span class="p">(</span><span class="n">strain</span><span class="p">)</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="mf">1.0</span>
+        
+        <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span>
+
+        <span class="n">energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="n">WExact</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">strainBelowYield</span><span class="o">**</span><span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">WExact</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+
+        <span class="n">F</span> <span class="o">=</span> <span class="n">dispGrad</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">kirchhoffStress</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stress_func</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span> <span class="o">@</span> <span class="n">F</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">kirchhoffstressExact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">strainBelowYield</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">kirchhoffStress</span><span class="p">,</span> <span class="n">kirchhoffstressExact</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span></div>
+
+
+        
+<div class="viewcode-block" id="GradOfPlasticityModelFixture.test_elastic_strain_path">
+<a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.test_elastic_strain_path">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_elastic_strain_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">strain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+        <span class="n">strain_inc</span> <span class="o">=</span> <span class="mf">1e-6</span>
+        <span class="n">stateOld</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+        <span class="n">strainHistory</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">stressHistory</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">eqpsHistory</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">energyHistory</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+            <span class="n">dispGrad</span> <span class="o">=</span> <span class="n">make_disp_grad_from_strain</span><span class="p">(</span><span class="n">strain</span><span class="p">)</span>
+            <span class="n">F</span> <span class="o">=</span> <span class="n">dispGrad</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+            <span class="n">energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+            <span class="n">strainHistory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">stateNew</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+            <span class="n">stressNew</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stress_func</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateNew</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span> <span class="o">@</span> <span class="n">F</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">stressHistory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stressNew</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">eqpsHistory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stateNew</span><span class="p">[</span><span class="n">J2</span><span class="o">.</span><span class="n">EQPS</span><span class="p">])</span>
+            <span class="n">energyHistory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
+
+            <span class="n">stateOld</span> <span class="o">=</span> <span class="n">stateNew</span>
+            <span class="n">strain</span> <span class="o">=</span> <span class="n">dispGrad</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">strain_inc</span><span class="p">)</span>
+
+        <span class="n">E</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">]</span>
+        <span class="n">nu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;poisson ratio&#39;</span><span class="p">]</span>
+        <span class="n">stressNewExp</span> <span class="o">=</span> <span class="n">E</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">nu</span><span class="p">)</span> <span class="o">/</span> <span class="p">((</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">nu</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">nu</span><span class="p">))</span> <span class="o">*</span> <span class="n">strainHistory</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">stressHistory</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">stressNewExp</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">eqpsHistory</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">eqpsHistory</span><span class="p">)),</span> <span class="mi">12</span><span class="p">)</span></div>
+
+
+        
+<div class="viewcode-block" id="GradOfPlasticityModelFixture.test_plastic_strain_path">
+<a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.test_plastic_strain_path">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_plastic_strain_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">strain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+        <span class="n">strain_inc</span> <span class="o">=</span> <span class="mf">0.2</span>
+        <span class="n">stateOld</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="mf">1.0</span>
+        
+        <span class="n">strainHistory</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">stressHistory</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tangentsHistory</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">eqpsHistory</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">energyHistory</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">strain</span> <span class="o">=</span> <span class="n">strain</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">strain_inc</span><span class="p">)</span>
+            <span class="n">dispGrad</span> <span class="o">=</span> <span class="n">make_disp_grad_from_strain</span><span class="p">(</span><span class="n">strain</span><span class="p">)</span>
+            <span class="n">F</span> <span class="o">=</span> <span class="n">dispGrad</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+            <span class="n">energy</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+            <span class="n">tangentsNew</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tangents_func</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+            <span class="n">stateNew</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+            <span class="n">stressNew</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stress_func</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span> <span class="o">@</span> <span class="n">F</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">strainHistory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">strain</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">stressHistory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stressNew</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">tangentsHistory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tangentsNew</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">eqpsHistory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stateNew</span><span class="p">[</span><span class="n">J2</span><span class="o">.</span><span class="n">EQPS</span><span class="p">])</span>
+            <span class="n">energyHistory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
+
+            <span class="n">stateOld</span> <span class="o">=</span> <span class="n">stateNew</span>
+
+        <span class="k">if</span> <span class="n">plotting</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">strainHistory</span><span class="p">,</span> <span class="n">energyHistory</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">fillstyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;strain&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;potential density&#39;</span><span class="p">)</span>
+            
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">strainHistory</span><span class="p">,</span> <span class="n">stressHistory</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">fillstyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;strain&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;stress&#39;</span><span class="p">)</span>
+            
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">strainHistory</span><span class="p">,</span> <span class="n">eqpsHistory</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;strain&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Eq Pl Strain&#39;</span><span class="p">)</span>
+            
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">strainHistory</span><span class="p">,</span> <span class="n">tangentsHistory</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;strain&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Tangent modulus&#39;</span><span class="p">)</span>
+            
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="n">E</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">]</span>
+        <span class="n">nu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;poisson ratio&#39;</span><span class="p">]</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">E</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">nu</span><span class="p">)</span>
+        <span class="n">lam</span> <span class="o">=</span> <span class="n">E</span><span class="o">*</span><span class="n">nu</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">nu</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">nu</span><span class="p">)</span>
+        <span class="n">Y0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;yield strength&#39;</span><span class="p">]</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;hardening modulus&#39;</span><span class="p">]</span>
+        <span class="n">strainEnd</span> <span class="o">=</span> <span class="n">strainHistory</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># for solutions, refer to jax-fem/papers/plane_strain_unit_test.pdf</span>
+        <span class="n">eqpsExp</span> <span class="o">=</span> <span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">i</span> <span class="o">*</span> <span class="n">mu</span> <span class="o">-</span> <span class="n">Y0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.0</span><span class="o">*</span><span class="n">mu</span> <span class="o">+</span> <span class="n">H</span><span class="p">)</span> <span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">strainHistory</span><span class="p">]</span>
+        <span class="n">stressNewExp</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">mu</span> <span class="o">*</span> <span class="n">Y0</span> <span class="o">+</span> \
+            <span class="mf">2.0</span> <span class="o">*</span> <span class="n">strainEnd</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> \
+            <span class="n">strainEnd</span> <span class="o">*</span> <span class="n">H</span> <span class="o">*</span> <span class="n">lam</span> <span class="o">+</span> \
+            <span class="mf">2.0</span> <span class="o">*</span> <span class="n">strainEnd</span> <span class="o">*</span> <span class="n">H</span> <span class="o">*</span> <span class="n">mu</span> <span class="o">+</span> \
+            <span class="mf">3.0</span> <span class="o">*</span> <span class="n">strainEnd</span> <span class="o">*</span> <span class="n">lam</span> <span class="o">*</span> <span class="n">mu</span><span class="p">)</span> \
+            <span class="o">/</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">mu</span> <span class="o">+</span> <span class="n">H</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span> <span class="n">stressHistory</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">stressNewExp</span><span class="p">,</span> <span class="mi">11</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">eqpsHistory</span><span class="p">,</span> <span class="n">eqpsExp</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="J2UpdateFixture">
+<a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.J2UpdateFixture">[docs]</a>
+<span class="k">class</span> <span class="nc">J2UpdateFixture</span><span class="p">(</span><span class="n">TestFixture</span><span class="p">):</span>
+<div class="viewcode-block" id="J2UpdateFixture.setUp">
+<a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.J2UpdateFixture.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="mf">100.0</span>
+        <span class="n">poisson</span> <span class="o">=</span> <span class="mf">0.321</span>
+        <span class="n">Y0</span> <span class="o">=</span> <span class="mf">0.3</span><span class="o">*</span><span class="n">E</span>
+        <span class="n">eps0</span> <span class="o">=</span> <span class="n">Y0</span><span class="o">/</span><span class="n">E</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">4</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">props</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">:</span> <span class="n">E</span><span class="p">,</span>
+                      <span class="s1">&#39;poisson ratio&#39;</span><span class="p">:</span> <span class="n">poisson</span><span class="p">,</span>
+                      <span class="s1">&#39;yield strength&#39;</span><span class="p">:</span> <span class="n">Y0</span><span class="p">,</span>
+                      <span class="s1">&#39;hardening model&#39;</span><span class="p">:</span> <span class="s1">&#39;power law&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;hardening exponent&#39;</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span>
+                      <span class="s1">&#39;reference plastic strain&#39;</span><span class="p">:</span> <span class="n">eps0</span><span class="p">}</span>
+
+        <span class="n">materialModel</span> <span class="o">=</span> <span class="n">J2</span><span class="o">.</span><span class="n">create_material_model_functions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">compute_state_new</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">materialModel</span><span class="o">.</span><span class="n">compute_state_new</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compute_initial_state</span> <span class="o">=</span> <span class="n">materialModel</span><span class="o">.</span><span class="n">compute_initial_state</span></div>
+
+
+<div class="viewcode-block" id="J2UpdateFixture.test_update_only_happens_once">
+<a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.J2UpdateFixture.test_update_only_happens_once">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_update_only_happens_once</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+        <span class="c1"># get 10,000 random displacement gradients</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">dispGrads</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="mi">10000</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+        <span class="c1"># get 10,000 copies of the initial state</span>
+        <span class="n">states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">(),</span> <span class="p">(</span><span class="mi">10000</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">states_new</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compute_state_new</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">))(</span><span class="n">dispGrads</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+
+        <span class="n">states_should_be_unchanged</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compute_state_new</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">))(</span><span class="n">dispGrads</span><span class="p">,</span> <span class="n">states_new</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayEqual</span><span class="p">(</span><span class="n">states_new</span><span class="p">,</span> <span class="n">states_should_be_unchanged</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="J2PlasticUniaxial">
+<a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.J2PlasticUniaxial">[docs]</a>
+<span class="k">class</span> <span class="nc">J2PlasticUniaxial</span><span class="p">(</span><span class="n">TestFixture</span><span class="p">):</span>
+
+<div class="viewcode-block" id="J2PlasticUniaxial.setUp">
+<a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.J2PlasticUniaxial.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="mf">100.0e3</span>
+        <span class="n">nu</span> <span class="o">=</span> <span class="mf">0.25</span>
+        <span class="n">Y0</span> <span class="o">=</span> <span class="mf">30.0</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="n">E</span><span class="o">/</span><span class="mi">200</span>
+
+        <span class="n">properties</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">:</span> <span class="n">E</span><span class="p">,</span>
+                      <span class="s1">&#39;poisson ratio&#39;</span><span class="p">:</span> <span class="n">nu</span><span class="p">,</span>
+                      <span class="s1">&#39;yield strength&#39;</span><span class="p">:</span> <span class="n">Y0</span><span class="p">,</span>
+                      <span class="s1">&#39;kinematics&#39;</span><span class="p">:</span> <span class="s1">&#39;large deformations&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;hardening model&#39;</span><span class="p">:</span> <span class="s1">&#39;linear&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;hardening modulus&#39;</span><span class="p">:</span> <span class="n">H</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="o">=</span> <span class="n">E</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Y0</span> <span class="o">=</span> <span class="n">Y0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">H</span> <span class="o">=</span> <span class="n">H</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mat</span> <span class="o">=</span> <span class="n">J2</span><span class="o">.</span><span class="n">create_material_model_functions</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="J2PlasticUniaxial.test_uniaxial">
+<a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.J2PlasticUniaxial.test_uniaxial">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_uniaxial</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">strainRate</span> <span class="o">=</span> <span class="mf">1e-3</span>
+
+        <span class="k">def</span> <span class="nf">constant_true_strain_rate</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">expm1</span><span class="p">(</span><span class="n">strainRate</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
+
+        <span class="n">maxTime</span> <span class="o">=</span> <span class="mf">20.0</span>
+
+        <span class="n">uniaxial</span> <span class="o">=</span> <span class="n">MaterialUniaxialSimulator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">,</span> <span class="n">constant_true_strain_rate</span><span class="p">,</span> <span class="n">maxTime</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+        <span class="n">logStrainHistory</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">uniaxial</span><span class="o">.</span><span class="n">strainHistory</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">yieldStrain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y0</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">E</span>
+        <span class="n">exact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">logStrainHistory</span> <span class="o">&lt;</span> <span class="n">yieldStrain</span><span class="p">,</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="o">*</span><span class="n">logStrainHistory</span><span class="p">,</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="o">*</span><span class="n">logStrainHistory</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y0</span><span class="p">))</span>
+
+        <span class="c1"># convert Piola stress output to Kirchhoff stress</span>
+        <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">kirchhoffStressHistory</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">H</span><span class="p">,</span> <span class="n">P</span><span class="p">:</span> <span class="n">P</span><span class="o">@</span><span class="p">(</span><span class="n">H</span> <span class="o">+</span> <span class="n">I</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)(</span><span class="n">uniaxial</span><span class="o">.</span><span class="n">strainHistory</span><span class="p">,</span> <span class="n">uniaxial</span><span class="o">.</span><span class="n">stressHistory</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">kirchhoffStressHistory</span><span class="p">[:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">exact</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="PlasticityOnMesh">
+<a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.PlasticityOnMesh">[docs]</a>
+<span class="k">class</span> <span class="nc">PlasticityOnMesh</span><span class="p">(</span><span class="n">MeshFixture</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PlasticityOnMesh.test_plasticity_with_mesh">
+<a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.PlasticityOnMesh.test_plasticity_with_mesh">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_plasticity_with_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">dispGrad0</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">],</span>
+                               <span class="p">[</span><span class="o">-</span><span class="mf">0.04</span><span class="p">,</span> <span class="mf">0.68</span><span class="p">]])</span>
+        <span class="n">mesh</span><span class="p">,</span> <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_mesh_and_disp</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">,[</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">],[</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">],</span>
+                                            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">dispGrad0</span><span class="nd">@x</span><span class="p">)</span>
+        
+        <span class="n">E</span> <span class="o">=</span> <span class="mf">100.0</span>
+        <span class="n">poisson</span> <span class="o">=</span> <span class="mf">0.321</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="mf">1e-2</span> <span class="o">*</span> <span class="n">E</span>
+        <span class="n">Y0</span> <span class="o">=</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="n">E</span>
+
+        <span class="n">props</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">:</span> <span class="n">E</span><span class="p">,</span>
+                 <span class="s1">&#39;poisson ratio&#39;</span><span class="p">:</span> <span class="n">poisson</span><span class="p">,</span>
+                 <span class="s1">&#39;yield strength&#39;</span><span class="p">:</span> <span class="n">Y0</span><span class="p">,</span>
+                 <span class="s1">&#39;hardening model&#39;</span><span class="p">:</span> <span class="s1">&#39;linear&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;hardening modulus&#39;</span><span class="p">:</span> <span class="n">H</span><span class="p">}</span>
+
+        <span class="n">materialModel</span> <span class="o">=</span> <span class="n">J2</span><span class="o">.</span><span class="n">create_material_model_functions</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
+
+        <span class="n">quadRule</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">create_quadrature_rule_on_triangle</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">construct_function_space</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">)</span>
+        
+        <span class="n">mechFuncs</span> <span class="o">=</span> <span class="n">Mechanics</span><span class="o">.</span><span class="n">create_mechanics_functions</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span>
+                                                         <span class="s2">&quot;plane strain&quot;</span><span class="p">,</span>
+                                                         <span class="n">materialModel</span><span class="p">)</span>
+                
+        <span class="n">EBCs</span> <span class="o">=</span> <span class="p">[</span><span class="n">FunctionSpace</span><span class="o">.</span><span class="n">EssentialBC</span><span class="p">(</span><span class="n">nodeSet</span><span class="o">=</span><span class="s1">&#39;all_boundary&#39;</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">EssentialBC</span><span class="p">(</span><span class="n">nodeSet</span><span class="o">=</span><span class="s1">&#39;all_boundary&#39;</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
+        <span class="n">dofManager</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">DofManager</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">EBCs</span><span class="p">)</span>
+        
+        <span class="n">Ubc</span> <span class="o">=</span> <span class="n">dofManager</span><span class="o">.</span><span class="n">get_bc_values</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
+
+        <span class="n">nElems</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+        <span class="n">nQpsPerElem</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">len</span><span class="p">(</span><span class="n">quadRule</span><span class="p">)</span>
+        <span class="n">internalVariables</span> <span class="o">=</span> <span class="n">mechFuncs</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span>
+
+        <span class="n">tOld</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="n">tOld</span><span class="p">]))</span>
+        
+        
+        <span class="k">def</span> <span class="nf">compute_energy</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+            <span class="n">U</span> <span class="o">=</span> <span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="p">)</span>
+            <span class="n">internalVariables</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">mechFuncs</span><span class="o">.</span><span class="n">compute_strain_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+
+        <span class="n">UuGuess</span> <span class="o">=</span> <span class="mf">0.0</span><span class="o">*</span><span class="n">dofManager</span><span class="o">.</span><span class="n">get_unknown_values</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
+        
+        <span class="n">objective</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Objective</span><span class="p">(</span><span class="n">compute_energy</span><span class="p">,</span> <span class="n">UuGuess</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        
+        <span class="n">Uu</span><span class="p">,</span> <span class="n">solverSuccess</span> <span class="o">=</span> <span class="n">EqSolver</span><span class="o">.</span><span class="n">nonlinear_equation_solve</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">UuGuess</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">EqSolver</span><span class="o">.</span><span class="n">get_settings</span><span class="p">(),</span> <span class="n">useWarmStart</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">solverSuccess</span><span class="p">)</span>
+        
+        <span class="n">U</span> <span class="o">=</span> <span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="p">)</span>
+
+        <span class="n">dispGrads</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">compute_field_gradient</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">dg</span> <span class="ow">in</span> <span class="n">dispGrads</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nElems</span><span class="o">*</span><span class="n">nQpsPerElem</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">dg</span><span class="p">,</span> <span class="n">dispGrad0</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+
+        <span class="n">internalVariablesNew</span> <span class="o">=</span> <span class="n">mechFuncs</span><span class="o">.</span><span class="n">compute_updated_internal_variables</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">t</span> <span class="o">-</span> <span class="n">tOld</span><span class="p">)</span>
+        
+        <span class="c1"># check to make sure plastic strain evolved</span>
+        <span class="c1"># if this fails, make the applied displacement grad bigger</span>
+        <span class="n">eqpsField</span> <span class="o">=</span> <span class="n">internalVariablesNew</span><span class="p">[:,:,</span><span class="n">J2</span><span class="o">.</span><span class="n">EQPS</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">eqpsField</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">1e-8</span><span class="p">)</span></div>
+</div>
+
+
+        
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

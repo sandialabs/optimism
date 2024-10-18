@@ -1,0 +1,322 @@
+optimism package
+================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   optimism.contact
+   optimism.material
+   optimism.phasefield
+   optimism.test
+
+Submodules
+----------
+
+optimism.AlSolver module
+------------------------
+
+.. automodule:: optimism.AlSolver
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.BoundConstrainedObjective module
+-----------------------------------------
+
+.. automodule:: optimism.BoundConstrainedObjective
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.BoundConstrainedSolver module
+--------------------------------------
+
+.. automodule:: optimism.BoundConstrainedSolver
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.ConstrainedObjective module
+------------------------------------
+
+.. automodule:: optimism.ConstrainedObjective
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.EquationSolver module
+------------------------------
+
+.. automodule:: optimism.EquationSolver
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.EquationSolverSubspace module
+--------------------------------------
+
+.. automodule:: optimism.EquationSolverSubspace
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.FunctionSpace module
+-----------------------------
+
+.. automodule:: optimism.FunctionSpace
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.IncompleteCholesky module
+----------------------------------
+
+.. automodule:: optimism.IncompleteCholesky
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.Interpolants module
+----------------------------
+
+.. automodule:: optimism.Interpolants
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.J2PlasticPhaseField module
+-----------------------------------
+
+.. automodule:: optimism.J2PlasticPhaseField
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.JaxConfig module
+-------------------------
+
+.. automodule:: optimism.JaxConfig
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.LU module
+------------------
+
+.. automodule:: optimism.LU
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.LinAlg module
+----------------------
+
+.. automodule:: optimism.LinAlg
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.Math module
+--------------------
+
+.. automodule:: optimism.Math
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.Mechanics module
+-------------------------
+
+.. automodule:: optimism.Mechanics
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.Mesh module
+--------------------
+
+.. automodule:: optimism.Mesh
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.MeshPlot module
+------------------------
+
+.. automodule:: optimism.MeshPlot
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.MinimizeScalar module
+------------------------------
+
+.. automodule:: optimism.MinimizeScalar
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.NewtonSolver module
+----------------------------
+
+.. automodule:: optimism.NewtonSolver
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.Objective module
+-------------------------
+
+.. automodule:: optimism.Objective
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.QuadratureRule module
+------------------------------
+
+.. automodule:: optimism.QuadratureRule
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.ReadExodusMesh module
+------------------------------
+
+.. automodule:: optimism.ReadExodusMesh
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.ReadMesh module
+------------------------
+
+.. automodule:: optimism.ReadMesh
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.ScalarRootFind module
+------------------------------
+
+.. automodule:: optimism.ScalarRootFind
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.SmoothFunctions module
+-------------------------------
+
+.. automodule:: optimism.SmoothFunctions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.SparseCholesky module
+------------------------------
+
+.. automodule:: optimism.SparseCholesky
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.SparseMatrixAssembler module
+-------------------------------------
+
+.. automodule:: optimism.SparseMatrixAssembler
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.Surface module
+-----------------------
+
+.. automodule:: optimism.Surface
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.TensorMath module
+--------------------------
+
+.. automodule:: optimism.TensorMath
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.Timer module
+---------------------
+
+.. automodule:: optimism.Timer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.TrustRegionSPG module
+------------------------------
+
+.. automodule:: optimism.TrustRegionSPG
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.VTKWriter module
+-------------------------
+
+.. automodule:: optimism.VTKWriter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.WarmStart module
+-------------------------
+
+.. automodule:: optimism.WarmStart
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+Module contents
+---------------
+
+.. automodule:: optimism
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:

@@ -1,0 +1,263 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.test.test_ScalarRootFinder &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.test.test_ScalarRootFinder</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.test.test_ScalarRootFinder</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">float_info</span>
+
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">minimize_scalar</span><span class="p">,</span> <span class="n">root_scalar</span> <span class="c1"># for comparison</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">OptimizeResult</span>
+
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">ScalarRootFind</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">TestFixture</span>
+
+
+<div class="viewcode-block" id="f">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_ScalarRootFinder.f">[docs]</a>
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="k">return</span> <span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="mf">4.0</span></div>
+
+
+
+<div class="viewcode-block" id="ScalarRootFindTestFixture">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_ScalarRootFinder.ScalarRootFindTestFixture">[docs]</a>
+<span class="k">class</span> <span class="nc">ScalarRootFindTestFixture</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ScalarRootFindTestFixture.setUp">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_ScalarRootFinder.ScalarRootFindTestFixture.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">ScalarRootFind</span><span class="o">.</span><span class="n">get_settings</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rootGuess</span> <span class="o">=</span> <span class="mf">1e-5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rootExpected</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cbrt</span><span class="p">(</span><span class="mf">4.0</span><span class="p">)</span></div>
+
+
+
+        <span class="c1"># this shows that a scipy root finder takes longer</span>
+        <span class="c1"># sp_opts = {&#39;xtol&#39;: self.settings.x_tol, &#39;maxiter&#39;: self.settings.max_iters}</span>
+        <span class="c1"># result = root_scalar(f, method=&#39;brentq&#39;, bracket=self.rootBracket)</span>
+        <span class="c1"># self.scipy_function_calls = result.function_calls</span>
+        <span class="c1"># self.scipy_iterations = result.iterations</span>
+        <span class="c1"># print(&#39;scipy root &#39;, result.root)</span>
+        <span class="c1"># print(&#39;scipy fevals &#39;, result.function_calls)</span>
+        <span class="c1"># print(&#39;scipy iterations &#39;, result.iterations)</span>
+        
+
+<div class="viewcode-block" id="ScalarRootFindTestFixture.test_find_root">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_ScalarRootFinder.ScalarRootFindTestFixture.test_find_root">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_find_root</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rootBracket</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">float_info</span><span class="o">.</span><span class="n">epsilon</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">])</span>
+        <span class="n">root</span><span class="p">,</span> <span class="n">status</span> <span class="o">=</span> <span class="n">ScalarRootFind</span><span class="o">.</span><span class="n">find_root</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rootGuess</span><span class="p">,</span> <span class="n">rootBracket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">status</span><span class="o">.</span><span class="n">converged</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rootExpected</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span></div>
+
+
+        
+<div class="viewcode-block" id="ScalarRootFindTestFixture.test_find_root_with_jit">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_ScalarRootFinder.ScalarRootFindTestFixture.test_find_root_with_jit">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_find_root_with_jit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rtsafe_jit</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">ScalarRootFind</span><span class="o">.</span><span class="n">find_root</span><span class="p">,</span> <span class="n">static_argnums</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+        <span class="n">rootBracket</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">float_info</span><span class="o">.</span><span class="n">epsilon</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">])</span>
+        <span class="n">root</span><span class="p">,</span> <span class="n">status</span> <span class="o">=</span> <span class="n">rtsafe_jit</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rootGuess</span><span class="p">,</span> <span class="n">rootBracket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">status</span><span class="o">.</span><span class="n">converged</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rootExpected</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ScalarRootFindTestFixture.test_unbracketed_root_gives_nan">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_ScalarRootFinder.ScalarRootFindTestFixture.test_unbracketed_root_gives_nan">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_unbracketed_root_gives_nan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rootBracket</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">])</span>
+        <span class="n">root</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ScalarRootFind</span><span class="o">.</span><span class="n">find_root</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rootGuess</span><span class="p">,</span> <span class="n">rootBracket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">root</span><span class="p">))</span></div>
+
+
+        
+<div class="viewcode-block" id="ScalarRootFindTestFixture.test_find_root_converges_on_hard_function">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_ScalarRootFinder.ScalarRootFindTestFixture.test_find_root_converges_on_hard_function">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_find_root_converges_on_hard_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">x</span>
+        <span class="n">rootBracket</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">])</span>
+        <span class="n">x0</span> <span class="o">=</span> <span class="mf">19.0</span>
+        <span class="n">root</span><span class="p">,</span> <span class="n">status</span> <span class="o">=</span> <span class="n">ScalarRootFind</span><span class="o">.</span><span class="n">find_root</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">rootBracket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">status</span><span class="o">.</span><span class="n">converged</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rootExpected</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span></div>
+
+
+        
+<div class="viewcode-block" id="ScalarRootFindTestFixture.test_root_find_is_differentiable">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_ScalarRootFinder.ScalarRootFindTestFixture.test_root_find_is_differentiable">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_root_find_is_differentiable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">myfunc</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="n">a</span>
+        <span class="k">def</span> <span class="nf">cube_root</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+            <span class="n">rootBracket</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">float_info</span><span class="o">.</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">a</span><span class="p">])</span>
+            <span class="n">root</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ScalarRootFind</span><span class="o">.</span><span class="n">find_root</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">myfunc</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">),</span> <span class="mf">8.0</span><span class="p">,</span> <span class="n">rootBracket</span><span class="p">,</span> 
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">root</span>
+                                            
+        <span class="n">root</span> <span class="o">=</span> <span class="n">cube_root</span><span class="p">(</span><span class="mf">4.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rootExpected</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jacfwd</span><span class="p">(</span><span class="n">cube_root</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="mf">3.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">df</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">x</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ScalarRootFindTestFixture.test_find_root_with_forced_bisection_step">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_ScalarRootFinder.ScalarRootFindTestFixture.test_find_root_with_forced_bisection_step">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_find_root_with_forced_bisection_step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">myfunc</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">a</span>
+        <span class="k">def</span> <span class="nf">my_sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+            <span class="n">rootBracket</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">float_info</span><span class="o">.</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">a</span><span class="p">])</span>
+            <span class="n">root</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ScalarRootFind</span><span class="o">.</span><span class="n">find_root</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">myfunc</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">),</span> <span class="mf">8.0</span><span class="p">,</span>
+                                               <span class="n">rootBracket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">root</span>
+
+        <span class="n">r</span> <span class="o">=</span> <span class="n">my_sqrt</span><span class="p">(</span><span class="mf">9.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ScalarRootFindTestFixture.test_root_find_with_vmap_and_jit">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_ScalarRootFinder.ScalarRootFindTestFixture.test_root_find_with_vmap_and_jit">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_root_find_with_vmap_and_jit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">myfunc</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">a</span>
+        <span class="k">def</span> <span class="nf">my_sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+            <span class="n">rootBracket</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">float_info</span><span class="o">.</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">a</span><span class="p">])</span>
+            <span class="n">root</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ScalarRootFind</span><span class="o">.</span><span class="n">find_root</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">myfunc</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">),</span> <span class="mf">8.0</span><span class="p">,</span>
+                                               <span class="n">rootBracket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">root</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">,</span> <span class="mf">16.0</span><span class="p">])</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">my_sqrt</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">expectedRoots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">F</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">expectedRoots</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ScalarRootFindTestFixture.test_solves_when_left_bracket_is_solution">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_ScalarRootFinder.ScalarRootFindTestFixture.test_solves_when_left_bracket_is_solution">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_solves_when_left_bracket_is_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rootBracket</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
+        <span class="n">guess</span> <span class="o">=</span> <span class="mf">3.0</span>
+        <span class="n">root</span><span class="p">,</span> <span class="n">status</span> <span class="o">=</span> <span class="n">ScalarRootFind</span><span class="o">.</span><span class="n">find_root</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mf">10.0</span><span class="p">),</span> <span class="n">guess</span><span class="p">,</span> <span class="n">rootBracket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">status</span><span class="o">.</span><span class="n">converged</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ScalarRootFindTestFixture.test_solves_when_right_bracket_is_solution">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_ScalarRootFinder.ScalarRootFindTestFixture.test_solves_when_right_bracket_is_solution">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_solves_when_right_bracket_is_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rootBracket</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+        <span class="n">guess</span> <span class="o">=</span> <span class="mf">3.0</span>
+        <span class="n">root</span><span class="p">,</span> <span class="n">status</span> <span class="o">=</span> <span class="n">ScalarRootFind</span><span class="o">.</span><span class="n">find_root</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mf">10.0</span><span class="p">),</span> <span class="n">guess</span><span class="p">,</span> <span class="n">rootBracket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">status</span><span class="o">.</span><span class="n">converged</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span></div>
+</div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">TestFixture</span><span class="o">.</span><span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

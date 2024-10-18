@@ -1,0 +1,309 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.AlSolver &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.AlSolver</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.AlSolver</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">optimism.EquationSolver</span> <span class="k">as</span> <span class="nn">EqSolver</span>
+<span class="kn">from</span> <span class="nn">optimism.NewtonSolver</span> <span class="kn">import</span> <span class="n">globalized_newton_step</span>
+<span class="kn">from</span> <span class="nn">optimism.NewtonSolver</span> <span class="kn">import</span> <span class="n">newton_step</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">WarmStart</span>
+
+<span class="n">Settings</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Settings&#39;</span><span class="p">,</span>
+                      <span class="p">[</span><span class="s1">&#39;penalty_scaling&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;target_constraint_decrease_factor&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;relative_gmres_tol&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;max_gmres_iters&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;use_second_order_update&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;use_newton_only&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;num_initial_low_order_iterations&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;inverse_ncp_hessian_bound&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;max_al_iters&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;tol&#39;</span><span class="p">])</span>
+
+<div class="viewcode-block" id="get_settings">
+<a class="viewcode-back" href="../../optimism.html#optimism.AlSolver.get_settings">[docs]</a>
+<span class="k">def</span> <span class="nf">get_settings</span><span class="p">(</span><span class="n">penalty_scaling</span><span class="o">=</span><span class="mf">4.</span><span class="p">,</span>
+                 <span class="n">target_constraint_decrease_factor</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span>
+                 <span class="n">relative_gmres_tol</span><span class="o">=</span><span class="mf">2e-2</span><span class="p">,</span>
+                 <span class="n">max_gmres_iters</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                 <span class="n">use_second_order_update</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">use_newton_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">num_initial_low_order_iterations</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                 <span class="n">inverse_ncp_hessian_bound</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span>
+                 <span class="n">max_al_iters</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                 <span class="n">tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
+    
+    <span class="k">return</span> <span class="n">Settings</span><span class="p">(</span><span class="n">penalty_scaling</span><span class="p">,</span>
+                    <span class="n">target_constraint_decrease_factor</span><span class="p">,</span>
+                    <span class="n">relative_gmres_tol</span><span class="p">,</span>
+                    <span class="n">max_gmres_iters</span><span class="p">,</span>
+                    <span class="n">use_second_order_update</span><span class="p">,</span>
+                    <span class="n">use_newton_only</span><span class="p">,</span>
+                    <span class="n">num_initial_low_order_iterations</span><span class="p">,</span>
+                    <span class="n">inverse_ncp_hessian_bound</span><span class="p">,</span>
+                    <span class="n">max_al_iters</span><span class="p">,</span>
+                    <span class="n">tol</span><span class="p">)</span></div>
+
+
+<span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span>
+
+
+<div class="viewcode-block" id="solve_sub_step">
+<a class="viewcode-back" href="../../optimism.html#optimism.AlSolver.solve_sub_step">[docs]</a>
+<span class="k">def</span> <span class="nf">solve_sub_step</span><span class="p">(</span><span class="n">alObjective</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">ncpErrorOld</span><span class="p">,</span> <span class="n">alSettings</span><span class="p">,</span> <span class="n">subSettings</span><span class="p">,</span> <span class="n">sub_problem_solver</span><span class="p">,</span> <span class="n">sub_problem_callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">solverSuccess</span> <span class="o">=</span> <span class="n">sub_problem_solver</span><span class="p">(</span><span class="n">alObjective</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">subSettings</span><span class="p">,</span> <span class="n">sub_problem_callback</span><span class="p">)</span>
+    
+    <span class="n">c</span> <span class="o">=</span> <span class="n">alObjective</span><span class="o">.</span><span class="n">constraint</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">kappa</span> <span class="o">=</span> <span class="n">alObjective</span><span class="o">.</span><span class="n">kappa</span>
+    <span class="n">alObjective</span><span class="o">.</span><span class="n">lam</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">alObjective</span><span class="o">.</span><span class="n">lam</span><span class="o">-</span><span class="n">kappa</span><span class="o">*</span><span class="n">c</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    
+    <span class="n">ncpError</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span> <span class="n">alObjective</span><span class="o">.</span><span class="n">ncp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">)</span>
+    <span class="c1"># check if each constraint is making progress, or if they are already small relative to the specificed constraint tolerances</span>
+    <span class="n">poorProgress</span> <span class="o">=</span> <span class="n">ncpError</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">alSettings</span><span class="o">.</span><span class="n">target_constraint_decrease_factor</span> <span class="o">*</span> <span class="n">ncpErrorOld</span><span class="p">,</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">alSettings</span><span class="o">.</span><span class="n">tol</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ncpError</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">poorProgress</span><span class="p">)</span> <span class="ow">and</span> <span class="n">solverSuccess</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Poor progress on ncp detected, increasing some penalty parameters&#39;</span><span class="p">)</span>
+        <span class="n">alObjective</span><span class="o">.</span><span class="n">kappa</span> <span class="o">=</span> <span class="n">kappa</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">poorProgress</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">alSettings</span><span class="o">.</span><span class="n">penalty_scaling</span><span class="o">*</span><span class="n">kappa</span><span class="p">[</span><span class="n">poorProgress</span><span class="p">])</span>
+        
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">ncpError</span><span class="p">,</span> <span class="n">solverSuccess</span></div>
+
+
+
+<div class="viewcode-block" id="linear_update">
+<a class="viewcode-back" href="../../optimism.html#optimism.AlSolver.linear_update">[docs]</a>
+<span class="k">def</span> <span class="nf">linear_update</span><span class="p">(</span><span class="n">alObjective</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">rhs_func</span><span class="p">,</span> <span class="n">alSettings</span><span class="p">):</span>
+    <span class="n">xl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">alObjective</span><span class="o">.</span><span class="n">lam</span><span class="p">))</span>
+    <span class="n">xsize</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span>
+
+    
+    <span class="k">def</span> <span class="nf">residual_jac_vec</span><span class="p">(</span><span class="n">vxl</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">alObjective</span><span class="o">.</span><span class="n">constrained_jacobian_vec</span><span class="p">(</span><span class="n">xl</span><span class="p">,</span> <span class="n">vxl</span><span class="p">)</span>
+
+    
+    <span class="k">def</span> <span class="nf">precond</span><span class="p">(</span><span class="n">vl</span><span class="p">):</span>
+        <span class="n">xR</span> <span class="o">=</span> <span class="n">vl</span><span class="p">[:</span><span class="n">xsize</span><span class="p">]</span>
+        <span class="n">lR</span> <span class="o">=</span> <span class="n">vl</span><span class="p">[</span><span class="n">xsize</span><span class="p">:]</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="n">alObjective</span><span class="o">.</span><span class="n">ncp_hessian</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="n">constraintDiffCap</span> <span class="o">=</span> <span class="n">alSettings</span><span class="o">.</span><span class="n">inverse_ncp_hessian_bound</span>
+        <span class="n">nearSingularValues</span> <span class="o">=</span> <span class="n">D</span> <span class="o">&gt;</span> <span class="o">-</span><span class="n">constraintDiffCap</span>
+        
+        <span class="n">DInv</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">D</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">nearSingularValues</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="o">-</span><span class="n">constraintDiffCap</span><span class="p">)</span>
+        <span class="n">DInvCapped</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">nearSingularValues</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+        
+        <span class="n">deltaL</span> <span class="o">=</span> <span class="n">lR</span> <span class="o">*</span> <span class="n">DInv</span>
+        <span class="n">deltaX</span> <span class="o">=</span> <span class="n">alObjective</span><span class="o">.</span><span class="n">apply_precond</span><span class="p">(</span><span class="n">xR</span> <span class="o">-</span> <span class="n">alObjective</span><span class="o">.</span><span class="n">jacobian_l_vec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lR</span> <span class="o">*</span> <span class="n">DInvCapped</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">deltaX</span><span class="p">,</span> <span class="n">deltaL</span><span class="p">))</span>
+    
+    <span class="n">dxl</span><span class="p">,</span> <span class="n">solveSuccess</span> <span class="o">=</span> <span class="n">newton_step</span><span class="p">(</span><span class="n">rhs_func</span><span class="p">,</span> <span class="n">residual_jac_vec</span><span class="p">,</span>
+                                    <span class="n">xl</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">alSettings</span><span class="p">,</span> <span class="n">precond</span><span class="o">=</span><span class="n">precond</span><span class="p">)</span>
+            
+    <span class="k">return</span> <span class="n">dxl</span><span class="p">[:</span><span class="n">xsize</span><span class="p">],</span> <span class="n">dxl</span><span class="p">[</span><span class="n">xsize</span><span class="p">:],</span> <span class="n">solveSuccess</span></div>
+
+        
+
+<div class="viewcode-block" id="augmented_lagrange_solve">
+<a class="viewcode-back" href="../../optimism.html#optimism.AlSolver.augmented_lagrange_solve">[docs]</a>
+<span class="k">def</span> <span class="nf">augmented_lagrange_solve</span><span class="p">(</span><span class="n">alObjective</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">alSettings</span><span class="p">,</span> <span class="n">subSettings</span><span class="p">,</span>
+                             <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                             <span class="n">sub_problem_callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                             <span class="n">sub_problem_solver</span><span class="o">=</span><span class="n">EqSolver</span><span class="o">.</span><span class="n">trust_region_minimize</span><span class="p">,</span>
+                             <span class="n">useWarmStart</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                             <span class="n">updatePrecond</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                             <span class="n">updatePrecondBeforeWarmStart</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">useWarmStart</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">updatePrecondBeforeWarmStart</span><span class="p">:</span>
+            <span class="n">alObjective</span><span class="o">.</span><span class="n">update_precond</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">+=</span> <span class="n">WarmStart</span><span class="o">.</span><span class="n">warm_start_increment</span><span class="p">(</span><span class="n">alObjective</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="n">alObjective</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">alObjective</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
+
+    <span class="k">if</span> <span class="n">updatePrecond</span><span class="p">:</span>
+        <span class="n">alObjective</span><span class="o">.</span><span class="n">update_precond</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        
+    <span class="n">hugeVal</span> <span class="o">=</span> <span class="mf">1e64</span>
+    <span class="n">ncpError</span> <span class="o">=</span> <span class="n">hugeVal</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">alObjective</span><span class="o">.</span><span class="n">lam</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">errorNorm</span> <span class="o">=</span> <span class="n">hugeVal</span>
+    
+    <span class="n">maxAlIters</span> <span class="o">=</span> <span class="n">alSettings</span><span class="o">.</span><span class="n">max_al_iters</span>
+
+    <span class="n">initialTolScaling</span> <span class="o">=</span> <span class="mf">100.0</span>
+    <span class="n">tolRampDownIters</span><span class="o">=</span><span class="mi">3</span>
+    
+    <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxAlIters</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">it</span> <span class="o">&lt;</span> <span class="n">tolRampDownIters</span><span class="p">:</span>
+            <span class="n">tolScaling</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">initialTolScaling</span><span class="p">,</span> <span class="p">(</span><span class="n">tolRampDownIters</span><span class="o">-</span><span class="n">it</span><span class="p">)</span> <span class="o">/</span> <span class="n">tolRampDownIters</span><span class="p">)</span>
+            <span class="n">settings</span> <span class="o">=</span> <span class="n">EqSolver</span><span class="o">.</span><span class="n">settings_with_new_tol</span><span class="p">(</span><span class="n">subSettings</span><span class="p">,</span>
+                                                      <span class="n">tolScaling</span> <span class="o">*</span> <span class="n">subSettings</span><span class="o">.</span><span class="n">tol</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">settings</span> <span class="o">=</span> <span class="n">subSettings</span>
+            
+        <span class="k">if</span> <span class="n">callback</span><span class="p">:</span> <span class="n">callback</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">alObjective</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        
+        <span class="n">updatePrecond</span><span class="o">=</span><span class="kc">False</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">alSettings</span><span class="o">.</span><span class="n">use_second_order_update</span> <span class="ow">and</span> <span class="n">it</span> <span class="o">&gt;=</span><span class="n">alSettings</span><span class="o">.</span><span class="n">num_initial_low_order_iterations</span><span class="p">)</span> <span class="ow">or</span> <span class="n">alSettings</span><span class="o">.</span><span class="n">use_newton_only</span><span class="p">:</span>
+            
+            <span class="n">dx</span><span class="p">,</span> <span class="n">dl</span><span class="p">,</span> <span class="n">solveSuccess</span> <span class="o">=</span> <span class="n">linear_update</span><span class="p">(</span><span class="n">alObjective</span><span class="p">,</span>
+                                                 <span class="n">x</span><span class="p">,</span>
+                                                 <span class="n">alObjective</span><span class="o">.</span><span class="n">constrained_residual</span><span class="p">,</span>
+                                                 <span class="n">alSettings</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">solveSuccess</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">updatePrecond</span><span class="o">=</span><span class="kc">True</span>
+
+            <span class="n">lamSave</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">alObjective</span><span class="o">.</span><span class="n">lam</span><span class="p">)</span>
+            
+            <span class="n">maxLinesearchIters</span><span class="o">=</span><span class="mi">10</span>
+            <span class="k">for</span> <span class="n">linesearch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxLinesearchIters</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">linesearch</span><span class="o">==</span><span class="n">maxLinesearchIters</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">updatePrecond</span><span class="o">=</span><span class="kc">True</span>
+                
+                <span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">dx</span>
+                <span class="n">alObjective</span><span class="o">.</span><span class="n">lam</span> <span class="o">=</span> <span class="n">alObjective</span><span class="o">.</span><span class="n">lam</span> <span class="o">+</span> <span class="n">dl</span>
+
+                <span class="n">trialErrorNorm</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">alObjective</span><span class="o">.</span><span class="n">total_residual</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+                
+                <span class="k">if</span> <span class="n">norm</span><span class="p">(</span><span class="n">trialErrorNorm</span>  <span class="o">&lt;</span> <span class="n">errorNorm</span><span class="p">):</span>
+                    <span class="c1"># print(&#39;Force error after 2nd order update success = &#39;, norm(alObjective.gradient(y)))</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Total error after 2nd order update = &#39;</span><span class="p">,</span> <span class="n">trialErrorNorm</span><span class="p">)</span>
+                    <span class="n">errorNorm</span> <span class="o">=</span> <span class="n">trialErrorNorm</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">y</span>
+                    <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Total error after 2nd order update = &#39;</span><span class="p">,</span> <span class="n">trialErrorNorm</span><span class="p">,</span>
+                          <span class="s1">&#39;, no improvement&#39;</span><span class="p">)</span>
+                    <span class="n">alObjective</span><span class="o">.</span><span class="n">lam</span> <span class="o">=</span> <span class="n">lamSave</span>
+                    <span class="n">dx</span> <span class="o">*=</span> <span class="mf">0.2</span>
+                    <span class="n">dl</span> <span class="o">*=</span> <span class="mf">0.2</span>
+
+        <span class="k">if</span> <span class="n">updatePrecond</span><span class="p">:</span>
+            <span class="c1">#print(&#39;GMRES solver was struggling.&#39;)</span>
+            <span class="n">alObjective</span><span class="o">.</span><span class="n">update_precond</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">alSettings</span><span class="o">.</span><span class="n">use_newton_only</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">ncpError</span><span class="p">,</span> <span class="n">solverSuccess</span> <span class="o">=</span> <span class="n">solve_sub_step</span><span class="p">(</span><span class="n">alObjective</span><span class="p">,</span>
+                                                        <span class="n">x</span><span class="p">,</span>
+                                                        <span class="n">ncpError</span><span class="p">,</span>
+                                                        <span class="n">alSettings</span><span class="p">,</span>
+                                                        <span class="n">settings</span><span class="p">,</span>
+                                                        <span class="n">sub_problem_solver</span><span class="p">,</span>
+                                                        <span class="n">sub_problem_callback</span><span class="p">)</span>
+            
+            <span class="n">forceErrorNorm</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">alObjective</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;force error = &#39;</span><span class="p">,</span> <span class="n">forceErrorNorm</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ncp error = &#39;</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">ncpError</span><span class="p">))</span>
+            <span class="n">errorNorm</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">alObjective</span><span class="o">.</span><span class="n">total_residual</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;total error = &#39;</span><span class="p">,</span> <span class="n">errorNorm</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">errorNorm</span> <span class="o">&lt;</span> <span class="n">alSettings</span><span class="o">.</span><span class="n">tol</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">callback</span><span class="p">:</span> <span class="n">callback</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">alObjective</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">x</span>
+
+    <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s1">&#39;Loadstep failed to converge in&#39;</span><span class="p">,</span> <span class="n">maxAlIters</span><span class="p">,</span> <span class="s1">&#39;iterations.&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

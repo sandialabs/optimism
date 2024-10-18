@@ -1,0 +1,304 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.LinAlg &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.LinAlg</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.LinAlg</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="n">if_then_else</span>
+<span class="kn">from</span> <span class="nn">optimism.QuadratureRule</span> <span class="kn">import</span> <span class="n">create_padded_quadrature_rule_1D</span>
+
+<span class="nd">@jax</span><span class="o">.</span><span class="n">custom_jvp</span>
+<span class="k">def</span> <span class="nf">sqrtm</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">sqrtA</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">sqrtm_dbp</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sqrtA</span>
+
+
+<div class="viewcode-block" id="jvp_sqrtm">
+<a class="viewcode-back" href="../../optimism.html#optimism.LinAlg.jvp_sqrtm">[docs]</a>
+<span class="nd">@sqrtm</span><span class="o">.</span><span class="n">defjvp</span>
+<span class="k">def</span> <span class="nf">jvp_sqrtm</span><span class="p">(</span><span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
+    <span class="n">A</span><span class="p">,</span> <span class="o">=</span> <span class="n">primals</span>
+    <span class="n">H</span><span class="p">,</span> <span class="o">=</span> <span class="n">tangents</span>
+    <span class="n">sqrtA</span> <span class="o">=</span> <span class="n">sqrtm</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># TODO(brandon): Use a stable algorithm for solving a Sylvester equation.</span>
+    <span class="c1"># See https://en.wikipedia.org/wiki/Bartels%E2%80%93Stewart_algorithm</span>
+    <span class="c1"># The following will only reliably work for small matrices.</span>
+    <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">sqrtA</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">I</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">sqrtA</span><span class="p">)</span>
+    <span class="n">Hvec</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">sqrtA</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">Hvec</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span><span class="n">dim</span><span class="p">))</span><span class="o">.</span><span class="n">T</span></div>
+
+
+
+<div class="viewcode-block" id="sqrtm_dbp">
+<a class="viewcode-back" href="../../optimism.html#optimism.LinAlg.sqrtm_dbp">[docs]</a>
+<span class="k">def</span> <span class="nf">sqrtm_dbp</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Matrix square root by product form of Denman-Beavers iteration.</span>
+<span class="sd">    </span>
+<span class="sd">    Translated from the Matrix Function Toolbox</span>
+<span class="sd">    http://www.ma.man.ac.uk/~higham/mftoolbox</span>
+<span class="sd">    Nicholas J. Higham, Functions of Matrices: Theory and Computation,</span>
+<span class="sd">    SIAM, Philadelphia, PA, USA, 2008. ISBN 978-0-898716-46-7,</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dim</span>        <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">tol</span>        <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;float64&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">eps</span>
+    <span class="n">maxIters</span>   <span class="o">=</span> <span class="mi">32</span>
+    <span class="n">scaleTol</span>   <span class="o">=</span> <span class="mf">0.01</span>
+
+    <span class="k">def</span> <span class="nf">scaling</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+        <span class="n">d</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">M</span><span class="p">))</span><span class="o">**</span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">dim</span><span class="p">))</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">d</span>
+        <span class="k">return</span> <span class="n">g</span>
+    
+    <span class="k">def</span> <span class="nf">cond_f</span><span class="p">(</span><span class="n">loopData</span><span class="p">):</span>
+        <span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">error</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">loopData</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">k</span> <span class="o">&lt;</span> <span class="n">maxIters</span><span class="p">,</span> <span class="n">error</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">body_f</span><span class="p">(</span><span class="n">loopData</span><span class="p">):</span>
+        <span class="n">X</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">diff</span> <span class="o">=</span> <span class="n">loopData</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diff</span> <span class="o">&gt;=</span> <span class="n">scaleTol</span><span class="p">,</span>
+                     <span class="n">scaling</span><span class="p">(</span><span class="n">M</span><span class="p">),</span>
+                     <span class="mf">1.0</span><span class="p">)</span>
+        
+        <span class="n">X</span> <span class="o">*=</span> <span class="n">g</span>
+        <span class="n">M</span> <span class="o">*=</span> <span class="n">g</span> <span class="o">*</span> <span class="n">g</span>
+        
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">X</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+        <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">X</span> <span class="o">@</span> <span class="p">(</span><span class="n">I</span> <span class="o">+</span> <span class="n">N</span><span class="p">)</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">I</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">M</span> <span class="o">+</span> <span class="n">N</span><span class="p">))</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">M</span> <span class="o">-</span> <span class="n">I</span><span class="p">,</span> <span class="s1">&#39;fro&#39;</span><span class="p">)</span>
+        <span class="n">diff</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="n">Y</span><span class="p">,</span> <span class="s1">&#39;fro&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="s1">&#39;fro&#39;</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span>
+
+    <span class="n">X0</span>        <span class="o">=</span> <span class="n">A</span>
+    <span class="n">M0</span>        <span class="o">=</span> <span class="n">A</span>
+    <span class="n">error0</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;float64&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">max</span>
+    <span class="n">k0</span>        <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">diff0</span>     <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">scaleTol</span> <span class="c1"># want to force scaling on first iteration</span>
+    <span class="n">loopData0</span> <span class="o">=</span> <span class="p">(</span><span class="n">X0</span><span class="p">,</span> <span class="n">M0</span><span class="p">,</span> <span class="n">error0</span><span class="p">,</span> <span class="n">k0</span><span class="p">,</span> <span class="n">diff0</span><span class="p">)</span>
+    
+    <span class="n">X</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">while_loop</span><span class="p">(</span><span class="n">cond_f</span><span class="p">,</span> <span class="n">body_f</span><span class="p">,</span> <span class="n">loopData0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span><span class="n">k</span></div>
+
+
+
+<span class="nd">@jax</span><span class="o">.</span><span class="n">custom_jvp</span>
+<span class="k">def</span> <span class="nf">logm_iss</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">X</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">m</span> <span class="o">=</span> <span class="n">_logm_iss</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">k</span><span class="p">)</span> <span class="o">*</span> <span class="n">log_pade_pf</span><span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">m</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="logm_jvp">
+<a class="viewcode-back" href="../../optimism.html#optimism.LinAlg.logm_jvp">[docs]</a>
+<span class="nd">@logm_iss</span><span class="o">.</span><span class="n">defjvp</span>
+<span class="k">def</span> <span class="nf">logm_jvp</span><span class="p">(</span><span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
+    <span class="n">A</span><span class="p">,</span> <span class="o">=</span> <span class="n">primals</span>
+    <span class="n">H</span><span class="p">,</span> <span class="o">=</span> <span class="n">tangents</span>
+    <span class="n">logA</span> <span class="o">=</span> <span class="n">logm_iss</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">DexpLogA</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jacfwd</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">expm</span><span class="p">)(</span><span class="n">logA</span><span class="p">)</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">JVP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">DexpLogA</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dim</span><span class="o">*</span><span class="n">dim</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">H</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">logA</span><span class="p">,</span> <span class="n">JVP</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="n">dim</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_logm_iss">
+<a class="viewcode-back" href="../../optimism.html#optimism.LinAlg._logm_iss">[docs]</a>
+<span class="k">def</span> <span class="nf">_logm_iss</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Logarithmic map by inverse scaling and squaring and Padé approximants</span>
+<span class="sd">    </span>
+<span class="sd">    Translated from the Matrix Function Toolbox</span>
+<span class="sd">    http://www.ma.man.ac.uk/~higham/mftoolbox</span>
+<span class="sd">    Nicholas J. Higham, Functions of Matrices: Theory and Computation,</span>
+<span class="sd">    SIAM, Philadelphia, PA, USA, 2008. ISBN 978-0-898716-46-7,</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">c15</span> <span class="o">=</span> <span class="n">log_pade_coefficients</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">cond_f</span><span class="p">(</span><span class="n">loopData</span><span class="p">):</span>
+        <span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">converged</span> <span class="o">=</span> <span class="n">loopData</span>
+        <span class="n">conditions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">~</span><span class="n">converged</span><span class="p">,</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="mi">16</span><span class="p">],</span> <span class="n">dtype</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">conditions</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">compute_pade_degree</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">itk</span><span class="p">):</span>
+        <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c1"># Manually force the return type of searchsorted to be 64-bit int, because it</span>
+        <span class="c1"># returns 32-bit ints, ignoring the global `jax_enable_x64` flag. This looks</span>
+        <span class="c1"># like a bug. I filed an issue (#11375) with Jax to correct this.</span>
+        <span class="c1"># If they fix it, the conversions on p and q can be removed.</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">log_pade_coefficients</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">16</span><span class="p">],</span> <span class="n">diff</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="mi">2</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">log_pade_coefficients</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">16</span><span class="p">],</span> <span class="n">diff</span><span class="o">/</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">+=</span> <span class="mi">2</span>
+        <span class="n">m</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">converged</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="n">q</span><span class="p">)</span> <span class="o">//</span> <span class="mi">3</span> <span class="o">&lt;</span> <span class="n">itk</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">j</span> <span class="o">==</span> <span class="mi">2</span><span class="p">),</span>
+                                     <span class="p">(</span><span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="kc">True</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="kc">False</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">m</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">converged</span>
+
+    <span class="k">def</span> <span class="nf">body_f</span><span class="p">(</span><span class="n">loopData</span><span class="p">):</span>
+        <span class="n">X</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">itk</span><span class="p">,</span><span class="n">converged</span> <span class="o">=</span> <span class="n">loopData</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">dim</span><span class="p">),</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">m</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">converged</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">diff</span> <span class="o">&lt;</span> <span class="n">c15</span><span class="p">,</span>
+                                     <span class="n">compute_pade_degree</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">itk</span><span class="p">),</span>
+                                     <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">converged</span><span class="p">))</span>
+        <span class="n">X</span><span class="p">,</span><span class="n">itk</span> <span class="o">=</span> <span class="n">sqrtm_dbp</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">X</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">itk</span><span class="p">,</span><span class="n">converged</span>
+
+    <span class="n">X</span>   <span class="o">=</span> <span class="n">A</span>
+    <span class="n">j</span>   <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">k</span>   <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">m</span>   <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">itk</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">converged</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">X</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">itk</span><span class="p">,</span><span class="n">converged</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">while_loop</span><span class="p">(</span><span class="n">cond_f</span><span class="p">,</span> <span class="n">body_f</span><span class="p">,</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">itk</span><span class="p">,</span><span class="n">converged</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">m</span></div>
+
+
+
+<div class="viewcode-block" id="log_pade_pf">
+<a class="viewcode-back" href="../../optimism.html#optimism.LinAlg.log_pade_pf">[docs]</a>
+<span class="k">def</span> <span class="nf">log_pade_pf</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Logarithmic map by Padé approximant and partial fractions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">quadPrec</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">xs</span><span class="p">,</span><span class="n">ws</span> <span class="o">=</span> <span class="n">create_padded_quadrature_rule_1D</span><span class="p">(</span><span class="n">quadPrec</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_log_inc</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">I</span> <span class="o">+</span> <span class="n">x</span><span class="o">*</span><span class="n">A</span>
+        <span class="n">dXT</span> <span class="o">=</span> <span class="n">w</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dXT</span>
+
+    <span class="n">dXsTransposed</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">get_log_inc</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))(</span><span class="n">A</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">ws</span><span class="p">)</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dXsTransposed</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        
+    <span class="k">return</span> <span class="n">X</span></div>
+
+
+
+<span class="n">log_pade_coefficients</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+    <span class="mf">1.100343044625278e-05</span><span class="p">,</span> <span class="mf">1.818617533662554e-03</span><span class="p">,</span> <span class="mf">1.620628479501567e-02</span><span class="p">,</span> <span class="mf">5.387353263138127e-02</span><span class="p">,</span>
+    <span class="mf">1.135280226762866e-01</span><span class="p">,</span> <span class="mf">1.866286061354130e-01</span><span class="p">,</span> <span class="mf">2.642960831111435e-01</span><span class="p">,</span> <span class="mf">3.402172331985299e-01</span><span class="p">,</span>
+    <span class="mf">4.108235000556820e-01</span><span class="p">,</span> <span class="mf">4.745521256007768e-01</span><span class="p">,</span> <span class="mf">5.310667521178455e-01</span><span class="p">,</span> <span class="mf">5.806887133441684e-01</span><span class="p">,</span>
+    <span class="mf">6.240414344012918e-01</span><span class="p">,</span> <span class="mf">6.618482563071411e-01</span><span class="p">,</span> <span class="mf">6.948266172489354e-01</span><span class="p">,</span> <span class="mf">7.236382701437292e-01</span><span class="p">,</span>
+    <span class="mf">7.488702930926310e-01</span><span class="p">,</span> <span class="mf">7.710320825151814e-01</span><span class="p">,</span> <span class="mf">7.905600074925671e-01</span><span class="p">,</span> <span class="mf">8.078252198050853e-01</span><span class="p">,</span>
+    <span class="mf">8.231422814010787e-01</span><span class="p">,</span> <span class="mf">8.367774696147783e-01</span><span class="p">,</span> <span class="mf">8.489562661576765e-01</span><span class="p">,</span> <span class="mf">8.598698723737197e-01</span><span class="p">,</span>
+    <span class="mf">8.696807597657327e-01</span><span class="p">,</span> <span class="mf">8.785273397512191e-01</span><span class="p">,</span> <span class="mf">8.865278635527148e-01</span><span class="p">,</span> <span class="mf">8.937836659824918e-01</span><span class="p">,</span>
+    <span class="mf">9.003818585631236e-01</span><span class="p">,</span> <span class="mf">9.063975647545747e-01</span><span class="p">,</span> <span class="mf">9.118957765024351e-01</span><span class="p">,</span> <span class="mf">9.169328985287867e-01</span><span class="p">,</span>
+    <span class="mf">9.215580354375991e-01</span><span class="p">,</span> <span class="mf">9.258140669835052e-01</span><span class="p">,</span> <span class="mf">9.297385486977516e-01</span><span class="p">,</span> <span class="mf">9.333644683151422e-01</span><span class="p">,</span>
+    <span class="mf">9.367208829050256e-01</span><span class="p">,</span> <span class="mf">9.398334570841484e-01</span><span class="p">,</span> <span class="mf">9.427249190039424e-01</span><span class="p">,</span> <span class="mf">9.454154478075423e-01</span><span class="p">,</span>
+    <span class="mf">9.479230038146050e-01</span><span class="p">,</span> <span class="mf">9.502636107090112e-01</span><span class="p">,</span> <span class="mf">9.524515973891873e-01</span><span class="p">,</span> <span class="mf">9.544998058228285e-01</span><span class="p">,</span>
+    <span class="mf">9.564197701703862e-01</span><span class="p">,</span> <span class="mf">9.582218715590143e-01</span><span class="p">,</span> <span class="mf">9.599154721638511e-01</span><span class="p">,</span> <span class="mf">9.615090316568806e-01</span><span class="p">,</span>
+    <span class="mf">9.630102085912245e-01</span><span class="p">,</span> <span class="mf">9.644259488813590e-01</span><span class="p">,</span> <span class="mf">9.657625632018019e-01</span><span class="p">,</span> <span class="mf">9.670257948457799e-01</span><span class="p">,</span>
+    <span class="mf">9.682208793510226e-01</span><span class="p">,</span> <span class="mf">9.693525970039069e-01</span><span class="p">,</span> <span class="mf">9.704253191689650e-01</span><span class="p">,</span> <span class="mf">9.714430492527785e-01</span><span class="p">,</span>
+    <span class="mf">9.724094589950460e-01</span><span class="p">,</span> <span class="mf">9.733279206814576e-01</span><span class="p">,</span> <span class="mf">9.742015357899175e-01</span><span class="p">,</span> <span class="mf">9.750331605111618e-01</span><span class="p">,</span>
+    <span class="mf">9.758254285248543e-01</span><span class="p">,</span> <span class="mf">9.765807713611383e-01</span><span class="p">,</span> <span class="mf">9.773014366339591e-01</span><span class="p">,</span> <span class="mf">9.779895043950849e-01</span> <span class="p">])</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

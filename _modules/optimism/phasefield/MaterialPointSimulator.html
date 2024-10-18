@@ -1,0 +1,255 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.phasefield.MaterialPointSimulator &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.phasefield.MaterialPointSimulator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.phasefield.MaterialPointSimulator</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
+<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">disable_jit</span>
+
+<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">EquationSolver</span> <span class="k">as</span> <span class="n">EqSolver</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">AlSolver</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Objective</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">ConstrainedObjective</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">TensorMath</span>
+
+
+<span class="n">UniaxialOutput</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;UniaxialOutput&#39;</span><span class="p">,</span>
+                            <span class="p">[</span><span class="s1">&#39;times&#39;</span><span class="p">,</span> <span class="s1">&#39;strainHistory&#39;</span><span class="p">,</span> <span class="s1">&#39;stressHistory&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;kirchhoffStressHistory&#39;</span><span class="p">,</span> <span class="s1">&#39;energyHistory&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;internalVariableHistory&#39;</span><span class="p">,</span> <span class="s1">&#39;phaseHistory&#39;</span><span class="p">])</span>
+
+<span class="n">FREE_STRAINS</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">PHASE</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">NUM_UNKNOWNS</span> <span class="o">=</span> <span class="mi">3</span>
+
+
+<div class="viewcode-block" id="MaterialPointSimulator">
+<a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.MaterialPointSimulator.MaterialPointSimulator">[docs]</a>
+<span class="k">class</span> <span class="nc">MaterialPointSimulator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates the uniaxial response of a given phase field potential density function</span>
+
+<span class="sd">    The non-axial strain components are determined by minimizing the potential,</span>
+<span class="sd">    which coincides with stress-free conditions for every stress component</span>
+<span class="sd">    besides the uniaxial stress.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    run():</span>
+<span class="sd">      Launches the simluation with the given parameters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">materialModel</span><span class="p">,</span> <span class="n">maxStrain</span><span class="p">,</span> <span class="n">strainRate</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor</span>
+
+<span class="sd">        Args</span>
+<span class="sd">        ----</span>
+<span class="sd">          materialModel: namedtuple (of functions)function</span>
+<span class="sd">            Set of functions for desired phase field fracture material model</span>
+<span class="sd">          maxStrain: float</span>
+<span class="sd">            Maximum engineering strain for uniaxial test</span>
+<span class="sd">          strainRate: float</span>
+<span class="sd">            Strain rate</span>
+<span class="sd">          steps: int</span>
+<span class="sd">            Number of time steps to take</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">          Named tuple type UniaxialOutput</span>
+<span class="sd">          Note stressHistory attribute are Piola stresses</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">strainHistory</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">strainInc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">maxStrain</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">steps</span><span class="p">,</span> <span class="n">retstep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">steps</span> <span class="o">=</span> <span class="n">steps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strainInc</span><span class="o">/</span><span class="n">strainRate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">times</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strainHistory</span><span class="o">/</span><span class="n">strainRate</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energy_density</span> <span class="o">=</span> <span class="n">materialModel</span><span class="o">.</span><span class="n">compute_energy_density</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energy_density_and_fluxes</span> <span class="o">=</span> <span class="n">jit</span><span class="p">(</span><span class="n">value_and_grad</span><span class="p">(</span><span class="n">materialModel</span><span class="o">.</span><span class="n">compute_output_energy_density</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_new</span> <span class="o">=</span> <span class="n">jit</span><span class="p">(</span><span class="n">materialModel</span><span class="o">.</span><span class="n">compute_state_new</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compute_initial_state</span> <span class="o">=</span> <span class="n">materialModel</span><span class="o">.</span><span class="n">compute_initial_state</span>
+
+    
+<div class="viewcode-block" id="MaterialPointSimulator.run">
+<a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.MaterialPointSimulator.MaterialPointSimulator.run">[docs]</a>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">gradPhase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">obj_func</span><span class="p">(</span><span class="n">unknowns</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+            <span class="n">strain</span><span class="p">,</span> <span class="n">phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">makeKinematics</span><span class="p">(</span><span class="n">unknowns</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+            <span class="n">internalVariables</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_density</span><span class="p">(</span><span class="n">strain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">gradPhase</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">constraint_func</span><span class="p">(</span><span class="n">unknowns</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">unknowns</span><span class="p">[</span><span class="n">PHASE</span><span class="p">]])</span>
+
+        <span class="n">alSettings</span> <span class="o">=</span> <span class="n">AlSolver</span><span class="o">.</span><span class="n">get_settings</span><span class="p">(</span><span class="n">target_constraint_decrease_factor</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+                                           <span class="n">num_initial_low_order_iterations</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">trSettings</span> <span class="o">=</span> <span class="n">EqSolver</span><span class="o">.</span><span class="n">get_settings</span><span class="p">()</span>
+        <span class="n">internalVariables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span>
+        
+        
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strainHistory</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">internalVariables</span><span class="p">)</span>
+
+        <span class="n">unknowns</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">NUM_UNKNOWNS</span><span class="p">)</span>
+        <span class="n">strain</span><span class="p">,</span> <span class="n">phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">makeKinematics</span><span class="p">(</span><span class="n">unknowns</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="c1">#print(&quot;uncon hessian = &quot;, jit(hessian(obj_func))(unknowns, p))</span>
+        <span class="n">energyDensity</span><span class="p">,</span> <span class="n">fluxes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_density_and_fluxes</span><span class="p">(</span><span class="n">strain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">gradPhase</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">)</span>
+        <span class="n">stress</span><span class="p">,</span> <span class="n">phaseForce</span> <span class="o">=</span> <span class="n">fluxes</span>
+        <span class="n">lam0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">phaseForce</span><span class="p">])</span>
+        <span class="n">kappa0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">10.0</span><span class="o">*</span><span class="n">phaseForce</span><span class="p">])</span> <span class="c1"># ??</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="n">ConstrainedObjective</span><span class="o">.</span><span class="n">ConstrainedObjective</span><span class="p">(</span><span class="n">obj_func</span><span class="p">,</span>
+                                                      <span class="n">constraint_func</span><span class="p">,</span>
+                                                      <span class="n">unknowns</span><span class="p">,</span>
+                                                      <span class="n">p</span><span class="p">,</span>
+                                                      <span class="n">lam0</span><span class="p">,</span>
+                                                      <span class="n">kappa0</span><span class="p">)</span>
+        
+        <span class="n">strainEnergyDensityHistory</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">stressHistory</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">kirchhoffStressHistory</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">energyHistory</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">phaseHistory</span>  <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">internalVariableHistory</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-----------------------------------&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;STEP &#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">param_index_update</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">strainHistory</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">unknowns</span> <span class="o">=</span> <span class="n">AlSolver</span><span class="o">.</span><span class="n">augmented_lagrange_solve</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">unknowns</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">alSettings</span><span class="p">,</span> <span class="n">trSettings</span><span class="p">)</span>
+            
+            <span class="n">strain</span><span class="p">,</span> <span class="n">phase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">makeKinematics</span><span class="p">(</span><span class="n">unknowns</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+            <span class="n">internalVariables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_new</span><span class="p">(</span><span class="n">strain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">gradPhase</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">param_index_update</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">)</span>
+
+            <span class="c1"># compute outputs</span>
+            <span class="n">energyDensity</span><span class="p">,</span> <span class="n">fluxes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy_density_and_fluxes</span><span class="p">(</span><span class="n">strain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">gradPhase</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">)</span>
+            <span class="n">stress</span><span class="p">,</span> <span class="n">phaseForce</span> <span class="o">=</span> <span class="n">fluxes</span>
+            <span class="n">F</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">strain</span>
+            <span class="n">stressK</span> <span class="o">=</span> <span class="n">stress</span><span class="nd">@F</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">stressHistory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stress</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">kirchhoffStressHistory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stressK</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">energyHistory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">energyDensity</span><span class="p">)</span>
+            <span class="n">internalVariableHistory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">internalVariables</span><span class="p">)</span>
+            <span class="n">phaseHistory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">UniaxialOutput</span><span class="p">(</span><span class="n">times</span><span class="o">=</span><span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">),</span>
+                              <span class="n">strainHistory</span><span class="o">=</span><span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strainHistory</span><span class="p">),</span>
+                              <span class="n">stressHistory</span><span class="o">=</span><span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">stressHistory</span><span class="p">),</span>
+                              <span class="n">kirchhoffStressHistory</span><span class="o">=</span><span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">kirchhoffStressHistory</span><span class="p">),</span>
+                              <span class="n">energyHistory</span><span class="o">=</span><span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">energyHistory</span><span class="p">),</span>
+                              <span class="n">internalVariableHistory</span><span class="o">=</span><span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">internalVariableHistory</span><span class="p">),</span>
+                              <span class="n">phaseHistory</span><span class="o">=</span><span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phaseHistory</span><span class="p">))</span></div>
+
+
+    
+<div class="viewcode-block" id="MaterialPointSimulator.makeKinematics">
+<a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.MaterialPointSimulator.MaterialPointSimulator.makeKinematics">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">makeKinematics</span><span class="p">(</span><span class="n">unknowns</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+        <span class="n">uniaxialStrain</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">freeStrains</span> <span class="o">=</span> <span class="n">unknowns</span><span class="p">[</span><span class="n">FREE_STRAINS</span><span class="p">]</span>
+        <span class="n">strain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">uniaxialStrain</span><span class="p">,</span><span class="n">freeStrains</span><span class="p">))</span> <span class="p">)</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="n">unknowns</span><span class="p">[</span><span class="n">PHASE</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">strain</span><span class="p">,</span> <span class="n">phase</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

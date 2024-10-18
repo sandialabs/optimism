@@ -1,0 +1,462 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.test.test_FunctionSpace &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.test.test_FunctionSpace</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.test.test_FunctionSpace</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">FunctionSpace</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Interpolants</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">QuadratureRule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">TestFixture</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">MeshFixture</span>
+
+
+<div class="viewcode-block" id="TestFunctionSpaceFixture">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceFixture">[docs]</a>
+<span class="k">class</span> <span class="nc">TestFunctionSpaceFixture</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TestFunctionSpaceFixture.setUp">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceFixture.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.6162298</span> <span class="p">,</span>  <span class="mf">4.4201174</span><span class="p">],</span>
+                                <span class="p">[</span><span class="o">-</span><span class="mf">2.2743905</span> <span class="p">,</span>  <span class="mf">4.53892</span>   <span class="p">],</span>
+                                <span class="p">[</span> <span class="mf">2.0868123</span> <span class="p">,</span>  <span class="mf">0.68486094</span><span class="p">]])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parentElement</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">make_parent_element_2d</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestFunctionSpaceFixture.test_mass_matrix_exactly_integrated">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceFixture.test_mass_matrix_exactly_integrated">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_mass_matrix_exactly_integrated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">UNodal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="c1"># value of U doesn&#39;t matter</span>
+        <span class="n">quadRule</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">create_quadrature_rule_on_triangle</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">stateVar</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">shape</span><span class="p">,</span> <span class="n">shapeGrad</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">compute_shapes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parentElement</span><span class="p">,</span> <span class="n">quadRule</span><span class="o">.</span><span class="n">xigauss</span><span class="p">)</span>
+        <span class="n">vol</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">compute_element_volumes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span>
+                                                    <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="p">,</span>
+                                                    <span class="bp">self</span><span class="o">.</span><span class="n">parentElement</span><span class="p">,</span>
+                                                    <span class="n">shape</span><span class="p">,</span>
+                                                    <span class="n">quadRule</span><span class="o">.</span><span class="n">wgauss</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">gradu</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span> <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">u</span><span class="o">*</span><span class="n">u</span>
+        <span class="n">compute_mass</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">hessian</span><span class="p">(</span><span class="k">lambda</span> <span class="n">U</span><span class="p">:</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_element</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">stateVar</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">shapeGrad</span><span class="p">,</span> <span class="n">vol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">FunctionSpace</span><span class="o">.</span><span class="n">default_modify_element_gradient</span><span class="p">))</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">compute_mass</span><span class="p">(</span><span class="n">UNodal</span><span class="p">)</span>
+        <span class="n">area</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">,:],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">2</span><span class="p">,:]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">,:])</span>
+        <span class="n">MExact</span> <span class="o">=</span> <span class="n">area</span><span class="o">/</span><span class="mf">12.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">],</span>
+                                     <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">],</span>
+                                     <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">]])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">MExact</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="TestFunctionSpaceFixture.test_mass_matrix_inexactly_integrated_with_low_order_quadrature">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceFixture.test_mass_matrix_inexactly_integrated_with_low_order_quadrature">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_mass_matrix_inexactly_integrated_with_low_order_quadrature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">UNodal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="c1"># value of U doesn&#39;t matter</span>
+        <span class="n">quadRule</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">create_quadrature_rule_on_triangle</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">stateVar</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">shape</span><span class="p">,</span> <span class="n">shapeGrad</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">compute_shapes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parentElement</span><span class="p">,</span> <span class="n">quadRule</span><span class="o">.</span><span class="n">xigauss</span><span class="p">)</span>
+        <span class="n">vol</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">compute_element_volumes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span>
+                                                    <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="p">,</span>
+                                                    <span class="bp">self</span><span class="o">.</span><span class="n">parentElement</span><span class="p">,</span>
+                                                    <span class="n">shape</span><span class="p">,</span>
+                                                    <span class="n">quadRule</span><span class="o">.</span><span class="n">wgauss</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">gradu</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span> <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">u</span><span class="o">*</span><span class="n">u</span>
+        <span class="n">compute_mass</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">hessian</span><span class="p">(</span><span class="k">lambda</span> <span class="n">U</span><span class="p">:</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_element</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">stateVar</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">shapeGrad</span><span class="p">,</span> <span class="n">vol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">FunctionSpace</span><span class="o">.</span><span class="n">default_modify_element_gradient</span><span class="p">))</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">compute_mass</span><span class="p">(</span><span class="n">UNodal</span><span class="p">)</span>
+        <span class="n">area</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">,:],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">2</span><span class="p">,:]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">,:])</span>
+        <span class="n">MExact</span> <span class="o">=</span> <span class="n">area</span><span class="o">/</span><span class="mf">12.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">],</span>
+                                     <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">],</span>
+                                     <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">]])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">MExact</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">))</span></div>
+</div>
+
+
+    
+<div class="viewcode-block" id="TestFunctionSpaceSingleQuadPointFixture">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceSingleQuadPointFixture">[docs]</a>
+<span class="k">class</span> <span class="nc">TestFunctionSpaceSingleQuadPointFixture</span><span class="p">(</span><span class="n">MeshFixture</span><span class="o">.</span><span class="n">MeshFixture</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TestFunctionSpaceSingleQuadPointFixture.setUp">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceSingleQuadPointFixture.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quadratureRule</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">create_quadrature_rule_on_triangle</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># mesh</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Nx</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ny</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xRange</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yRange</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">targetDispGrad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">],[</span><span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">]])</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_mesh_and_disp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ny</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xRange</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yRange</span><span class="p">,</span>
+                                                      <span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetDispGrad</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+        <span class="c1"># function space</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fs</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">construct_function_space</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span>
+                                                         <span class="bp">self</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">)</span>
+
+        <span class="n">nElements</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
+        <span class="n">nQuadPoints</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nElements</span><span class="p">,</span><span class="n">nQuadPoints</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="mf">0.0</span></div>
+
+
+
+<div class="viewcode-block" id="TestFunctionSpaceSingleQuadPointFixture.test_element_volume_single_point_quadrature">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceSingleQuadPointFixture.test_element_volume_single_point_quadrature">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_element_volume_single_point_quadrature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">elementVols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">vols</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">nElements</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">elementVols</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nElements</span><span class="p">)</span><span class="o">*</span><span class="mf">0.5</span><span class="o">/</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">Nx</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ny</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span> <span class="mi">14</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestFunctionSpaceSingleQuadPointFixture.test_linear_reproducing_single_point_quadrature">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceSingleQuadPointFixture.test_linear_reproducing_single_point_quadrature">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_linear_reproducing_single_point_quadrature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dispGrads</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">compute_field_gradient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">)</span>
+        <span class="n">nElements</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
+        <span class="n">npts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quadratureRule</span><span class="o">.</span><span class="n">xigauss</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">exact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targetDispGrad</span><span class="p">,</span> <span class="p">(</span><span class="n">nElements</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">dispGrads</span><span class="p">,</span> <span class="n">exact</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="TestFunctionSpaceSingleQuadPointFixture.test_integrate_constant_field_single_point_quadrature">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceSingleQuadPointFixture.test_integrate_constant_field_single_point_quadrature">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_integrate_constant_field_single_point_quadrature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">integralOfOne</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span>
+                                                           <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
+                                                           <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
+                                                           <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+                                                           <span class="k">lambda</span> <span class="n">u</span><span class="p">,</span> <span class="n">gradu</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+                                                           <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="s1">&#39;block&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">integralOfOne</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestFunctionSpaceSingleQuadPointFixture.test_integrate_linear_field_single_point_quadrature">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceSingleQuadPointFixture.test_integrate_linear_field_single_point_quadrature">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_integrate_linear_field_single_point_quadrature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="n">Ix</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+                                                <span class="k">lambda</span> <span class="n">u</span><span class="p">,</span> <span class="n">gradu</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="n">gradu</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="s1">&#39;block&#39;</span><span class="p">])</span>
+        <span class="c1"># displacement at x=1 should match integral</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">[:,</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">expected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yRange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">yRange</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">Ix</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span>
+        
+        <span class="n">Iy</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+                                                <span class="k">lambda</span> <span class="n">u</span><span class="p">,</span> <span class="n">gradu</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="n">gradu</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="s1">&#39;block&#39;</span><span class="p">])</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">expected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xRange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">xRange</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">Iy</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span></div>
+</div>
+
+
+        
+<div class="viewcode-block" id="TestFunctionSpaceMultiQuadPointFixture">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceMultiQuadPointFixture">[docs]</a>
+<span class="k">class</span> <span class="nc">TestFunctionSpaceMultiQuadPointFixture</span><span class="p">(</span><span class="n">MeshFixture</span><span class="o">.</span><span class="n">MeshFixture</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TestFunctionSpaceMultiQuadPointFixture.setUp">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceMultiQuadPointFixture.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quadratureRule</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">create_quadrature_rule_on_triangle</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># mesh</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Nx</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ny</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xRange</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yRange</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">targetDispGrad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">],[</span><span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">]])</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_mesh_and_disp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ny</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xRange</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yRange</span><span class="p">,</span>
+                                                      <span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetDispGrad</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="c1"># function space</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fs</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">construct_function_space</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">)</span>
+        <span class="n">nElements</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
+        <span class="n">nQuadPoints</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nElements</span><span class="p">,</span><span class="n">nQuadPoints</span><span class="p">,))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="mf">0.0</span></div>
+
+
+
+<div class="viewcode-block" id="TestFunctionSpaceMultiQuadPointFixture.test_element_volume_multi_point_quadrature">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceMultiQuadPointFixture.test_element_volume_multi_point_quadrature">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_element_volume_multi_point_quadrature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">elementVols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">vols</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">nElements</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">elementVols</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nElements</span><span class="p">)</span><span class="o">*</span><span class="mf">0.5</span><span class="o">/</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">Nx</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ny</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span> <span class="mi">14</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestFunctionSpaceMultiQuadPointFixture.test_linear_reproducing_multi_point_quadrature">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceMultiQuadPointFixture.test_linear_reproducing_multi_point_quadrature">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_linear_reproducing_multi_point_quadrature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dispGrads</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">compute_field_gradient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">)</span>
+        <span class="n">nElements</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
+        <span class="n">npts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quadratureRule</span><span class="o">.</span><span class="n">xigauss</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">exact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targetDispGrad</span><span class="p">,</span> <span class="p">(</span><span class="n">nElements</span><span class="p">,</span> <span class="n">npts</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">dispGrads</span><span class="p">,</span> <span class="n">exact</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="TestFunctionSpaceMultiQuadPointFixture.test_integrate_constant_field_multi_point_quadrature">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceMultiQuadPointFixture.test_integrate_constant_field_multi_point_quadrature">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_integrate_constant_field_multi_point_quadrature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">integralOfOne</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span>
+                                                           <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
+                                                           <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
+                                                           <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+                                                           <span class="k">lambda</span> <span class="n">u</span><span class="p">,</span> <span class="n">gradu</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+                                                           <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="s1">&#39;block&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">integralOfOne</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestFunctionSpaceMultiQuadPointFixture.test_integrate_linear_field_multi_point_quadrature">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceMultiQuadPointFixture.test_integrate_linear_field_multi_point_quadrature">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_integrate_linear_field_multi_point_quadrature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">Ix</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+                                                <span class="k">lambda</span> <span class="n">u</span><span class="p">,</span> <span class="n">gradu</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="n">gradu</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="s1">&#39;block&#39;</span><span class="p">])</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">[:,</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">expected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yRange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">yRange</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">Ix</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span>
+        
+        <span class="n">Iy</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+                                                <span class="k">lambda</span> <span class="n">u</span><span class="p">,</span> <span class="n">gradu</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="n">gradu</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="s1">&#39;block&#39;</span><span class="p">])</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">expected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xRange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">xRange</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">Iy</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestFunctionSpaceMultiQuadPointFixture.test_integrate_over_half_block">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceMultiQuadPointFixture.test_integrate_over_half_block">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_integrate_over_half_block</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">nElements</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
+        <span class="c1"># this test will only work with an even number of elements</span>
+        <span class="c1"># put this in so that if test is modified to odd number,</span>
+        <span class="c1"># we understand why it fails</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">nElements</span> <span class="o">%</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        
+        <span class="n">blockWithHalfTheVolume</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">nElements</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">integral</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span>
+                                                      <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
+                                                      <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
+                                                      <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+                                                      <span class="k">lambda</span> <span class="n">u</span><span class="p">,</span> <span class="n">gradu</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+                                                      <span class="n">blockWithHalfTheVolume</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">integral</span><span class="p">,</span> <span class="mf">1.0</span><span class="o">/</span><span class="mf">2.0</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestFunctionSpaceMultiQuadPointFixture.test_integrate_over_half_block_indices">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceMultiQuadPointFixture.test_integrate_over_half_block_indices">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_integrate_over_half_block_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">nElements</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
+        <span class="c1"># this test will only work with an even number of elements</span>
+        <span class="c1"># put this in so that if test is modified to odd number,</span>
+        <span class="c1"># we understand why it fails</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">nElements</span> <span class="o">%</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        
+        <span class="n">blockWithHalfTheVolume</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nElements</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span>
+        
+        <span class="n">integral</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span>
+                                                      <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
+                                                      <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
+                                                      <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+                                                      <span class="k">lambda</span> <span class="n">u</span><span class="p">,</span> <span class="n">gradu</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+                                                      <span class="n">blockWithHalfTheVolume</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">integral</span><span class="p">,</span> <span class="mf">1.0</span><span class="o">/</span><span class="mf">2.0</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span></div>
+
+        
+        
+<div class="viewcode-block" id="TestFunctionSpaceMultiQuadPointFixture.test_jit_on_integration">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceMultiQuadPointFixture.test_jit_on_integration">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_jit_on_integration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">integrate_jit</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">,</span> <span class="n">static_argnums</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,))</span>
+        <span class="n">I</span> <span class="o">=</span> <span class="n">integrate_jit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">u</span><span class="p">,</span> <span class="n">gradu</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="s1">&#39;block&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span></div>
+
+
+        
+<div class="viewcode-block" id="TestFunctionSpaceMultiQuadPointFixture.test_jit_and_jacrev_on_integration">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceMultiQuadPointFixture.test_jit_and_jacrev_on_integration">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_jit_and_jacrev_on_integration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">jacrev</span><span class="p">(</span><span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">static_argnums</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,))</span>
+        <span class="n">dI</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">u</span><span class="p">,</span> <span class="n">gradu</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">gradu</span><span class="p">,</span> <span class="n">gradu</span><span class="p">),</span>
+               <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="s1">&#39;block&#39;</span><span class="p">])</span>
+        <span class="n">nNodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">interiorNodeIds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nNodes</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodeSets</span><span class="p">[</span><span class="s1">&#39;all_boundary&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">dI</span><span class="p">[</span><span class="n">interiorNodeIds</span><span class="p">,:],</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">[</span><span class="n">interiorNodeIds</span><span class="p">,:]),</span> <span class="mi">14</span><span class="p">)</span></div>
+</div>
+
+                
+        
+<div class="viewcode-block" id="ParameterizationTestSuite">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.ParameterizationTestSuite">[docs]</a>
+<span class="k">class</span> <span class="nc">ParameterizationTestSuite</span><span class="p">(</span><span class="n">MeshFixture</span><span class="o">.</span><span class="n">MeshFixture</span><span class="p">):</span>
+<div class="viewcode-block" id="ParameterizationTestSuite.setUp">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.ParameterizationTestSuite.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quadratureRule</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">create_quadrature_rule_on_triangle</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># mesh</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Nx</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ny</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xRange</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span><span class="mf">3.</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yRange</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">],</span>
+                           <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">]])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="mf">2.5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_mesh_and_disp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ny</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xRange</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yRange</span><span class="p">,</span>
+                                                      <span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]]))</span>
+        <span class="c1"># function space</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fs</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">construct_function_space</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">)</span>
+        <span class="n">nElements</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
+        <span class="n">nQuadPoints</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nElements</span><span class="p">,</span><span class="n">nQuadPoints</span><span class="p">,))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="mf">0.0</span></div>
+
+
+<div class="viewcode-block" id="ParameterizationTestSuite.test_integrate_with_parameter">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_FunctionSpace.ParameterizationTestSuite.test_integrate_with_parameter">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_integrate_with_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">centroid</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">xc</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">conn</span><span class="p">,</span> <span class="n">coords</span><span class="p">:</span> <span class="n">centroid</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="n">conn</span><span class="p">,</span> <span class="p">:]),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">))(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">xc</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">xRange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">u</span><span class="p">,</span> <span class="n">dudx</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="s1">&#39;block&#39;</span><span class="p">],</span> <span class="n">weights</span><span class="p">)</span>
+        <span class="n">exact</span> <span class="o">=</span> <span class="mf">1.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">xRange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">yRange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">exact</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span></div>
+</div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

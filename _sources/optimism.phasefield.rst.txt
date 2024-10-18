@@ -1,0 +1,85 @@
+optimism.phasefield package
+===========================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   optimism.phasefield.test
+
+Submodules
+----------
+
+optimism.phasefield.MaterialPointSimulator module
+-------------------------------------------------
+
+.. automodule:: optimism.phasefield.MaterialPointSimulator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.phasefield.PhaseField module
+-------------------------------------
+
+.. automodule:: optimism.phasefield.PhaseField
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.phasefield.PhaseFieldClassic module
+--------------------------------------------
+
+.. automodule:: optimism.phasefield.PhaseFieldClassic
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.phasefield.PhaseFieldLorentzPlastic module
+---------------------------------------------------
+
+.. automodule:: optimism.phasefield.PhaseFieldLorentzPlastic
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.phasefield.PhaseFieldMaterialModel module
+--------------------------------------------------
+
+.. automodule:: optimism.phasefield.PhaseFieldMaterialModel
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.phasefield.PhaseFieldThreshold module
+----------------------------------------------
+
+.. automodule:: optimism.phasefield.PhaseFieldThreshold
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.phasefield.PhaseFieldThresholdPlastic module
+-----------------------------------------------------
+
+.. automodule:: optimism.phasefield.PhaseFieldThresholdPlastic
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+Module contents
+---------------
+
+.. automodule:: optimism.phasefield
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:

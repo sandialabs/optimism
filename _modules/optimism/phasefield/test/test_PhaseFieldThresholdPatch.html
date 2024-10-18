@@ -1,0 +1,325 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.phasefield.test.test_PhaseFieldThresholdPatch &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.phasefield.test.test_PhaseFieldThresholdPatch</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.phasefield.test.test_PhaseFieldThresholdPatch</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">diags</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">optimism.phasefield</span> <span class="kn">import</span> <span class="n">PhaseFieldThreshold</span> <span class="k">as</span> <span class="n">material</span>
+<span class="kn">from</span> <span class="nn">optimism.phasefield</span> <span class="kn">import</span> <span class="n">PhaseField</span>
+<span class="kn">from</span> <span class="nn">optimism.phasefield</span> <span class="kn">import</span> <span class="n">MaterialPointSimulator</span>
+<span class="kn">from</span> <span class="nn">optimism.test</span> <span class="kn">import</span> <span class="n">MeshFixture</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">AlSolver</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">EquationSolver</span> <span class="k">as</span> <span class="n">EqSolver</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">FunctionSpace</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Interpolants</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Objective</span>
+<span class="kn">from</span> <span class="nn">optimism.ConstrainedObjective</span> <span class="kn">import</span> <span class="n">ConstrainedObjective</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">QuadratureRule</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">SparseMatrixAssembler</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">TensorMath</span>
+
+
+<span class="n">E</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">nu</span> <span class="o">=</span> <span class="mf">0.25</span>
+<span class="n">Gc</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">ell</span> <span class="o">=</span> <span class="mf">0.25</span>
+
+<span class="n">props</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">:</span> <span class="n">E</span><span class="p">,</span>
+         <span class="s1">&#39;poisson ratio&#39;</span><span class="p">:</span> <span class="n">nu</span><span class="p">,</span>
+         <span class="s1">&#39;critical energy release rate&#39;</span><span class="p">:</span> <span class="n">Gc</span><span class="p">,</span>
+         <span class="s1">&#39;regularization length&#39;</span><span class="p">:</span> <span class="n">ell</span><span class="p">,</span>
+         <span class="s1">&#39;kinematics&#39;</span><span class="p">:</span> <span class="s1">&#39;large deformations&#39;</span><span class="p">}</span>
+
+<span class="n">materialModel</span> <span class="o">=</span> <span class="n">material</span><span class="o">.</span><span class="n">create_material_model_functions</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
+
+<span class="n">subProblemSettings</span> <span class="o">=</span> <span class="n">EqSolver</span><span class="o">.</span><span class="n">get_settings</span><span class="p">()</span>
+<span class="n">alSettings</span> <span class="o">=</span> <span class="n">AlSolver</span><span class="o">.</span><span class="n">get_settings</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TestSingleMeshFixture">
+<a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture">[docs]</a>
+<span class="k">class</span> <span class="nc">TestSingleMeshFixture</span><span class="p">(</span><span class="n">MeshFixture</span><span class="o">.</span><span class="n">MeshFixture</span><span class="p">):</span>
+    
+<div class="viewcode-block" id="TestSingleMeshFixture.setUp">
+<a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Nx</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ny</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="n">xRange</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]</span>
+        <span class="n">yRange</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">targetFieldGrad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">],[</span><span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">targetFieldOffset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_mesh_and_disp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ny</span><span class="p">,</span> <span class="n">xRange</span><span class="p">,</span> <span class="n">yRange</span><span class="p">,</span>
+                                                      <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetFieldGrad</span><span class="nd">@x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetFieldOffset</span><span class="p">)</span>
+
+        <span class="n">quadRule</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">create_quadrature_rule_on_triangle</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fs</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">construct_function_space</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">)</span>
+        
+        <span class="n">ebc</span> <span class="o">=</span> <span class="p">[</span><span class="n">FunctionSpace</span><span class="o">.</span><span class="n">EssentialBC</span><span class="p">(</span><span class="n">nodeSet</span><span class="o">=</span><span class="s1">&#39;all_boundary&#39;</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+               <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">EssentialBC</span><span class="p">(</span><span class="n">nodeSet</span><span class="o">=</span><span class="s1">&#39;all_boundary&#39;</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
+        <span class="n">dim</span> <span class="o">=</span> <span class="mi">3</span> <span class="c1"># 2 displacements and scalar phase</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">DofManager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">ebc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ubc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">get_bc_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span> <span class="o">=</span>  <span class="n">PhaseField</span><span class="o">.</span><span class="n">create_phasefield_functions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span>
+                                                                    <span class="s2">&quot;plane strain&quot;</span><span class="p">,</span>
+                                                                    <span class="n">materialModel</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nElements</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nQuadPtsPerElem</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">len</span><span class="p">(</span><span class="n">quadRule</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span>
+
+        <span class="n">dofToUnknown</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">dofToUnknown</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phaseIds</span> <span class="o">=</span> <span class="n">dofToUnknown</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">isUnknown</span><span class="p">[:,</span><span class="mi">2</span><span class="p">],</span><span class="mi">2</span><span class="p">]</span></div>
+
+        
+
+<div class="viewcode-block" id="TestSingleMeshFixture.test_sparse_hessian_at_zero_phase">
+<a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.test_sparse_hessian_at_zero_phase">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_sparse_hessian_at_zero_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">elementStiffnesses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span><span class="o">.</span>\
+            <span class="n">compute_element_stiffnesses</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">)</span>
+
+        <span class="n">KSparse</span> <span class="o">=</span> <span class="n">SparseMatrixAssembler</span><span class="o">.</span><span class="n">assemble_sparse_stiffness_matrix</span><span class="p">(</span><span class="n">elementStiffnesses</span><span class="p">,</span>
+                                                                         <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">,</span>
+                                                                         <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="p">)</span>
+        <span class="n">KSparseDensified</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">KSparse</span><span class="o">.</span><span class="n">todense</span><span class="p">())</span>
+
+        <span class="n">Ubc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">get_bc_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">)</span>
+        
+        <span class="k">def</span> <span class="nf">objective_func</span><span class="p">(</span><span class="n">Uu</span><span class="p">):</span>
+            <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span><span class="o">.</span><span class="n">compute_internal_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">)</span>
+
+        <span class="n">compute_dense_hessian</span> <span class="o">=</span> <span class="n">hessian</span><span class="p">(</span><span class="n">objective_func</span><span class="p">)</span>
+        <span class="n">KDense</span> <span class="o">=</span> <span class="n">compute_dense_hessian</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">get_unknown_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">))</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">KSparseDensified</span><span class="p">,</span> <span class="n">KDense</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestSingleMeshFixture.test_sparse_hessian_at_nonzero_phase">
+<a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.test_sparse_hessian_at_nonzero_phase">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_sparse_hessian_at_nonzero_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="o">.</span><span class="n">at</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nx</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Ny</span><span class="p">))</span>
+
+        <span class="n">elementStiffnesses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span><span class="o">.</span>\
+            <span class="n">compute_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">)</span>
+
+        <span class="n">KSparse</span> <span class="o">=</span> <span class="n">SparseMatrixAssembler</span><span class="o">.</span><span class="n">assemble_sparse_stiffness_matrix</span><span class="p">(</span><span class="n">elementStiffnesses</span><span class="p">,</span>
+                                                                         <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">,</span>
+                                                                         <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="p">)</span>
+        <span class="n">KSparseDensified</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">KSparse</span><span class="o">.</span><span class="n">todense</span><span class="p">())</span>
+
+        <span class="n">Ubc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">get_bc_values</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
+        
+        <span class="k">def</span> <span class="nf">objective_func</span><span class="p">(</span><span class="n">Uu</span><span class="p">):</span>
+            <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span><span class="o">.</span><span class="n">compute_internal_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">)</span>
+
+        <span class="n">compute_dense_hessian</span> <span class="o">=</span> <span class="n">hessian</span><span class="p">(</span><span class="n">objective_func</span><span class="p">)</span>
+        <span class="n">KDense</span> <span class="o">=</span> <span class="n">compute_dense_hessian</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">get_unknown_values</span><span class="p">(</span><span class="n">U</span><span class="p">))</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">KSparseDensified</span><span class="p">,</span> <span class="n">KDense</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestSingleMeshFixture.test_constrained_hessian">
+<a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.test_constrained_hessian">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_constrained_hessian</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span>
+        
+        <span class="n">c</span> <span class="o">=</span> <span class="n">U</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">isUnknown</span><span class="p">[:,</span><span class="mi">2</span><span class="p">],</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">lam</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="n">kappa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">lam</span><span class="p">)</span>
+
+        <span class="n">elementStiffnesses</span> <span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span><span class="o">.</span>\
+            <span class="n">compute_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">)</span>
+
+        <span class="n">KSparse</span> <span class="o">=</span> <span class="n">SparseMatrixAssembler</span><span class="o">.</span><span class="n">assemble_sparse_stiffness_matrix</span><span class="p">(</span><span class="n">elementStiffnesses</span><span class="p">,</span>
+                                                                         <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">,</span>
+                                                                         <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="p">)</span>
+        <span class="n">constraintHessian</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span><span class="o">.</span><span class="n">compute_constraint_hessian</span><span class="p">(</span><span class="n">lam</span><span class="p">,</span>
+                                                                         <span class="n">kappa</span><span class="p">,</span>
+                                                                         <span class="n">c</span><span class="p">,</span>
+                                                                         <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="p">)</span>
+
+        <span class="n">KSparse</span> <span class="o">+=</span> <span class="n">diags</span><span class="p">(</span><span class="n">constraintHessian</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span>
+        <span class="n">KDensified</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">KSparse</span><span class="o">.</span><span class="n">todense</span><span class="p">())</span>
+
+        <span class="c1"># construct constrained obj</span>
+        <span class="n">Ubc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">get_bc_values</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
+        <span class="n">Uu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">get_unknown_values</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
+        
+        <span class="k">def</span> <span class="nf">objective_function</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+            <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span><span class="o">.</span><span class="n">compute_internal_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">constraint_function</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+            <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="p">)</span>    
+            <span class="k">return</span> <span class="n">U</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">isUnknown</span><span class="p">[:,</span><span class="mi">2</span><span class="p">],</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="n">objective</span> <span class="o">=</span> <span class="n">ConstrainedObjective</span><span class="p">(</span><span class="n">objective_function</span><span class="p">,</span>
+                                         <span class="n">constraint_function</span><span class="p">,</span>
+                                         <span class="n">Uu</span><span class="p">,</span>
+                                         <span class="kc">None</span><span class="p">,</span>
+                                         <span class="n">lam</span><span class="p">,</span>
+                                         <span class="n">kappa</span><span class="p">)</span>
+        
+        <span class="n">KDense</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">hessian</span><span class="p">(</span><span class="n">Uu</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">KDensified</span><span class="p">,</span> <span class="n">KDense</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestSingleMeshFixture.test_patch_test">
+<a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.test_patch_test">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_patch_test</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="k">def</span> <span class="nf">objective_function</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+            <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ubc</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span><span class="o">.</span><span class="n">compute_internal_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">constraint_function</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">Uu</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">phaseIds</span><span class="p">]</span>
+                                                  
+        <span class="n">Uu_guess</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">get_unknown_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">)</span>
+
+        <span class="n">p0</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">)</span>
+        <span class="n">lam0</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">objective_function</span><span class="p">,</span> <span class="mi">0</span><span class="p">)(</span><span class="n">Uu_guess</span><span class="p">,</span> <span class="n">p0</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">phaseIds</span><span class="p">]</span>
+        <span class="n">kappa0</span> <span class="o">=</span> <span class="mf">10.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">lam0</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">lam0</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="n">objective</span> <span class="o">=</span> <span class="n">ConstrainedObjective</span><span class="p">(</span><span class="n">objective_function</span><span class="p">,</span>
+                                         <span class="n">constraint_function</span><span class="p">,</span>
+                                         <span class="n">Uu_guess</span><span class="p">,</span>
+                                         <span class="n">p0</span><span class="p">,</span> 
+                                         <span class="n">lam0</span><span class="p">,</span> 
+                                         <span class="n">kappa0</span><span class="p">)</span>
+           
+        <span class="n">Uu</span> <span class="o">=</span> <span class="n">AlSolver</span><span class="o">.</span><span class="n">augmented_lagrange_solve</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">Uu_guess</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span>
+                                               <span class="n">alSettings</span><span class="p">,</span> <span class="n">subProblemSettings</span><span class="p">,</span>
+                                               <span class="n">useWarmStart</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ubc</span><span class="p">)</span>
+
+        <span class="n">fieldGrads</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">compute_field_gradient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">)</span>
+        <span class="n">fieldGrads</span> <span class="o">=</span> <span class="n">fieldGrads</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nElements</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">nQuadPtsPerElem</span><span class="p">,</span>
+                                         <span class="n">fieldGrads</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">fieldGrads</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">fg</span> <span class="ow">in</span> <span class="n">fieldGrads</span><span class="p">:</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">fg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetFieldGrad</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+        <span class="n">lagrangian</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="n">objective_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">-</span> <span class="n">constraint_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">@</span> <span class="n">objective</span><span class="o">.</span><span class="n">lam</span>
+        <span class="n">grad_lagrangian</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">lagrangian</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span> <span class="n">grad_lagrangian</span><span class="p">(</span><span class="n">Uu</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">Uu</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="mi">10</span><span class="p">)</span></div>
+</div>
+
+
+            
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">MeshFixture</span><span class="o">.</span><span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

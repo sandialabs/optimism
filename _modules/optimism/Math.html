@@ -1,0 +1,254 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.Math &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.Math</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.Math</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">custom_jvp</span>
+
+<span class="c1"># constants</span>
+<span class="c1"># Assumes IEEE double precision</span>
+<span class="n">_DBL_PRECISION_SIGNIFICAND_BITS</span> <span class="o">=</span> <span class="mi">53</span>
+
+<span class="c1"># equivalent to ceil(_DBL_PRECISION_SIGNIFICAND_BITS / 2) as an integer</span>
+<span class="n">_SPLIT_S</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="o">-</span><span class="n">_DBL_PRECISION_SIGNIFICAND_BITS</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">_SPLIT_FACTOR</span> <span class="o">=</span> <span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">_SPLIT_S</span> <span class="o">+</span> <span class="mi">1</span>
+
+<span class="nd">@custom_jvp</span>
+<span class="k">def</span> <span class="nf">safe_sqrt</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="safe_sqrt_jvp">
+<a class="viewcode-back" href="../../optimism.html#optimism.Math.safe_sqrt_jvp">[docs]</a>
+<span class="nd">@safe_sqrt</span><span class="o">.</span><span class="n">defjvp</span>
+<span class="k">def</span> <span class="nf">safe_sqrt_jvp</span><span class="p">(</span><span class="n">xt</span><span class="p">,</span> <span class="n">vt</span><span class="p">):</span>
+    <span class="n">x</span><span class="p">,</span> <span class="o">=</span> <span class="n">xt</span>
+    <span class="n">v</span><span class="p">,</span> <span class="o">=</span> <span class="n">vt</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">safe_sqrt</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">v</span> <span class="o">*</span> <span class="n">lax</span><span class="o">.</span><span class="n">cond</span><span class="p">(</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">,</span>
+                       <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
+                       <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mf">0.5</span><span class="o">/</span><span class="n">f</span><span class="p">,</span>
+                       <span class="n">x</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="sum2">
+<a class="viewcode-back" href="../../optimism.html#optimism.Math.sum2">[docs]</a>
+<span class="k">def</span> <span class="nf">sum2</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sum a vector to much higher accuracy than numpy.sum.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    a : ndarray, with only one axis (shape [n,])</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    sum : real</span>
+<span class="sd">        The sum of the numbers in the array</span>
+
+
+<span class="sd">    This special sum method computes the result as accurate as if </span>
+<span class="sd">    computed in quadruple precision.</span>
+
+<span class="sd">    Reference:</span>
+<span class="sd">    T. Ogita, S. M. Rump, and S. Oishi. Accurate sum and dot product.</span>
+<span class="sd">    SIAM J. Sci. Comput., Vol 26, No 6, pp. 1955-1988.</span>
+<span class="sd">    doi: 10.1137/030601818</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">carry</span><span class="p">,</span> <span class="n">ai</span><span class="p">):</span>
+        <span class="n">p</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="n">carry</span>
+        <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">_two_sum</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">ai</span><span class="p">)</span>
+        <span class="n">sigma</span> <span class="o">+=</span> <span class="n">q</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">sigma</span><span class="p">),</span> <span class="n">p</span>
+
+    <span class="n">total</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="p">(</span><span class="n">total</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span> <span class="n">partialSums</span> <span class="o">=</span> <span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="p">(</span><span class="n">total</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span> <span class="n">a</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">total</span> <span class="o">+</span> <span class="n">c</span></div>
+
+
+
+<div class="viewcode-block" id="_two_sum">
+<a class="viewcode-back" href="../../optimism.html#optimism.Math._two_sum">[docs]</a>
+<span class="k">def</span> <span class="nf">_two_sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">a</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">z</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="n">z</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span></div>
+
+
+
+<div class="viewcode-block" id="dot2">
+<a class="viewcode-back" href="../../optimism.html#optimism.Math.dot2">[docs]</a>
+<span class="k">def</span> <span class="nf">dot2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute inner product of 2 vectors to much higher accuracy than numpy.dot.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : ndarray, with only one axis (shape [n,])</span>
+<span class="sd">    y : ndarray, with only one axis (shape [n,])</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dotprod : real</span>
+<span class="sd">        The inner product of the input vectors.</span>
+
+
+<span class="sd">    This special inner product  method computes the result as accurate</span>
+<span class="sd">    as if computed in quadruple precision. This algorithm is useful to</span>
+<span class="sd">    computing objective functions from numerical integration. It avoids</span>
+<span class="sd">    accumulation of floating point cancellation error that can obscure</span>
+<span class="sd">    whether an objective function has truly decreased.</span>
+
+<span class="sd">    The environment variable setting </span>
+<span class="sd">        &#39;XLA_FLAGS = &quot;--xla_cpu_enable_fast_math=false&quot;&#39;</span>
+<span class="sd">    is critical for this function to work on the CPU. Otherwise, xla</span>
+<span class="sd">    apparently sets a flag for LLVM that allows unsafe floating point</span>
+<span class="sd">    optimizations that can change associativity.</span>
+
+<span class="sd">    Reference:</span>
+<span class="sd">    T. Ogita, S. M. Rump, and S. Oishi. Accurate sum and dot product.</span>
+<span class="sd">    SIAM J. Sci. Comput., Vol 26, No 6, pp. 1955-1988.</span>
+<span class="sd">    doi: 10.1137/030601818</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">carry</span><span class="p">,</span> <span class="n">xy</span><span class="p">):</span>
+        <span class="n">p</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="n">carry</span>
+        <span class="n">xi</span><span class="p">,</span> <span class="n">yi</span> <span class="o">=</span> <span class="n">xy</span>
+        <span class="n">h</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">_two_product</span><span class="p">(</span><span class="n">xi</span><span class="p">,</span> <span class="n">yi</span><span class="p">)</span>
+        <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">_two_sum</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="p">(</span><span class="n">q</span> <span class="o">+</span> <span class="n">r</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">s</span><span class="p">),</span> <span class="n">p</span>
+
+    <span class="n">rawTotal</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">compensation</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">))</span>
+    <span class="p">(</span><span class="n">rawTotal</span><span class="p">,</span> <span class="n">compensation</span><span class="p">),</span> <span class="n">partialSums</span> <span class="o">=</span> <span class="n">lax</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="n">f</span><span class="p">,</span>
+                                                     <span class="p">(</span><span class="n">rawTotal</span><span class="p">,</span> <span class="n">compensation</span><span class="p">),</span>
+                                                     <span class="n">X</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rawTotal</span> <span class="o">+</span> <span class="n">compensation</span></div>
+
+
+
+<div class="viewcode-block" id="_two_product">
+<a class="viewcode-back" href="../../optimism.html#optimism.Math._two_product">[docs]</a>
+<span class="k">def</span> <span class="nf">_two_product</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">b</span>
+    <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="o">=</span> <span class="n">_float_split</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span> <span class="o">=</span> <span class="n">_float_split</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">a2</span><span class="o">*</span><span class="n">b2</span> <span class="o">-</span> <span class="p">(((</span><span class="n">x</span> <span class="o">-</span> <span class="n">a1</span><span class="o">*</span><span class="n">b1</span><span class="p">)</span> <span class="o">-</span> <span class="n">a2</span><span class="o">*</span><span class="n">b1</span><span class="p">)</span> <span class="o">-</span> <span class="n">a1</span><span class="o">*</span><span class="n">b2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span></div>
+
+
+
+<div class="viewcode-block" id="_float_split">
+<a class="viewcode-back" href="../../optimism.html#optimism.Math._float_split">[docs]</a>
+<span class="k">def</span> <span class="nf">_float_split</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">_SPLIT_FACTOR</span><span class="o">*</span><span class="n">a</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">c</span> <span class="o">-</span> <span class="p">(</span><span class="n">c</span> <span class="o">-</span> <span class="n">a</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">a</span> <span class="o">-</span> <span class="n">x</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

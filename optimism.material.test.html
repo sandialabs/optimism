@@ -1,0 +1,511 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.material.test package &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="optimism.phasefield package" href="optimism.phasefield.html" />
+    <link rel="prev" title="optimism.material package" href="optimism.material.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">optimism</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="optimism.html">optimism package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="optimism.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html">optimism.contact package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="optimism.material.html">optimism.material package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html">optimism.phasefield package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html">optimism.test package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.AlSolver">optimism.AlSolver module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.BoundConstrainedObjective">optimism.BoundConstrainedObjective module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.BoundConstrainedSolver">optimism.BoundConstrainedSolver module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.ConstrainedObjective">optimism.ConstrainedObjective module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.EquationSolver">optimism.EquationSolver module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.EquationSolverSubspace">optimism.EquationSolverSubspace module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.FunctionSpace">optimism.FunctionSpace module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism-incompletecholesky-module">optimism.IncompleteCholesky module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Interpolants">optimism.Interpolants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.J2PlasticPhaseField">optimism.J2PlasticPhaseField module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.JaxConfig">optimism.JaxConfig module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.LU">optimism.LU module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.LinAlg">optimism.LinAlg module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Math">optimism.Math module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Mechanics">optimism.Mechanics module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Mesh">optimism.Mesh module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.MeshPlot">optimism.MeshPlot module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.MinimizeScalar">optimism.MinimizeScalar module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.NewtonSolver">optimism.NewtonSolver module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Objective">optimism.Objective module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.QuadratureRule">optimism.QuadratureRule module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.ReadExodusMesh">optimism.ReadExodusMesh module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.ReadMesh">optimism.ReadMesh module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.ScalarRootFind">optimism.ScalarRootFind module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.SmoothFunctions">optimism.SmoothFunctions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.SparseCholesky">optimism.SparseCholesky module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.SparseMatrixAssembler">optimism.SparseMatrixAssembler module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Surface">optimism.Surface module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.TensorMath">optimism.TensorMath module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Timer">optimism.Timer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.TrustRegionSPG">optimism.TrustRegionSPG module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.VTKWriter">optimism.VTKWriter module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.WarmStart">optimism.WarmStart module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="optimism.html">optimism package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="optimism.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="optimism.contact.html">optimism.contact package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="optimism.material.html">optimism.material package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="optimism.material.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.Gent">optimism.material.Gent module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.Hardening">optimism.material.Hardening module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.HyperViscoelastic">optimism.material.HyperViscoelastic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.J2Plastic">optimism.material.J2Plastic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.LinearElastic">optimism.material.LinearElastic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.MaterialModel">optimism.material.MaterialModel module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.MaterialUniaxialSimulator">optimism.material.MaterialUniaxialSimulator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.Neohookean">optimism.material.Neohookean module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.phasefield.html">optimism.phasefield package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.test.html">optimism.test package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.AlSolver">optimism.AlSolver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.BoundConstrainedObjective">optimism.BoundConstrainedObjective module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.BoundConstrainedSolver">optimism.BoundConstrainedSolver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.ConstrainedObjective">optimism.ConstrainedObjective module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.EquationSolver">optimism.EquationSolver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.EquationSolverSubspace">optimism.EquationSolverSubspace module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.FunctionSpace">optimism.FunctionSpace module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#optimism-incompletecholesky-module">optimism.IncompleteCholesky module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Interpolants">optimism.Interpolants module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.J2PlasticPhaseField">optimism.J2PlasticPhaseField module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.JaxConfig">optimism.JaxConfig module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.LU">optimism.LU module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.LinAlg">optimism.LinAlg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Math">optimism.Math module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Mechanics">optimism.Mechanics module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Mesh">optimism.Mesh module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.MeshPlot">optimism.MeshPlot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.MinimizeScalar">optimism.MinimizeScalar module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.NewtonSolver">optimism.NewtonSolver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Objective">optimism.Objective module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.QuadratureRule">optimism.QuadratureRule module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.ReadExodusMesh">optimism.ReadExodusMesh module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.ReadMesh">optimism.ReadMesh module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.ScalarRootFind">optimism.ScalarRootFind module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.SmoothFunctions">optimism.SmoothFunctions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.SparseCholesky">optimism.SparseCholesky module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.SparseMatrixAssembler">optimism.SparseMatrixAssembler module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Surface">optimism.Surface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.TensorMath">optimism.TensorMath module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Timer">optimism.Timer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.TrustRegionSPG">optimism.TrustRegionSPG module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.VTKWriter">optimism.VTKWriter module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.WarmStart">optimism.WarmStart module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">optimism</a></li>
+          <li class="breadcrumb-item"><a href="optimism.html">optimism package</a></li>
+          <li class="breadcrumb-item"><a href="optimism.material.html">optimism.material package</a></li>
+      <li class="breadcrumb-item active">optimism.material.test package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/optimism.material.test.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="optimism-material-test-package">
+<h1>optimism.material.test package<a class="headerlink" href="#optimism-material-test-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="optimism-material-test-plotj2plastic-module">
+<h2>optimism.material.test.plotJ2Plastic module<a class="headerlink" href="#optimism-material-test-plotj2plastic-module" title="Link to this heading"></a></h2>
+</section>
+<section id="module-optimism.material.test.test_Gent">
+<span id="optimism-material-test-test-gent-module"></span><h2>optimism.material.test.test_Gent module<a class="headerlink" href="#module-optimism.material.test.test_Gent" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.material.test.test_Gent.TestGentMaterial">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.material.test.test_Gent.</span></span><span class="sig-name descname"><span class="pre">TestGentMaterial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_Gent.html#TestGentMaterial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_Gent.TestGentMaterial" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_Gent.TestGentMaterial.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_Gent.html#TestGentMaterial.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_Gent.TestGentMaterial.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_Gent.TestGentMaterial.test_correspondence_with_linear_elasticity">
+<span class="sig-name descname"><span class="pre">test_correspondence_with_linear_elasticity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_Gent.html#TestGentMaterial.test_correspondence_with_linear_elasticity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_Gent.TestGentMaterial.test_correspondence_with_linear_elasticity" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_Gent.TestGentMaterial.test_finite_extensibility">
+<span class="sig-name descname"><span class="pre">test_finite_extensibility</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_Gent.html#TestGentMaterial.test_finite_extensibility"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_Gent.TestGentMaterial.test_finite_extensibility" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_Gent.TestGentMaterial.test_frame_indifference">
+<span class="sig-name descname"><span class="pre">test_frame_indifference</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_Gent.html#TestGentMaterial.test_frame_indifference"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_Gent.TestGentMaterial.test_frame_indifference" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_Gent.TestGentMaterial.test_zero_point">
+<span class="sig-name descname"><span class="pre">test_zero_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_Gent.html#TestGentMaterial.test_zero_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_Gent.TestGentMaterial.test_zero_point" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optimism.material.test.test_Hardening">
+<span id="optimism-material-test-test-hardening-module"></span><h2>optimism.material.test.test_Hardening module<a class="headerlink" href="#module-optimism.material.test.test_Hardening" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.material.test.test_Hardening.PowerLawHardeningTestFixture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.material.test.test_Hardening.</span></span><span class="sig-name descname"><span class="pre">PowerLawHardeningTestFixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_Hardening.html#PowerLawHardeningTestFixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_Hardening.PowerLawHardeningTestFixture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_Hardening.PowerLawHardeningTestFixture.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_Hardening.html#PowerLawHardeningTestFixture.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_Hardening.PowerLawHardeningTestFixture.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_Hardening.PowerLawHardeningTestFixture.test_power_law_hardening_slope_is_finite_at_origin">
+<span class="sig-name descname"><span class="pre">test_power_law_hardening_slope_is_finite_at_origin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_Hardening.html#PowerLawHardeningTestFixture.test_power_law_hardening_slope_is_finite_at_origin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_Hardening.PowerLawHardeningTestFixture.test_power_law_hardening_slope_is_finite_at_origin" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_Hardening.PowerLawHardeningTestFixture.test_power_law_hardening_yield_strength">
+<span class="sig-name descname"><span class="pre">test_power_law_hardening_yield_strength</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_Hardening.html#PowerLawHardeningTestFixture.test_power_law_hardening_yield_strength"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_Hardening.PowerLawHardeningTestFixture.test_power_law_hardening_yield_strength" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_Hardening.PowerLawHardeningTestFixture.test_power_law_hardening_zero_point">
+<span class="sig-name descname"><span class="pre">test_power_law_hardening_zero_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_Hardening.html#PowerLawHardeningTestFixture.test_power_law_hardening_zero_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_Hardening.PowerLawHardeningTestFixture.test_power_law_hardening_zero_point" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_Hardening.PowerLawHardeningTestFixture.test_power_law_strength_increases">
+<span class="sig-name descname"><span class="pre">test_power_law_strength_increases</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_Hardening.html#PowerLawHardeningTestFixture.test_power_law_strength_increases"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_Hardening.PowerLawHardeningTestFixture.test_power_law_strength_increases" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.material.test.test_Hardening.VoceHardeningTestFixture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.material.test.test_Hardening.</span></span><span class="sig-name descname"><span class="pre">VoceHardeningTestFixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_Hardening.html#VoceHardeningTestFixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_Hardening.VoceHardeningTestFixture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_Hardening.VoceHardeningTestFixture.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_Hardening.html#VoceHardeningTestFixture.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_Hardening.VoceHardeningTestFixture.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_Hardening.VoceHardeningTestFixture.test_voce_hardening_saturates_to_correct_value">
+<span class="sig-name descname"><span class="pre">test_voce_hardening_saturates_to_correct_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_Hardening.html#VoceHardeningTestFixture.test_voce_hardening_saturates_to_correct_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_Hardening.VoceHardeningTestFixture.test_voce_hardening_saturates_to_correct_value" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_Hardening.VoceHardeningTestFixture.test_voce_hardening_yield_strength">
+<span class="sig-name descname"><span class="pre">test_voce_hardening_yield_strength</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_Hardening.html#VoceHardeningTestFixture.test_voce_hardening_yield_strength"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_Hardening.VoceHardeningTestFixture.test_voce_hardening_yield_strength" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_Hardening.VoceHardeningTestFixture.test_voce_hardening_zero_point">
+<span class="sig-name descname"><span class="pre">test_voce_hardening_zero_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_Hardening.html#VoceHardeningTestFixture.test_voce_hardening_zero_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_Hardening.VoceHardeningTestFixture.test_voce_hardening_zero_point" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optimism.material.test.test_HyperVisco">
+<span id="optimism-material-test-test-hypervisco-module"></span><h2>optimism.material.test.test_HyperVisco module<a class="headerlink" href="#module-optimism.material.test.test_HyperVisco" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.material.test.test_HyperVisco.HyperViscoModelFixture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.material.test.test_HyperVisco.</span></span><span class="sig-name descname"><span class="pre">HyperViscoModelFixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_HyperVisco.html#HyperViscoModelFixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_HyperVisco.HyperViscoModelFixture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_HyperVisco.HyperViscoModelFixture.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_HyperVisco.html#HyperViscoModelFixture.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_HyperVisco.HyperViscoModelFixture.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.material.test.test_HyperVisco.HyperViscoUniaxialStrain">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.material.test.test_HyperVisco.</span></span><span class="sig-name descname"><span class="pre">HyperViscoUniaxialStrain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_HyperVisco.html#HyperViscoUniaxialStrain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_HyperVisco.HyperViscoUniaxialStrain" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#optimism.material.test.test_HyperVisco.HyperViscoModelFixture" title="optimism.material.test.test_HyperVisco.HyperViscoModelFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">HyperViscoModelFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_HyperVisco.HyperViscoUniaxialStrain.test_loading_only">
+<span class="sig-name descname"><span class="pre">test_loading_only</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_HyperVisco.html#HyperViscoUniaxialStrain.test_loading_only"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_HyperVisco.HyperViscoUniaxialStrain.test_loading_only" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optimism.material.test.test_J2Plastic">
+<span id="optimism-material-test-test-j2plastic-module"></span><h2>optimism.material.test.test_J2Plastic module<a class="headerlink" href="#module-optimism.material.test.test_J2Plastic" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.material.test.test_J2Plastic.</span></span><span class="sig-name descname"><span class="pre">GradOfPlasticityModelFixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_J2Plastic.html#GradOfPlasticityModelFixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_J2Plastic.html#GradOfPlasticityModelFixture.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.test_elastic_energy">
+<span class="sig-name descname"><span class="pre">test_elastic_energy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_J2Plastic.html#GradOfPlasticityModelFixture.test_elastic_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.test_elastic_energy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.test_elastic_strain_path">
+<span class="sig-name descname"><span class="pre">test_elastic_strain_path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_J2Plastic.html#GradOfPlasticityModelFixture.test_elastic_strain_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.test_elastic_strain_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.test_plastic_strain_path">
+<span class="sig-name descname"><span class="pre">test_plastic_strain_path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_J2Plastic.html#GradOfPlasticityModelFixture.test_plastic_strain_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.test_plastic_strain_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.test_zero_point">
+<span class="sig-name descname"><span class="pre">test_zero_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_J2Plastic.html#GradOfPlasticityModelFixture.test_zero_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.test_zero_point" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.material.test.test_J2Plastic.J2PlasticUniaxial">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.material.test.test_J2Plastic.</span></span><span class="sig-name descname"><span class="pre">J2PlasticUniaxial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_J2Plastic.html#J2PlasticUniaxial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_J2Plastic.J2PlasticUniaxial" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_J2Plastic.J2PlasticUniaxial.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_J2Plastic.html#J2PlasticUniaxial.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_J2Plastic.J2PlasticUniaxial.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_J2Plastic.J2PlasticUniaxial.test_uniaxial">
+<span class="sig-name descname"><span class="pre">test_uniaxial</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_J2Plastic.html#J2PlasticUniaxial.test_uniaxial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_J2Plastic.J2PlasticUniaxial.test_uniaxial" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.material.test.test_J2Plastic.J2UpdateFixture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.material.test.test_J2Plastic.</span></span><span class="sig-name descname"><span class="pre">J2UpdateFixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_J2Plastic.html#J2UpdateFixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_J2Plastic.J2UpdateFixture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_J2Plastic.J2UpdateFixture.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_J2Plastic.html#J2UpdateFixture.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_J2Plastic.J2UpdateFixture.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_J2Plastic.J2UpdateFixture.test_update_only_happens_once">
+<span class="sig-name descname"><span class="pre">test_update_only_happens_once</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_J2Plastic.html#J2UpdateFixture.test_update_only_happens_once"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_J2Plastic.J2UpdateFixture.test_update_only_happens_once" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.material.test.test_J2Plastic.PlasticityOnMesh">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.material.test.test_J2Plastic.</span></span><span class="sig-name descname"><span class="pre">PlasticityOnMesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_J2Plastic.html#PlasticityOnMesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_J2Plastic.PlasticityOnMesh" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.MeshFixture.MeshFixture" title="optimism.test.MeshFixture.MeshFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeshFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_J2Plastic.PlasticityOnMesh.test_plasticity_with_mesh">
+<span class="sig-name descname"><span class="pre">test_plasticity_with_mesh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_J2Plastic.html#PlasticityOnMesh.test_plasticity_with_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_J2Plastic.PlasticityOnMesh.test_plasticity_with_mesh" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.material.test.test_J2Plastic.make_disp_grad_from_strain">
+<span class="sig-prename descclassname"><span class="pre">optimism.material.test.test_J2Plastic.</span></span><span class="sig-name descname"><span class="pre">make_disp_grad_from_strain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_J2Plastic.html#make_disp_grad_from_strain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_J2Plastic.make_disp_grad_from_strain" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-optimism.material.test.test_LinearElastic">
+<span id="optimism-material-test-test-linearelastic-module"></span><h2>optimism.material.test.test_LinearElastic module<a class="headerlink" href="#module-optimism.material.test.test_LinearElastic" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.material.test.test_LinearElastic.TestLinearElasticMaterial">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.material.test.test_LinearElastic.</span></span><span class="sig-name descname"><span class="pre">TestLinearElasticMaterial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_LinearElastic.html#TestLinearElasticMaterial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_LinearElastic.TestLinearElasticMaterial" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_LinearElastic.TestLinearElasticMaterial.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_LinearElastic.html#TestLinearElasticMaterial.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_LinearElastic.TestLinearElasticMaterial.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_LinearElastic.TestLinearElasticMaterial.test_finite_deformation_frame_indifference">
+<span class="sig-name descname"><span class="pre">test_finite_deformation_frame_indifference</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_LinearElastic.html#TestLinearElasticMaterial.test_finite_deformation_frame_indifference"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_LinearElastic.TestLinearElasticMaterial.test_finite_deformation_frame_indifference" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_LinearElastic.TestLinearElasticMaterial.test_internal_state_update">
+<span class="sig-name descname"><span class="pre">test_internal_state_update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_LinearElastic.html#TestLinearElasticMaterial.test_internal_state_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_LinearElastic.TestLinearElasticMaterial.test_internal_state_update" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_LinearElastic.TestLinearElasticMaterial.test_zero_point">
+<span class="sig-name descname"><span class="pre">test_zero_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_LinearElastic.html#TestLinearElasticMaterial.test_zero_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_LinearElastic.TestLinearElasticMaterial.test_zero_point" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optimism.material.test.test_MaterialUniaxialSimulator">
+<span id="optimism-material-test-test-materialuniaxialsimulator-module"></span><h2>optimism.material.test.test_MaterialUniaxialSimulator module<a class="headerlink" href="#module-optimism.material.test.test_MaterialUniaxialSimulator" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.material.test.test_MaterialUniaxialSimulator.MaterialUniaxialSimulatorFixture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.material.test.test_MaterialUniaxialSimulator.</span></span><span class="sig-name descname"><span class="pre">MaterialUniaxialSimulatorFixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_MaterialUniaxialSimulator.html#MaterialUniaxialSimulatorFixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_MaterialUniaxialSimulator.MaterialUniaxialSimulatorFixture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_MaterialUniaxialSimulator.MaterialUniaxialSimulatorFixture.test_uniaxial_state_achieved">
+<span class="sig-name descname"><span class="pre">test_uniaxial_state_achieved</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_MaterialUniaxialSimulator.html#MaterialUniaxialSimulatorFixture.test_uniaxial_state_achieved"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_MaterialUniaxialSimulator.MaterialUniaxialSimulatorFixture.test_uniaxial_state_achieved" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optimism.material.test.test_RateSensitivity">
+<span id="optimism-material-test-test-ratesensitivity-module"></span><h2>optimism.material.test.test_RateSensitivity module<a class="headerlink" href="#module-optimism.material.test.test_RateSensitivity" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.material.test.test_RateSensitivity.RateSensitivityFixture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.material.test.test_RateSensitivity.</span></span><span class="sig-name descname"><span class="pre">RateSensitivityFixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_RateSensitivity.html#RateSensitivityFixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_RateSensitivity.RateSensitivityFixture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_RateSensitivity.RateSensitivityFixture.test_power_law_scales_correctly">
+<span class="sig-name descname"><span class="pre">test_power_law_scales_correctly</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_RateSensitivity.html#RateSensitivityFixture.test_power_law_scales_correctly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_RateSensitivity.RateSensitivityFixture.test_power_law_scales_correctly" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_RateSensitivity.RateSensitivityFixture.test_property_parsing">
+<span class="sig-name descname"><span class="pre">test_property_parsing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_RateSensitivity.html#RateSensitivityFixture.test_property_parsing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_RateSensitivity.RateSensitivityFixture.test_property_parsing" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.material.test.test_RateSensitivity.RateSentivityInsideJ2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.material.test.test_RateSensitivity.</span></span><span class="sig-name descname"><span class="pre">RateSentivityInsideJ2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_RateSensitivity.html#RateSentivityInsideJ2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_RateSensitivity.RateSentivityInsideJ2" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_RateSensitivity.RateSentivityInsideJ2.test_kinetic_potential_works_inside_J2">
+<span class="sig-name descname"><span class="pre">test_kinetic_potential_works_inside_J2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_RateSensitivity.html#RateSentivityInsideJ2.test_kinetic_potential_works_inside_J2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_RateSensitivity.RateSentivityInsideJ2.test_kinetic_potential_works_inside_J2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optimism.material.test">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-optimism.material.test" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="optimism.material.html" class="btn btn-neutral float-left" title="optimism.material package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="optimism.phasefield.html" class="btn btn-neutral float-right" title="optimism.phasefield package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

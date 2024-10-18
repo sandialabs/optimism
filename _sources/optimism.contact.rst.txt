@@ -1,0 +1,103 @@
+optimism.contact package
+========================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   optimism.contact.test
+
+Submodules
+----------
+
+optimism.contact.Contact module
+-------------------------------
+
+.. automodule:: optimism.contact.Contact
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.contact.EdgeCpp module
+-------------------------------
+
+.. automodule:: optimism.contact.EdgeCpp
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.contact.EdgeIntersection module
+----------------------------------------
+
+.. automodule:: optimism.contact.EdgeIntersection
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.contact.Friction module
+--------------------------------
+
+.. automodule:: optimism.contact.Friction
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.contact.Levelset module
+--------------------------------
+
+.. automodule:: optimism.contact.Levelset
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.contact.LevelsetConstraint module
+------------------------------------------
+
+.. automodule:: optimism.contact.LevelsetConstraint
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.contact.MortarContact module
+-------------------------------------
+
+.. automodule:: optimism.contact.MortarContact
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.contact.PenaltyContact module
+--------------------------------------
+
+.. automodule:: optimism.contact.PenaltyContact
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.contact.Search module
+------------------------------
+
+.. automodule:: optimism.contact.Search
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+Module contents
+---------------
+
+.. automodule:: optimism.contact
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:

@@ -1,0 +1,475 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.EquationSolverSubspace &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.EquationSolverSubspace</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.EquationSolverSubspace</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">optimism.treigen</span> <span class="kn">import</span> <span class="n">treigen</span>
+
+
+
+<span class="kn">from</span> <span class="nn">optimism.EquationSolver</span> <span class="kn">import</span> <span class="n">Settings</span><span class="p">,</span> <span class="n">get_settings</span><span class="p">,</span> <span class="n">settings_with_new_tol</span><span class="p">,</span> <span class="n">negCurveString</span><span class="p">,</span> <span class="n">boundaryString</span><span class="p">,</span> <span class="n">interiorString</span><span class="p">,</span> <span class="n">is_converged</span><span class="p">,</span> <span class="n">is_on_boundary</span><span class="p">,</span> <span class="n">print_min_banner</span>
+
+
+<div class="viewcode-block" id="ModelProblem">
+<a class="viewcode-back" href="../../optimism.html#optimism.EquationSolverSubspace.ModelProblem">[docs]</a>
+<span class="k">class</span> <span class="nc">ModelProblem</span><span class="p">():</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">g</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Kv</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isInitialized</span><span class="o">=</span><span class="kc">False</span>
+
+
+<div class="viewcode-block" id="ModelProblem.is_initialized">
+<a class="viewcode-back" href="../../optimism.html#optimism.EquationSolverSubspace.ModelProblem.is_initialized">[docs]</a>
+    <span class="k">def</span> <span class="nf">is_initialized</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">isInitialized</span></div>
+
+
+    
+<div class="viewcode-block" id="ModelProblem.add_vector">
+<a class="viewcode-back" href="../../optimism.html#optimism.EquationSolverSubspace.ModelProblem.add_vector">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_vector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">Kv</span><span class="p">):</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="n">v</span><span class="nd">@self</span><span class="o">.</span><span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">v</span> <span class="o">-</span> <span class="n">alpha</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">Kv</span> <span class="o">=</span> <span class="n">Kv</span> <span class="o">-</span> <span class="n">alpha</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Kv</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="n">vnorm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="o">/</span><span class="n">vnorm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Kv</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Kv</span><span class="o">/</span><span class="n">vnorm</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ModelProblem.setup_system">
+<a class="viewcode-back" href="../../optimism.html#optimism.EquationSolverSubspace.ModelProblem.setup_system">[docs]</a>
+    <span class="k">def</span> <span class="nf">setup_system</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isInitialized</span><span class="o">=</span><span class="kc">True</span>
+        <span class="c1"># for the reduced system</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
+
+        <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span><span class="n">N</span><span class="p">))</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">))</span>
+        
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="nd">@self</span><span class="o">.</span><span class="n">b</span> <span class="p">)</span>
+            <span class="c1"># g[i] = self.v[i]@self.b</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+                <span class="n">H</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="nd">@self</span><span class="o">.</span><span class="n">Kv</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="p">)</span>
+            <span class="c1"># H[i,j] = vi^T K vj</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">g</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">H</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">H</span><span class="o">+</span><span class="n">H</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
+
+
+        
+        
+<div class="viewcode-block" id="ModelProblem.solve">
+<a class="viewcode-back" href="../../optimism.html#optimism.EquationSolverSubspace.ModelProblem.solve">[docs]</a>
+    <span class="k">def</span> <span class="nf">solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Delta</span><span class="p">):</span>
+        <span class="c1"># s below is alpha, the coefficeints for the vectors</span>
+        <span class="c1"># min 1/2 alpha^T H alpha + alpha dot self.g, st. norm(alpha) &lt;= Delta</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">treigen</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="n">Delta</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;chosen vector weights are = &#39;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">N</span><span class="p">):</span>
+            <span class="n">step</span> <span class="o">=</span> <span class="n">step</span> <span class="o">+</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">step</span></div>
+</div>
+
+            
+                
+
+<div class="viewcode-block" id="project_to_boundary_with_coefs">
+<a class="viewcode-back" href="../../optimism.html#optimism.EquationSolverSubspace.project_to_boundary_with_coefs">[docs]</a>
+<span class="k">def</span> <span class="nf">project_to_boundary_with_coefs</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">zz</span><span class="p">,</span> <span class="n">zd</span><span class="p">,</span> <span class="n">dd</span><span class="p">):</span>
+    <span class="c1"># find tau s.t. (z + tau*d)^2 = trSize^2</span>
+    <span class="n">tau</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="p">(</span><span class="n">trSize</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="n">zz</span><span class="p">)</span><span class="o">*</span><span class="n">dd</span> <span class="o">+</span> <span class="n">zd</span><span class="o">**</span><span class="mi">2</span> <span class="p">)</span> <span class="o">-</span> <span class="n">zd</span><span class="p">)</span><span class="o">/</span><span class="n">dd</span>
+    <span class="k">return</span> <span class="n">z</span> <span class="o">+</span> <span class="n">tau</span><span class="o">*</span><span class="n">d</span></div>
+
+
+
+<div class="viewcode-block" id="trust_region_cg">
+<a class="viewcode-back" href="../../optimism.html#optimism.EquationSolverSubspace.trust_region_cg">[docs]</a>
+<span class="k">def</span> <span class="nf">trust_region_cg</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">Pr</span><span class="p">,</span> <span class="n">HPr</span><span class="p">,</span> <span class="n">hess_vec_func</span><span class="p">,</span> <span class="n">precond</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+    <span class="c1"># minimize r@z + 0.5*z@J@z</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="mf">0.</span><span class="o">*</span><span class="n">x</span>
+
+    <span class="n">cgInexactRelTol</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">cg_inexact_solve_ratio</span>
+    <span class="n">cgTolSquared</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">cg_tol</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">cgInexactRelTol</span><span class="o">*</span><span class="n">cgInexactRelTol</span><span class="o">*</span><span class="n">r</span><span class="nd">@r</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">r</span><span class="nd">@r</span> <span class="o">&lt;</span> <span class="n">cgTolSquared</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Entering cg with zero gradient, probably should not be getting here, please debug.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">interiorString</span><span class="p">,</span> <span class="mi">0</span>
+    
+    <span class="n">d</span> <span class="o">=</span> <span class="o">-</span><span class="n">Pr</span>
+    <span class="n">rPr</span> <span class="o">=</span> <span class="n">r</span><span class="nd">@Pr</span>
+    <span class="n">curvature</span> <span class="o">=</span> <span class="o">-</span><span class="n">d</span><span class="nd">@HPr</span>
+    
+    <span class="n">usePrecondForStep</span> <span class="o">=</span> <span class="kc">False</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">max_cg_iters</span><span class="p">):</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">rPr</span> <span class="o">/</span> <span class="n">curvature</span>           
+        <span class="n">zNp1</span> <span class="o">=</span> <span class="n">z</span> <span class="o">+</span> <span class="n">alpha</span><span class="o">*</span><span class="n">d</span>
+
+        <span class="k">if</span> <span class="n">curvature</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">zz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+            <span class="n">zd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+            <span class="n">dd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+            <span class="n">zOut</span> <span class="o">=</span> <span class="n">project_to_boundary_with_coefs</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span>
+                                                  <span class="n">zz</span><span class="p">,</span> <span class="n">zd</span><span class="p">,</span> <span class="n">dd</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">zOut</span><span class="p">,</span> <span class="n">negCurveString</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+            
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">zNp1</span><span class="p">,</span> <span class="n">zNp1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">trSize</span><span class="o">**</span><span class="mi">2</span><span class="p">:</span>
+            <span class="n">zz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+            <span class="n">zd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+            <span class="n">dd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+            <span class="n">zOut</span> <span class="o">=</span> <span class="n">project_to_boundary_with_coefs</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span>
+                                                  <span class="n">zz</span><span class="p">,</span> <span class="n">zd</span><span class="p">,</span> <span class="n">dd</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">zOut</span><span class="p">,</span> <span class="n">boundaryString</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+
+        <span class="n">z</span> <span class="o">=</span> <span class="n">zNp1</span>
+           
+        <span class="n">r</span> <span class="o">+=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">hess_vec_func</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="n">Pr</span> <span class="o">=</span> <span class="n">precond</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+        <span class="n">rPrNp1</span> <span class="o">=</span> <span class="n">r</span><span class="nd">@Pr</span>
+          
+        <span class="k">if</span> <span class="n">r</span><span class="nd">@r</span> <span class="o">&lt;</span> <span class="n">cgTolSquared</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">interiorString</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+
+        <span class="n">beta</span> <span class="o">=</span> <span class="n">rPrNp1</span> <span class="o">/</span> <span class="n">rPr</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="o">-</span><span class="n">Pr</span> <span class="o">+</span> <span class="n">beta</span><span class="o">*</span><span class="n">d</span>
+        <span class="n">rPr</span> <span class="o">=</span> <span class="n">rPrNp1</span>
+        <span class="n">curvature</span> <span class="o">=</span> <span class="n">d</span><span class="o">@</span><span class="p">(</span> <span class="n">hess_vec_func</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="p">)</span>
+        
+    <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">interiorString</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span></div>
+
+
+
+
+<div class="viewcode-block" id="spectral_gradient_minimize">
+<a class="viewcode-back" href="../../optimism.html#optimism.EquationSolverSubspace.spectral_gradient_minimize">[docs]</a>
+<span class="k">def</span> <span class="nf">spectral_gradient_minimize</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">hess_vec_func</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+
+    <span class="n">Hx</span> <span class="o">=</span> <span class="n">hess_vec_func</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">g</span> <span class="o">+</span> <span class="n">Hx</span>
+    <span class="n">energy</span> <span class="o">=</span> <span class="n">g</span><span class="nd">@x</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">x</span><span class="nd">@Hx</span>
+    
+    <span class="n">dNorm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    
+    <span class="n">L</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">over_iters</span>
+
+    <span class="n">lamMin</span> <span class="o">=</span> <span class="mf">1e-8</span>
+    <span class="n">lamMax</span> <span class="o">=</span> <span class="mf">1e8</span>
+    <span class="n">lam</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="o">-</span><span class="n">lam</span> <span class="o">*</span> <span class="n">d</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">hess_vec_func</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">hs</span> <span class="o">=</span> <span class="n">h</span><span class="nd">@s</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">d</span><span class="nd">@s</span>
+        <span class="k">if</span> <span class="n">hs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="n">ds</span><span class="o">/</span><span class="n">hs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;negative curvature found&#39;</span><span class="p">)</span>
+            
+        <span class="n">x</span> <span class="o">+=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">s</span>
+        <span class="n">d</span> <span class="o">+=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">h</span>
+        <span class="n">lam</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">lamMin</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">lamMax</span><span class="p">,</span> <span class="n">s</span><span class="nd">@s</span> <span class="o">/</span> <span class="n">hs</span><span class="p">))</span>
+
+    <span class="n">finalEnergy</span> <span class="o">=</span> <span class="n">g</span><span class="nd">@x</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">x</span><span class="nd">@hess_vec_func</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;spg initial and final energy = &#39;</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">finalEnergy</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+
+<div class="viewcode-block" id="trust_region_subspace_minimize">
+<a class="viewcode-back" href="../../optimism.html#optimism.EquationSolverSubspace.trust_region_subspace_minimize">[docs]</a>
+<span class="k">def</span> <span class="nf">trust_region_subspace_minimize</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    
+    <span class="n">trSize</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">tr_size</span>
+    
+    <span class="n">g</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">o</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">gNorm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Initial objective, residual = &quot;</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">gNorm</span><span class="p">)</span>
+
+    <span class="c1"># this could potentially return an unstable solution</span>
+    <span class="k">if</span> <span class="n">is_converged</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">callback</span><span class="p">:</span> <span class="n">callback</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span>
+
+    <span class="n">cumulativeCgIters</span><span class="o">=</span><span class="mi">0</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">max_trust_iters</span><span class="p">):</span>
+        <span class="c1"># minimize 0.5*(2*r + J_sd)*d = r + 0.5*dHd</span>
+
+        <span class="n">trSizeForStep</span> <span class="o">=</span> <span class="n">trSize</span>
+        
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">use_incremental_objective</span><span class="p">:</span>
+            <span class="n">incremental_objective</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">((</span><span class="n">g</span> <span class="o">+</span> <span class="n">objective</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">d</span><span class="p">))</span> <span class="o">@</span> <span class="n">d</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">incremental_objective</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">objective</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">d</span><span class="p">)</span> <span class="o">-</span> <span class="n">o</span>
+
+        <span class="n">hess_vec_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">objective</span><span class="o">.</span><span class="n">hessian_vec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+
+
+        <span class="c1"># minimize z^T K z + g^z, z = alpha1*v1 + alpha2*v2 + ...</span>
+        <span class="n">subspace</span> <span class="o">=</span> <span class="n">ModelProblem</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+                
+        <span class="n">Pg</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">apply_precond</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+        <span class="n">HPg</span> <span class="o">=</span> <span class="n">hess_vec_func</span><span class="p">(</span><span class="n">Pg</span><span class="p">)</span>
+        
+        <span class="n">d</span><span class="p">,</span> <span class="n">stepType</span><span class="p">,</span> <span class="n">cgIters</span> <span class="o">=</span> \
+            <span class="n">trust_region_cg</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span>
+                            <span class="n">Pg</span><span class="p">,</span> <span class="n">HPg</span><span class="p">,</span>
+                            <span class="n">hess_vec_func</span><span class="p">,</span>
+                            <span class="n">objective</span><span class="o">.</span><span class="n">apply_precond</span><span class="p">,</span>
+                            <span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">)</span>
+        <span class="n">cumulativeCgIters</span> <span class="o">+=</span> <span class="n">cgIters</span>
+
+        <span class="n">trySpg</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">over_iters</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">stepType</span> <span class="o">!=</span><span class="n">interiorString</span>
+        <span class="k">if</span> <span class="n">trySpg</span><span class="p">:</span>
+            <span class="n">d_spg</span> <span class="o">=</span> <span class="n">spectral_gradient_minimize</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">hess_vec_func</span><span class="p">,</span>
+                                               <span class="mi">2</span><span class="o">*</span><span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">)</span>
+
+        <span class="n">Hd</span> <span class="o">=</span> <span class="n">hess_vec_func</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="n">dHd</span> <span class="o">=</span> <span class="n">d</span> <span class="o">@</span> <span class="n">Hd</span>
+        <span class="n">modelObjective</span> <span class="o">=</span> <span class="n">g</span><span class="nd">@d</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">dHd</span>
+        
+        <span class="k">if</span> <span class="n">stepType</span> <span class="o">!=</span> <span class="n">interiorString</span><span class="p">:</span>
+            <span class="n">subspace</span><span class="o">.</span><span class="n">add_vector</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">hess_vec_func</span><span class="p">(</span><span class="n">g</span><span class="p">))</span>
+            <span class="n">subspace</span><span class="o">.</span><span class="n">add_vector</span><span class="p">(</span><span class="n">Pg</span><span class="p">,</span> <span class="n">HPg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cgIters</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">subspace</span><span class="o">.</span><span class="n">add_vector</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">Hd</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">trySpg</span><span class="p">:</span>
+                <span class="n">subspace</span><span class="o">.</span><span class="n">add_vector</span><span class="p">(</span><span class="n">d_spg</span><span class="p">,</span> <span class="n">hess_vec_func</span><span class="p">(</span><span class="n">d_spg</span><span class="p">))</span>
+            <span class="n">subspace</span><span class="o">.</span><span class="n">setup_system</span><span class="p">()</span>
+                
+            <span class="c1"># try to find a better model solution</span>
+            <span class="n">d_ss</span> <span class="o">=</span> <span class="n">subspace</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">trSizeForStep</span><span class="p">)</span>
+            <span class="n">Hd_ss</span> <span class="o">=</span> <span class="n">hess_vec_func</span><span class="p">(</span><span class="n">d_ss</span><span class="p">)</span>
+            <span class="n">modelObjective_ss</span> <span class="o">=</span> <span class="n">g</span><span class="nd">@d_ss</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">d_ss</span><span class="nd">@Hd_ss</span>
+
+            <span class="c1">#print(&#39;default, subspace objective = &#39;, modelObjective, modelObjective_ss)</span>
+            
+            <span class="k">if</span> <span class="n">modelObjective_ss</span> <span class="o">&lt;=</span> <span class="n">modelObjective</span><span class="p">:</span>
+                <span class="n">modelObjective</span> <span class="o">=</span> <span class="n">modelObjective_ss</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">d_ss</span>
+            
+        <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">+</span><span class="n">d</span>
+        <span class="n">realObjective</span> <span class="o">=</span> <span class="n">incremental_objective</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="n">gy</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">is_converged</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">realObjective</span><span class="p">,</span> <span class="n">modelObjective</span><span class="p">,</span>
+                        <span class="n">gy</span><span class="p">,</span> <span class="n">g</span> <span class="o">+</span> <span class="n">Hd</span><span class="p">,</span> <span class="n">cgIters</span><span class="p">,</span> <span class="n">trSizeForStep</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">callback</span><span class="p">:</span> <span class="n">callback</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">y</span>
+        
+        <span class="n">modelImprove</span> <span class="o">=</span> <span class="o">-</span><span class="n">modelObjective</span>
+        <span class="n">realImprove</span> <span class="o">=</span> <span class="o">-</span><span class="n">realObjective</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">realImprove</span> <span class="o">/</span> <span class="n">modelImprove</span>
+        
+        <span class="k">if</span> <span class="n">modelObjective</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Found a positive model objective increase.  Debug if you see this.&#39;</span><span class="p">)</span>
+            <span class="n">rho</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="n">realResNorm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">gy</span><span class="p">)</span>
+
+        <span class="c1"># accepts if the model is good or if the energy doesn&#39;t change, but the residual drops</span>
+        <span class="n">willAccept</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">&gt;=</span> <span class="n">settings</span><span class="o">.</span><span class="n">eta1</span> <span class="ow">or</span> <span class="p">(</span><span class="n">rho</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">realResNorm</span> <span class="o">&lt;=</span> <span class="n">gNorm</span><span class="p">)</span>
+
+        <span class="n">modelRes</span> <span class="o">=</span> <span class="n">g</span> <span class="o">+</span> <span class="n">Hd</span>
+        <span class="n">modelResNorm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">modelRes</span><span class="p">)</span>
+        <span class="n">print_min_banner</span><span class="p">(</span><span class="n">realObjective</span><span class="p">,</span> <span class="n">modelObjective</span><span class="p">,</span>
+                         <span class="n">realResNorm</span><span class="p">,</span> <span class="n">modelResNorm</span><span class="p">,</span>
+                         <span class="n">cgIters</span><span class="p">,</span> <span class="n">trSizeForStep</span><span class="p">,</span> <span class="n">stepType</span><span class="p">,</span>
+                         <span class="n">willAccept</span><span class="p">,</span>
+                         <span class="n">settings</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">rho</span> <span class="o">&gt;=</span> <span class="n">settings</span><span class="o">.</span><span class="n">eta2</span><span class="p">:</span> <span class="c1"># this way to handle NaNs</span>
+            <span class="k">if</span> <span class="n">willAccept</span><span class="p">:</span>
+                <span class="n">trSize</span> <span class="o">*=</span> <span class="n">settings</span><span class="o">.</span><span class="n">t1</span>
+            <span class="k">else</span><span class="p">:</span> <span class="c1"># recursively shrink and solve sub-space</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">subspace</span><span class="o">.</span><span class="n">is_initialized</span><span class="p">():</span>
+                    <span class="n">subspace</span><span class="o">.</span><span class="n">add_vector</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">hess_vec_func</span><span class="p">(</span><span class="n">g</span><span class="p">))</span>
+                    <span class="n">subspace</span><span class="o">.</span><span class="n">add_vector</span><span class="p">(</span><span class="n">Pg</span><span class="p">,</span> <span class="n">HPg</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">cgIters</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+                        <span class="n">subspace</span><span class="o">.</span><span class="n">add_vector</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">Hd</span><span class="p">)</span>
+                    <span class="n">subspace</span><span class="o">.</span><span class="n">setup_system</span><span class="p">()</span>
+
+                <span class="n">stepType</span> <span class="o">=</span> <span class="n">boundaryString</span>
+                <span class="n">maxTrShrinks</span><span class="o">=</span><span class="mi">10</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxTrShrinks</span><span class="p">):</span>
+                    <span class="n">trSizeForStep</span> <span class="o">*=</span> <span class="n">settings</span><span class="o">.</span><span class="n">t1</span>
+                    <span class="c1">#print(&quot;Shrinking trust-region and resolving sub-space with size = &quot;, trSizeForStep)</span>
+                    <span class="n">d</span> <span class="o">=</span> <span class="n">subspace</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">trSizeForStep</span><span class="p">)</span>
+                    <span class="n">Hd</span> <span class="o">=</span> <span class="n">hess_vec_func</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+                    <span class="n">modelObjective</span> <span class="o">=</span> <span class="n">g</span><span class="nd">@d</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">d</span><span class="nd">@Hd</span>
+
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">+</span><span class="n">d</span>
+                    <span class="n">realObjective</span> <span class="o">=</span> <span class="n">incremental_objective</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+                    <span class="n">gy</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+                    <span class="n">realResNorm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">gy</span><span class="p">)</span>
+                    
+                    <span class="n">modelImprove</span> <span class="o">=</span> <span class="o">-</span><span class="n">modelObjective</span>
+                    <span class="n">realImprove</span> <span class="o">=</span> <span class="o">-</span><span class="n">realObjective</span>
+                    <span class="n">rho</span> <span class="o">=</span> <span class="n">realImprove</span> <span class="o">/</span> <span class="n">modelImprove</span>
+                    
+                    <span class="n">willAccept</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">&gt;=</span> <span class="n">settings</span><span class="o">.</span><span class="n">eta1</span>
+
+                    <span class="n">modelRes</span> <span class="o">=</span> <span class="n">g</span> <span class="o">+</span> <span class="n">Hd</span>
+                    <span class="n">modelResNorm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">modelRes</span><span class="p">)</span>
+                    <span class="n">print_min_banner</span><span class="p">(</span><span class="n">realObjective</span><span class="p">,</span> <span class="n">modelObjective</span><span class="p">,</span>
+                                     <span class="n">realResNorm</span><span class="p">,</span> <span class="n">modelResNorm</span><span class="p">,</span>
+                                     <span class="mi">0</span><span class="p">,</span> <span class="n">trSizeForStep</span><span class="p">,</span> <span class="n">stepType</span><span class="p">,</span>
+                                     <span class="n">willAccept</span><span class="p">,</span>
+                                     <span class="n">settings</span><span class="p">)</span>
+                    
+                    <span class="k">if</span> <span class="n">willAccept</span><span class="p">:</span>
+                        <span class="k">break</span>
+                        
+                <span class="k">if</span> <span class="n">willAccept</span><span class="p">:</span>
+                    <span class="n">trSize</span> <span class="o">=</span> <span class="n">trSizeForStep</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># the subspace failed, force preconditioner update</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;subspace trust region reduction failed, trying the slow way and updating preconditioner&#39;</span><span class="p">)</span>
+                    <span class="n">trSize</span> <span class="o">*=</span> <span class="n">settings</span><span class="o">.</span><span class="n">t1</span>
+                    <span class="n">cumulativeCgIters</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">max_cumulative_cg_iters</span>
+        
+        <span class="k">elif</span> <span class="n">rho</span> <span class="o">&gt;</span> <span class="n">settings</span><span class="o">.</span><span class="n">eta3</span> <span class="ow">and</span> <span class="n">is_on_boundary</span><span class="p">(</span><span class="n">stepType</span><span class="p">):</span>
+            <span class="n">trSize</span> <span class="o">*=</span> <span class="n">settings</span><span class="o">.</span><span class="n">t2</span>
+
+        <span class="k">if</span> <span class="n">willAccept</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">y</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">gy</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">gNorm</span> <span class="o">=</span> <span class="n">realResNorm</span>
+            <span class="k">if</span> <span class="n">callback</span><span class="p">:</span> <span class="n">callback</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="n">cgIters</span> <span class="o">&gt;=</span> <span class="n">settings</span><span class="o">.</span><span class="n">max_cg_iters</span> <span class="ow">or</span> <span class="n">cumulativeCgIters</span> <span class="o">&gt;=</span> <span class="n">settings</span><span class="o">.</span><span class="n">max_cumulative_cg_iters</span><span class="p">:</span> 
+            <span class="n">objective</span><span class="o">.</span><span class="n">update_precond</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">cumulativeCgIters</span><span class="o">=</span><span class="mi">0</span>
+ 
+        
+        <span class="k">if</span> <span class="n">trSize</span> <span class="o">&lt;</span> <span class="n">settings</span><span class="o">.</span><span class="n">min_tr_size</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The trust region is too small.  Accepting, but be careful.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">callback</span><span class="p">:</span> <span class="n">callback</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">x</span>
+                    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reached the maximum number of trust region iterations.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">check_stability</span><span class="p">:</span>
+        <span class="n">objective</span><span class="o">.</span><span class="n">check_stability</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">callback</span><span class="p">:</span> <span class="n">callback</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

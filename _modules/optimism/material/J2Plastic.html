@@ -1,0 +1,414 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.material.J2Plastic &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.material.J2Plastic</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.material.J2Plastic</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">optimism.material.MaterialModel</span> <span class="kn">import</span> <span class="n">MaterialModel</span>
+<span class="kn">from</span> <span class="nn">optimism.material</span> <span class="kn">import</span> <span class="n">Hardening</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">TensorMath</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">ScalarRootFind</span>
+
+
+<span class="c1"># props</span>
+<span class="n">PROPS_E</span>     <span class="o">=</span> <span class="mi">0</span>
+<span class="n">PROPS_NU</span>    <span class="o">=</span> <span class="mi">1</span>
+<span class="n">PROPS_MU</span>    <span class="o">=</span> <span class="mi">2</span>
+<span class="n">PROPS_KAPPA</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">PROPS_Y0</span>    <span class="o">=</span> <span class="mi">4</span>
+
+<span class="c1"># internal variables</span>
+<span class="n">EQPS</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">PLASTIC_DISTORTION</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="o">+</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">PLASTIC_STRAIN</span> <span class="o">=</span> <span class="n">PLASTIC_DISTORTION</span> <span class="c1"># alias for better readability in small deformation theory</span>
+<span class="n">NUM_STATE_VARS</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c1"># hardening functions</span>
+<span class="n">ENERGY_DENSITY</span>  <span class="o">=</span> <span class="mi">0</span>
+<span class="n">FLOW_STRESS</span>     <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c1"># tolerance on EPQS change</span>
+<span class="n">_TOLERANCE</span> <span class="o">=</span> <span class="mf">1e-10</span>
+
+<div class="viewcode-block" id="create_material_model_functions">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic.create_material_model_functions">[docs]</a>
+<span class="k">def</span> <span class="nf">create_material_model_functions</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
+    <span class="n">props</span> <span class="o">=</span> <span class="n">make_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">[</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">],</span>
+                            <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;poisson ratio&#39;</span><span class="p">],</span>
+                            <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;yield strength&#39;</span><span class="p">])</span>
+    <span class="c1"># parse kinematics</span>
+    <span class="n">finiteDeformations</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">sethHill</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="s1">&#39;kinematics&#39;</span> <span class="ow">in</span> <span class="n">properties</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;kinematics&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;large deformations&#39;</span><span class="p">:</span>
+            <span class="n">finiteDeformations</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;kinematics&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;small deformations&#39;</span><span class="p">:</span>
+            <span class="n">finiteDeformations</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;kinematics&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;seth hill&#39;</span><span class="p">:</span>
+            <span class="n">finiteDeformations</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">sethHill</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown value specified for kinematics in J2Plastic&#39;</span><span class="p">)</span>
+        
+    <span class="k">if</span> <span class="n">finiteDeformations</span><span class="p">:</span>
+        <span class="n">compute_elastic_strain</span> <span class="o">=</span> <span class="n">compute_elastic_logarithmic_strain</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sethHill</span><span class="p">:</span>
+            <span class="n">compute_elastic_strain</span> <span class="o">=</span> <span class="n">compute_elastic_seth_hill_strain</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">compute_elastic_strain</span> <span class="o">=</span> <span class="n">compute_elastic_linear_strain</span>
+        
+    <span class="n">hardeningModel</span> <span class="o">=</span> <span class="n">Hardening</span><span class="o">.</span><span class="n">create_hardening_model</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
+
+    
+    <span class="k">def</span> <span class="nf">energy_density_function</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="n">elasticTrialStrain</span> <span class="o">=</span> <span class="n">compute_elastic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_energy_density</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">finiteDeformations</span><span class="p">:</span>
+        <span class="n">compute_state_new_func</span> <span class="o">=</span> <span class="n">compute_state_new_finite_deformations</span>
+        <span class="n">compute_initial_state</span> <span class="o">=</span> <span class="n">make_initial_state_finite_deformations</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sethHill</span><span class="p">:</span>
+            <span class="n">compute_state_new_func</span> <span class="o">=</span> <span class="n">compute_state_new_seth_hill</span>
+            <span class="n">compute_initial_state</span> <span class="o">=</span> <span class="n">make_initial_state_small_deformations</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">compute_state_new_func</span> <span class="o">=</span> <span class="n">compute_state_new_small_deformations</span>
+            <span class="n">compute_initial_state</span> <span class="o">=</span> <span class="n">make_initial_state_small_deformations</span>
+        
+    <span class="k">def</span> <span class="nf">compute_state_new_function</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">compute_state_new_func</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">)</span>
+
+    <span class="n">density</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;density&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">compute_material_qoi</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_compute_dissipation</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">MaterialModel</span><span class="p">(</span><span class="n">compute_energy_density</span> <span class="o">=</span> <span class="n">energy_density_function</span><span class="p">,</span>
+                         <span class="n">compute_initial_state</span> <span class="o">=</span> <span class="n">compute_initial_state</span><span class="p">,</span>
+                         <span class="n">compute_state_new</span> <span class="o">=</span> <span class="n">compute_state_new_function</span><span class="p">,</span>
+                         <span class="n">compute_material_qoi</span> <span class="o">=</span> <span class="n">compute_material_qoi</span><span class="p">,</span>
+                         <span class="n">density</span> <span class="o">=</span> <span class="n">density</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="make_properties">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic.make_properties">[docs]</a>
+<span class="k">def</span> <span class="nf">make_properties</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">nu</span><span class="p">,</span> <span class="n">Y0</span><span class="p">):</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">E</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">nu</span><span class="p">)</span>
+    <span class="n">kappa</span> <span class="o">=</span> <span class="n">E</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">nu</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">nu</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">Y0</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="make_initial_state_finite_deformations">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic.make_initial_state_finite_deformations">[docs]</a>
+<span class="k">def</span> <span class="nf">make_initial_state_finite_deformations</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,)):</span>
+    <span class="n">eqps</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">Fp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">eqps</span><span class="p">,</span> <span class="n">Fp</span><span class="o">.</span><span class="n">ravel</span><span class="p">()))</span></div>
+
+
+
+<div class="viewcode-block" id="make_initial_state_small_deformations">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic.make_initial_state_small_deformations">[docs]</a>
+<span class="k">def</span> <span class="nf">make_initial_state_small_deformations</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,)):</span>
+    <span class="n">eqps</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">plasticStrain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">pointState</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">eqps</span><span class="p">,</span> <span class="n">plasticStrain</span><span class="o">.</span><span class="n">ravel</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">pointState</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_state_new_finite_deformations">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic.compute_state_new_finite_deformations">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_state_new_finite_deformations</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardening_model</span><span class="p">):</span>
+    <span class="n">elasticTrialStrain</span> <span class="o">=</span> <span class="n">compute_elastic_logarithmic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">)</span>
+    <span class="n">stateInc</span> <span class="o">=</span> <span class="n">compute_state_increment</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardening_model</span><span class="p">)</span>
+    <span class="n">eqpsNew</span> <span class="o">=</span> <span class="n">stateOld</span><span class="p">[</span><span class="n">EQPS</span><span class="p">]</span> <span class="o">+</span> <span class="n">stateInc</span><span class="p">[</span><span class="n">EQPS</span><span class="p">]</span>
+    <span class="n">FpOld</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">stateOld</span><span class="p">[</span><span class="n">PLASTIC_DISTORTION</span><span class="p">],</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">FpNew</span> <span class="o">=</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">exp_symm</span><span class="p">(</span><span class="n">stateInc</span><span class="p">[</span><span class="n">PLASTIC_DISTORTION</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)))</span><span class="nd">@FpOld</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">eqpsNew</span><span class="p">,</span> <span class="n">FpNew</span><span class="o">.</span><span class="n">ravel</span><span class="p">()))</span></div>
+
+
+
+<div class="viewcode-block" id="compute_state_new_small_deformations">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic.compute_state_new_small_deformations">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_state_new_small_deformations</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardening_model</span><span class="p">):</span>
+    <span class="n">elasticTrialStrain</span> <span class="o">=</span> <span class="n">compute_elastic_linear_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">)</span>
+    <span class="n">stateInc</span> <span class="o">=</span> <span class="n">compute_state_increment</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardening_model</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">stateOld</span> <span class="o">+</span> <span class="n">stateInc</span></div>
+
+
+
+<div class="viewcode-block" id="compute_state_new_seth_hill">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic.compute_state_new_seth_hill">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_state_new_seth_hill</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardening_model</span><span class="p">):</span>
+    <span class="n">elasticTrialStrain</span> <span class="o">=</span> <span class="n">compute_elastic_seth_hill_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">)</span>
+    <span class="n">stateInc</span> <span class="o">=</span> <span class="n">compute_state_increment</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardening_model</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">stateOld</span> <span class="o">+</span> <span class="n">stateInc</span></div>
+
+
+
+<div class="viewcode-block" id="_energy_density">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic._energy_density">[docs]</a>
+<span class="k">def</span> <span class="nf">_energy_density</span><span class="p">(</span><span class="n">elStrain</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardening_model</span><span class="p">):</span>
+    <span class="n">stateInc</span> <span class="o">=</span> <span class="n">compute_state_increment</span><span class="p">(</span><span class="n">elStrain</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardening_model</span><span class="p">)</span>
+    
+    <span class="n">eqpsNew</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="n">EQPS</span><span class="p">]</span> <span class="o">+</span> <span class="n">stateInc</span><span class="p">[</span><span class="n">EQPS</span><span class="p">]</span>
+    <span class="n">elasticStrainNew</span> <span class="o">=</span> <span class="n">elStrain</span> <span class="o">-</span> <span class="n">stateInc</span><span class="p">[</span><span class="n">PLASTIC_DISTORTION</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+        
+    <span class="n">W</span> <span class="o">=</span> <span class="n">elastic_free_energy</span><span class="p">(</span><span class="n">elasticStrainNew</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span> <span class="o">+</span> <span class="n">hardening_model</span><span class="p">[</span><span class="n">ENERGY_DENSITY</span><span class="p">](</span><span class="n">eqpsNew</span><span class="p">,</span> <span class="n">state</span><span class="p">[</span><span class="n">EQPS</span><span class="p">],</span> <span class="n">dt</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">W</span></div>
+
+
+
+<div class="viewcode-block" id="compute_state_increment">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic.compute_state_increment">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_state_increment</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardening_model</span><span class="p">):</span>
+    <span class="n">eqps</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="n">EQPS</span><span class="p">]</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">compute_flow_direction</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">)</span>
+    <span class="n">trialStress</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_MU</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">dev</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">),</span> <span class="n">N</span><span class="p">)</span>
+    <span class="n">flowStress</span> <span class="o">=</span> <span class="n">hardening_model</span><span class="p">[</span><span class="n">FLOW_STRESS</span><span class="p">](</span><span class="n">eqps</span><span class="p">,</span> <span class="n">eqps</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+
+    <span class="c1"># The tolerance on the yield check is the same as that in the nonlinear solve.</span>
+    <span class="c1"># This ensures that we take the elastic branch if the state vars are updated.</span>
+    <span class="n">isYielding</span> <span class="o">=</span> <span class="n">trialStress</span> <span class="o">-</span> <span class="n">flowStress</span> <span class="o">&gt;</span> <span class="n">_TOLERANCE</span><span class="o">*</span><span class="n">props</span><span class="p">[</span><span class="n">PROPS_Y0</span><span class="p">]</span>
+
+    <span class="n">stateInc</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">cond</span><span class="p">(</span><span class="n">isYielding</span><span class="p">,</span>
+                            <span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">update_state</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardening_model</span><span class="p">),</span>
+                            <span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">NUM_STATE_VARS</span><span class="p">),</span>
+                            <span class="n">elasticStrain</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">stateInc</span></div>
+
+
+
+<div class="viewcode-block" id="elastic_deviatoric_free_energy">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic.elastic_deviatoric_free_energy">[docs]</a>
+<span class="k">def</span> <span class="nf">elastic_deviatoric_free_energy</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_MU</span><span class="p">]</span> <span class="o">*</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">norm_of_deviator_squared</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="elastic_volumetric_free_energy">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic.elastic_volumetric_free_energy">[docs]</a>
+<span class="k">def</span> <span class="nf">elastic_volumetric_free_energy</span><span class="p">(</span><span class="n">strain</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">props</span><span class="p">[</span><span class="n">PROPS_KAPPA</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">strain</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span></div>
+
+
+
+<div class="viewcode-block" id="elastic_free_energy">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic.elastic_free_energy">[docs]</a>
+<span class="k">def</span> <span class="nf">elastic_free_energy</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+    <span class="n">Wvol</span> <span class="o">=</span> <span class="n">elastic_volumetric_free_energy</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
+    <span class="n">Wdev</span> <span class="o">=</span> <span class="n">elastic_deviatoric_free_energy</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Wvol</span> <span class="o">+</span> <span class="n">Wdev</span></div>
+
+
+
+<div class="viewcode-block" id="compute_flow_direction">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic.compute_flow_direction">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_flow_direction</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">):</span>
+    <span class="n">devElasticStrain</span> <span class="o">=</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">dev</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">)</span>
+    <span class="n">devElasticStrainNormSquared</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">devElasticStrain</span><span class="p">,</span> <span class="n">devElasticStrain</span><span class="p">)</span>
+    <span class="n">isNonzero</span> <span class="o">=</span> <span class="n">devElasticStrainNormSquared</span> <span class="o">&gt;</span> <span class="mf">1e-16</span>
+    <span class="n">devElasticStrainNormSquared</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">isNonzero</span><span class="p">,</span>
+                                           <span class="n">devElasticStrainNormSquared</span><span class="p">,</span>
+                                           <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">dummyN</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+                           <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+                           <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">isNonzero</span><span class="p">,</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">3.</span><span class="o">/</span><span class="mf">2.</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">devElasticStrainNormSquared</span><span class="p">)</span> <span class="o">*</span> <span class="n">devElasticStrain</span><span class="p">,</span>
+                    <span class="n">dummyN</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="incremental_potential">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic.incremental_potential">[docs]</a>
+<span class="k">def</span> <span class="nf">incremental_potential</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">,</span> <span class="n">eqps</span><span class="p">,</span> <span class="n">eqpsOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardening_model</span><span class="p">):</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">compute_flow_direction</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">)</span>
+    <span class="n">elasticStrain</span> <span class="o">=</span> <span class="n">elasticTrialStrain</span> <span class="o">-</span> <span class="p">(</span><span class="n">eqps</span><span class="o">-</span><span class="n">eqpsOld</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span>
+    <span class="k">return</span> <span class="n">elastic_deviatoric_free_energy</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span> <span class="o">+</span> \
+        <span class="n">hardening_model</span><span class="p">[</span><span class="n">ENERGY_DENSITY</span><span class="p">](</span><span class="n">eqps</span><span class="p">,</span> <span class="n">eqpsOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span></div>
+
+
+
+<span class="n">r</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jacfwd</span><span class="p">(</span><span class="n">incremental_potential</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="update_state">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic.update_state">[docs]</a>
+<span class="k">def</span> <span class="nf">update_state</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardening_model</span><span class="p">):</span>
+    <span class="n">settings</span> <span class="o">=</span> <span class="n">ScalarRootFind</span><span class="o">.</span><span class="n">get_settings</span><span class="p">(</span><span class="n">x_tol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">r_tol</span><span class="o">=</span><span class="n">_TOLERANCE</span><span class="o">*</span><span class="n">props</span><span class="p">[</span><span class="n">PROPS_Y0</span><span class="p">])</span>
+    <span class="n">eqpsOld</span> <span class="o">=</span> <span class="n">stateOld</span><span class="p">[</span><span class="n">EQPS</span><span class="p">]</span>
+
+    <span class="n">N</span> <span class="o">=</span> <span class="n">compute_flow_direction</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">)</span>
+    <span class="n">lb</span> <span class="o">=</span> <span class="n">eqpsOld</span>
+    <span class="n">trialMises</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_MU</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">dev</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">),</span> <span class="n">N</span><span class="p">)</span>
+    <span class="n">ub</span> <span class="o">=</span> <span class="n">eqpsOld</span> <span class="o">+</span> <span class="p">(</span><span class="n">trialMises</span> <span class="o">-</span> <span class="n">hardening_model</span><span class="o">.</span><span class="n">compute_flow_stress</span><span class="p">(</span><span class="n">eqpsOld</span><span class="p">,</span> <span class="n">eqpsOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mf">3.0</span><span class="o">*</span><span class="n">props</span><span class="p">[</span><span class="n">PROPS_MU</span><span class="p">])</span>
+    <span class="c1"># Avoid the initial guess eqpsGuess = eqpsOld, because the power law rate sensitivity has an infinte slope</span>
+    <span class="c1"># in this case.</span>
+    <span class="n">eqpsGuess</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">lb</span> <span class="o">+</span> <span class="n">ub</span><span class="p">)</span>
+    <span class="n">eqps</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ScalarRootFind</span><span class="o">.</span><span class="n">find_root</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">r</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">eqpsOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardening_model</span><span class="p">),</span>
+                                       <span class="n">eqpsGuess</span><span class="p">,</span>
+                                       <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">lb</span><span class="p">,</span> <span class="n">ub</span><span class="p">]),</span>
+                                       <span class="n">settings</span><span class="p">)</span>
+    <span class="n">DeltaEqps</span> <span class="o">=</span> <span class="n">eqps</span> <span class="o">-</span> <span class="n">eqpsOld</span>
+    <span class="n">DeltaPlasticStrain</span> <span class="o">=</span> <span class="n">DeltaEqps</span><span class="o">*</span><span class="n">N</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span> <span class="p">(</span><span class="n">DeltaEqps</span><span class="p">,</span> <span class="n">DeltaPlasticStrain</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span> <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_elastic_logarithmic_strain">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic.compute_elastic_logarithmic_strain">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_elastic_logarithmic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="c1"># Compute the deviatoric and spherical parts separately</span>
+    <span class="c1"># to preserve the sign of J. Want to let solver sense and</span>
+    <span class="c1"># deal with inverted elements.</span>
+    <span class="n">Je_minus_1</span> <span class="o">=</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">detpIm1</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">)</span> <span class="c1"># J = Je since this model is isochoric plasticity</span>
+    <span class="n">traceEe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">Je_minus_1</span><span class="p">)</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="n">dispGrad</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">Fp</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="n">PLASTIC_DISTORTION</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">Fe</span> <span class="o">=</span> <span class="n">F</span><span class="nd">@TensorMath</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">Fp</span><span class="p">)</span>
+    <span class="n">Ce</span> <span class="o">=</span> <span class="n">Fe</span><span class="o">.</span><span class="n">T</span><span class="nd">@Fe</span>
+    <span class="n">Ee</span> <span class="o">=</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">log_sqrt_symm</span><span class="p">(</span><span class="n">Ce</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">dev</span><span class="p">(</span><span class="n">Ee</span><span class="p">)</span> <span class="o">+</span> <span class="n">traceEe</span><span class="o">/</span><span class="mf">3.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_elastic_linear_strain">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic.compute_elastic_linear_strain">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_elastic_linear_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="n">strain</span> <span class="o">=</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">)</span>
+    <span class="n">plasticStrain</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="n">PLASTIC_STRAIN</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">strain</span> <span class="o">-</span> <span class="n">plasticStrain</span></div>
+
+
+
+<span class="c1"># default to the Tupek strain measure</span>
+<div class="viewcode-block" id="compute_elastic_seth_hill_strain">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic.compute_elastic_seth_hill_strain">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_elastic_seth_hill_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="n">m</span><span class="o">=</span><span class="mf">0.25</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">dispGrad</span><span class="o">.</span><span class="n">T</span><span class="nd">@dispGrad</span>
+    <span class="n">strain</span> <span class="o">=</span> <span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">pow_symm</span><span class="p">(</span><span class="n">C</span><span class="p">,</span><span class="n">m</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">m</span><span class="p">)</span>
+    <span class="n">plasticStrain</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="n">PLASTIC_STRAIN</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">strain</span> <span class="o">-</span> <span class="n">plasticStrain</span></div>
+
+
+<div class="viewcode-block" id="_compute_dissipation">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic._compute_dissipation">[docs]</a>
+<span class="k">def</span> <span class="nf">_compute_dissipation</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">):</span>
+    <span class="n">elasticTrialStrain</span> <span class="o">=</span> <span class="n">compute_elastic_logarithmic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">)</span>
+    <span class="n">stateInc</span> <span class="o">=</span> <span class="n">compute_state_increment</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">)</span>
+    <span class="n">Ee</span> <span class="o">=</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">dev</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">)</span> <span class="o">-</span> <span class="n">stateInc</span><span class="p">[</span><span class="n">PLASTIC_DISTORTION</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">Me</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_MU</span><span class="p">]</span> <span class="o">*</span> <span class="n">Ee</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">compute_flow_direction</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">stateInc</span><span class="p">[</span><span class="n">EQPS</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">Me</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

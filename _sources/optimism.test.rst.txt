@@ -1,0 +1,293 @@
+optimism.test package
+=====================
+
+Submodules
+----------
+
+optimism.test.ConvexityPlot module
+----------------------------------
+
+.. automodule:: optimism.test.ConvexityPlot
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.MeshFixture module
+--------------------------------
+
+.. automodule:: optimism.test.MeshFixture
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.TestFixture module
+--------------------------------
+
+.. automodule:: optimism.test.TestFixture
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_AxisymmPatchTest module
+-------------------------------------------
+
+.. automodule:: optimism.test.test_AxisymmPatchTest
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_DofManager module
+-------------------------------------
+
+.. automodule:: optimism.test.test_DofManager
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_EquationSolver module
+-----------------------------------------
+
+.. automodule:: optimism.test.test_EquationSolver
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_FunctionSpace module
+----------------------------------------
+
+.. automodule:: optimism.test.test_FunctionSpace
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_Interpolants module
+---------------------------------------
+
+.. automodule:: optimism.test.test_Interpolants
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_JaxConfig module
+------------------------------------
+
+.. automodule:: optimism.test.test_JaxConfig
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_LinAlg module
+---------------------------------
+
+.. automodule:: optimism.test.test_LinAlg
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_Math module
+-------------------------------
+
+.. automodule:: optimism.test.test_Math
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_Mechanics module
+------------------------------------
+
+.. automodule:: optimism.test.test_Mechanics
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_Mesh module
+-------------------------------
+
+.. automodule:: optimism.test.test_Mesh
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_MinimizeScalar module
+-----------------------------------------
+
+.. automodule:: optimism.test.test_MinimizeScalar
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_Newmark module
+----------------------------------
+
+.. automodule:: optimism.test.test_Newmark
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_Objective module
+------------------------------------
+
+.. automodule:: optimism.test.test_Objective
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_PatchTest module
+------------------------------------
+
+.. automodule:: optimism.test.test_PatchTest
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_PatchTestPou module
+---------------------------------------
+
+.. automodule:: optimism.test.test_PatchTestPou
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_QuadratureRule module
+-----------------------------------------
+
+.. automodule:: optimism.test.test_QuadratureRule
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_ReadExodusMesh module
+-----------------------------------------
+
+.. automodule:: optimism.test.test_ReadExodusMesh
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_ReadMesh module
+-----------------------------------
+
+.. automodule:: optimism.test.test_ReadMesh
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_ScalarRootFinder module
+-------------------------------------------
+
+.. automodule:: optimism.test.test_ScalarRootFinder
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_SmoothFunctions module
+------------------------------------------
+
+.. automodule:: optimism.test.test_SmoothFunctions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_SparseMatrix module
+---------------------------------------
+
+.. automodule:: optimism.test.test_SparseMatrix
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_SparsePreconditioner module
+-----------------------------------------------
+
+.. automodule:: optimism.test.test_SparsePreconditioner
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_Surface module
+----------------------------------
+
+.. automodule:: optimism.test.test_Surface
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_TensorMath module
+-------------------------------------
+
+.. automodule:: optimism.test.test_TensorMath
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_Traction module
+-----------------------------------
+
+.. automodule:: optimism.test.test_Traction
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_TrustRegionSPG module
+-----------------------------------------
+
+.. automodule:: optimism.test.test_TrustRegionSPG
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_VTKWriter module
+------------------------------------
+
+.. automodule:: optimism.test.test_VTKWriter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.test.test\_VolumeAverageJ module
+-----------------------------------------
+
+.. automodule:: optimism.test.test_VolumeAverageJ
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+Module contents
+---------------
+
+.. automodule:: optimism.test
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:

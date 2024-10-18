@@ -1,0 +1,7 @@
+optimism
+========
+
+.. toctree::
+   :maxdepth: 4
+
+   optimism

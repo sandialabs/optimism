@@ -1,0 +1,480 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.test.test_TensorMath &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.test.test_TensorMath</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.test.test_TensorMath</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial.transform</span> <span class="kn">import</span> <span class="n">Rotation</span>
+
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">from</span> <span class="nn">jax.test_util</span> <span class="kn">import</span> <span class="n">check_grads</span>
+
+<span class="kn">from</span> <span class="nn">.TestFixture</span> <span class="kn">import</span> <span class="n">TestFixture</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">TensorMath</span>
+
+<span class="n">R</span> <span class="o">=</span> <span class="n">Rotation</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">41</span><span class="p">)</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
+
+<div class="viewcode-block" id="numerical_grad">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.numerical_grad">[docs]</a>
+<span class="k">def</span> <span class="nf">numerical_grad</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">lam</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-7</span>
+        <span class="n">ff</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                <span class="n">Ap</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
+                <span class="n">fp</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">Ap</span><span class="p">)</span>
+                <span class="n">fprime</span> <span class="o">=</span> <span class="p">(</span><span class="n">fp</span><span class="o">-</span><span class="n">ff</span><span class="p">)</span><span class="o">/</span><span class="n">eps</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">fprime</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span>
+    <span class="k">return</span> <span class="n">lam</span></div>
+
+
+
+<div class="viewcode-block" id="TensorMathFixture">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture">[docs]</a>
+<span class="k">class</span> <span class="nc">TensorMathFixture</span><span class="p">(</span><span class="n">TestFixture</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TensorMathFixture.setUp">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">R</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">orthogonal</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertGreater</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span> <span class="c1"># make sure this is a rotation and not a reflection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_squared</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">log_sqrt</span><span class="p">(</span><span class="n">A</span><span class="p">),</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">log_sqrt</span><span class="p">(</span><span class="n">A</span><span class="p">))</span></div>
+
+        
+
+<div class="viewcode-block" id="TensorMathFixture.test_eigen_sym33_non_unit">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_eigen_sym33_non_unit">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_eigen_sym33_non_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">minval</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">T</span><span class="nd">@F</span>
+        <span class="n">d</span><span class="p">,</span><span class="n">vecs</span> <span class="o">=</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">eigen_sym33_unit</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">vecs</span><span class="nd">@np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="nd">@vecs</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">vecs</span><span class="nd">@vecs</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mi">13</span><span class="p">)</span></div>
+
+
+        
+<div class="viewcode-block" id="TensorMathFixture.test_eigen_sym33_non_unit_degenerate_case">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_eigen_sym33_non_unit_degenerate_case">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_eigen_sym33_non_unit_degenerate_case</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="mf">5.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">d</span><span class="p">,</span><span class="n">vecs</span> <span class="o">=</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">eigen_sym33_unit</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">vecs</span><span class="nd">@np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="nd">@vecs</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">vecs</span><span class="nd">@vecs</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mi">13</span><span class="p">)</span></div>
+
+
+    <span class="c1"># log_symm tests</span>
+
+<div class="viewcode-block" id="TensorMathFixture.test_log_symm_scaled_identity">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_log_symm_scaled_identity">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_log_symm_scaled_identity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="mf">1.2</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">]))</span>
+        <span class="n">logVal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">log_symm</span><span class="p">(</span><span class="n">C</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">logVal</span><span class="p">,</span> <span class="n">logVal</span><span class="p">,</span> <span class="n">logVal</span><span class="p">])),</span> <span class="mi">12</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_log_symm_double_eigs">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_log_symm_double_eigs">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_log_symm_double_eigs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">val1</span> <span class="o">=</span> <span class="mf">2.0</span>
+        <span class="n">val2</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="nd">@np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val1</span><span class="p">,</span> <span class="n">val2</span><span class="p">,</span> <span class="n">val1</span><span class="p">]))</span><span class="nd">@self</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="n">log1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">val1</span><span class="p">)</span>
+        <span class="n">log2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">val2</span><span class="p">)</span>
+        <span class="n">diagLog</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">log1</span><span class="p">,</span> <span class="n">log2</span><span class="p">,</span> <span class="n">log1</span><span class="p">]))</span>
+
+        <span class="n">logCExpected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="nd">@diagLog@self</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">T</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">log_symm</span><span class="p">(</span><span class="n">C</span><span class="p">),</span> <span class="n">logCExpected</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_log_symm_gradient_scaled_identity">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_log_symm_gradient_scaled_identity">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_log_symm_gradient_scaled_identity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="mf">1.2</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">]))</span>
+        <span class="n">check_grads</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">log_symm</span><span class="p">,</span> <span class="p">(</span><span class="n">C</span><span class="p">,),</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_log_symm_gradient_double_eigs">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_log_symm_gradient_double_eigs">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_log_symm_gradient_double_eigs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">val1</span> <span class="o">=</span> <span class="mf">2.0</span>
+        <span class="n">val2</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="nd">@np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val1</span><span class="p">,</span> <span class="n">val2</span><span class="p">,</span> <span class="n">val1</span><span class="p">]))</span><span class="nd">@self</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">check_grads</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">log_symm</span><span class="p">,</span> <span class="p">(</span><span class="n">C</span><span class="p">,),</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_log_symm_gradient_distinct_eigenvalues">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_log_symm_gradient_distinct_eigenvalues">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_log_symm_gradient_distinct_eigenvalues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">minval</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">T</span><span class="nd">@F</span>
+        <span class="n">check_grads</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">log_symm</span><span class="p">,</span> <span class="p">(</span><span class="n">C</span><span class="p">,),</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_log_symm_gradient_almost_double_degenerate">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_log_symm_gradient_almost_double_degenerate">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_log_symm_gradient_almost_double_degenerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="nd">@np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">2.1</span> <span class="o">+</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]))</span><span class="nd">@self</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">check_grads</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">log_symm</span><span class="p">,</span> <span class="p">(</span><span class="n">C</span><span class="p">,),</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-16</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">)</span></div>
+
+
+    <span class="c1"># sqrt_symm_tests</span>
+
+<div class="viewcode-block" id="TensorMathFixture.test_sqrt_symm">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_sqrt_symm">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_sqrt_symm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">minval</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">T</span><span class="nd">@F</span>
+        <span class="n">U</span> <span class="o">=</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">sqrt_symm</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">U</span><span class="nd">@U</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_sqrt_symm_scaled_identity">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_sqrt_symm_scaled_identity">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_sqrt_symm_scaled_identity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="mf">1.2</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">]))</span>
+        <span class="n">sqrtVal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">sqrt_symm</span><span class="p">(</span><span class="n">C</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sqrtVal</span><span class="p">,</span> <span class="n">sqrtVal</span><span class="p">,</span> <span class="n">sqrtVal</span><span class="p">])),</span> <span class="mi">12</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_sqrt_symm_double_eigs">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_sqrt_symm_double_eigs">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_sqrt_symm_double_eigs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">val1</span> <span class="o">=</span> <span class="mf">2.0</span>
+        <span class="n">val2</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="nd">@np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val1</span><span class="p">,</span> <span class="n">val2</span><span class="p">,</span> <span class="n">val1</span><span class="p">]))</span><span class="nd">@self</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">sqrt1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">val1</span><span class="p">)</span>
+        <span class="n">sqrt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">val2</span><span class="p">)</span>
+        <span class="n">diagSqrt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sqrt1</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">sqrt1</span><span class="p">]))</span>
+
+        <span class="n">sqrtCExpected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="nd">@diagSqrt@self</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">T</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">sqrt_symm</span><span class="p">(</span><span class="n">C</span><span class="p">),</span> <span class="n">sqrtCExpected</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_sqrt_symm_gradient_scaled_identity">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_sqrt_symm_gradient_scaled_identity">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_sqrt_symm_gradient_scaled_identity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="mf">1.2</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">]))</span>
+        <span class="n">check_grads</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">sqrt_symm</span><span class="p">,</span> <span class="p">(</span><span class="n">C</span><span class="p">,),</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_sqrt_symm_gradient_double_eigs">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_sqrt_symm_gradient_double_eigs">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_sqrt_symm_gradient_double_eigs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">val1</span> <span class="o">=</span> <span class="mf">2.0</span>
+        <span class="n">val2</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="nd">@np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val1</span><span class="p">,</span> <span class="n">val2</span><span class="p">,</span> <span class="n">val1</span><span class="p">]))</span><span class="nd">@self</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">check_grads</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">sqrt_symm</span><span class="p">,</span> <span class="p">(</span><span class="n">C</span><span class="p">,),</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_sqrt_symm_gradient_distinct_eigenvalues">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_sqrt_symm_gradient_distinct_eigenvalues">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_sqrt_symm_gradient_distinct_eigenvalues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">minval</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">T</span><span class="nd">@F</span>
+        <span class="n">check_grads</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">sqrt_symm</span><span class="p">,</span> <span class="p">(</span><span class="n">C</span><span class="p">,),</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">test_sqrt_symm_gradient_almost_double_degenerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="nd">@np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">2.1</span> <span class="o">+</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]))</span><span class="nd">@self</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">check_grads</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">sqrt_symm</span><span class="p">,</span> <span class="p">(</span><span class="n">C</span><span class="p">,),</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">)</span>
+
+    <span class="c1">### exp_symm tests</span>
+<div class="viewcode-block" id="TensorMathFixture.test_exp_symm_at_identity">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_exp_symm_at_identity">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_exp_symm_at_identity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">I</span> <span class="o">=</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">exp_symm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mi">12</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_exp_symm_scaled_identity">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_exp_symm_scaled_identity">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_exp_symm_scaled_identity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="mf">1.2</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">]))</span>
+        <span class="n">expVal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">exp_symm</span><span class="p">(</span><span class="n">C</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">expVal</span><span class="p">,</span> <span class="n">expVal</span><span class="p">,</span> <span class="n">expVal</span><span class="p">])),</span> <span class="mi">12</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_exp_symm_double_eigs">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_exp_symm_double_eigs">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_exp_symm_double_eigs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">val1</span> <span class="o">=</span> <span class="mf">2.0</span>
+        <span class="n">val2</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="nd">@np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val1</span><span class="p">,</span> <span class="n">val2</span><span class="p">,</span> <span class="n">val1</span><span class="p">]))</span><span class="nd">@self</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">exp1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">val1</span><span class="p">)</span>
+        <span class="n">exp2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">val2</span><span class="p">)</span>
+        <span class="n">diagExp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">exp1</span><span class="p">,</span> <span class="n">exp2</span><span class="p">,</span> <span class="n">exp1</span><span class="p">]))</span>
+        <span class="n">expCExpected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="nd">@diagExp@self</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">T</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">exp_symm</span><span class="p">(</span><span class="n">C</span><span class="p">),</span> <span class="n">expCExpected</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_exp_symm_gradient_scaled_identity">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_exp_symm_gradient_scaled_identity">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_exp_symm_gradient_scaled_identity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="mf">1.2</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">]))</span>
+        <span class="n">check_grads</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">exp_symm</span><span class="p">,</span> <span class="p">(</span><span class="n">C</span><span class="p">,),</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_exp_symm_gradient_double_eigs">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_exp_symm_gradient_double_eigs">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_exp_symm_gradient_double_eigs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">val1</span> <span class="o">=</span> <span class="mf">2.0</span>
+        <span class="n">val2</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="nd">@np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val1</span><span class="p">,</span> <span class="n">val2</span><span class="p">,</span> <span class="n">val1</span><span class="p">]))</span><span class="nd">@self</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">check_grads</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">exp_symm</span><span class="p">,</span> <span class="p">(</span><span class="n">C</span><span class="p">,),</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_exp_symm_gradient_distinct_eigenvalues">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_exp_symm_gradient_distinct_eigenvalues">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_exp_symm_gradient_distinct_eigenvalues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">minval</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">T</span><span class="nd">@F</span>
+        <span class="n">check_grads</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">exp_symm</span><span class="p">,</span> <span class="p">(</span><span class="n">C</span><span class="p">,),</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_sqrt_symm_gradient_almost_double_degenerate">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_sqrt_symm_gradient_almost_double_degenerate">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_sqrt_symm_gradient_almost_double_degenerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="nd">@np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">2.1</span> <span class="o">+</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]))</span><span class="nd">@self</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">check_grads</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">exp_symm</span><span class="p">,</span> <span class="p">(</span><span class="n">C</span><span class="p">,),</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">)</span></div>
+
+    
+    <span class="c1"># pow_symm tests</span>
+
+<div class="viewcode-block" id="TensorMathFixture.test_pow_symm_scaled_identity">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_pow_symm_scaled_identity">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_pow_symm_scaled_identity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="mf">1.2</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">val</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">powVal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">pow_symm</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">powVal</span><span class="p">,</span> <span class="n">powVal</span><span class="p">,</span> <span class="n">powVal</span><span class="p">])),</span> <span class="mi">12</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_pow_symm_double_eigs">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_pow_symm_double_eigs">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_pow_symm_double_eigs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">val1</span> <span class="o">=</span> <span class="mf">2.0</span>
+        <span class="n">val2</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="nd">@np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val1</span><span class="p">,</span> <span class="n">val2</span><span class="p">,</span> <span class="n">val1</span><span class="p">]))</span><span class="nd">@self</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="mf">0.25</span>
+        <span class="n">pow1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">val1</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+        <span class="n">pow2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">val2</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+        <span class="n">diagPow</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">pow1</span><span class="p">,</span> <span class="n">pow2</span><span class="p">,</span> <span class="n">pow1</span><span class="p">]))</span>
+        <span class="n">powCExpected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="nd">@diagPow@self</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">T</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">pow_symm</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="n">powCExpected</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_pow_symm_gradient_scaled_identity">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_pow_symm_gradient_scaled_identity">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_pow_symm_gradient_scaled_identity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="mf">1.2</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">]))</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">check_grads</span><span class="p">(</span><span class="k">lambda</span> <span class="n">A</span><span class="p">:</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">pow_symm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="p">(</span><span class="n">C</span><span class="p">,),</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_pow_symm_gradient_double_eigs">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_pow_symm_gradient_double_eigs">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_pow_symm_gradient_double_eigs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">val1</span> <span class="o">=</span> <span class="mf">2.0</span>
+        <span class="n">val2</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="nd">@np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val1</span><span class="p">,</span> <span class="n">val2</span><span class="p">,</span> <span class="n">val1</span><span class="p">]))</span><span class="nd">@self</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">check_grads</span><span class="p">(</span><span class="k">lambda</span> <span class="n">A</span><span class="p">:</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">pow_symm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="p">(</span><span class="n">C</span><span class="p">,),</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_pow_symm_gradient_distinct_eigenvalues">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_pow_symm_gradient_distinct_eigenvalues">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_pow_symm_gradient_distinct_eigenvalues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">minval</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">T</span><span class="nd">@F</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="mf">0.25</span>
+        <span class="n">check_grads</span><span class="p">(</span><span class="k">lambda</span> <span class="n">A</span><span class="p">:</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">pow_symm</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="p">(</span><span class="n">C</span><span class="p">,),</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_pow_symm_gradient_almost_double_degenerate">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_pow_symm_gradient_almost_double_degenerate">[docs]</a>
+    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>
+    <span class="k">def</span> <span class="nf">test_pow_symm_gradient_almost_double_degenerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="nd">@np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.1</span><span class="p">,</span> <span class="mf">2.1</span> <span class="o">+</span> <span class="mf">1e-8</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]))</span><span class="nd">@self</span><span class="o">.</span><span class="n">R</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="mf">0.25</span>
+        <span class="n">check_grads</span><span class="p">(</span><span class="k">lambda</span> <span class="n">A</span><span class="p">:</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">pow_symm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">),</span> <span class="p">(</span><span class="n">C</span><span class="p">,),</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-16</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_determinant">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_determinant">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_determinant</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">5</span><span class="o">/</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="o">/</span><span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="o">/</span><span class="mi">11</span><span class="p">],</span>
+                      <span class="p">[</span><span class="mi">7</span><span class="o">/</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="o">/</span><span class="mi">9</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">5</span><span class="p">],</span>
+                      <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="o">/</span><span class="mi">7</span><span class="p">,</span> <span class="mi">17</span><span class="o">/</span><span class="mi">18</span><span class="p">]])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">A</span><span class="p">),</span> <span class="o">-</span><span class="mi">45583</span><span class="o">/</span><span class="mi">280665</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_detpIm1">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_detpIm1">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_detpIm1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">8.7644781692191447986e-7</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.00060943437636452272438</span><span class="p">,</span> <span class="mf">0.0006160110345770283824</span><span class="p">],</span>
+                      <span class="p">[</span><span class="mf">0.00059197095431573693372</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.00032421698142571543644</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.00075031460538177354586</span><span class="p">],</span>
+                      <span class="p">[</span><span class="o">-</span><span class="mf">0.00057095032376313107833</span><span class="p">,</span> <span class="mf">0.00042675236045286923589</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.00029239794707394684004</span><span class="p">]])</span>
+        <span class="n">exact</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.00061636368316760725654</span> <span class="c1"># computed with exact arithmetic in Mathematica and truncated</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">detpIm1</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">exact</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_determinant_precision">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_determinant_precision">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_determinant_precision</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-8</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">eps</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">eps</span><span class="p">]))</span>
+        <span class="c1"># det(A + I) - 1</span>
+        <span class="n">exact</span> <span class="o">=</span> <span class="n">eps</span><span class="o">**</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">3</span><span class="o">*</span><span class="n">eps</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span><span class="o">*</span><span class="n">eps</span>
+
+        <span class="c1"># straightforward approach loses precision</span>
+        <span class="n">Jm1</span> <span class="o">=</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">A</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">Jm1</span> <span class="o">-</span> <span class="n">exact</span><span class="p">)</span><span class="o">/</span><span class="n">exact</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertGreater</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="mf">1e-9</span><span class="p">)</span>
+
+        <span class="c1"># special function retains precision</span>
+        <span class="n">Jm1</span> <span class="o">=</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">detpIm1</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">Jm1</span> <span class="o">-</span> <span class="n">exact</span><span class="p">)</span><span class="o">/</span><span class="n">exact</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorMathFixture.test_right_polar_decomp">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_right_polar_decomp">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_right_polar_decomp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">minval</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+        <span class="n">R</span><span class="p">,</span> <span class="n">U</span> <span class="o">=</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">right_polar_decomposition</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+        <span class="c1"># R is orthogonal</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">R</span><span class="nd">@R</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mi">14</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">T</span><span class="nd">@R</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mi">14</span><span class="p">)</span>
+        <span class="c1"># U is symmetric</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="n">U</span><span class="p">),</span> <span class="mi">14</span><span class="p">)</span>
+        <span class="c1"># RU = F</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">R</span><span class="nd">@U</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

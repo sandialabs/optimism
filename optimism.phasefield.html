@@ -1,0 +1,1150 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.phasefield package &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="optimism.phasefield.test package" href="optimism.phasefield.test.html" />
+    <link rel="prev" title="optimism.material.test package" href="optimism.material.test.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">optimism</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="optimism.html">optimism package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="optimism.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html">optimism.contact package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html">optimism.material package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">optimism.phasefield package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html">optimism.test package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.AlSolver">optimism.AlSolver module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.BoundConstrainedObjective">optimism.BoundConstrainedObjective module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.BoundConstrainedSolver">optimism.BoundConstrainedSolver module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.ConstrainedObjective">optimism.ConstrainedObjective module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.EquationSolver">optimism.EquationSolver module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.EquationSolverSubspace">optimism.EquationSolverSubspace module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.FunctionSpace">optimism.FunctionSpace module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism-incompletecholesky-module">optimism.IncompleteCholesky module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Interpolants">optimism.Interpolants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.J2PlasticPhaseField">optimism.J2PlasticPhaseField module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.JaxConfig">optimism.JaxConfig module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.LU">optimism.LU module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.LinAlg">optimism.LinAlg module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Math">optimism.Math module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Mechanics">optimism.Mechanics module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Mesh">optimism.Mesh module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.MeshPlot">optimism.MeshPlot module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.MinimizeScalar">optimism.MinimizeScalar module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.NewtonSolver">optimism.NewtonSolver module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Objective">optimism.Objective module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.QuadratureRule">optimism.QuadratureRule module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.ReadExodusMesh">optimism.ReadExodusMesh module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.ReadMesh">optimism.ReadMesh module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.ScalarRootFind">optimism.ScalarRootFind module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.SmoothFunctions">optimism.SmoothFunctions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.SparseCholesky">optimism.SparseCholesky module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.SparseMatrixAssembler">optimism.SparseMatrixAssembler module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Surface">optimism.Surface module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.TensorMath">optimism.TensorMath module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Timer">optimism.Timer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.TrustRegionSPG">optimism.TrustRegionSPG module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.VTKWriter">optimism.VTKWriter module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.WarmStart">optimism.WarmStart module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="optimism.html">optimism package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="optimism.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="optimism.contact.html">optimism.contact package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.material.html">optimism.material package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">optimism.phasefield package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-optimism.phasefield.MaterialPointSimulator">optimism.phasefield.MaterialPointSimulator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-optimism.phasefield.PhaseField">optimism.phasefield.PhaseField module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#optimism-phasefield-phasefieldclassic-module">optimism.phasefield.PhaseFieldClassic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-optimism.phasefield.PhaseFieldLorentzPlastic">optimism.phasefield.PhaseFieldLorentzPlastic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-optimism.phasefield.PhaseFieldMaterialModel">optimism.phasefield.PhaseFieldMaterialModel module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-optimism.phasefield.PhaseFieldThreshold">optimism.phasefield.PhaseFieldThreshold module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-optimism.phasefield.PhaseFieldThresholdPlastic">optimism.phasefield.PhaseFieldThresholdPlastic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-optimism.phasefield">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.test.html">optimism.test package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.AlSolver">optimism.AlSolver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.BoundConstrainedObjective">optimism.BoundConstrainedObjective module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.BoundConstrainedSolver">optimism.BoundConstrainedSolver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.ConstrainedObjective">optimism.ConstrainedObjective module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.EquationSolver">optimism.EquationSolver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.EquationSolverSubspace">optimism.EquationSolverSubspace module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.FunctionSpace">optimism.FunctionSpace module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#optimism-incompletecholesky-module">optimism.IncompleteCholesky module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Interpolants">optimism.Interpolants module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.J2PlasticPhaseField">optimism.J2PlasticPhaseField module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.JaxConfig">optimism.JaxConfig module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.LU">optimism.LU module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.LinAlg">optimism.LinAlg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Math">optimism.Math module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Mechanics">optimism.Mechanics module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Mesh">optimism.Mesh module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.MeshPlot">optimism.MeshPlot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.MinimizeScalar">optimism.MinimizeScalar module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.NewtonSolver">optimism.NewtonSolver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Objective">optimism.Objective module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.QuadratureRule">optimism.QuadratureRule module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.ReadExodusMesh">optimism.ReadExodusMesh module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.ReadMesh">optimism.ReadMesh module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.ScalarRootFind">optimism.ScalarRootFind module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.SmoothFunctions">optimism.SmoothFunctions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.SparseCholesky">optimism.SparseCholesky module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.SparseMatrixAssembler">optimism.SparseMatrixAssembler module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Surface">optimism.Surface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.TensorMath">optimism.TensorMath module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Timer">optimism.Timer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.TrustRegionSPG">optimism.TrustRegionSPG module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.VTKWriter">optimism.VTKWriter module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.WarmStart">optimism.WarmStart module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">optimism</a></li>
+          <li class="breadcrumb-item"><a href="optimism.html">optimism package</a></li>
+      <li class="breadcrumb-item active">optimism.phasefield package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/optimism.phasefield.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="optimism-phasefield-package">
+<h1>optimism.phasefield package<a class="headerlink" href="#optimism-phasefield-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="optimism.phasefield.test.html">optimism.phasefield.test package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optimism.phasefield.test.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.phasefield.test.html#module-optimism.phasefield.test.plotPhaseFieldThresholdModel">optimism.phasefield.test.plotPhaseFieldThresholdModel module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.plotPhaseFieldThresholdModel.PhaseFieldThresholdUniaxialFixture"><code class="docutils literal notranslate"><span class="pre">PhaseFieldThresholdUniaxialFixture</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.plotPhaseFieldThresholdModel.PhaseFieldThresholdUniaxialFixture.setUp"><code class="docutils literal notranslate"><span class="pre">PhaseFieldThresholdUniaxialFixture.setUp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.plotPhaseFieldThresholdModel.PhaseFieldThresholdUniaxialFixture.testUniaxial"><code class="docutils literal notranslate"><span class="pre">PhaseFieldThresholdUniaxialFixture.testUniaxial()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.phasefield.test.html#optimism-phasefield-test-plotsandiamodeluniaxial-module">optimism.phasefield.test.plotSandiaModelUniaxial module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.phasefield.test.html#module-optimism.phasefield.test.test_PhaseFieldLorentzPlastic">optimism.phasefield.test.test_PhaseFieldLorentzPlastic module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture"><code class="docutils literal notranslate"><span class="pre">GradOfPlasticPhaseFieldModelFixture</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.setUp"><code class="docutils literal notranslate"><span class="pre">GradOfPlasticPhaseFieldModelFixture.setUp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_elastic_energy"><code class="docutils literal notranslate"><span class="pre">GradOfPlasticPhaseFieldModelFixture.test_elastic_energy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_plastic_stress"><code class="docutils literal notranslate"><span class="pre">GradOfPlasticPhaseFieldModelFixture.test_plastic_stress()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_rotation_invariance"><code class="docutils literal notranslate"><span class="pre">GradOfPlasticPhaseFieldModelFixture.test_rotation_invariance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_zero_point"><code class="docutils literal notranslate"><span class="pre">GradOfPlasticPhaseFieldModelFixture.test_zero_point()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.phasefield.test.html#module-optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch">optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture"><code class="docutils literal notranslate"><span class="pre">TestSingleMeshFixture</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture.no_test_uniaxial"><code class="docutils literal notranslate"><span class="pre">TestSingleMeshFixture.no_test_uniaxial()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture.setUp"><code class="docutils literal notranslate"><span class="pre">TestSingleMeshFixture.setUp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture.test_constrained_hessian"><code class="docutils literal notranslate"><span class="pre">TestSingleMeshFixture.test_constrained_hessian()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture.test_patch_test"><code class="docutils literal notranslate"><span class="pre">TestSingleMeshFixture.test_patch_test()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture.test_sparse_hessian_at_nonzero_phase"><code class="docutils literal notranslate"><span class="pre">TestSingleMeshFixture.test_sparse_hessian_at_nonzero_phase()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture.test_sparse_hessian_at_zero_phase"><code class="docutils literal notranslate"><span class="pre">TestSingleMeshFixture.test_sparse_hessian_at_zero_phase()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.phasefield.test.html#module-optimism.phasefield.test.test_PhaseFieldThreshold">optimism.phasefield.test.test_PhaseFieldThreshold module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThreshold.PhaseFieldThresholdModelFixture"><code class="docutils literal notranslate"><span class="pre">PhaseFieldThresholdModelFixture</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThreshold.PhaseFieldThresholdModelFixture.setUp"><code class="docutils literal notranslate"><span class="pre">PhaseFieldThresholdModelFixture.setUp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThreshold.PhaseFieldThresholdModelFixture.test_rotation_invariance"><code class="docutils literal notranslate"><span class="pre">PhaseFieldThresholdModelFixture.test_rotation_invariance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThreshold.PhaseFieldThresholdModelFixture.test_uniaxial_energy"><code class="docutils literal notranslate"><span class="pre">PhaseFieldThresholdModelFixture.test_uniaxial_energy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThreshold.PhaseFieldThresholdModelFixture.test_zero_point"><code class="docutils literal notranslate"><span class="pre">PhaseFieldThresholdModelFixture.test_zero_point()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.phasefield.test.html#module-optimism.phasefield.test.test_PhaseFieldThresholdPatch">optimism.phasefield.test.test_PhaseFieldThresholdPatch module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture"><code class="docutils literal notranslate"><span class="pre">TestSingleMeshFixture</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.setUp"><code class="docutils literal notranslate"><span class="pre">TestSingleMeshFixture.setUp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.test_constrained_hessian"><code class="docutils literal notranslate"><span class="pre">TestSingleMeshFixture.test_constrained_hessian()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.test_patch_test"><code class="docutils literal notranslate"><span class="pre">TestSingleMeshFixture.test_patch_test()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.test_sparse_hessian_at_nonzero_phase"><code class="docutils literal notranslate"><span class="pre">TestSingleMeshFixture.test_sparse_hessian_at_nonzero_phase()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.test_sparse_hessian_at_zero_phase"><code class="docutils literal notranslate"><span class="pre">TestSingleMeshFixture.test_sparse_hessian_at_zero_phase()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.phasefield.test.html#module-optimism.phasefield.test.test_PhaseFieldThresholdPlastic">optimism.phasefield.test.test_PhaseFieldThresholdPlastic module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture"><code class="docutils literal notranslate"><span class="pre">GradOfPlasticPhaseFieldModelFixture</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture.no_test_plastic_strain_path"><code class="docutils literal notranslate"><span class="pre">GradOfPlasticPhaseFieldModelFixture.no_test_plastic_strain_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture.setUp"><code class="docutils literal notranslate"><span class="pre">GradOfPlasticPhaseFieldModelFixture.setUp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture.test_elastic_energy"><code class="docutils literal notranslate"><span class="pre">GradOfPlasticPhaseFieldModelFixture.test_elastic_energy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture.test_plastic_stress"><code class="docutils literal notranslate"><span class="pre">GradOfPlasticPhaseFieldModelFixture.test_plastic_stress()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture.test_rotation_invariance"><code class="docutils literal notranslate"><span class="pre">GradOfPlasticPhaseFieldModelFixture.test_rotation_invariance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture.test_zero_point"><code class="docutils literal notranslate"><span class="pre">GradOfPlasticPhaseFieldModelFixture.test_zero_point()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.phasefield.test.html#module-optimism.phasefield.test.test_PhaseFieldUniaxial">optimism.phasefield.test.test_PhaseFieldUniaxial module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldUniaxial.PhaseFieldUniaxialFixture"><code class="docutils literal notranslate"><span class="pre">PhaseFieldUniaxialFixture</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldUniaxial.PhaseFieldUniaxialFixture.testUniaxial"><code class="docutils literal notranslate"><span class="pre">PhaseFieldUniaxialFixture.testUniaxial()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldUniaxial.energy_density"><code class="docutils literal notranslate"><span class="pre">energy_density()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldUniaxial.update"><code class="docutils literal notranslate"><span class="pre">update()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.phasefield.test.html#module-optimism.phasefield.test">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-optimism.phasefield.MaterialPointSimulator">
+<span id="optimism-phasefield-materialpointsimulator-module"></span><h2>optimism.phasefield.MaterialPointSimulator module<a class="headerlink" href="#module-optimism.phasefield.MaterialPointSimulator" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.phasefield.MaterialPointSimulator.MaterialPointSimulator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.phasefield.MaterialPointSimulator.</span></span><span class="sig-name descname"><span class="pre">MaterialPointSimulator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">materialModel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strainRate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/MaterialPointSimulator.html#MaterialPointSimulator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.MaterialPointSimulator.MaterialPointSimulator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Generates the uniaxial response of a given phase field potential density function</p>
+<p>The non-axial strain components are determined by minimizing the potential,
+which coincides with stress-free conditions for every stress component
+besides the uniaxial stress.</p>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">run():</span></span></dt>
+<dd><p>Launches the simluation with the given parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.MaterialPointSimulator.MaterialPointSimulator.makeKinematics">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">makeKinematics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unknowns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/MaterialPointSimulator.html#MaterialPointSimulator.makeKinematics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.MaterialPointSimulator.MaterialPointSimulator.makeKinematics" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.MaterialPointSimulator.MaterialPointSimulator.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/MaterialPointSimulator.html#MaterialPointSimulator.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.MaterialPointSimulator.MaterialPointSimulator.run" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.phasefield.MaterialPointSimulator.UniaxialOutput">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.phasefield.MaterialPointSimulator.</span></span><span class="sig-name descname"><span class="pre">UniaxialOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strainHistory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stressHistory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kirchhoffStressHistory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energyHistory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">internalVariableHistory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phaseHistory</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.MaterialPointSimulator.UniaxialOutput" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.MaterialPointSimulator.UniaxialOutput._asdict">
+<span class="sig-name descname"><span class="pre">_asdict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.MaterialPointSimulator.UniaxialOutput._asdict" title="Link to this definition"></a></dt>
+<dd><p>Return a new dict which maps field names to their values.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.MaterialPointSimulator.UniaxialOutput._field_defaults">
+<span class="sig-name descname"><span class="pre">_field_defaults</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#optimism.phasefield.MaterialPointSimulator.UniaxialOutput._field_defaults" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.MaterialPointSimulator.UniaxialOutput._fields">
+<span class="sig-name descname"><span class="pre">_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('times',</span> <span class="pre">'strainHistory',</span> <span class="pre">'stressHistory',</span> <span class="pre">'kirchhoffStressHistory',</span> <span class="pre">'energyHistory',</span> <span class="pre">'internalVariableHistory',</span> <span class="pre">'phaseHistory')</span></em><a class="headerlink" href="#optimism.phasefield.MaterialPointSimulator.UniaxialOutput._fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.MaterialPointSimulator.UniaxialOutput._make">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_make</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.MaterialPointSimulator.UniaxialOutput._make" title="Link to this definition"></a></dt>
+<dd><p>Make a new UniaxialOutput object from a sequence or iterable</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.MaterialPointSimulator.UniaxialOutput._replace">
+<span class="sig-name descname"><span class="pre">_replace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.MaterialPointSimulator.UniaxialOutput._replace" title="Link to this definition"></a></dt>
+<dd><p>Return a new UniaxialOutput object replacing specified fields with new values</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.MaterialPointSimulator.UniaxialOutput.energyHistory">
+<span class="sig-name descname"><span class="pre">energyHistory</span></span><a class="headerlink" href="#optimism.phasefield.MaterialPointSimulator.UniaxialOutput.energyHistory" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.MaterialPointSimulator.UniaxialOutput.internalVariableHistory">
+<span class="sig-name descname"><span class="pre">internalVariableHistory</span></span><a class="headerlink" href="#optimism.phasefield.MaterialPointSimulator.UniaxialOutput.internalVariableHistory" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.MaterialPointSimulator.UniaxialOutput.kirchhoffStressHistory">
+<span class="sig-name descname"><span class="pre">kirchhoffStressHistory</span></span><a class="headerlink" href="#optimism.phasefield.MaterialPointSimulator.UniaxialOutput.kirchhoffStressHistory" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.MaterialPointSimulator.UniaxialOutput.phaseHistory">
+<span class="sig-name descname"><span class="pre">phaseHistory</span></span><a class="headerlink" href="#optimism.phasefield.MaterialPointSimulator.UniaxialOutput.phaseHistory" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 6</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.MaterialPointSimulator.UniaxialOutput.strainHistory">
+<span class="sig-name descname"><span class="pre">strainHistory</span></span><a class="headerlink" href="#optimism.phasefield.MaterialPointSimulator.UniaxialOutput.strainHistory" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.MaterialPointSimulator.UniaxialOutput.stressHistory">
+<span class="sig-name descname"><span class="pre">stressHistory</span></span><a class="headerlink" href="#optimism.phasefield.MaterialPointSimulator.UniaxialOutput.stressHistory" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.MaterialPointSimulator.UniaxialOutput.times">
+<span class="sig-name descname"><span class="pre">times</span></span><a class="headerlink" href="#optimism.phasefield.MaterialPointSimulator.UniaxialOutput.times" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optimism.phasefield.PhaseField">
+<span id="optimism-phasefield-phasefield-module"></span><h2>optimism.phasefield.PhaseField module<a class="headerlink" href="#module-optimism.phasefield.PhaseField" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.PhaseFieldFunctions">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseField.</span></span><span class="sig-name descname"><span class="pre">PhaseFieldFunctions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compute_internal_energy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_output_energy_densities_and_fluxes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_strain_energy_densities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_phase_potential_energy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_element_stiffnesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_block_diagonal_element_stiffnesses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_initial_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_updated_internal_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_constraint_hessian</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseField.PhaseFieldFunctions" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.PhaseFieldFunctions._asdict">
+<span class="sig-name descname"><span class="pre">_asdict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseField.PhaseFieldFunctions._asdict" title="Link to this definition"></a></dt>
+<dd><p>Return a new dict which maps field names to their values.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.PhaseFieldFunctions._field_defaults">
+<span class="sig-name descname"><span class="pre">_field_defaults</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#optimism.phasefield.PhaseField.PhaseFieldFunctions._field_defaults" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.PhaseFieldFunctions._fields">
+<span class="sig-name descname"><span class="pre">_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('compute_internal_energy',</span> <span class="pre">'compute_output_energy_densities_and_fluxes',</span> <span class="pre">'compute_strain_energy_densities',</span> <span class="pre">'compute_phase_potential_energy',</span> <span class="pre">'compute_element_stiffnesses',</span> <span class="pre">'compute_block_diagonal_element_stiffnesses',</span> <span class="pre">'compute_initial_state',</span> <span class="pre">'compute_updated_internal_variables',</span> <span class="pre">'compute_constraint_hessian')</span></em><a class="headerlink" href="#optimism.phasefield.PhaseField.PhaseFieldFunctions._fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.PhaseFieldFunctions._make">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_make</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseField.PhaseFieldFunctions._make" title="Link to this definition"></a></dt>
+<dd><p>Make a new PhaseFieldFunctions object from a sequence or iterable</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.PhaseFieldFunctions._replace">
+<span class="sig-name descname"><span class="pre">_replace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseField.PhaseFieldFunctions._replace" title="Link to this definition"></a></dt>
+<dd><p>Return a new PhaseFieldFunctions object replacing specified fields with new values</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.PhaseFieldFunctions.compute_block_diagonal_element_stiffnesses">
+<span class="sig-name descname"><span class="pre">compute_block_diagonal_element_stiffnesses</span></span><a class="headerlink" href="#optimism.phasefield.PhaseField.PhaseFieldFunctions.compute_block_diagonal_element_stiffnesses" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.PhaseFieldFunctions.compute_constraint_hessian">
+<span class="sig-name descname"><span class="pre">compute_constraint_hessian</span></span><a class="headerlink" href="#optimism.phasefield.PhaseField.PhaseFieldFunctions.compute_constraint_hessian" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 8</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.PhaseFieldFunctions.compute_element_stiffnesses">
+<span class="sig-name descname"><span class="pre">compute_element_stiffnesses</span></span><a class="headerlink" href="#optimism.phasefield.PhaseField.PhaseFieldFunctions.compute_element_stiffnesses" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.PhaseFieldFunctions.compute_initial_state">
+<span class="sig-name descname"><span class="pre">compute_initial_state</span></span><a class="headerlink" href="#optimism.phasefield.PhaseField.PhaseFieldFunctions.compute_initial_state" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 6</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.PhaseFieldFunctions.compute_internal_energy">
+<span class="sig-name descname"><span class="pre">compute_internal_energy</span></span><a class="headerlink" href="#optimism.phasefield.PhaseField.PhaseFieldFunctions.compute_internal_energy" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.PhaseFieldFunctions.compute_output_energy_densities_and_fluxes">
+<span class="sig-name descname"><span class="pre">compute_output_energy_densities_and_fluxes</span></span><a class="headerlink" href="#optimism.phasefield.PhaseField.PhaseFieldFunctions.compute_output_energy_densities_and_fluxes" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.PhaseFieldFunctions.compute_phase_potential_energy">
+<span class="sig-name descname"><span class="pre">compute_phase_potential_energy</span></span><a class="headerlink" href="#optimism.phasefield.PhaseField.PhaseFieldFunctions.compute_phase_potential_energy" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.PhaseFieldFunctions.compute_strain_energy_densities">
+<span class="sig-name descname"><span class="pre">compute_strain_energy_densities</span></span><a class="headerlink" href="#optimism.phasefield.PhaseField.PhaseFieldFunctions.compute_strain_energy_densities" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.PhaseFieldFunctions.compute_updated_internal_variables">
+<span class="sig-name descname"><span class="pre">compute_updated_internal_variables</span></span><a class="headerlink" href="#optimism.phasefield.PhaseField.PhaseFieldFunctions.compute_updated_internal_variables" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 7</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField._compute_block_diagonal_element_stiffnesses">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseField.</span></span><span class="sig-name descname"><span class="pre">_compute_block_diagonal_element_stiffnesses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">U</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">internalVariables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionSpace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lagrangian_density</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modify_element_gradient</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseField.html#_compute_block_diagonal_element_stiffnesses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseField._compute_block_diagonal_element_stiffnesses" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField._compute_element_stiffnesses">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseField.</span></span><span class="sig-name descname"><span class="pre">_compute_element_stiffnesses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">U</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">internalVariables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionSpace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lagrangian_density</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modify_element_gradient</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseField.html#_compute_element_stiffnesses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseField._compute_element_stiffnesses" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.axisymmetric_element_gradient_transformation">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseField.</span></span><span class="sig-name descname"><span class="pre">axisymmetric_element_gradient_transformation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elemGrads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elemShapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elemVols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elemNodalDofs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elemNodalCoords</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseField.html#axisymmetric_element_gradient_transformation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseField.axisymmetric_element_gradient_transformation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.axisymmetric_gradient">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseField.</span></span><span class="sig-name descname"><span class="pre">axisymmetric_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gradU</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseField.html#axisymmetric_gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseField.axisymmetric_gradient" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.compute_element_stiffness_from_global_fields">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseField.</span></span><span class="sig-name descname"><span class="pre">compute_element_stiffness_from_global_fields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">U</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elemInternals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elemConns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elemShapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elemShapeGrads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elemVols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lagrangian_density</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modify_element_gradient</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseField.html#compute_element_stiffness_from_global_fields"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseField.compute_element_stiffness_from_global_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.compute_phase_field_constraint_hessian">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseField.</span></span><span class="sig-name descname"><span class="pre">compute_phase_field_constraint_hessian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lambda</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dofManager</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseField.html#compute_phase_field_constraint_hessian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseField.compute_phase_field_constraint_hessian" title="Link to this definition"></a></dt>
+<dd><p>Augmented Lagrange Hessian terms for lower bound constrained phase field models.</p>
+<p>Because this is a simple bound constraint, the Hessian terms are diagonal.
+This function returns just this diagonal, which can be added onto the
+unconstrained Hessian matrix.</p>
+<p>Note that return value is a standard numpy array (with one axis).
+This is so that it can be added to a sparse matrix without causing an error.
+Jax numpy arrays do not work with scipy sparse arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Lambda</strong> (<em>array</em><em> of </em><em>constraint forces</em>)</p></li>
+<li><p><strong>kappa</strong> (<em>array</em><em> of </em><em>penalty parameters</em>)</p></li>
+<li><p><strong>constraint</strong> (<em>values</em><em> of </em><em>lower bound constraint functions</em>) – (just unknown nodal phases)</p></li>
+<li><p><strong>dofManager</strong> (<em>dofManager object for current mesh</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>d</strong> – part of the AL Hessian</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>standard numpy array with one axis representing the constraint</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.create_phasefield_functions">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseField.</span></span><span class="sig-name descname"><span class="pre">create_phasefield_functions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">functionSpace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode2D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">materialModel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pressureProjectionDegree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseField.html#create_phasefield_functions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseField.create_phasefield_functions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.energy_density_to_lagrangian_density">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseField.</span></span><span class="sig-name descname"><span class="pre">energy_density_to_lagrangian_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">energy_density</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseField.html#energy_density_to_lagrangian_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseField.energy_density_to_lagrangian_density" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.plane_strain_element_gradient_transformation">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseField.</span></span><span class="sig-name descname"><span class="pre">plane_strain_element_gradient_transformation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elemGrads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elemShapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elemVols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elemNodalDofs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elemNodalCoords</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseField.html#plane_strain_element_gradient_transformation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseField.plane_strain_element_gradient_transformation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.plane_strain_gradient">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseField.</span></span><span class="sig-name descname"><span class="pre">plane_strain_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gradU</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseField.html#plane_strain_gradient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseField.plane_strain_gradient" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.unpack_fields_2D">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseField.</span></span><span class="sig-name descname"><span class="pre">unpack_fields_2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">U</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseField.html#unpack_fields_2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseField.unpack_fields_2D" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseField.unpack_gradients_2D">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseField.</span></span><span class="sig-name descname"><span class="pre">unpack_gradients_2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gradU</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseField.html#unpack_gradients_2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseField.unpack_gradients_2D" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="optimism-phasefield-phasefieldclassic-module">
+<h2>optimism.phasefield.PhaseFieldClassic module<a class="headerlink" href="#optimism-phasefield-phasefieldclassic-module" title="Link to this heading"></a></h2>
+</section>
+<section id="module-optimism.phasefield.PhaseFieldLorentzPlastic">
+<span id="optimism-phasefield-phasefieldlorentzplastic-module"></span><h2>optimism.phasefield.PhaseFieldLorentzPlastic module<a class="headerlink" href="#module-optimism.phasefield.PhaseFieldLorentzPlastic" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic._compute_elastic_linear_strain">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">_compute_elastic_linear_strain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldLorentzPlastic.html#_compute_elastic_linear_strain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic._compute_elastic_linear_strain" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic._compute_elastic_logarithmic_strain">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">_compute_elastic_logarithmic_strain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldLorentzPlastic.html#_compute_elastic_logarithmic_strain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic._compute_elastic_logarithmic_strain" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.compute_elastic_linear_strain">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">compute_elastic_linear_strain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plasticStrain</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldLorentzPlastic.html#compute_elastic_linear_strain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.compute_elastic_linear_strain" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.compute_elastic_logarithmic_strain">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">compute_elastic_logarithmic_strain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Fp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldLorentzPlastic.html#compute_elastic_logarithmic_strain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.compute_elastic_logarithmic_strain" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.compute_free_energy_density">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">compute_free_energy_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elasticStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phaseGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqpsOld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hardeningModel</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldLorentzPlastic.html#compute_free_energy_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.compute_free_energy_density" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.compute_state_increment">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">compute_state_increment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elasticTrialStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stateOld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hardeningModel</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldLorentzPlastic.html#compute_state_increment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.compute_state_increment" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.compute_state_new_finite_deformations">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">compute_state_new_finite_deformations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phaseGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stateOld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hardeningModel</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldLorentzPlastic.html#compute_state_new_finite_deformations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.compute_state_new_finite_deformations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.compute_state_new_small_deformations">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">compute_state_new_small_deformations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phaseGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stateOld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hardeningModel</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldLorentzPlastic.html#compute_state_new_small_deformations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.compute_state_new_small_deformations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.create_material_model_functions">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">create_material_model_functions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldLorentzPlastic.html#create_material_model_functions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.create_material_model_functions" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>properties:</dt><dd><p>‘elastic modulus’
+‘poisson ratio’
+‘critical energy release rate’
+‘critical strain energy density’
+‘regularization length’
+‘yield strength’
+‘hardening modulus’</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.degradation">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">degradation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldLorentzPlastic.html#degradation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.degradation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.dr">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">dr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elasticTrialStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqpsOld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hardeningModel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.dr" title="Link to this definition"></a></dt>
+<dd><p>Jacobian of incremental_potential with respect to positional argument(s) (0, 1, 3). Takes the same arguments as incremental_potential but returns the jacobian of the output with respect to the arguments at positions (0, 1, 3).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.elastic_deviatoric_free_energy">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">elastic_deviatoric_free_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elasticStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldLorentzPlastic.html#elastic_deviatoric_free_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.elastic_deviatoric_free_energy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.elastic_volumetric_free_energy">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">elastic_volumetric_free_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldLorentzPlastic.html#elastic_volumetric_free_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.elastic_volumetric_free_energy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.energy_density_generic">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">energy_density_generic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phaseGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hardeningModel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doUpdate</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldLorentzPlastic.html#energy_density_generic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.energy_density_generic" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.incremental_potential">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">incremental_potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elasticTrialStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqpsOld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hardeningModel</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldLorentzPlastic.html#incremental_potential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.incremental_potential" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.make_initial_state_finite_deformations">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">make_initial_state_finite_deformations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldLorentzPlastic.html#make_initial_state_finite_deformations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.make_initial_state_finite_deformations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.make_initial_state_small_deformations">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">make_initial_state_small_deformations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldLorentzPlastic.html#make_initial_state_small_deformations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.make_initial_state_small_deformations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.make_properties">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">make_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Gc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psiC</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldLorentzPlastic.html#make_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.make_properties" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.phase_potential_density">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">phase_potential_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gradPhase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldLorentzPlastic.html#phase_potential_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.phase_potential_density" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.r">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">r</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elasticTrialStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqpsOld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hardeningModel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.r" title="Link to this definition"></a></dt>
+<dd><p>Jacobian of incremental_potential with respect to positional argument(s) 1. Takes the same arguments as incremental_potential but returns the jacobian of the output with respect to the arguments at positions 1.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.r_and_deqps">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">r_and_deqps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elasticTrialStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqpsOld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hardeningModel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.r_and_deqps" title="Link to this definition"></a></dt>
+<dd><p>Value and gradient of incremental_potential with respect to positional argument(s) 1. Takes the same arguments as incremental_potential but returns a two-element tuple where the first element is the value of incremental_potential and the second element is the gradient, which has the same shape as the arguments at positions 1.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.strain_energy_density">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">strain_energy_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elasticStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldLorentzPlastic.html#strain_energy_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.strain_energy_density" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldLorentzPlastic.update_state">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">update_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elasticTrialStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stateOld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stateNewGuess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hardeningModel</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldLorentzPlastic.html#update_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldLorentzPlastic.update_state" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-optimism.phasefield.PhaseFieldMaterialModel">
+<span id="optimism-phasefield-phasefieldmaterialmodel-module"></span><h2>optimism.phasefield.PhaseFieldMaterialModel module<a class="headerlink" href="#module-optimism.phasefield.PhaseFieldMaterialModel" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldMaterialModel.MaterialModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldMaterialModel.</span></span><span class="sig-name descname"><span class="pre">MaterialModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compute_energy_density</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_output_energy_density</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_strain_energy_density</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_phase_potential_density</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_initial_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_state_new</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseFieldMaterialModel.MaterialModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldMaterialModel.MaterialModel._asdict">
+<span class="sig-name descname"><span class="pre">_asdict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseFieldMaterialModel.MaterialModel._asdict" title="Link to this definition"></a></dt>
+<dd><p>Return a new dict which maps field names to their values.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldMaterialModel.MaterialModel._field_defaults">
+<span class="sig-name descname"><span class="pre">_field_defaults</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#optimism.phasefield.PhaseFieldMaterialModel.MaterialModel._field_defaults" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldMaterialModel.MaterialModel._fields">
+<span class="sig-name descname"><span class="pre">_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('compute_energy_density',</span> <span class="pre">'compute_output_energy_density',</span> <span class="pre">'compute_strain_energy_density',</span> <span class="pre">'compute_phase_potential_density',</span> <span class="pre">'compute_initial_state',</span> <span class="pre">'compute_state_new')</span></em><a class="headerlink" href="#optimism.phasefield.PhaseFieldMaterialModel.MaterialModel._fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldMaterialModel.MaterialModel._make">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_make</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseFieldMaterialModel.MaterialModel._make" title="Link to this definition"></a></dt>
+<dd><p>Make a new MaterialModel object from a sequence or iterable</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldMaterialModel.MaterialModel._replace">
+<span class="sig-name descname"><span class="pre">_replace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseFieldMaterialModel.MaterialModel._replace" title="Link to this definition"></a></dt>
+<dd><p>Return a new MaterialModel object replacing specified fields with new values</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldMaterialModel.MaterialModel.compute_energy_density">
+<span class="sig-name descname"><span class="pre">compute_energy_density</span></span><a class="headerlink" href="#optimism.phasefield.PhaseFieldMaterialModel.MaterialModel.compute_energy_density" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldMaterialModel.MaterialModel.compute_initial_state">
+<span class="sig-name descname"><span class="pre">compute_initial_state</span></span><a class="headerlink" href="#optimism.phasefield.PhaseFieldMaterialModel.MaterialModel.compute_initial_state" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldMaterialModel.MaterialModel.compute_output_energy_density">
+<span class="sig-name descname"><span class="pre">compute_output_energy_density</span></span><a class="headerlink" href="#optimism.phasefield.PhaseFieldMaterialModel.MaterialModel.compute_output_energy_density" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldMaterialModel.MaterialModel.compute_phase_potential_density">
+<span class="sig-name descname"><span class="pre">compute_phase_potential_density</span></span><a class="headerlink" href="#optimism.phasefield.PhaseFieldMaterialModel.MaterialModel.compute_phase_potential_density" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldMaterialModel.MaterialModel.compute_state_new">
+<span class="sig-name descname"><span class="pre">compute_state_new</span></span><a class="headerlink" href="#optimism.phasefield.PhaseFieldMaterialModel.MaterialModel.compute_state_new" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldMaterialModel.MaterialModel.compute_strain_energy_density">
+<span class="sig-name descname"><span class="pre">compute_strain_energy_density</span></span><a class="headerlink" href="#optimism.phasefield.PhaseFieldMaterialModel.MaterialModel.compute_strain_energy_density" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optimism.phasefield.PhaseFieldThreshold">
+<span id="optimism-phasefield-phasefieldthreshold-module"></span><h2>optimism.phasefield.PhaseFieldThreshold module<a class="headerlink" href="#module-optimism.phasefield.PhaseFieldThreshold" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.Properties">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThreshold.</span></span><span class="sig-name descname"><span class="pre">Properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Gc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.Properties" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.Properties.E">
+<span class="sig-name descname"><span class="pre">E</span></span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.Properties.E" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.Properties.Gc">
+<span class="sig-name descname"><span class="pre">Gc</span></span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.Properties.Gc" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.Properties._asdict">
+<span class="sig-name descname"><span class="pre">_asdict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.Properties._asdict" title="Link to this definition"></a></dt>
+<dd><p>Return a new dict which maps field names to their values.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.Properties._field_defaults">
+<span class="sig-name descname"><span class="pre">_field_defaults</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.Properties._field_defaults" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.Properties._fields">
+<span class="sig-name descname"><span class="pre">_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('E',</span> <span class="pre">'nu',</span> <span class="pre">'mu',</span> <span class="pre">'kappa',</span> <span class="pre">'Gc',</span> <span class="pre">'l')</span></em><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.Properties._fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.Properties._make">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_make</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.Properties._make" title="Link to this definition"></a></dt>
+<dd><p>Make a new Properties object from a sequence or iterable</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.Properties._replace">
+<span class="sig-name descname"><span class="pre">_replace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.Properties._replace" title="Link to this definition"></a></dt>
+<dd><p>Return a new Properties object replacing specified fields with new values</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.Properties.kappa">
+<span class="sig-name descname"><span class="pre">kappa</span></span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.Properties.kappa" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.Properties.l">
+<span class="sig-name descname"><span class="pre">l</span></span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.Properties.l" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.Properties.mu">
+<span class="sig-name descname"><span class="pre">mu</span></span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.Properties.mu" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.Properties.nu">
+<span class="sig-name descname"><span class="pre">nu</span></span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.Properties.nu" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.compute_linear_strain">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThreshold.</span></span><span class="sig-name descname"><span class="pre">compute_linear_strain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThreshold.html#compute_linear_strain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.compute_linear_strain" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.compute_logarithmic_strain">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThreshold.</span></span><span class="sig-name descname"><span class="pre">compute_logarithmic_strain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThreshold.html#compute_logarithmic_strain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.compute_logarithmic_strain" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.create_material_model_functions">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThreshold.</span></span><span class="sig-name descname"><span class="pre">create_material_model_functions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThreshold.html#create_material_model_functions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.create_material_model_functions" title="Link to this definition"></a></dt>
+<dd><dl>
+<dt>properties:</dt><dd><p>‘elastic modulus’:       real
+‘poisson ratio’:         real
+‘critical energy release rate’: real
+‘regularization length’: real
+‘kinematics’:            string</p>
+<blockquote>
+<div><p>Value ‘large deformations’ or ‘small deformations’</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.degradation">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThreshold.</span></span><span class="sig-name descname"><span class="pre">degradation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phase</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThreshold.html#degradation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.degradation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.elastic_deviatoric_free_energy">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThreshold.</span></span><span class="sig-name descname"><span class="pre">elastic_deviatoric_free_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThreshold.html#elastic_deviatoric_free_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.elastic_deviatoric_free_energy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.elastic_volumetric_free_energy">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThreshold.</span></span><span class="sig-name descname"><span class="pre">elastic_volumetric_free_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThreshold.html#elastic_volumetric_free_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.elastic_volumetric_free_energy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.energy_density">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThreshold.</span></span><span class="sig-name descname"><span class="pre">energy_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phaseGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThreshold.html#energy_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.energy_density" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.initial_state">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThreshold.</span></span><span class="sig-name descname"><span class="pre">initial_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThreshold.html#initial_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.initial_state" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.make_properties">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThreshold.</span></span><span class="sig-name descname"><span class="pre">make_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Gc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThreshold.html#make_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.make_properties" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.phase_potential_density">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThreshold.</span></span><span class="sig-name descname"><span class="pre">phase_potential_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gradPhase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThreshold.html#phase_potential_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.phase_potential_density" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.state_new">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThreshold.</span></span><span class="sig-name descname"><span class="pre">state_new</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThreshold.html#state_new"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.state_new" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThreshold.strain_energy_density">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThreshold.</span></span><span class="sig-name descname"><span class="pre">strain_energy_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThreshold.html#strain_energy_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThreshold.strain_energy_density" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-optimism.phasefield.PhaseFieldThresholdPlastic">
+<span id="optimism-phasefield-phasefieldthresholdplastic-module"></span><h2>optimism.phasefield.PhaseFieldThresholdPlastic module<a class="headerlink" href="#module-optimism.phasefield.PhaseFieldThresholdPlastic" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.Properties">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">Properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Gc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.Properties" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.Properties.E">
+<span class="sig-name descname"><span class="pre">E</span></span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.Properties.E" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.Properties.Gc">
+<span class="sig-name descname"><span class="pre">Gc</span></span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.Properties.Gc" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.Properties.H">
+<span class="sig-name descname"><span class="pre">H</span></span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.Properties.H" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 7</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.Properties.Y0">
+<span class="sig-name descname"><span class="pre">Y0</span></span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.Properties.Y0" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 6</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.Properties._asdict">
+<span class="sig-name descname"><span class="pre">_asdict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.Properties._asdict" title="Link to this definition"></a></dt>
+<dd><p>Return a new dict which maps field names to their values.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.Properties._field_defaults">
+<span class="sig-name descname"><span class="pre">_field_defaults</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.Properties._field_defaults" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.Properties._fields">
+<span class="sig-name descname"><span class="pre">_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('E',</span> <span class="pre">'nu',</span> <span class="pre">'mu',</span> <span class="pre">'kappa',</span> <span class="pre">'Gc',</span> <span class="pre">'l',</span> <span class="pre">'Y0',</span> <span class="pre">'H')</span></em><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.Properties._fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.Properties._make">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_make</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.Properties._make" title="Link to this definition"></a></dt>
+<dd><p>Make a new Properties object from a sequence or iterable</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.Properties._replace">
+<span class="sig-name descname"><span class="pre">_replace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.Properties._replace" title="Link to this definition"></a></dt>
+<dd><p>Return a new Properties object replacing specified fields with new values</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.Properties.kappa">
+<span class="sig-name descname"><span class="pre">kappa</span></span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.Properties.kappa" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.Properties.l">
+<span class="sig-name descname"><span class="pre">l</span></span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.Properties.l" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.Properties.mu">
+<span class="sig-name descname"><span class="pre">mu</span></span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.Properties.mu" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.Properties.nu">
+<span class="sig-name descname"><span class="pre">nu</span></span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.Properties.nu" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.compute_elastic_strain">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">compute_elastic_strain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThresholdPlastic.html#compute_elastic_strain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.compute_elastic_strain" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.compute_element_energy">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">compute_element_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compute_free_energy_density</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shapeGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThresholdPlastic.html#compute_element_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.compute_element_energy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.compute_state_increment">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">compute_state_increment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elasticTrialStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stateOld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThresholdPlastic.html#compute_state_increment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.compute_state_increment" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.compute_state_new">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">compute_state_new</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phaseGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stateOld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThresholdPlastic.html#compute_state_new"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.compute_state_new" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.compute_total_energy">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">compute_total_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compute_free_energy_density</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThresholdPlastic.html#compute_total_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.compute_total_energy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.degradation">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">degradation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phase</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThresholdPlastic.html#degradation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.degradation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.dr">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">dr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elasticTrialStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqpsOld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.dr" title="Link to this definition"></a></dt>
+<dd><p>Jacobian of incremental_potential with respect to positional argument(s) (0, 1, 3). Takes the same arguments as incremental_potential but returns the jacobian of the output with respect to the arguments at positions (0, 1, 3).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.dr_dstrain_and_deqps">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">dr_dstrain_and_deqps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elasticTrialStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqpsOld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.dr_dstrain_and_deqps" title="Link to this definition"></a></dt>
+<dd><p>Jacobian of incremental_potential with respect to positional argument(s) (0, 1). Takes the same arguments as incremental_potential but returns the jacobian of the output with respect to the arguments at positions (0, 1).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.elastic_deviatoric_free_energy">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">elastic_deviatoric_free_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elasticStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThresholdPlastic.html#elastic_deviatoric_free_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.elastic_deviatoric_free_energy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.elastic_volumetric_free_energy">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">elastic_volumetric_free_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThresholdPlastic.html#elastic_volumetric_free_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.elastic_volumetric_free_energy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.energy_density">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">energy_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phaseGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doUpdate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThresholdPlastic.html#energy_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.energy_density" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.energy_density_generic">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">energy_density_generic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phaseGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doUpdate</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThresholdPlastic.html#energy_density_generic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.energy_density_generic" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.flow_stress">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">flow_stress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eqps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.flow_stress" title="Link to this definition"></a></dt>
+<dd><p>Jacobian of hardening_energy_density with respect to positional argument(s) 0. Takes the same arguments as hardening_energy_density but returns the jacobian of the output with respect to the arguments at positions 0.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.hardening_energy_density">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">hardening_energy_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eqps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThresholdPlastic.html#hardening_energy_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.hardening_energy_density" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.incremental_potential">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">incremental_potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elasticTrialStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqpsOld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThresholdPlastic.html#incremental_potential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.incremental_potential" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.interpolate_element_kinematics">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">interpolate_element_kinematics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">U</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shapeGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThresholdPlastic.html#interpolate_element_kinematics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.interpolate_element_kinematics" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.interpolate_kinematics">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">interpolate_kinematics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThresholdPlastic.html#interpolate_kinematics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.interpolate_kinematics" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.make_initial_state">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">make_initial_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThresholdPlastic.html#make_initial_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.make_initial_state" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.make_properties">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">make_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Gc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThresholdPlastic.html#make_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.make_properties" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.phase_potential_density">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">phase_potential_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gradPhase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThresholdPlastic.html#phase_potential_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.phase_potential_density" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.r">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">r</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elasticTrialStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqpsOld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.r" title="Link to this definition"></a></dt>
+<dd><p>Jacobian of incremental_potential with respect to positional argument(s) 1. Takes the same arguments as incremental_potential but returns the jacobian of the output with respect to the arguments at positions 1.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.r_and_deqps">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">r_and_deqps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elasticTrialStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eqpsOld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.r_and_deqps" title="Link to this definition"></a></dt>
+<dd><p>Value and gradient of incremental_potential with respect to positional argument(s) 1. Takes the same arguments as incremental_potential but returns a two-element tuple where the first element is the value of incremental_potential and the second element is the gradient, which has the same shape as the arguments at positions 1.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.strain_energy_density">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">strain_energy_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elasticStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThresholdPlastic.html#strain_energy_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.strain_energy_density" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.PhaseFieldThresholdPlastic.update_state">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">update_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elasticTrialStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stateOld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stateNewGuess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/PhaseFieldThresholdPlastic.html#update_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.PhaseFieldThresholdPlastic.update_state" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-optimism.phasefield">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-optimism.phasefield" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="optimism.material.test.html" class="btn btn-neutral float-left" title="optimism.material.test package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="optimism.phasefield.test.html" class="btn btn-neutral float-right" title="optimism.phasefield.test package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,517 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.test.test_TrustRegionSPG &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.test.test_TrustRegionSPG</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.test.test_TrustRegionSPG</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
+<span class="kn">from</span> <span class="nn">jax.scipy</span> <span class="kn">import</span> <span class="n">linalg</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">TrustRegionSPG</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Objective</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">TestFixture</span>
+
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">sparse</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">EquationSolver</span>
+
+<div class="viewcode-block" id="energy">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.energy">[docs]</a>
+<span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.3</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mf">0.2</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.2</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">p</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="quadratic">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.quadratic">[docs]</a>
+<span class="k">def</span> <span class="nf">quadratic</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">3.0</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="rosenbrock">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.rosenbrock">[docs]</a>
+<span class="k">def</span> <span class="nf">rosenbrock</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">F</span> <span class="o">+=</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+    <span class="k">return</span> <span class="n">F</span></div>
+
+
+
+<div class="viewcode-block" id="TRSPGCauchyPointFixture">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TRSPGCauchyPointFixture">[docs]</a>
+<span class="k">class</span> <span class="nc">TRSPGCauchyPointFixture</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TRSPGCauchyPointFixture.setUp">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TRSPGCauchyPointFixture.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">TrustRegionSPG</span><span class="o">.</span><span class="n">get_settings</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mu0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">cauchy_point_sufficient_decrease_factor</span>
+
+        <span class="c1"># initial guess</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">7.</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Objective</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TRSPGCauchyPointFixture.test_projection">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TRSPGCauchyPointFixture.test_projection">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">])</span>
+        <span class="n">lb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">3.0</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">])</span>
+        <span class="n">ub</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">lb</span><span class="p">,</span> <span class="n">ub</span><span class="p">))</span>
+        <span class="n">Px</span> <span class="o">=</span> <span class="n">TrustRegionSPG</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">Px</span> <span class="o">&gt;=</span> <span class="n">lb</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">Px</span> <span class="o">&lt;=</span> <span class="n">ub</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="TRSPGCauchyPointFixture.test_unconstrained_cauchy_point_achieves_sufficient_decrease">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TRSPGCauchyPointFixture.test_unconstrained_cauchy_point_achieves_sufficient_decrease">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_unconstrained_cauchy_point_achieves_sufficient_decrease</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">])</span>
+        <span class="n">objective</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Objective</span><span class="p">(</span><span class="n">quadratic</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">lb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="n">ub</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">lb</span><span class="p">,</span><span class="n">ub</span><span class="p">))</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">trSize</span> <span class="o">=</span> <span class="mf">1e10</span> <span class="c1"># huge, so it does not matter</span>
+        <span class="n">alpha</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="n">TrustRegionSPG</span><span class="o">.</span><span class="n">find_generalized_cauchy_point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">objective</span><span class="o">.</span><span class="n">hessian_vec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;xNew&#39;</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">alpha</span><span class="o">*</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">qOld</span> <span class="o">=</span> <span class="n">quadratic</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="n">qNew</span> <span class="o">=</span> <span class="n">quadratic</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">alpha</span><span class="o">*</span><span class="n">s</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertLessEqual</span><span class="p">(</span><span class="n">qNew</span><span class="o">-</span><span class="n">qOld</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu0</span><span class="o">*</span><span class="n">s</span><span class="nd">@g</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TRSPGCauchyPointFixture.test_cauchy_point_obeys_constraints">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TRSPGCauchyPointFixture.test_cauchy_point_obeys_constraints">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_cauchy_point_obeys_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">])</span>
+        <span class="n">objective</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Objective</span><span class="p">(</span><span class="n">quadratic</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">lb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">])</span>
+        <span class="n">ub</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">lb</span><span class="p">,</span><span class="n">ub</span><span class="p">))</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">trSize</span> <span class="o">=</span> <span class="mf">1e10</span> <span class="c1"># huge, so it does not matter</span>
+        <span class="n">alpha</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="n">TrustRegionSPG</span><span class="o">.</span><span class="n">find_generalized_cauchy_point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">objective</span><span class="o">.</span><span class="n">hessian_vec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+        <span class="n">xCP</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">alpha</span><span class="o">*</span><span class="n">s</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">xCP</span> <span class="o">&gt;=</span> <span class="n">lb</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">xCP</span> <span class="o">&lt;=</span> <span class="n">ub</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="TRSPGCauchyPointFixture.test_cauchy_point_with_active_constraints_achieves_sufficient_decrease">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TRSPGCauchyPointFixture.test_cauchy_point_with_active_constraints_achieves_sufficient_decrease">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_cauchy_point_with_active_constraints_achieves_sufficient_decrease</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">])</span>
+        <span class="n">objective</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Objective</span><span class="p">(</span><span class="n">quadratic</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">lb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">])</span>
+        <span class="n">ub</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">lb</span><span class="p">,</span><span class="n">ub</span><span class="p">))</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">trSize</span> <span class="o">=</span> <span class="mf">1e10</span> <span class="c1"># huge, so it does not matter</span>
+        <span class="n">alpha</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="n">TrustRegionSPG</span><span class="o">.</span><span class="n">find_generalized_cauchy_point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">objective</span><span class="o">.</span><span class="n">hessian_vec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+        <span class="n">qOld</span> <span class="o">=</span> <span class="n">quadratic</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="n">qNew</span> <span class="o">=</span> <span class="n">quadratic</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">alpha</span><span class="o">*</span><span class="n">s</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertLessEqual</span><span class="p">(</span><span class="n">qNew</span><span class="o">-</span><span class="n">qOld</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu0</span><span class="o">*</span><span class="n">s</span><span class="nd">@g</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TRSPGCauchyPointFixture.test_cauchy_point_stays_inside_trust_region">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TRSPGCauchyPointFixture.test_cauchy_point_stays_inside_trust_region">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_cauchy_point_stays_inside_trust_region</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">])</span>
+        <span class="n">objective</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Objective</span><span class="p">(</span><span class="n">quadratic</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">lb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="n">ub</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">lb</span><span class="p">,</span><span class="n">ub</span><span class="p">))</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">trSize</span> <span class="o">=</span> <span class="mf">1.0e-2</span>
+        <span class="n">alpha</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="n">TrustRegionSPG</span><span class="o">.</span><span class="n">find_generalized_cauchy_point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">objective</span><span class="o">.</span><span class="n">hessian_vec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;xNew&#39;</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">alpha</span><span class="o">*</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">qOld</span> <span class="o">=</span> <span class="n">quadratic</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="n">qNew</span> <span class="o">=</span> <span class="n">quadratic</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">alpha</span><span class="o">*</span><span class="n">s</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="n">sNorm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;step norm&#39;</span><span class="p">,</span> <span class="n">sNorm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertLessEqual</span><span class="p">(</span><span class="n">sNorm</span><span class="p">,</span> <span class="n">trSize</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TRSPGCauchyPointFixture.test_forward_track_search_of_cp_step_length_achieves_sufficient_decrease">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TRSPGCauchyPointFixture.test_forward_track_search_of_cp_step_length_achieves_sufficient_decrease">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_forward_track_search_of_cp_step_length_achieves_sufficient_decrease</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">])</span>
+        <span class="n">objective</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Objective</span><span class="p">(</span><span class="n">quadratic</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">lb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="n">ub</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">lb</span><span class="p">,</span><span class="n">ub</span><span class="p">))</span>
+        <span class="c1"># pick small initial step guess so that forward track</span>
+        <span class="c1"># will be used</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.0e-3</span>
+        <span class="c1"># verify that forward track will be used</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">TrustRegionSPG</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">alpha</span><span class="o">*</span><span class="n">g</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span> <span class="o">-</span> <span class="n">x</span>
+        <span class="n">ss</span> <span class="o">=</span> <span class="n">s</span><span class="nd">@s</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">s</span><span class="nd">@objective</span><span class="o">.</span><span class="n">hess_vec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="n">g</span><span class="nd">@s</span>
+        <span class="n">trSize</span> <span class="o">=</span> <span class="mf">1e10</span> <span class="c1"># huge, so it does not matter</span>
+        <span class="n">intialStepAcceptable</span> <span class="o">=</span> <span class="n">model</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu0</span><span class="o">*</span><span class="n">g</span><span class="nd">@s</span> <span class="ow">and</span> <span class="n">ss</span> <span class="o">&lt;=</span> <span class="n">trSize</span><span class="o">*</span><span class="n">trSize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">intialStepAcceptable</span><span class="p">)</span>
+        <span class="n">alpha</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="n">TrustRegionSPG</span><span class="o">.</span><span class="n">find_generalized_cauchy_point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">objective</span><span class="o">.</span><span class="n">hessian_vec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+        <span class="n">qOld</span> <span class="o">=</span> <span class="n">quadratic</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="n">qNew</span> <span class="o">=</span> <span class="n">quadratic</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">alpha</span><span class="o">*</span><span class="n">s</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="c1">#print(&#39;xNew&#39;, x + alpha*s)</span>
+        <span class="c1">#print(&#39;qOld&#39;, qOld)</span>
+        <span class="c1">#print(&#39;qNew&#39;, qNew)</span>
+        <span class="c1">#print(&#39;minimal acceptable decrease&#39;, mu0*s@g)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertLessEqual</span><span class="p">(</span><span class="n">qNew</span><span class="o">-</span><span class="n">qOld</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu0</span><span class="o">*</span><span class="n">s</span><span class="nd">@g</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TRSPGCauchyPointFixture.no_test_trust_region_equation_solver">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TRSPGCauchyPointFixture.no_test_trust_region_equation_solver">[docs]</a>
+    <span class="k">def</span> <span class="nf">no_test_trust_region_equation_solver</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sol</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">trust_region_least_squares_solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">sol</span><span class="p">)),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">7</span> <span class="p">)</span></div>
+</div>
+
+
+
+
+<div class="viewcode-block" id="TestProjectionOnBoundary">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TestProjectionOnBoundary">[docs]</a>
+<span class="k">class</span> <span class="nc">TestProjectionOnBoundary</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TestProjectionOnBoundary.setUp">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TestProjectionOnBoundary.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">7.</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ub</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">lb</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">ub</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="TestProjectionOnBoundary.test_project_onto_tr_function_when_vector_is_inside_tr">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TestProjectionOnBoundary.test_project_onto_tr_function_when_vector_is_inside_tr">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_project_onto_tr_function_when_vector_is_inside_tr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">trSize</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="mf">1.2</span>
+        <span class="n">xNew</span> <span class="o">=</span> <span class="n">TrustRegionSPG</span><span class="o">.</span><span class="n">project_onto_tr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xk</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="n">trSize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">xNew</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lb</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">xNew</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ub</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="TestProjectionOnBoundary.test_project_onto_tr_function_when_vector_is_outside_tr">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TestProjectionOnBoundary.test_project_onto_tr_function_when_vector_is_outside_tr">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_project_onto_tr_function_when_vector_is_outside_tr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">trSize</span> <span class="o">=</span> <span class="mf">4.0</span>
+        <span class="n">xNew</span> <span class="o">=</span> <span class="n">TrustRegionSPG</span><span class="o">.</span><span class="n">project_onto_tr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">xk</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="n">trSize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">xNew</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lb</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">xNew</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ub</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertLess</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">xNew</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">xk</span><span class="p">),</span> <span class="n">trSize</span><span class="o">*</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="mf">1e-8</span><span class="p">))</span></div>
+</div>
+
+
+        
+<div class="viewcode-block" id="TestSubproblemSolveFixture">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TestSubproblemSolveFixture">[docs]</a>
+<span class="k">class</span> <span class="nc">TestSubproblemSolveFixture</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TestSubproblemSolveFixture.setUp">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TestSubproblemSolveFixture.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">TrustRegionSPG</span><span class="o">.</span><span class="n">get_settings</span><span class="p">(</span><span class="n">spg_inexact_solve_ratio</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span> <span class="n">spg_tol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span>
+        <span class="c1"># initial guess</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">7.</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Objective</span><span class="p">(</span><span class="n">quadratic</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">lb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">])</span>
+        <span class="n">ub</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">lb</span><span class="p">,</span><span class="n">ub</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">Hv</span><span class="p">(</span><span class="n">v</span><span class="p">):</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">hessian_vec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hess_vec</span> <span class="o">=</span> <span class="n">Hv</span></div>
+
+        
+<div class="viewcode-block" id="TestSubproblemSolveFixture.test_subproblem_solve_inside_tr">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TestSubproblemSolveFixture.test_subproblem_solve_inside_tr">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_subproblem_solve_inside_tr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">trSize</span> <span class="o">=</span> <span class="mf">1e10</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">cp</span> <span class="o">=</span> <span class="n">TrustRegionSPG</span><span class="o">.</span><span class="n">find_generalized_cauchy_point</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hess_vec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span>
+            <span class="n">trSize</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+        <span class="c1"># print(&#39;cp&#39;, cp)</span>
+        <span class="n">z</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">stepType</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="n">TrustRegionSPG</span><span class="o">.</span><span class="n">solve_spg_subproblem</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">cp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hess_vec</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+        <span class="c1"># print(&#39;iters taken&#39;, i)</span>
+        <span class="n">xNew</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">z</span>
+        <span class="n">xExact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">xNew</span><span class="p">,</span> <span class="n">xExact</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+        <span class="c1"># unconstrained DOFS should have zero residual</span>
+        <span class="n">residual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">xNew</span><span class="p">)</span>
+        <span class="n">unconstrainedResidNorm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">residual</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertLess</span><span class="p">(</span><span class="n">unconstrainedResidNorm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">spg_tol</span><span class="p">)</span>
+
+        <span class="c1"># check constraint force of bounded DOF</span>
+        <span class="n">LagrangeMultiplierExact</span> <span class="o">=</span> <span class="o">-</span><span class="mi">19</span><span class="o">/</span><span class="mi">12</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">residual</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="n">LagrangeMultiplierExact</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+        <span class="c1"># step should be inside trust region</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertLessEqual</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">z</span><span class="p">),</span> <span class="n">trSize</span><span class="p">)</span></div>
+
+        
+        <span class="c1">#print(&#39;z&#39;, z)</span>
+        <span class="c1">#print(&#39;norm z&#39;, np.linalg.norm(z))</span>
+        <span class="c1">#print(&#39;trsize&#39;, trSize)</span>
+        <span class="c1">#rint(&#39;residual&#39;, self.obj.gradient(xNew))</span>
+        <span class="c1">#print(&#39;iters&#39;, i)</span>
+
+<div class="viewcode-block" id="TestSubproblemSolveFixture.test_subproblem_solve_on_tr_boundary">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TestSubproblemSolveFixture.test_subproblem_solve_on_tr_boundary">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_subproblem_solve_on_tr_boundary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="c1"># This is the full step that would be taken if the</span>
+        <span class="c1"># trust region boundary was big enough</span>
+        <span class="n">xFullStep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">])</span>
+        <span class="n">trSize</span> <span class="o">=</span> <span class="mf">0.75</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">xFullStep</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">cp</span> <span class="o">=</span> <span class="n">TrustRegionSPG</span><span class="o">.</span><span class="n">find_generalized_cauchy_point</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hess_vec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span>
+            <span class="n">trSize</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;trSize&#39;</span><span class="p">,</span> <span class="n">trSize</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;cp&#39;</span><span class="p">,</span> <span class="n">cp</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;cp step size&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">cp</span><span class="p">))</span>
+        <span class="n">z</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">stepType</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="n">TrustRegionSPG</span><span class="o">.</span><span class="n">solve_spg_subproblem</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">cp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hess_vec</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+        <span class="n">xNew</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">z</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;step size&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">z</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;trSize&#39;</span><span class="p">,</span> <span class="n">trSize</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">z</span><span class="p">),</span> <span class="n">trSize</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertLess</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">quadratic</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertGreaterEqual</span><span class="p">(</span><span class="n">xNew</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span></div>
+</div>
+
+        
+        <span class="c1">#print(&#39;iters&#39;, i)</span>
+
+
+<div class="viewcode-block" id="TestTrustRegionSPGFixture">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TestTrustRegionSPGFixture">[docs]</a>
+<span class="k">class</span> <span class="nc">TestTrustRegionSPGFixture</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TestTrustRegionSPGFixture.setUp">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TestTrustRegionSPGFixture.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">TrustRegionSPG</span><span class="o">.</span><span class="n">get_settings</span><span class="p">()</span>
+
+        <span class="c1"># initial guess</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">7.</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.</span><span class="p">])</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Objective</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="TestTrustRegionSPGFixture.test_trust_region_spg_on_unbounded_problem">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TestTrustRegionSPGFixture.test_trust_region_spg_on_unbounded_problem">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_trust_region_spg_on_unbounded_problem</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">lb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="n">ub</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="n">sol</span><span class="p">,</span> <span class="n">solverSuccess</span> <span class="o">=</span> <span class="n">TrustRegionSPG</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">lb</span><span class="p">,</span> <span class="n">ub</span><span class="p">,</span>
+                                                  <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">,</span> <span class="n">useWarmStart</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">solverSuccess</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">sol</span><span class="p">)),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span></div>
+
+
+        <span class="c1"># BT: This solver is converging to the same point as the</span>
+        <span class="c1"># Steihaug solver in EquationSolver, which is good.</span>
+        <span class="c1"># That point has a negative eigenvalue in the Hessian,</span>
+        <span class="c1"># which is bad. I think this objective function may be</span>
+        <span class="c1"># badly formed for this problem.</span>
+        <span class="c1"># Otherwise, this might be a rare example that causes a</span>
+        <span class="c1"># saddle point to be found. More study needed.</span>
+        <span class="c1"># H = self.obj.hess(self.x, self.p)</span>
+        <span class="c1"># eigvals = linalg.eigh(H, eigvals_only=True)</span>
+        <span class="c1"># print(&#39;eigvals&#39;, eigvals)</span>
+        <span class="c1"># self.assertTrue(onp.testing.assert_array_less(-eigvals, np.zeros(self.x.shape)))</span>
+
+<div class="viewcode-block" id="TestTrustRegionSPGFixture.no_test_cgunbound">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TestTrustRegionSPGFixture.no_test_cgunbound">[docs]</a>
+    <span class="k">def</span> <span class="nf">no_test_cgunbound</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="n">EquationSolver</span><span class="o">.</span><span class="n">get_settings</span><span class="p">()</span>
+        <span class="n">sol</span><span class="p">,</span> <span class="n">solverSuccess</span> <span class="o">=</span> <span class="n">EquationSolver</span><span class="o">.</span><span class="n">nonlinear_equation_solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
+                                                                     <span class="n">settings</span><span class="p">,</span> <span class="n">useWarmStart</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">solverSuccess</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">sol</span><span class="p">)),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TestTrustRegionSPGRosenbrock">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TestTrustRegionSPGRosenbrock">[docs]</a>
+<span class="k">class</span> <span class="nc">TestTrustRegionSPGRosenbrock</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
+    
+<div class="viewcode-block" id="TestTrustRegionSPGRosenbrock.setUp">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TestTrustRegionSPGRosenbrock.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">TrustRegionSPG</span><span class="o">.</span><span class="n">get_settings</span><span class="p">(</span><span class="n">max_spg_iters</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+                                                    <span class="n">cauchy_point_max_line_search_iters</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                                                    <span class="n">eta1</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+                                                    <span class="n">eta2</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+                                                    <span class="n">eta3</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+                                                    <span class="n">t2</span><span class="o">=</span><span class="mf">2.5</span><span class="p">)</span>
+
+        <span class="c1"># initial guess</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">8.</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">id_precond</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">sparse</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span>
+        <span class="n">precondStrategy</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">PrecondStrategy</span><span class="p">(</span><span class="n">id_precond</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Objective</span><span class="p">(</span><span class="n">rosenbrock</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">precondStrategy</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestTrustRegionSPGRosenbrock.no_test_hessian">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TestTrustRegionSPGRosenbrock.no_test_hessian">[docs]</a>
+    <span class="k">def</span> <span class="nf">no_test_hessian</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">hess</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span>
+        <span class="n">eigvals</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">eigvals_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;eigvals&#39;</span><span class="p">,</span> <span class="n">eigvals</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="TestTrustRegionSPGRosenbrock.test_spg_on_rosenbrock">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TestTrustRegionSPGRosenbrock.test_spg_on_rosenbrock">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_spg_on_rosenbrock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">lb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="n">ub</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="n">sol</span><span class="p">,</span> <span class="n">solverSuccess</span> <span class="o">=</span> <span class="n">TrustRegionSPG</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">lb</span><span class="p">,</span> <span class="n">ub</span><span class="p">,</span>
+                                                  <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">,</span> <span class="n">useWarmStart</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">solverSuccess</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">sol</span><span class="p">)),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">sol</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">sol</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestTrustRegionSPGRosenbrock.no_test_steihaug_on_rosenbrock">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_TrustRegionSPG.TestTrustRegionSPGRosenbrock.no_test_steihaug_on_rosenbrock">[docs]</a>
+    <span class="k">def</span> <span class="nf">no_test_steihaug_on_rosenbrock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="n">EquationSolver</span><span class="o">.</span><span class="n">get_settings</span><span class="p">()</span>
+        <span class="n">sol</span><span class="p">,</span> <span class="n">solverSuccess</span> <span class="o">=</span> <span class="n">EquationSolver</span><span class="o">.</span><span class="n">nonlinear_equation_solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
+                                                                     <span class="n">settings</span><span class="p">,</span> <span class="n">useWarmStart</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">solverSuccess</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;sol&#39;</span><span class="p">,</span> <span class="n">sol</span><span class="p">)</span></div>
+</div>
+
+        
+        
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

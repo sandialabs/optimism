@@ -1,0 +1,216 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.NewtonSolver &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.NewtonSolver</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.NewtonSolver</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">LinearOperator</span><span class="p">,</span> <span class="n">gmres</span>
+
+<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<span class="n">Settings</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Settings&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;relative_gmres_tol&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;max_gmres_iters&#39;</span><span class="p">])</span>
+
+<div class="viewcode-block" id="construct_quadratic">
+<a class="viewcode-back" href="../../optimism.html#optimism.NewtonSolver.construct_quadratic">[docs]</a>
+<span class="k">def</span> <span class="nf">construct_quadratic</span><span class="p">(</span><span class="n">ps</span><span class="p">):</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">ps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">ps</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">ps</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">ps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">ps</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="k">return</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">a</span><span class="o">*</span><span class="n">s</span><span class="o">*</span><span class="n">s</span> <span class="o">+</span> <span class="n">b</span><span class="o">*</span><span class="n">s</span> <span class="o">+</span> <span class="n">c</span></div>
+
+
+
+<div class="viewcode-block" id="compute_min_p">
+<a class="viewcode-back" href="../../optimism.html#optimism.NewtonSolver.compute_min_p">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_min_p</span><span class="p">(</span><span class="n">ps</span><span class="p">,</span> <span class="n">bounds</span><span class="p">):</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">ps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">ps</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">ps</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">ps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">ps</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    
+    <span class="k">if</span> <span class="n">a</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">ps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">ps</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">else</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">construct_quadratic</span><span class="p">(</span><span class="n">ps</span><span class="p">)</span>
+        <span class="n">quadMin</span> <span class="o">=</span> <span class="o">-</span><span class="n">b</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">quadMin</span><span class="p">,</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="newton_step">
+<a class="viewcode-back" href="../../optimism.html#optimism.NewtonSolver.newton_step">[docs]</a>
+<span class="k">def</span> <span class="nf">newton_step</span><span class="p">(</span><span class="n">residual</span><span class="p">,</span> <span class="n">linear_op</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">Settings</span><span class="p">(</span><span class="mf">1e-2</span><span class="p">,</span><span class="mi">100</span><span class="p">),</span> <span class="n">precond</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">sz</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span>
+    <span class="c1"># The call to onp.array copies the jax array output into a plain numpy</span>
+    <span class="c1"># array. The copy is necessary for safety, since as far as scipy knows,</span>
+    <span class="c1"># it is allowed to modify the output in place.</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">LinearOperator</span><span class="p">((</span><span class="n">sz</span><span class="p">,</span><span class="n">sz</span><span class="p">),</span>
+                       <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">linear_op</span><span class="p">(</span><span class="n">v</span><span class="p">)))</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">residual</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+    <span class="n">numIters</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="n">xk</span><span class="p">):</span>
+        <span class="k">nonlocal</span> <span class="n">numIters</span>
+        <span class="n">numIters</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">relTol</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">relative_gmres_tol</span>
+    <span class="n">maxIters</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">max_gmres_iters</span>
+    
+    <span class="k">if</span> <span class="n">precond</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Another copy to a plain numpy array, see comment for A above.</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">LinearOperator</span><span class="p">((</span><span class="n">sz</span><span class="p">,</span><span class="n">sz</span><span class="p">),</span>
+                           <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">precond</span><span class="p">(</span><span class="n">v</span><span class="p">)))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="kc">None</span>
+        
+    <span class="n">dx</span><span class="p">,</span> <span class="n">exitcode</span> <span class="o">=</span> <span class="n">gmres</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="n">relTol</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">callback_type</span><span class="o">=</span><span class="s1">&#39;legacy&#39;</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="n">maxIters</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of GMRES iters = &#39;</span><span class="p">,</span> <span class="n">numIters</span><span class="p">)</span>
+        
+    <span class="k">return</span> <span class="o">-</span><span class="n">dx</span><span class="p">,</span> <span class="n">exitcode</span></div>
+
+
+
+<div class="viewcode-block" id="globalized_newton_step">
+<a class="viewcode-back" href="../../optimism.html#optimism.NewtonSolver.globalized_newton_step">[docs]</a>
+<span class="k">def</span> <span class="nf">globalized_newton_step</span><span class="p">(</span><span class="n">residual</span><span class="p">,</span> <span class="n">linear_op</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">etak</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">maxLinesearchIters</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">precond</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">r0</span> <span class="o">=</span> <span class="n">residual</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">rEnergy0</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">r0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    
+    <span class="n">s</span><span class="p">,</span> <span class="n">exitcode</span> <span class="o">=</span> <span class="n">newton_step</span><span class="p">(</span><span class="n">residual</span><span class="p">,</span> <span class="n">linear_op</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">precond</span><span class="o">=</span><span class="n">precond</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">exitcode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Failed to solve linearized newton step with gmres&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+    
+    <span class="n">rN</span> <span class="o">=</span> <span class="n">residual</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">s</span><span class="p">)</span>
+    <span class="n">rEnergyN</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">rN</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    
+    <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">maxLinesearchIters</span><span class="p">):</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;linesearch iter = &#39;</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
+        
+        <span class="n">minImprove</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">-</span><span class="n">t</span><span class="o">*</span><span class="p">(</span><span class="mf">1.0</span><span class="o">-</span><span class="n">etak</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rEnergyN</span> <span class="o">&lt;</span> <span class="n">minImprove</span><span class="o">*</span><span class="n">rEnergy0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">s</span>
+
+        <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">residual</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">t</span><span class="o">*</span><span class="n">s</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">r</span><span class="nd">@r</span>
+        
+        <span class="n">drEnergy0</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">energy</span><span class="p">)(</span><span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">drEnergy0</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">:</span> <span class="k">return</span> <span class="mf">0.0</span>
+        
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">compute_min_p</span><span class="p">([</span><span class="n">rEnergy0</span><span class="p">,</span> <span class="n">rEnergyN</span><span class="p">,</span> <span class="n">drEnergy0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+        
+        <span class="n">s</span> <span class="o">*=</span> <span class="n">theta</span>
+        <span class="n">etak</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">-</span><span class="n">theta</span><span class="o">*</span><span class="p">(</span><span class="mf">1.0</span><span class="o">-</span><span class="n">etak</span><span class="p">)</span>
+        
+        <span class="n">rN</span> <span class="o">=</span> <span class="n">residual</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">s</span><span class="p">)</span>
+        <span class="n">rEnergyN</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">rN</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+
+        <span class="c1">#raise NameError(&quot;Exceeded the maximum number of linesearch cutback tried.&quot;)</span>
+        
+    <span class="k">return</span> <span class="mf">0.0</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

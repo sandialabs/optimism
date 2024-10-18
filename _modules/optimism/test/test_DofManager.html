@@ -1,0 +1,181 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.test.test_DofManager &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.test.test_DofManager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.test.test_DofManager</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">FunctionSpace</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">QuadratureRule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">MeshFixture</span>
+
+
+
+<div class="viewcode-block" id="DofManagerTest">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_DofManager.DofManagerTest">[docs]</a>
+<span class="k">class</span> <span class="nc">DofManagerTest</span><span class="p">(</span><span class="n">MeshFixture</span><span class="o">.</span><span class="n">MeshFixture</span><span class="p">):</span>
+    
+<div class="viewcode-block" id="DofManagerTest.setUp">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_DofManager.DofManagerTest.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Nx</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ny</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">xRange</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]</span>
+        <span class="n">yRange</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]</span>
+        
+        <span class="c1">#self.targetDispGrad = np.array([[0.1, -0.2],[0.4, -0.1]]) </span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_mesh_and_disp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ny</span><span class="p">,</span> <span class="n">xRange</span><span class="p">,</span> <span class="n">yRange</span><span class="p">,</span>
+                                                 <span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="mi">0</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="n">quadRule</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">create_quadrature_rule_on_triangle</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">construct_function_space</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">)</span>
+        <span class="n">ebcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">FunctionSpace</span><span class="o">.</span><span class="n">EssentialBC</span><span class="p">(</span><span class="n">nodeSet</span><span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">EssentialBC</span><span class="p">(</span><span class="n">nodeSet</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nNodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nx</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Ny</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nFields</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">DofManager</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nFields</span><span class="p">,</span> <span class="n">ebcs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nDof</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nFields</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">nNodes</span>
+        <span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nNodes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nFields</span><span class="p">))</span>
+        <span class="n">U</span> <span class="o">=</span> <span class="n">U</span><span class="o">.</span><span class="n">at</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">U</span> <span class="o">=</span> <span class="n">U</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodeSets</span><span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">],</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">=</span> <span class="n">U</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodeSets</span><span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">],</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mf">3.0</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="DofManagerTest.test_get_bc_size">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_DofManager.DofManagerTest.test_get_bc_size">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_get_bc_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># number of dofs from top, field 0</span>
+        <span class="n">nEbcs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nx</span>
+        <span class="c1"># number of dofs from right, field 1</span>
+        <span class="n">nEbcs</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ny</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">get_bc_size</span><span class="p">(),</span> <span class="n">nEbcs</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="DofManagerTest.test_get_unknown_size">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_DofManager.DofManagerTest.test_get_unknown_size">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_get_unknown_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># number of dofs from top, field 0</span>
+        <span class="n">nEbcs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nx</span>
+        <span class="c1"># number of dofs from right, field 1</span>
+        <span class="n">nEbcs</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ny</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">get_unknown_size</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">nDof</span> <span class="o">-</span> <span class="n">nEbcs</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="DofManagerTest.test_slice_unknowns_with_dof_indices">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_DofManager.DofManagerTest.test_slice_unknowns_with_dof_indices">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_slice_unknowns_with_dof_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">Uu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">get_unknown_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">)</span>
+        <span class="n">Uu_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">slice_unknowns_with_dof_indices</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span><span class="mi">0</span><span class="p">)</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayEqual</span><span class="p">(</span><span class="n">Uu_x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Nx</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ny</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+        <span class="n">Uu_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">slice_unknowns_with_dof_indices</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayEqual</span><span class="p">(</span><span class="n">Uu_y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ny</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Nx</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span></div>
+</div>
+
+        
+        
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">MeshFixture</span><span class="o">.</span><span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

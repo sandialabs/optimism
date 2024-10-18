@@ -1,0 +1,283 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.ScalarRootFind &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.ScalarRootFind</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.ScalarRootFind</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">SolutionInfo</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;SolutionInfo&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;converged&#39;</span><span class="p">,</span> <span class="s1">&#39;iterations&#39;</span><span class="p">,</span> <span class="s1">&#39;function_calls&#39;</span><span class="p">,</span> <span class="s1">&#39;residual_norm&#39;</span><span class="p">,</span> <span class="s1">&#39;correction_norm&#39;</span><span class="p">])</span>
+
+<span class="n">Settings</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Settings&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;max_iters&#39;</span><span class="p">,</span> <span class="s1">&#39;x_tol&#39;</span><span class="p">,</span> <span class="s1">&#39;r_tol&#39;</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="get_settings">
+<a class="viewcode-back" href="../../optimism.html#optimism.ScalarRootFind.get_settings">[docs]</a>
+<span class="k">def</span> <span class="nf">get_settings</span><span class="p">(</span><span class="n">max_iters</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">x_tol</span><span class="o">=</span><span class="mf">1e-13</span><span class="p">,</span> <span class="n">r_tol</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get numerical settings for the root finder.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ==========</span>
+<span class="sd">    max_iters : int</span>
+<span class="sd">        Maximum number of iterations to use in search</span>
+<span class="sd">    x_tol : real</span>
+<span class="sd">        Tolerance on independent variable for convergence. The root finder will</span>
+<span class="sd">        terminate when the independent variable changes by less than `x_tol` in</span>
+<span class="sd">        an iteration.</span>
+<span class="sd">    r_tol : real</span>
+<span class="sd">        Tolerance on absolute value of residual for convergence.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    =======</span>
+<span class="sd">    settings : A Settings object, which can be used in `find_root`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Settings</span><span class="p">(</span><span class="n">max_iters</span><span class="p">,</span> <span class="n">x_tol</span><span class="p">,</span> <span class="n">r_tol</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="find_root">
+<a class="viewcode-back" href="../../optimism.html#optimism.ScalarRootFind.find_root">[docs]</a>
+<span class="k">def</span> <span class="nf">find_root</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">bracket</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find a root of a nonlinear scalar-valued equation.</span>
+
+<span class="sd">    Uses Newton&#39;s method, safeguarded with bisection.</span>
+<span class="sd">    See rtsafe(...) from Numerical Recipes. This function is differentiable</span>
+<span class="sd">    using Jax transforms, and can be compsed with `vmap` and `jit`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ==========</span>
+<span class="sd">    f : callable</span>
+<span class="sd">        Scalar function of which to find a root.</span>
+<span class="sd">    x0 : real</span>
+<span class="sd">        Initial guess for root. The value of x0 should be within the range</span>
+<span class="sd">        defined by bracket. If not, the initial guess will be automatically</span>
+<span class="sd">        clipped to the nearest bound.</span>
+<span class="sd">    bracket : sequence of 2 reals (list, tuple, numpy array, etc)</span>
+<span class="sd">        Upper and lower bounds for the root search. The existence of a</span>
+<span class="sd">        root is inferred by checking that the values of `f` at both brackets</span>
+<span class="sd">        do not have the same sign. If this check fails, `nan` is returned.</span>
+<span class="sd">    settings : A settings object from this module</span>
+<span class="sd">        Algorithmic settings.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    =======</span>
+<span class="sd">    x : real (or nan)</span>
+<span class="sd">        Argument of f such that f(x) = 0 (within provided tolerance). If the</span>
+<span class="sd">        root is not bracketed, `nan` is returned.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">custom_root</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">F</span><span class="p">,</span> <span class="n">X0</span><span class="p">:</span> <span class="n">rtsafe_</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">X0</span><span class="p">,</span> <span class="n">bracket</span><span class="p">,</span> <span class="n">settings</span><span class="p">),</span>
+                               <span class="k">lambda</span> <span class="n">g</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">y</span><span class="o">/</span><span class="n">g</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">has_aux</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="rtsafe_">
+<a class="viewcode-back" href="../../optimism.html#optimism.ScalarRootFind.rtsafe_">[docs]</a>
+<span class="k">def</span> <span class="nf">rtsafe_</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">bracket</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+    <span class="c1"># Find root of a scalar function</span>
+    <span class="c1"># Newton&#39;s method, safeguarded with bisection</span>
+    <span class="c1"># from Numerical Recipes</span>
+
+    <span class="n">max_iters</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">max_iters</span>
+    <span class="n">x_tol</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">x_tol</span>
+    <span class="n">r_tol</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">r_tol</span>
+
+    <span class="n">f_and_fprime</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">value_and_grad</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="n">converged</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">fl</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">bracket</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">fh</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">bracket</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">functionCalls</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="c1"># Fix initial guess if outside bracket.</span>
+    <span class="c1"># Must do this before the steps that change the initial guess</span>
+    <span class="c1"># as a means to exit early (ie, root bracketing check and </span>
+    <span class="c1"># testing bracket values as solutions).</span>
+    <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">bracket</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bracket</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># check that root is bracketed</span>
+    <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">fl</span><span class="o">*</span><span class="n">fh</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">,</span>
+                  <span class="n">x0</span><span class="p">,</span>
+                  <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+    <span class="c1"># Check if either bracket is a root</span>
+    <span class="n">leftBracketIsSolution</span> <span class="o">=</span> <span class="p">(</span><span class="n">fl</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">leftBracketIsSolution</span><span class="p">,</span> <span class="n">bracket</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x0</span><span class="p">)</span>
+    <span class="n">converged</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">leftBracketIsSolution</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">converged</span><span class="p">)</span>
+
+    <span class="n">rightBracketIsSolution</span> <span class="o">=</span> <span class="p">(</span><span class="n">fh</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">rightBracketIsSolution</span><span class="p">,</span> <span class="n">bracket</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x0</span><span class="p">)</span>
+    <span class="n">converged</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">rightBracketIsSolution</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">converged</span><span class="p">)</span>
+
+    <span class="c1"># ORIENT THE SEARCH SO THAT F(XL) &lt; 0.</span>
+    <span class="n">xl</span><span class="p">,</span> <span class="n">xh</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">cond</span><span class="p">(</span><span class="n">fl</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span>
+                          <span class="k">lambda</span> <span class="n">b</span><span class="p">:</span> <span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                          <span class="k">lambda</span> <span class="n">b</span><span class="p">:</span> <span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                          <span class="n">bracket</span><span class="p">)</span>
+
+    <span class="c1"># INITIALIZE THE &#39;&#39;STEP SIZE BEFORE LAST&#39;&#39;, AND THE LAST STEP</span>
+    <span class="n">dxOld</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">bracket</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">bracket</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">dxOld</span>
+
+    <span class="n">F</span><span class="p">,</span> <span class="n">DF</span> <span class="o">=</span> <span class="n">f_and_fprime</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+    <span class="n">functionCalls</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">cond</span><span class="p">(</span><span class="n">carry</span><span class="p">):</span>
+        <span class="n">root</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dxOld</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">DF</span><span class="p">,</span> <span class="n">xl</span><span class="p">,</span> <span class="n">xh</span><span class="p">,</span> <span class="n">converged</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="n">carry</span>
+        <span class="n">keepLooping</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">converged</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">max_iters</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">keepLooping</span>
+
+    <span class="k">def</span> <span class="nf">loop_body</span><span class="p">(</span><span class="n">carry</span><span class="p">):</span>
+        <span class="n">root</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dxOld</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">DF</span><span class="p">,</span> <span class="n">xl</span><span class="p">,</span> <span class="n">xh</span><span class="p">,</span> <span class="n">converged</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="n">carry</span>
+        
+        <span class="n">newtonOutOfRange</span> <span class="o">=</span> <span class="p">((</span><span class="n">root</span> <span class="o">-</span> <span class="n">xh</span><span class="p">)</span><span class="o">*</span><span class="n">DF</span> <span class="o">-</span> <span class="n">F</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="n">root</span> <span class="o">-</span> <span class="n">xl</span><span class="p">)</span><span class="o">*</span><span class="n">DF</span> <span class="o">-</span> <span class="n">F</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="n">newtonDecreasingSlowly</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">F</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dxOld</span><span class="o">*</span><span class="n">DF</span><span class="p">)</span>
+        <span class="n">dxOld</span> <span class="o">=</span> <span class="n">dx</span>
+        <span class="n">root</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">converged</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">cond</span><span class="p">(</span><span class="n">newtonOutOfRange</span> <span class="o">|</span> <span class="n">newtonDecreasingSlowly</span><span class="p">,</span>
+                                           <span class="n">bisection_step</span><span class="p">,</span>
+                                           <span class="n">newton_step</span><span class="p">,</span>
+                                           <span class="n">root</span><span class="p">,</span> <span class="n">xl</span><span class="p">,</span> <span class="n">xh</span><span class="p">,</span> <span class="n">DF</span><span class="p">,</span> <span class="n">F</span><span class="p">)</span>
+
+        <span class="n">F</span><span class="p">,</span> <span class="n">DF</span> <span class="o">=</span> <span class="n">f_and_fprime</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+
+        <span class="c1"># MAINTAIN THE BRACKET ON THE ROOT</span>
+        <span class="n">xl</span><span class="p">,</span><span class="n">xh</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">cond</span><span class="p">(</span><span class="n">F</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span>
+                             <span class="k">lambda</span> <span class="n">rt</span><span class="p">,</span> <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span><span class="p">:</span> <span class="p">(</span><span class="n">rt</span><span class="p">,</span> <span class="n">hi</span><span class="p">),</span>
+                             <span class="k">lambda</span> <span class="n">rt</span><span class="p">,</span> <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span><span class="p">:</span> <span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">rt</span><span class="p">),</span>
+                             <span class="n">root</span><span class="p">,</span> <span class="n">xl</span><span class="p">,</span> <span class="n">xh</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">converged</span> <span class="o">=</span> <span class="n">converged</span> <span class="o">|</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">x_tol</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">F</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">r_tol</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">root</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dxOld</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">DF</span><span class="p">,</span> <span class="n">xl</span><span class="p">,</span> <span class="n">xh</span><span class="p">,</span> <span class="n">converged</span><span class="p">,</span> <span class="n">i</span>
+
+    <span class="n">x</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">converged</span><span class="p">,</span> <span class="n">iters</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">lax</span><span class="o">.</span><span class="n">while_loop</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span>
+                                                                <span class="n">loop_body</span><span class="p">,</span>
+                                                                <span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dxOld</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">DF</span><span class="p">,</span> <span class="n">xl</span><span class="p">,</span> <span class="n">xh</span><span class="p">,</span> <span class="n">converged</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">converged</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">SolutionInfo</span><span class="p">(</span><span class="n">converged</span><span class="o">=</span><span class="n">converged</span><span class="p">,</span> <span class="n">function_calls</span><span class="o">=</span><span class="n">functionCalls</span><span class="p">,</span>
+                           <span class="n">iterations</span><span class="o">=</span><span class="n">iters</span><span class="p">,</span> <span class="n">residual_norm</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">F</span><span class="p">),</span> <span class="n">correction_norm</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="bisection_step">
+<a class="viewcode-back" href="../../optimism.html#optimism.ScalarRootFind.bisection_step">[docs]</a>
+<span class="k">def</span> <span class="nf">bisection_step</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">xl</span><span class="p">,</span> <span class="n">xh</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">xh</span> <span class="o">-</span> <span class="n">xl</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">xl</span> <span class="o">+</span> <span class="n">dx</span>
+    <span class="n">converged</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">xl</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">converged</span></div>
+
+
+
+<div class="viewcode-block" id="newton_step">
+<a class="viewcode-back" href="../../optimism.html#optimism.ScalarRootFind.newton_step">[docs]</a>
+<span class="k">def</span> <span class="nf">newton_step</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">xl</span><span class="p">,</span> <span class="n">xh</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="o">-</span><span class="n">f</span><span class="o">/</span><span class="n">df</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">x</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">dx</span>
+    <span class="n">converged</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">temp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">converged</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

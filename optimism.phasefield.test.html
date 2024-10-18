@@ -1,0 +1,453 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.phasefield.test package &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="optimism.test package" href="optimism.test.html" />
+    <link rel="prev" title="optimism.phasefield package" href="optimism.phasefield.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">optimism</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="optimism.html">optimism package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="optimism.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html">optimism.contact package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html">optimism.material package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="optimism.phasefield.html">optimism.phasefield package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html">optimism.test package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.AlSolver">optimism.AlSolver module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.BoundConstrainedObjective">optimism.BoundConstrainedObjective module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.BoundConstrainedSolver">optimism.BoundConstrainedSolver module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.ConstrainedObjective">optimism.ConstrainedObjective module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.EquationSolver">optimism.EquationSolver module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.EquationSolverSubspace">optimism.EquationSolverSubspace module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.FunctionSpace">optimism.FunctionSpace module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism-incompletecholesky-module">optimism.IncompleteCholesky module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Interpolants">optimism.Interpolants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.J2PlasticPhaseField">optimism.J2PlasticPhaseField module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.JaxConfig">optimism.JaxConfig module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.LU">optimism.LU module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.LinAlg">optimism.LinAlg module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Math">optimism.Math module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Mechanics">optimism.Mechanics module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Mesh">optimism.Mesh module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.MeshPlot">optimism.MeshPlot module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.MinimizeScalar">optimism.MinimizeScalar module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.NewtonSolver">optimism.NewtonSolver module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Objective">optimism.Objective module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.QuadratureRule">optimism.QuadratureRule module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.ReadExodusMesh">optimism.ReadExodusMesh module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.ReadMesh">optimism.ReadMesh module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.ScalarRootFind">optimism.ScalarRootFind module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.SmoothFunctions">optimism.SmoothFunctions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.SparseCholesky">optimism.SparseCholesky module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.SparseMatrixAssembler">optimism.SparseMatrixAssembler module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Surface">optimism.Surface module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.TensorMath">optimism.TensorMath module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Timer">optimism.Timer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.TrustRegionSPG">optimism.TrustRegionSPG module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.VTKWriter">optimism.VTKWriter module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.WarmStart">optimism.WarmStart module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="optimism.html">optimism package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="optimism.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="optimism.contact.html">optimism.contact package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.material.html">optimism.material package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="optimism.phasefield.html">optimism.phasefield package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="optimism.phasefield.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html#module-optimism.phasefield.MaterialPointSimulator">optimism.phasefield.MaterialPointSimulator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html#module-optimism.phasefield.PhaseField">optimism.phasefield.PhaseField module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html#optimism-phasefield-phasefieldclassic-module">optimism.phasefield.PhaseFieldClassic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html#module-optimism.phasefield.PhaseFieldLorentzPlastic">optimism.phasefield.PhaseFieldLorentzPlastic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html#module-optimism.phasefield.PhaseFieldMaterialModel">optimism.phasefield.PhaseFieldMaterialModel module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html#module-optimism.phasefield.PhaseFieldThreshold">optimism.phasefield.PhaseFieldThreshold module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html#module-optimism.phasefield.PhaseFieldThresholdPlastic">optimism.phasefield.PhaseFieldThresholdPlastic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html#module-optimism.phasefield">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.test.html">optimism.test package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.AlSolver">optimism.AlSolver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.BoundConstrainedObjective">optimism.BoundConstrainedObjective module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.BoundConstrainedSolver">optimism.BoundConstrainedSolver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.ConstrainedObjective">optimism.ConstrainedObjective module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.EquationSolver">optimism.EquationSolver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.EquationSolverSubspace">optimism.EquationSolverSubspace module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.FunctionSpace">optimism.FunctionSpace module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#optimism-incompletecholesky-module">optimism.IncompleteCholesky module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Interpolants">optimism.Interpolants module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.J2PlasticPhaseField">optimism.J2PlasticPhaseField module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.JaxConfig">optimism.JaxConfig module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.LU">optimism.LU module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.LinAlg">optimism.LinAlg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Math">optimism.Math module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Mechanics">optimism.Mechanics module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Mesh">optimism.Mesh module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.MeshPlot">optimism.MeshPlot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.MinimizeScalar">optimism.MinimizeScalar module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.NewtonSolver">optimism.NewtonSolver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Objective">optimism.Objective module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.QuadratureRule">optimism.QuadratureRule module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.ReadExodusMesh">optimism.ReadExodusMesh module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.ReadMesh">optimism.ReadMesh module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.ScalarRootFind">optimism.ScalarRootFind module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.SmoothFunctions">optimism.SmoothFunctions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.SparseCholesky">optimism.SparseCholesky module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.SparseMatrixAssembler">optimism.SparseMatrixAssembler module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Surface">optimism.Surface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.TensorMath">optimism.TensorMath module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Timer">optimism.Timer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.TrustRegionSPG">optimism.TrustRegionSPG module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.VTKWriter">optimism.VTKWriter module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.WarmStart">optimism.WarmStart module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">optimism</a></li>
+          <li class="breadcrumb-item"><a href="optimism.html">optimism package</a></li>
+          <li class="breadcrumb-item"><a href="optimism.phasefield.html">optimism.phasefield package</a></li>
+      <li class="breadcrumb-item active">optimism.phasefield.test package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/optimism.phasefield.test.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="optimism-phasefield-test-package">
+<h1>optimism.phasefield.test package<a class="headerlink" href="#optimism-phasefield-test-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-optimism.phasefield.test.plotPhaseFieldThresholdModel">
+<span id="optimism-phasefield-test-plotphasefieldthresholdmodel-module"></span><h2>optimism.phasefield.test.plotPhaseFieldThresholdModel module<a class="headerlink" href="#module-optimism.phasefield.test.plotPhaseFieldThresholdModel" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.phasefield.test.plotPhaseFieldThresholdModel.PhaseFieldThresholdUniaxialFixture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.phasefield.test.plotPhaseFieldThresholdModel.</span></span><span class="sig-name descname"><span class="pre">PhaseFieldThresholdUniaxialFixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/plotPhaseFieldThresholdModel.html#PhaseFieldThresholdUniaxialFixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.plotPhaseFieldThresholdModel.PhaseFieldThresholdUniaxialFixture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.plotPhaseFieldThresholdModel.PhaseFieldThresholdUniaxialFixture.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/plotPhaseFieldThresholdModel.html#PhaseFieldThresholdUniaxialFixture.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.plotPhaseFieldThresholdModel.PhaseFieldThresholdUniaxialFixture.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.plotPhaseFieldThresholdModel.PhaseFieldThresholdUniaxialFixture.testUniaxial">
+<span class="sig-name descname"><span class="pre">testUniaxial</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/plotPhaseFieldThresholdModel.html#PhaseFieldThresholdUniaxialFixture.testUniaxial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.plotPhaseFieldThresholdModel.PhaseFieldThresholdUniaxialFixture.testUniaxial" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="optimism-phasefield-test-plotsandiamodeluniaxial-module">
+<h2>optimism.phasefield.test.plotSandiaModelUniaxial module<a class="headerlink" href="#optimism-phasefield-test-plotsandiamodeluniaxial-module" title="Link to this heading"></a></h2>
+</section>
+<section id="module-optimism.phasefield.test.test_PhaseFieldLorentzPlastic">
+<span id="optimism-phasefield-test-test-phasefieldlorentzplastic-module"></span><h2>optimism.phasefield.test.test_PhaseFieldLorentzPlastic module<a class="headerlink" href="#module-optimism.phasefield.test.test_PhaseFieldLorentzPlastic" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.phasefield.test.test_PhaseFieldLorentzPlastic.</span></span><span class="sig-name descname"><span class="pre">GradOfPlasticPhaseFieldModelFixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldLorentzPlastic.html#GradOfPlasticPhaseFieldModelFixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldLorentzPlastic.html#GradOfPlasticPhaseFieldModelFixture.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_elastic_energy">
+<span class="sig-name descname"><span class="pre">test_elastic_energy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldLorentzPlastic.html#GradOfPlasticPhaseFieldModelFixture.test_elastic_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_elastic_energy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_plastic_stress">
+<span class="sig-name descname"><span class="pre">test_plastic_stress</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldLorentzPlastic.html#GradOfPlasticPhaseFieldModelFixture.test_plastic_stress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_plastic_stress" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_rotation_invariance">
+<span class="sig-name descname"><span class="pre">test_rotation_invariance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldLorentzPlastic.html#GradOfPlasticPhaseFieldModelFixture.test_rotation_invariance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_rotation_invariance" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_zero_point">
+<span class="sig-name descname"><span class="pre">test_zero_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldLorentzPlastic.html#GradOfPlasticPhaseFieldModelFixture.test_zero_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_zero_point" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch">
+<span id="optimism-phasefield-test-test-phasefieldlorentzplasticpatch-module"></span><h2>optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch module<a class="headerlink" href="#module-optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.</span></span><span class="sig-name descname"><span class="pre">TestSingleMeshFixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldLorentzPlasticPatch.html#TestSingleMeshFixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.MeshFixture.MeshFixture" title="optimism.test.MeshFixture.MeshFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeshFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture.no_test_uniaxial">
+<span class="sig-name descname"><span class="pre">no_test_uniaxial</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldLorentzPlasticPatch.html#TestSingleMeshFixture.no_test_uniaxial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture.no_test_uniaxial" title="Link to this definition"></a></dt>
+<dd><p>Restore this test to see the uniaxial stress response</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldLorentzPlasticPatch.html#TestSingleMeshFixture.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture.test_constrained_hessian">
+<span class="sig-name descname"><span class="pre">test_constrained_hessian</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldLorentzPlasticPatch.html#TestSingleMeshFixture.test_constrained_hessian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture.test_constrained_hessian" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture.test_patch_test">
+<span class="sig-name descname"><span class="pre">test_patch_test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldLorentzPlasticPatch.html#TestSingleMeshFixture.test_patch_test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture.test_patch_test" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture.test_sparse_hessian_at_nonzero_phase">
+<span class="sig-name descname"><span class="pre">test_sparse_hessian_at_nonzero_phase</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldLorentzPlasticPatch.html#TestSingleMeshFixture.test_sparse_hessian_at_nonzero_phase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture.test_sparse_hessian_at_nonzero_phase" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture.test_sparse_hessian_at_zero_phase">
+<span class="sig-name descname"><span class="pre">test_sparse_hessian_at_zero_phase</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldLorentzPlasticPatch.html#TestSingleMeshFixture.test_sparse_hessian_at_zero_phase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldLorentzPlasticPatch.TestSingleMeshFixture.test_sparse_hessian_at_zero_phase" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optimism.phasefield.test.test_PhaseFieldThreshold">
+<span id="optimism-phasefield-test-test-phasefieldthreshold-module"></span><h2>optimism.phasefield.test.test_PhaseFieldThreshold module<a class="headerlink" href="#module-optimism.phasefield.test.test_PhaseFieldThreshold" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldThreshold.PhaseFieldThresholdModelFixture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.phasefield.test.test_PhaseFieldThreshold.</span></span><span class="sig-name descname"><span class="pre">PhaseFieldThresholdModelFixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldThreshold.html#PhaseFieldThresholdModelFixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldThreshold.PhaseFieldThresholdModelFixture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldThreshold.PhaseFieldThresholdModelFixture.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldThreshold.html#PhaseFieldThresholdModelFixture.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldThreshold.PhaseFieldThresholdModelFixture.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldThreshold.PhaseFieldThresholdModelFixture.test_rotation_invariance">
+<span class="sig-name descname"><span class="pre">test_rotation_invariance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldThreshold.html#PhaseFieldThresholdModelFixture.test_rotation_invariance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldThreshold.PhaseFieldThresholdModelFixture.test_rotation_invariance" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldThreshold.PhaseFieldThresholdModelFixture.test_uniaxial_energy">
+<span class="sig-name descname"><span class="pre">test_uniaxial_energy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldThreshold.html#PhaseFieldThresholdModelFixture.test_uniaxial_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldThreshold.PhaseFieldThresholdModelFixture.test_uniaxial_energy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldThreshold.PhaseFieldThresholdModelFixture.test_zero_point">
+<span class="sig-name descname"><span class="pre">test_zero_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldThreshold.html#PhaseFieldThresholdModelFixture.test_zero_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldThreshold.PhaseFieldThresholdModelFixture.test_zero_point" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optimism.phasefield.test.test_PhaseFieldThresholdPatch">
+<span id="optimism-phasefield-test-test-phasefieldthresholdpatch-module"></span><h2>optimism.phasefield.test.test_PhaseFieldThresholdPatch module<a class="headerlink" href="#module-optimism.phasefield.test.test_PhaseFieldThresholdPatch" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.phasefield.test.test_PhaseFieldThresholdPatch.</span></span><span class="sig-name descname"><span class="pre">TestSingleMeshFixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldThresholdPatch.html#TestSingleMeshFixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.MeshFixture.MeshFixture" title="optimism.test.MeshFixture.MeshFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeshFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldThresholdPatch.html#TestSingleMeshFixture.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.test_constrained_hessian">
+<span class="sig-name descname"><span class="pre">test_constrained_hessian</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldThresholdPatch.html#TestSingleMeshFixture.test_constrained_hessian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.test_constrained_hessian" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.test_patch_test">
+<span class="sig-name descname"><span class="pre">test_patch_test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldThresholdPatch.html#TestSingleMeshFixture.test_patch_test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.test_patch_test" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.test_sparse_hessian_at_nonzero_phase">
+<span class="sig-name descname"><span class="pre">test_sparse_hessian_at_nonzero_phase</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldThresholdPatch.html#TestSingleMeshFixture.test_sparse_hessian_at_nonzero_phase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.test_sparse_hessian_at_nonzero_phase" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.test_sparse_hessian_at_zero_phase">
+<span class="sig-name descname"><span class="pre">test_sparse_hessian_at_zero_phase</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldThresholdPatch.html#TestSingleMeshFixture.test_sparse_hessian_at_zero_phase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.test_sparse_hessian_at_zero_phase" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optimism.phasefield.test.test_PhaseFieldThresholdPlastic">
+<span id="optimism-phasefield-test-test-phasefieldthresholdplastic-module"></span><h2>optimism.phasefield.test.test_PhaseFieldThresholdPlastic module<a class="headerlink" href="#module-optimism.phasefield.test.test_PhaseFieldThresholdPlastic" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.phasefield.test.test_PhaseFieldThresholdPlastic.</span></span><span class="sig-name descname"><span class="pre">GradOfPlasticPhaseFieldModelFixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldThresholdPlastic.html#GradOfPlasticPhaseFieldModelFixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture.no_test_plastic_strain_path">
+<span class="sig-name descname"><span class="pre">no_test_plastic_strain_path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldThresholdPlastic.html#GradOfPlasticPhaseFieldModelFixture.no_test_plastic_strain_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture.no_test_plastic_strain_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldThresholdPlastic.html#GradOfPlasticPhaseFieldModelFixture.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture.test_elastic_energy">
+<span class="sig-name descname"><span class="pre">test_elastic_energy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldThresholdPlastic.html#GradOfPlasticPhaseFieldModelFixture.test_elastic_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture.test_elastic_energy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture.test_plastic_stress">
+<span class="sig-name descname"><span class="pre">test_plastic_stress</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldThresholdPlastic.html#GradOfPlasticPhaseFieldModelFixture.test_plastic_stress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture.test_plastic_stress" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture.test_rotation_invariance">
+<span class="sig-name descname"><span class="pre">test_rotation_invariance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldThresholdPlastic.html#GradOfPlasticPhaseFieldModelFixture.test_rotation_invariance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture.test_rotation_invariance" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture.test_zero_point">
+<span class="sig-name descname"><span class="pre">test_zero_point</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldThresholdPlastic.html#GradOfPlasticPhaseFieldModelFixture.test_zero_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture.test_zero_point" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optimism.phasefield.test.test_PhaseFieldUniaxial">
+<span id="optimism-phasefield-test-test-phasefielduniaxial-module"></span><h2>optimism.phasefield.test.test_PhaseFieldUniaxial module<a class="headerlink" href="#module-optimism.phasefield.test.test_PhaseFieldUniaxial" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldUniaxial.PhaseFieldUniaxialFixture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.phasefield.test.test_PhaseFieldUniaxial.</span></span><span class="sig-name descname"><span class="pre">PhaseFieldUniaxialFixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldUniaxial.html#PhaseFieldUniaxialFixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldUniaxial.PhaseFieldUniaxialFixture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldUniaxial.PhaseFieldUniaxialFixture.testUniaxial">
+<span class="sig-name descname"><span class="pre">testUniaxial</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldUniaxial.html#PhaseFieldUniaxialFixture.testUniaxial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldUniaxial.PhaseFieldUniaxialFixture.testUniaxial" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldUniaxial.energy_density">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.test.test_PhaseFieldUniaxial.</span></span><span class="sig-name descname"><span class="pre">energy_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phaseGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">internalVariables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doUpdate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldUniaxial.html#energy_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldUniaxial.energy_density" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.phasefield.test.test_PhaseFieldUniaxial.update">
+<span class="sig-prename descclassname"><span class="pre">optimism.phasefield.test.test_PhaseFieldUniaxial.</span></span><span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phaseGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">internalVariables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/phasefield/test/test_PhaseFieldUniaxial.html#update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.phasefield.test.test_PhaseFieldUniaxial.update" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-optimism.phasefield.test">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-optimism.phasefield.test" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="optimism.phasefield.html" class="btn btn-neutral float-left" title="optimism.phasefield package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="optimism.test.html" class="btn btn-neutral float-right" title="optimism.test package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,649 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.Mechanics &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.Mechanics</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.Mechanics</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">SparseMatrixAssembler</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">FunctionSpace</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span> <span class="nn">optimism.TensorMath</span> <span class="kn">import</span> <span class="n">tensor_2D_to_3D</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">QuadratureRule</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Interpolants</span>
+
+<span class="n">MechanicsFunctions</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;MechanicsFunctions&#39;</span><span class="p">,</span>
+                                <span class="p">[</span><span class="s1">&#39;compute_strain_energy&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;compute_updated_internal_variables&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;compute_element_stiffnesses&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;compute_output_energy_densities_and_stresses&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;compute_initial_state&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;integrated_material_qoi&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;compute_output_material_qoi&#39;</span><span class="p">])</span>
+
+
+<span class="n">DynamicsFunctions</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;DynamicsFunctions&#39;</span><span class="p">,</span>
+                               <span class="p">[</span><span class="s1">&#39;compute_algorithmic_energy&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;compute_updated_internal_variables&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;compute_element_hessians&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;compute_output_energy_densities_and_stresses&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;compute_output_kinetic_energy&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;compute_output_strain_energy&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;compute_initial_state&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;compute_element_masses&#39;</span><span class="p">,</span> <span class="c1"># not used for time integration, provided for convenience (spectral analysis, eg)</span>
+                                <span class="s1">&#39;predict&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;correct&#39;</span><span class="p">])</span>
+
+<span class="n">NewmarkParameters</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;NewmarkParameters&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;gamma&#39;</span><span class="p">,</span> <span class="s1">&#39;beta&#39;</span><span class="p">],</span> <span class="n">defaults</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="plane_strain_gradient_transformation">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics.plane_strain_gradient_transformation">[docs]</a>
+<span class="k">def</span> <span class="nf">plane_strain_gradient_transformation</span><span class="p">(</span><span class="n">elemDispGrads</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">elemNodalDisps</span><span class="p">,</span> <span class="n">elemNodalCoords</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">vmap</span><span class="p">(</span><span class="n">tensor_2D_to_3D</span><span class="p">)(</span><span class="n">elemDispGrads</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="volume_average_J_gradient_transformation">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics.volume_average_J_gradient_transformation">[docs]</a>
+<span class="k">def</span> <span class="nf">volume_average_J_gradient_transformation</span><span class="p">(</span><span class="n">elemDispGrads</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">pShapes</span><span class="p">):</span>
+    <span class="n">defGrads</span> <span class="o">=</span> <span class="n">elemDispGrads</span><span class="p">[:,:</span><span class="mi">2</span><span class="p">,:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">Js</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">defGrads</span><span class="p">)</span>
+    
+    <span class="n">rhs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">elemVols</span><span class="o">*</span><span class="n">Js</span><span class="p">,</span> <span class="n">pShapes</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">pShapes</span><span class="o">.</span><span class="n">T</span><span class="nd">@np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">elemVols</span><span class="p">)</span><span class="nd">@pShapes</span>
+    <span class="n">nodalJBars</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span>
+    
+    <span class="n">JBars</span> <span class="o">=</span> <span class="n">pShapes</span><span class="nd">@nodalJBars</span>
+    <span class="n">factors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">JBars</span><span class="o">/</span><span class="n">Js</span><span class="p">)</span>
+    <span class="n">defGrads</span> <span class="o">=</span> <span class="n">vmap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">,</span> <span class="n">A</span><span class="p">:</span> <span class="n">c</span><span class="o">*</span><span class="n">A</span><span class="p">)(</span><span class="n">factors</span><span class="p">,</span> <span class="n">defGrads</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">defGrads</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="axisymmetric_gradient">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics.axisymmetric_gradient">[docs]</a>
+<span class="k">def</span> <span class="nf">axisymmetric_gradient</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">coord</span><span class="p">):</span>
+    <span class="n">dispGrad</span> <span class="o">=</span> <span class="n">tensor_2D_to_3D</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">)</span>
+    <span class="n">dispGrad</span> <span class="o">=</span> <span class="n">dispGrad</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">disp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">coord</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">dispGrad</span></div>
+
+
+
+<div class="viewcode-block" id="axisymmetric_element_gradient_transformation">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics.axisymmetric_element_gradient_transformation">[docs]</a>
+<span class="k">def</span> <span class="nf">axisymmetric_element_gradient_transformation</span><span class="p">(</span><span class="n">elemDispGrads</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">elemNodalDisps</span><span class="p">,</span> <span class="n">elemNodalCoords</span><span class="p">):</span>
+    <span class="n">elemPointDisps</span> <span class="o">=</span> <span class="n">elemShapes</span><span class="nd">@elemNodalDisps</span>
+    <span class="n">elemPointCoords</span> <span class="o">=</span> <span class="n">elemShapes</span><span class="nd">@elemNodalCoords</span>
+    <span class="k">return</span> <span class="n">vmap</span><span class="p">(</span><span class="n">axisymmetric_gradient</span><span class="p">)(</span><span class="n">elemDispGrads</span><span class="p">,</span> <span class="n">elemPointDisps</span><span class="p">,</span> <span class="n">elemPointCoords</span><span class="p">)</span></div>
+
+
+
+<span class="n">element_hess_func</span> <span class="o">=</span> <span class="n">hessian</span><span class="p">(</span><span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_element_from_local_field</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="compute_element_stiffness_from_global_fields">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics.compute_element_stiffness_from_global_fields">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_element_stiffness_from_global_fields</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">elInternals</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">elConn</span><span class="p">,</span> <span class="n">elShapes</span><span class="p">,</span> <span class="n">elShapeGrads</span><span class="p">,</span> <span class="n">elVols</span><span class="p">,</span> <span class="n">lagrangian_density</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">):</span>
+    <span class="n">elDisp</span> <span class="o">=</span> <span class="n">U</span><span class="p">[</span><span class="n">elConn</span><span class="p">,:]</span>
+    <span class="n">elCoords</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="n">elConn</span><span class="p">,:]</span>
+    <span class="k">return</span> <span class="n">element_hess_func</span><span class="p">(</span><span class="n">elDisp</span><span class="p">,</span> <span class="n">elCoords</span><span class="p">,</span> <span class="n">elInternals</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">elShapes</span><span class="p">,</span> <span class="n">elShapeGrads</span><span class="p">,</span>
+                             <span class="n">elVols</span><span class="p">,</span> <span class="n">lagrangian_density</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_compute_element_stiffnesses">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics._compute_element_stiffnesses">[docs]</a>
+<span class="k">def</span> <span class="nf">_compute_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">internals</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">functionSpace</span><span class="p">,</span> <span class="n">compute_energy_density</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">):</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">strain_energy_density_to_lagrangian_density</span><span class="p">(</span><span class="n">compute_energy_density</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span>  <span class="n">vmap</span><span class="p">(</span><span class="n">compute_element_stiffness_from_global_fields</span><span class="p">,</span>
+              <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="n">functionSpace</span>
+    <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">internals</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">shapes</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">shapeGrads</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">vols</span><span class="p">,</span>
+             <span class="n">L</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_compute_strain_energy">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics._compute_strain_energy">[docs]</a>
+<span class="k">def</span> <span class="nf">_compute_strain_energy</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">UField</span><span class="p">,</span> <span class="n">stateField</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span>
+                           <span class="n">compute_energy_density</span><span class="p">,</span>
+                           <span class="n">modify_element_gradient</span><span class="p">):</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">strain_energy_density_to_lagrangian_density</span><span class="p">(</span><span class="n">compute_energy_density</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">UField</span><span class="p">,</span> <span class="n">stateField</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span>
+                                              <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+                                              <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">modify_element_gradient</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_compute_strain_energy_multi_block">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics._compute_strain_energy_multi_block">[docs]</a>
+<span class="k">def</span> <span class="nf">_compute_strain_energy_multi_block</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">UField</span><span class="p">,</span> <span class="n">stateField</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">blockModels</span><span class="p">,</span>
+                                       <span class="n">modify_element_gradient</span><span class="p">):</span>
+    <span class="n">energy</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">blockKey</span> <span class="ow">in</span> <span class="n">blockModels</span><span class="p">:</span>
+        <span class="n">materialModel</span> <span class="o">=</span> <span class="n">blockModels</span><span class="p">[</span><span class="n">blockKey</span><span class="p">]</span>
+        <span class="n">elemIds</span> <span class="o">=</span> <span class="n">functionSpace</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">blockKey</span><span class="p">]</span>
+        
+        <span class="n">L</span> <span class="o">=</span> <span class="n">strain_energy_density_to_lagrangian_density</span><span class="p">(</span><span class="n">materialModel</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">)</span>
+        
+        <span class="n">blockEnergy</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">UField</span><span class="p">,</span> <span class="n">stateField</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span>
+                                                         <span class="n">elemIds</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">modify_element_gradient</span><span class="p">)</span>
+        
+        <span class="n">energy</span> <span class="o">+=</span> <span class="n">blockEnergy</span>
+    <span class="k">return</span> <span class="n">energy</span></div>
+
+
+
+<div class="viewcode-block" id="_compute_updated_internal_variables">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics._compute_updated_internal_variables">[docs]</a>
+<span class="k">def</span> <span class="nf">_compute_updated_internal_variables</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">compute_state_new</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">):</span>
+    <span class="n">dispGrads</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">compute_field_gradient</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span>
+    <span class="n">dgQuadPointRavel</span> <span class="o">=</span> <span class="n">dispGrads</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dispGrads</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">dispGrads</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="o">*</span><span class="n">dispGrads</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+    <span class="n">stQuadPointRavel</span> <span class="o">=</span> <span class="n">states</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">states</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">states</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="o">*</span><span class="n">states</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+    <span class="n">statesNew</span> <span class="o">=</span> <span class="n">vmap</span><span class="p">(</span><span class="n">compute_state_new</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">))(</span><span class="n">dgQuadPointRavel</span><span class="p">,</span> <span class="n">stQuadPointRavel</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">statesNew</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">states</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_compute_updated_internal_variables_multi_block">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics._compute_updated_internal_variables_multi_block">[docs]</a>
+<span class="k">def</span> <span class="nf">_compute_updated_internal_variables_multi_block</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">blockModels</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">):</span>
+    <span class="n">dispGrads</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">compute_field_gradient</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span>
+
+    <span class="n">statesNew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">states</span><span class="p">)</span>
+
+    <span class="c1"># # Store the same number of state variables for every material to make</span>
+    <span class="c1"># vmapping easy. See comment below in _compute_initial_state_multi_block</span>
+    <span class="n">numStateVariables</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">blockKey</span> <span class="ow">in</span> <span class="n">blockModels</span><span class="p">:</span>
+        <span class="n">numStateVariablesForBlock</span> <span class="o">=</span> <span class="n">blockModels</span><span class="p">[</span><span class="n">blockKey</span><span class="p">]</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">numStateVariables</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">numStateVariables</span><span class="p">,</span> <span class="n">numStateVariablesForBlock</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">blockKey</span> <span class="ow">in</span> <span class="n">blockModels</span><span class="p">:</span>
+        <span class="n">elemIds</span> <span class="o">=</span> <span class="n">functionSpace</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">blockKey</span><span class="p">]</span>
+        <span class="n">blockDispGrads</span> <span class="o">=</span> <span class="n">dispGrads</span><span class="p">[</span><span class="n">elemIds</span><span class="p">]</span>
+        <span class="n">blockStates</span> <span class="o">=</span> <span class="n">states</span><span class="p">[</span><span class="n">elemIds</span><span class="p">]</span>
+        
+        <span class="n">compute_state_new</span> <span class="o">=</span> <span class="n">blockModels</span><span class="p">[</span><span class="n">blockKey</span><span class="p">]</span><span class="o">.</span><span class="n">compute_state_new</span>
+        
+        <span class="n">dgQuadPointRavel</span> <span class="o">=</span> <span class="n">blockDispGrads</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">blockDispGrads</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">blockDispGrads</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="o">*</span><span class="n">blockDispGrads</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+        <span class="n">stQuadPointRavel</span> <span class="o">=</span> <span class="n">blockStates</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">blockStates</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">blockStates</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">blockStatesNew</span> <span class="o">=</span> <span class="n">vmap</span><span class="p">(</span><span class="n">compute_state_new</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">))(</span><span class="n">dgQuadPointRavel</span><span class="p">,</span> <span class="n">stQuadPointRavel</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">blockStates</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">statesNew</span> <span class="o">=</span> <span class="n">statesNew</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">elemIds</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:</span><span class="n">blockStatesNew</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">blockStatesNew</span><span class="p">)</span>
+        
+
+    <span class="k">return</span> <span class="n">statesNew</span></div>
+
+
+
+<div class="viewcode-block" id="_compute_initial_state_multi_block">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics._compute_initial_state_multi_block">[docs]</a>
+<span class="k">def</span> <span class="nf">_compute_initial_state_multi_block</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">blockModels</span><span class="p">):</span>
+
+    <span class="n">numQuadPoints</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">len</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">)</span>
+    <span class="c1"># Store the same number of state variables for every material to make</span>
+    <span class="c1"># vmapping easy.</span>
+    <span class="c1">#</span>
+    <span class="c1"># TODO(talamini1): Fix this so that every material only stores what it</span>
+    <span class="c1"># needs and doesn&#39;t waste memory.</span>
+    <span class="c1">#</span>
+    <span class="c1"># To do this, walk through each material and query number of state</span>
+    <span class="c1"># variables. Use max to allocate the global state variable array.</span>
+    <span class="n">numStateVariables</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">blockKey</span> <span class="ow">in</span> <span class="n">blockModels</span><span class="p">:</span>
+        <span class="n">numStateVariablesForBlock</span> <span class="o">=</span> <span class="n">blockModels</span><span class="p">[</span><span class="n">blockKey</span><span class="p">]</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">numStateVariables</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">numStateVariables</span><span class="p">,</span> <span class="n">numStateVariablesForBlock</span><span class="p">)</span>
+
+    <span class="n">initialState</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="p">),</span> <span class="n">numQuadPoints</span><span class="p">,</span> <span class="n">numStateVariables</span><span class="p">))</span>
+    
+    <span class="k">for</span> <span class="n">blockKey</span> <span class="ow">in</span> <span class="n">blockModels</span><span class="p">:</span>
+        <span class="n">elemIds</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">blockKey</span><span class="p">]</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">blockModels</span><span class="p">[</span><span class="n">blockKey</span><span class="p">]</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span>
+        <span class="n">blockInitialState</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="p">(</span><span class="n">elemIds</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">numQuadPoints</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">initialState</span> <span class="o">=</span> <span class="n">initialState</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">elemIds</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:</span><span class="n">blockInitialState</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">blockInitialState</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">initialState</span></div>
+
+
+
+<div class="viewcode-block" id="_compute_element_stiffnesses_multi_block">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics._compute_element_stiffnesses_multi_block">[docs]</a>
+<span class="k">def</span> <span class="nf">_compute_element_stiffnesses_multi_block</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">functionSpace</span><span class="p">,</span> <span class="n">blockModels</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">):</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="n">functionSpace</span>
+    <span class="n">nen</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">(</span><span class="n">functionSpace</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">parentElement</span><span class="p">)</span>
+    <span class="n">elementHessians</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="n">functionSpace</span><span class="o">.</span><span class="n">mesh</span><span class="p">),</span> <span class="n">nen</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">nen</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">blockKey</span> <span class="ow">in</span> <span class="n">blockModels</span><span class="p">:</span>
+        <span class="n">materialModel</span> <span class="o">=</span> <span class="n">blockModels</span><span class="p">[</span><span class="n">blockKey</span><span class="p">]</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">strain_energy_density_to_lagrangian_density</span><span class="p">(</span><span class="n">materialModel</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">)</span>
+        <span class="n">elemIds</span> <span class="o">=</span> <span class="n">functionSpace</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">blockKey</span><span class="p">]</span>
+        <span class="n">f</span> <span class="o">=</span>  <span class="n">vmap</span><span class="p">(</span><span class="n">compute_element_stiffness_from_global_fields</span><span class="p">,</span>
+                  <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="n">blockHessians</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">[</span><span class="n">elemIds</span><span class="p">],</span> <span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="n">elemIds</span><span class="p">],</span>
+                          <span class="n">fs</span><span class="o">.</span><span class="n">shapes</span><span class="p">[</span><span class="n">elemIds</span><span class="p">],</span> <span class="n">fs</span><span class="o">.</span><span class="n">shapeGrads</span><span class="p">[</span><span class="n">elemIds</span><span class="p">],</span> <span class="n">fs</span><span class="o">.</span><span class="n">vols</span><span class="p">[</span><span class="n">elemIds</span><span class="p">],</span>
+                          <span class="n">L</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span>
+        <span class="n">elementHessians</span> <span class="o">=</span> <span class="n">elementHessians</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">elemIds</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">blockHessians</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">elementHessians</span></div>
+
+
+
+<div class="viewcode-block" id="strain_energy_density_to_lagrangian_density">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics.strain_energy_density_to_lagrangian_density">[docs]</a>
+<span class="k">def</span> <span class="nf">strain_energy_density_to_lagrangian_density</span><span class="p">(</span><span class="n">strain_energy_density</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">L</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">gradU</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">strain_energy_density</span><span class="p">(</span><span class="n">gradU</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">L</span></div>
+
+
+
+<div class="viewcode-block" id="create_multi_block_mechanics_functions">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics.create_multi_block_mechanics_functions">[docs]</a>
+<span class="k">def</span> <span class="nf">create_multi_block_mechanics_functions</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">mode2D</span><span class="p">,</span> <span class="n">materialModels</span><span class="p">,</span> <span class="n">pressureProjectionDegree</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="n">functionSpace</span>
+
+    <span class="k">if</span> <span class="n">mode2D</span> <span class="o">==</span> <span class="s1">&#39;plane strain&#39;</span><span class="p">:</span>
+         <span class="n">grad_2D_to_3D</span> <span class="o">=</span> <span class="n">plane_strain_gradient_transformation</span>
+    <span class="k">elif</span> <span class="n">mode2D</span> <span class="o">==</span> <span class="s1">&#39;axisymmetric&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="n">modify_element_gradient</span> <span class="o">=</span> <span class="n">grad_2D_to_3D</span>
+    <span class="k">if</span> <span class="n">pressureProjectionDegree</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">masterJ</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">make_master_tri_element</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="n">pressureProjectionDegree</span><span class="p">)</span>
+        <span class="n">xigauss</span> <span class="o">=</span> <span class="n">functionSpace</span><span class="o">.</span><span class="n">quadratureRule</span><span class="o">.</span><span class="n">xigauss</span>
+        <span class="n">shapesJ</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">compute_shapes_on_tri</span><span class="p">(</span><span class="n">masterJ</span><span class="p">,</span> <span class="n">xigauss</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">modify_element_gradient</span><span class="p">(</span><span class="n">elemGrads</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">):</span>
+            <span class="n">elemGrads</span> <span class="o">=</span> <span class="n">volume_average_J_gradient_transformation</span><span class="p">(</span><span class="n">elemGrads</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">shapesJ</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">grad_2D_to_3D</span><span class="p">(</span><span class="n">elemGrads</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">compute_strain_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_compute_strain_energy_multi_block</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">materialModels</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span>
+
+        
+    <span class="k">def</span> <span class="nf">compute_updated_internal_variables</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_compute_updated_internal_variables_multi_block</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">materialModels</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span>
+
+    
+    <span class="k">def</span> <span class="nf">compute_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_compute_element_stiffnesses_multi_block</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">functionSpace</span><span class="p">,</span> <span class="n">materialModels</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">compute_output_energy_densities_and_stresses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="n">energy_densities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="p">),</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">len</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">)))</span>
+        <span class="n">stresses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="p">),</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">len</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">),</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">blockKey</span> <span class="ow">in</span> <span class="n">materialModels</span><span class="p">:</span>
+            <span class="n">compute_output_energy_density</span> <span class="o">=</span> <span class="n">materialModels</span><span class="p">[</span><span class="n">blockKey</span><span class="p">]</span><span class="o">.</span><span class="n">compute_energy_density</span>
+            <span class="n">output_lagrangian</span> <span class="o">=</span> <span class="n">strain_energy_density_to_lagrangian_density</span><span class="p">(</span><span class="n">compute_output_energy_density</span><span class="p">)</span>
+            <span class="n">output_constitutive</span> <span class="o">=</span> <span class="n">value_and_grad</span><span class="p">(</span><span class="n">output_lagrangian</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">elemIds</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">blockKey</span><span class="p">]</span>
+            <span class="n">blockEnergyDensities</span><span class="p">,</span> <span class="n">blockStresses</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">evaluate_on_block</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">output_constitutive</span><span class="p">,</span> <span class="n">elemIds</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">modify_element_gradient</span><span class="p">)</span>
+            <span class="n">energy_densities</span> <span class="o">=</span> <span class="n">energy_densities</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">elemIds</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">blockEnergyDensities</span><span class="p">)</span>
+            <span class="n">stresses</span> <span class="o">=</span> <span class="n">stresses</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">elemIds</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">blockStresses</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">energy_densities</span><span class="p">,</span> <span class="n">stresses</span>
+
+
+    <span class="k">def</span> <span class="nf">compute_initial_state</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">_compute_initial_state_multi_block</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">materialModels</span><span class="p">)</span>
+
+    
+    <span class="k">return</span> <span class="n">MechanicsFunctions</span><span class="p">(</span><span class="n">compute_strain_energy</span><span class="p">,</span> <span class="n">jit</span><span class="p">(</span><span class="n">compute_updated_internal_variables</span><span class="p">),</span> <span class="n">jit</span><span class="p">(</span><span class="n">compute_element_stiffnesses</span><span class="p">),</span> <span class="n">jit</span><span class="p">(</span><span class="n">compute_output_energy_densities_and_stresses</span><span class="p">),</span> <span class="n">compute_initial_state</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+
+<span class="c1">######</span>
+    
+    
+<div class="viewcode-block" id="create_mechanics_functions">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics.create_mechanics_functions">[docs]</a>
+<span class="k">def</span> <span class="nf">create_mechanics_functions</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">mode2D</span><span class="p">,</span> <span class="n">materialModel</span><span class="p">,</span> 
+                               <span class="n">pressureProjectionDegree</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="n">functionSpace</span>
+
+    <span class="k">if</span> <span class="n">mode2D</span> <span class="o">==</span> <span class="s1">&#39;plane strain&#39;</span><span class="p">:</span>
+        <span class="n">grad_2D_to_3D</span> <span class="o">=</span> <span class="n">plane_strain_gradient_transformation</span>
+    <span class="k">elif</span> <span class="n">mode2D</span> <span class="o">==</span> <span class="s1">&#39;axisymmetric&#39;</span><span class="p">:</span>
+        <span class="n">grad_2D_to_3D</span> <span class="o">=</span> <span class="n">axisymmetric_element_gradient_transformation</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span>
+
+    <span class="n">modify_element_gradient</span> <span class="o">=</span> <span class="n">grad_2D_to_3D</span>
+    <span class="k">if</span> <span class="n">pressureProjectionDegree</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">masterJ</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">make_master_tri_element</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="n">pressureProjectionDegree</span><span class="p">)</span>
+        <span class="n">xigauss</span> <span class="o">=</span> <span class="n">functionSpace</span><span class="o">.</span><span class="n">quadratureRule</span><span class="o">.</span><span class="n">xigauss</span>
+        <span class="n">shapesJ</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">compute_shapes_on_tri</span><span class="p">(</span><span class="n">masterJ</span><span class="p">,</span> <span class="n">xigauss</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">modify_element_gradient</span><span class="p">(</span><span class="n">elemGrads</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">elemNodalDisps</span><span class="p">,</span> <span class="n">elemNodalCoords</span><span class="p">):</span>
+            <span class="n">elemGrads</span> <span class="o">=</span> <span class="n">volume_average_J_gradient_transformation</span><span class="p">(</span><span class="n">elemGrads</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">shapesJ</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">grad_2D_to_3D</span><span class="p">(</span><span class="n">elemGrads</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">elemNodalDisps</span><span class="p">,</span> <span class="n">elemNodalCoords</span><span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">compute_strain_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_compute_strain_energy</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">materialModel</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span>
+
+        
+    <span class="k">def</span> <span class="nf">compute_updated_internal_variables</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_compute_updated_internal_variables</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">materialModel</span><span class="o">.</span><span class="n">compute_state_new</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span>
+
+    
+    <span class="k">def</span> <span class="nf">compute_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_compute_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">materialModel</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span>
+
+
+    <span class="n">output_lagrangian</span> <span class="o">=</span> <span class="n">strain_energy_density_to_lagrangian_density</span><span class="p">(</span><span class="n">materialModel</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">)</span>
+    <span class="n">output_constitutive</span> <span class="o">=</span> <span class="n">value_and_grad</span><span class="p">(</span><span class="n">output_lagrangian</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    
+    <span class="k">def</span> <span class="nf">compute_output_energy_densities_and_stresses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">evaluate_on_block</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">output_constitutive</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">modify_element_gradient</span><span class="p">)</span>
+
+    
+    <span class="k">def</span> <span class="nf">compute_initial_state</span><span class="p">():</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="p">),</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">len</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">),</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">materialModel</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">(),</span> <span class="n">shape</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">lagrangian_qoi</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">gradU</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">materialModel</span><span class="o">.</span><span class="n">compute_material_qoi</span><span class="p">(</span><span class="n">gradU</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">integrated_material_qoi</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> 
+                                                  <span class="n">lagrangian_qoi</span><span class="p">,</span>
+                                                  <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span>
+                                                  <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">modify_element_gradient</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">compute_output_material_qoi</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">evaluate_on_block</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">lagrangian_qoi</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">modify_element_gradient</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">MechanicsFunctions</span><span class="p">(</span><span class="n">compute_strain_energy</span><span class="p">,</span> <span class="n">jit</span><span class="p">(</span><span class="n">compute_updated_internal_variables</span><span class="p">),</span> <span class="n">jit</span><span class="p">(</span><span class="n">compute_element_stiffnesses</span><span class="p">),</span> <span class="n">jit</span><span class="p">(</span><span class="n">compute_output_energy_densities_and_stresses</span><span class="p">),</span> <span class="n">compute_initial_state</span><span class="p">,</span> <span class="n">integrated_material_qoi</span><span class="p">,</span> <span class="n">jit</span><span class="p">(</span><span class="n">compute_output_material_qoi</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="_compute_kinetic_energy">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics._compute_kinetic_energy">[docs]</a>
+<span class="k">def</span> <span class="nf">_compute_kinetic_energy</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">internals</span><span class="p">,</span> <span class="n">density</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">lagrangian_density</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">gradU</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">kinetic_energy_density</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">density</span><span class="p">)</span>
+    <span class="n">unused</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">return</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">internals</span><span class="p">,</span> <span class="n">unused</span><span class="p">,</span> <span class="n">lagrangian_density</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="_compute_element_masses">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics._compute_element_masses">[docs]</a>
+<span class="k">def</span> <span class="nf">_compute_element_masses</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">internals</span><span class="p">,</span> <span class="n">density</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">lagrangian_density</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">gradV</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">kinetic_energy_density</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">density</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">vmap</span><span class="p">(</span><span class="n">compute_element_stiffness_from_global_fields</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span> <span class="p">,</span><span class="mi">0</span> <span class="p">,</span><span class="mi">0</span> <span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="n">functionSpace</span>
+    <span class="n">unusedDt</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">internals</span><span class="p">,</span> <span class="n">unusedDt</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">shapes</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">shapeGrads</span><span class="p">,</span>
+             <span class="n">fs</span><span class="o">.</span><span class="n">vols</span><span class="p">,</span> <span class="n">lagrangian_density</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="kinetic_energy_density">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics.kinetic_energy_density">[docs]</a>
+<span class="k">def</span> <span class="nf">kinetic_energy_density</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">density</span><span class="p">):</span>
+    <span class="c1"># assumes spatially homogeneous density</span>
+    <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">density</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">V</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_newmark_lagrangian">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics.compute_newmark_lagrangian">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_newmark_lagrangian</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">UPredicted</span><span class="p">,</span> <span class="n">internals</span><span class="p">,</span> <span class="n">density</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">newmarkBeta</span><span class="p">,</span> <span class="n">strain_energy_density</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">):</span>
+    <span class="c1"># We can&#39;t quite fuse these kernels because KE uses the velocity field and</span>
+    <span class="c1"># the strain energy uses the displacements. If profiling suggests fusing</span>
+    <span class="c1"># is beneficial, we could add the time derivative field to the Lagrangian</span>
+    <span class="c1"># density definition.</span>
+
+    <span class="k">def</span> <span class="nf">lagrangian_density</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">gradW</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">dtime</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">kinetic_energy_density</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">density</span><span class="p">)</span>
+    <span class="n">KE</span> <span class="o">=</span>  <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">U</span> <span class="o">-</span> <span class="n">UPredicted</span><span class="p">,</span> <span class="n">internals</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span>
+                                             <span class="n">lagrangian_density</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+    <span class="n">KE</span> <span class="o">*=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">newmarkBeta</span><span class="o">*</span><span class="n">dt</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">lagrangian_density</span> <span class="o">=</span> <span class="n">strain_energy_density_to_lagrangian_density</span><span class="p">(</span><span class="n">strain_energy_density</span><span class="p">)</span>
+    <span class="n">SE</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">internals</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">lagrangian_density</span><span class="p">,</span>
+                                            <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">modify_element_gradient</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">SE</span> <span class="o">+</span> <span class="n">KE</span></div>
+
+
+
+<div class="viewcode-block" id="_compute_newmark_element_hessians">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics._compute_newmark_element_hessians">[docs]</a>
+<span class="k">def</span> <span class="nf">_compute_newmark_element_hessians</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">UPredicted</span><span class="p">,</span> <span class="n">internals</span><span class="p">,</span> <span class="n">density</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">newmarkBeta</span><span class="p">,</span> <span class="n">strain_energy_density</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">lagrangian_density</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">gradW</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">dtime</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">kinetic_energy_density</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">density</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">newmarkBeta</span><span class="o">*</span><span class="n">dtime</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">strain_energy_density</span><span class="p">(</span><span class="n">gradW</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dtime</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span>  <span class="n">vmap</span><span class="p">(</span><span class="n">compute_element_stiffness_from_global_fields</span><span class="p">,</span>
+              <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="n">functionSpace</span>
+    <span class="n">UAlgorithmic</span> <span class="o">=</span> <span class="n">U</span> <span class="o">-</span> <span class="n">UPredicted</span>
+    <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">UAlgorithmic</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">internals</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">shapes</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">shapeGrads</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">vols</span><span class="p">,</span>
+             <span class="n">lagrangian_density</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="parse_2D_to_3D_gradient_transformation">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics.parse_2D_to_3D_gradient_transformation">[docs]</a>
+<span class="k">def</span> <span class="nf">parse_2D_to_3D_gradient_transformation</span><span class="p">(</span><span class="n">mode2D</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">mode2D</span> <span class="o">==</span> <span class="s1">&#39;plane strain&#39;</span><span class="p">:</span>
+        <span class="n">grad_2D_to_3D</span> <span class="o">=</span> <span class="n">plane_strain_gradient_transformation</span>
+    <span class="k">elif</span> <span class="n">mode2D</span> <span class="o">==</span> <span class="s1">&#39;axisymmetric&#39;</span><span class="p">:</span>
+        <span class="n">grad_2D_to_3D</span> <span class="o">=</span> <span class="n">axisymmetric_element_gradient_transformation</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecognized value for mode2D&quot;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">grad_2D_to_3D</span></div>
+
+
+
+<div class="viewcode-block" id="define_pressure_projection_gradient_tranformation">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics.define_pressure_projection_gradient_tranformation">[docs]</a>
+<span class="k">def</span> <span class="nf">define_pressure_projection_gradient_tranformation</span><span class="p">(</span><span class="n">pressureProjectionDegree</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">pressureProjectionDegree</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">masterJ</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">make_master_tri_element</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="n">pressureProjectionDegree</span><span class="p">)</span>
+        <span class="n">xigauss</span> <span class="o">=</span> <span class="n">functionSpace</span><span class="o">.</span><span class="n">quadratureRule</span><span class="o">.</span><span class="n">xigauss</span>
+        <span class="n">shapesJ</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">compute_shapes_on_tri</span><span class="p">(</span><span class="n">masterJ</span><span class="p">,</span> <span class="n">xigauss</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">modify_element_gradient_with_pressure_projection</span><span class="p">(</span><span class="n">elemGrads</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">elemNodalDisps</span><span class="p">,</span> <span class="n">elemNodalCoords</span><span class="p">):</span>
+            <span class="n">elemGrads</span> <span class="o">=</span> <span class="n">volume_average_J_gradient_transformation</span><span class="p">(</span><span class="n">elemGrads</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">shapesJ</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">modify_element_gradient</span><span class="p">(</span><span class="n">elemGrads</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">elemNodalDisps</span><span class="p">,</span> <span class="n">elemNodalCoords</span><span class="p">)</span>
+
+        <span class="n">modify_element_gradient</span> <span class="o">=</span> <span class="n">modify_element_gradient_with_pressure_projection</span>
+        
+    <span class="k">return</span> <span class="n">modify_element_gradient</span></div>
+
+
+
+<div class="viewcode-block" id="create_dynamics_functions">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics.create_dynamics_functions">[docs]</a>
+<span class="k">def</span> <span class="nf">create_dynamics_functions</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">mode2D</span><span class="p">,</span> <span class="n">materialModel</span><span class="p">,</span> <span class="n">newmarkParameters</span><span class="p">,</span> <span class="n">pressureProjectionDegree</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="n">functionSpace</span>
+
+    <span class="n">modify_element_gradient</span> <span class="o">=</span> <span class="n">parse_2D_to_3D_gradient_transformation</span><span class="p">(</span><span class="n">mode2D</span><span class="p">)</span>
+    <span class="n">modify_element_gradient</span> <span class="o">=</span> <span class="n">define_pressure_projection_gradient_tranformation</span><span class="p">(</span>
+        <span class="n">pressureProjectionDegree</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">compute_algorithmic_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">UPredicted</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">compute_newmark_lagrangian</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">UPredicted</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span>
+                                          <span class="n">materialModel</span><span class="o">.</span><span class="n">density</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">newmarkParameters</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span>
+                                          <span class="n">materialModel</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">,</span>
+                                          <span class="n">modify_element_gradient</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">compute_updated_internal_variables</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_compute_updated_internal_variables</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">materialModel</span><span class="o">.</span><span class="n">compute_state_new</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">compute_element_hessians</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">UPredicted</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_compute_newmark_element_hessians</span><span class="p">(</span>
+            <span class="n">functionSpace</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">UPredicted</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">materialModel</span><span class="o">.</span><span class="n">density</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> 
+            <span class="n">newmarkParameters</span><span class="o">.</span><span class="n">beta</span><span class="p">,</span> <span class="n">materialModel</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span>
+
+    <span class="n">output_lagrangian</span> <span class="o">=</span> <span class="n">strain_energy_density_to_lagrangian_density</span><span class="p">(</span><span class="n">materialModel</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">)</span>
+    <span class="n">output_constitutive</span> <span class="o">=</span> <span class="n">value_and_grad</span><span class="p">(</span><span class="n">output_lagrangian</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">compute_output_potential_densities_and_stresses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">evaluate_on_block</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">output_constitutive</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">modify_element_gradient</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">compute_kinetic_energy</span><span class="p">(</span><span class="n">V</span><span class="p">):</span>
+        <span class="n">stateVariables</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="p">),</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">len</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">_compute_kinetic_energy</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">materialModel</span><span class="o">.</span><span class="n">density</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">compute_output_strain_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_compute_strain_energy</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">materialModel</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">compute_initial_state</span><span class="p">():</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="p">),</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">len</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">),</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">materialModel</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">(),</span> <span class="n">shape</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">compute_element_masses</span><span class="p">():</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+        <span class="n">stateVariables</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="p">),</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">len</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">_compute_element_masses</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">materialModel</span><span class="o">.</span><span class="n">density</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="n">U</span> <span class="o">+=</span> <span class="n">dt</span><span class="o">*</span><span class="n">V</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">dt</span><span class="o">*</span><span class="n">dt</span><span class="o">*</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">newmarkParameters</span><span class="o">.</span><span class="n">beta</span><span class="p">)</span><span class="o">*</span><span class="n">A</span>
+        <span class="n">V</span> <span class="o">+=</span> <span class="n">dt</span><span class="o">*</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">newmarkParameters</span><span class="o">.</span><span class="n">gamma</span><span class="p">)</span><span class="o">*</span><span class="n">A</span>
+        <span class="k">return</span> <span class="n">U</span><span class="p">,</span> <span class="n">V</span>
+
+    <span class="k">def</span> <span class="nf">correct</span><span class="p">(</span><span class="n">UCorrection</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">UCorrection</span><span class="o">/</span><span class="p">(</span><span class="n">newmarkParameters</span><span class="o">.</span><span class="n">beta</span><span class="o">*</span><span class="n">dt</span><span class="o">*</span><span class="n">dt</span><span class="p">)</span>
+        <span class="n">V</span> <span class="o">+=</span> <span class="n">dt</span><span class="o">*</span><span class="n">newmarkParameters</span><span class="o">.</span><span class="n">gamma</span><span class="o">*</span><span class="n">A</span>
+        <span class="k">return</span> <span class="n">V</span><span class="p">,</span> <span class="n">A</span>
+
+    <span class="k">return</span> <span class="n">DynamicsFunctions</span><span class="p">(</span><span class="n">compute_algorithmic_energy</span><span class="p">,</span>
+                             <span class="n">jit</span><span class="p">(</span><span class="n">compute_updated_internal_variables</span><span class="p">),</span>
+                             <span class="n">jit</span><span class="p">(</span><span class="n">compute_element_hessians</span><span class="p">),</span>
+                             <span class="n">jit</span><span class="p">(</span><span class="n">compute_output_potential_densities_and_stresses</span><span class="p">),</span>
+                             <span class="n">jit</span><span class="p">(</span><span class="n">compute_kinetic_energy</span><span class="p">),</span>
+                             <span class="n">jit</span><span class="p">(</span><span class="n">compute_output_strain_energy</span><span class="p">),</span>
+                             <span class="n">compute_initial_state</span><span class="p">,</span>
+                             <span class="n">jit</span><span class="p">(</span><span class="n">compute_element_masses</span><span class="p">),</span>
+                             <span class="n">jit</span><span class="p">(</span><span class="n">predict</span><span class="p">),</span>
+                             <span class="n">jit</span><span class="p">(</span><span class="n">correct</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="compute_traction_potential_energy">
+<a class="viewcode-back" href="../../optimism.html#optimism.Mechanics.compute_traction_potential_energy">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_traction_potential_energy</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">load</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute potential energy of surface tractions.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">    fs: a FunctionSpace object</span>
+<span class="sd">    U: the nodal displacements</span>
+<span class="sd">    quadRule: the 1D quadrature rule to use for the integration</span>
+<span class="sd">    edges: array of edges, each row is an edge. Each edge has two entries, the</span>
+<span class="sd">         element ID, and the permutation of that edge in the triangle (0, 1,</span>
+<span class="sd">         2).</span>
+<span class="sd">    load: Callable that returns the traction vector. The signature is</span>
+<span class="sd">        load(X, n), where X is coordinates of a material point, and n is the</span>
+<span class="sd">        outward unit normal.</span>
+<span class="sd">    time: current time</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">compute_energy_density</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="n">traction</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">traction</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_function_on_edges</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">compute_energy_density</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">edges</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

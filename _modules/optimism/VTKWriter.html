@@ -1,0 +1,429 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.VTKWriter &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.VTKWriter</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.VTKWriter</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">auto</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+
+<div class="viewcode-block" id="write_matrix_as_table">
+<a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.write_matrix_as_table">[docs]</a>
+<span class="k">def</span> <span class="nf">write_matrix_as_table</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="c1"># it&#39;s insane that numpy requires this kind</span>
+    <span class="c1"># of hacking to write out a matrix as a table</span>
+    <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">A</span><span class="p">)</span></div>
+
+
+
+
+<div class="viewcode-block" id="VTKFieldType">
+<a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKFieldType">[docs]</a>
+<span class="k">class</span> <span class="nc">VTKFieldType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">SCALARS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">VECTORS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">TENSORS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></div>
+
+    
+
+<div class="viewcode-block" id="VTKDataType">
+<a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKDataType">[docs]</a>
+<span class="k">class</span> <span class="nc">VTKDataType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">BIT</span> <span class="o">=</span> <span class="s1">&#39;bit&#39;</span>
+    <span class="n">UNSIGNED_CHAR</span> <span class="o">=</span> <span class="s1">&#39;unsigned_char&#39;</span>
+    <span class="n">CHAR</span> <span class="o">=</span> <span class="s1">&#39;char&#39;</span>
+    <span class="n">UNSIGNED_SHORT</span> <span class="o">=</span> <span class="s1">&#39;unsigned_short&#39;</span>
+    <span class="n">SHORT</span> <span class="o">=</span> <span class="s1">&#39;short&#39;</span>
+    <span class="n">UNSIGNED_INT</span> <span class="o">=</span> <span class="s1">&#39;unsigned_int&#39;</span>
+    <span class="n">INT</span> <span class="o">=</span> <span class="s1">&#39;int&#39;</span>
+    <span class="n">UNSIGNED_LONG</span> <span class="o">=</span> <span class="s1">&#39;unsigned_long&#39;</span>
+    <span class="n">LONG</span> <span class="o">=</span> <span class="s1">&#39;long&#39;</span>
+    <span class="n">FLOAT</span> <span class="o">=</span> <span class="s1">&#39;float&#39;</span>
+    <span class="n">DOUBLE</span> <span class="o">=</span> <span class="s1">&#39;double&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="default_values">
+<a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.default_values">[docs]</a>
+<span class="k">def</span> <span class="nf">default_values</span><span class="p">(</span><span class="n">fieldType</span><span class="p">,</span> <span class="n">dataType</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">dataType</span><span class="o">==</span><span class="n">VTKDataType</span><span class="o">.</span><span class="n">FLOAT</span> <span class="ow">or</span>  <span class="n">dataType</span><span class="o">==</span><span class="n">VTKDataType</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">fieldType</span><span class="o">==</span><span class="n">VTKFieldType</span><span class="o">.</span><span class="n">SCALARS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.</span>
+        <span class="k">elif</span> <span class="n">fieldType</span><span class="o">==</span><span class="n">VTKFieldType</span><span class="o">.</span><span class="n">VECTORS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">fieldType</span><span class="o">==</span><span class="n">VTKFieldType</span><span class="o">.</span><span class="n">TENSORS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">fieldType</span><span class="o">==</span><span class="n">VTKFieldType</span><span class="o">.</span><span class="n">SCALARS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="n">fieldType</span><span class="o">==</span><span class="n">VTKFieldType</span><span class="o">.</span><span class="n">VECTORS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">fieldType</span><span class="o">==</span><span class="n">VTKFieldType</span><span class="o">.</span><span class="n">TENSORS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span></div>
+
+    
+<span class="c1"># Try to do 2D/3D -&gt; 3D in one code path</span>
+<span class="c1">#def make_data_3Db(A):</span>
+<span class="c1">#    ndims = A.ndim</span>
+<span class="c1">#    A3DShape = [A.shape[0]] + [3 for i in range(ndims)]</span>
+<span class="c1">#    A3D = np.zeros(A3DShape, A.dtype)</span>
+<span class="c1">#    # on LHS need to get 0:2 for every dimension after first</span>
+<span class="c1">#    # maybe use slice()?</span>
+
+
+
+<div class="viewcode-block" id="VTKWriter">
+<a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter">[docs]</a>
+<span class="k">class</span> <span class="nc">VTKWriter</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">baseFileName</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span> <span class="o">=</span> <span class="n">mesh</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span> <span class="o">=</span> <span class="n">baseFileName</span> <span class="o">+</span> <span class="s1">&#39;.vtk&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodalFields</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cellFields</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vtkFormat</span> <span class="o">=</span> <span class="s1">&#39;ASCII&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">spheres</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sphereRadii</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">contactEdges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+
+        <span class="c1"># Legacy vtk can only plot linear and quadratic elements.</span>
+        <span class="c1"># We will plot quadratic elements as is, and</span>
+        <span class="c1"># all other elements will be converted to linear</span>
+        <span class="k">if</span> <span class="n">mesh</span><span class="o">.</span><span class="n">parentElement</span><span class="o">.</span><span class="n">degree</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputNodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">elConn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int_</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vtkCellType</span> <span class="o">=</span> <span class="mi">22</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputNodes</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">simplexNodesOrdinals</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">elConn</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">parentElement</span><span class="o">.</span><span class="n">vertexNodes</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vtkCellType</span> <span class="o">=</span> <span class="mi">5</span>
+        
+        
+<div class="viewcode-block" id="VTKWriter.add_sphere">
+<a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter.add_sphere">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_sphere</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">radius</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spheres</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">])</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sphereRadii</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">radius</span> <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="VTKWriter.add_contact_edges">
+<a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter.add_contact_edges">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_contact_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edgeConns</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contactEdges</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">contactEdges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">contactEdges</span><span class="p">,</span> <span class="n">edgeConns</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">contactEdges</span> <span class="o">=</span> <span class="n">edgeConns</span></div>
+
+
+
+<div class="viewcode-block" id="VTKWriter.add_nodal_field">
+<a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter.add_nodal_field">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_nodal_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">nodalData</span><span class="p">,</span> <span class="n">fieldType</span><span class="p">,</span> <span class="n">dataType</span><span class="o">=</span><span class="n">VTKDataType</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">):</span>
+        <span class="n">nnodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">outputNodes</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">nodalData</span> <span class="o">=</span> <span class="n">nodalData</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">outputNodes</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">nodalData</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">nnodes</span><span class="p">:</span>
+            <span class="n">nodalData3D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_and_format_data</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nodalData</span><span class="p">),</span> <span class="n">fieldType</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nodalFields</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VTKFieldRecord</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">nodalData3D</span><span class="p">,</span> <span class="n">fieldType</span><span class="o">=</span><span class="n">fieldType</span><span class="p">,</span> <span class="n">dataType</span><span class="o">=</span><span class="n">dataType</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;VTKWriter: Added field has incorrect shape or number of &#39;</span>
+                          <span class="s1">&#39;entries</span><span class="se">\n</span><span class="s1">&#39;</span>
+                          <span class="s1">&#39;Skipping output of nodal field </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span></div>
+
+            
+
+<div class="viewcode-block" id="VTKWriter.add_cell_field">
+<a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter.add_cell_field">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_cell_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">cellData</span><span class="p">,</span> <span class="n">fieldType</span><span class="p">,</span> <span class="n">dataType</span><span class="o">=</span><span class="n">VTKDataType</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">):</span>
+        <span class="n">nelements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">cellData</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">nelements</span><span class="p">:</span>
+            <span class="n">cellData3D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_and_format_data</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cellData</span><span class="p">),</span> <span class="n">fieldType</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cellFields</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VTKFieldRecord</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">cellData3D</span><span class="p">,</span> <span class="n">fieldType</span><span class="o">=</span><span class="n">fieldType</span><span class="p">,</span>  <span class="n">dataType</span><span class="o">=</span><span class="n">dataType</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;VTKWriter: Added field has incorrect shape or number of &#39;</span>
+                          <span class="s1">&#39;entries</span><span class="se">\n</span><span class="s1">&#39;</span>
+                          <span class="s1">&#39;Skipping output of cell field </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span></div>
+
+
+        
+<div class="viewcode-block" id="VTKWriter.write">
+<a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter.write">[docs]</a>
+    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">vtkFile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;VTKWriter: Unable to open file: </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_header</span><span class="p">(</span><span class="n">vtkFile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_coordinate_data</span><span class="p">(</span><span class="n">vtkFile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_cell_connectivity</span><span class="p">(</span><span class="n">vtkFile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_contact_edges</span><span class="p">(</span><span class="n">vtkFile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_cell_types</span><span class="p">(</span><span class="n">vtkFile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_nodal_fields</span><span class="p">(</span><span class="n">vtkFile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_cell_fields</span><span class="p">(</span><span class="n">vtkFile</span><span class="p">)</span>
+        <span class="n">vtkFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+    
+    <span class="c1"># private</span>
+    
+    <span class="n">VTKFieldRecord</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;VTKFieldRecord&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;fieldType&#39;</span><span class="p">,</span> <span class="s1">&#39;dataType&#39;</span><span class="p">])</span>
+
+    
+<div class="viewcode-block" id="VTKWriter._check_and_format_data">
+<a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter._check_and_format_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">_check_and_format_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">fieldType</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">fieldType</span><span class="o">==</span><span class="n">VTKFieldType</span><span class="o">.</span><span class="n">SCALARS</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span> <span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> \
+                    <span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">field</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">field3D</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">fieldType</span><span class="o">==</span><span class="n">VTKFieldType</span><span class="o">.</span><span class="n">VECTORS</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">field3D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">field</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">3</span><span class="p">),</span> <span class="n">field</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">spatialDim</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">field3D</span><span class="p">[:,</span><span class="mi">0</span><span class="p">:</span><span class="n">spatialDim</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span>
+        <span class="k">elif</span> <span class="n">fieldType</span><span class="o">==</span><span class="n">VTKFieldType</span><span class="o">.</span><span class="n">TENSORS</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> \
+                   <span class="n">field</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">field</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">spatialDim</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">field3D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">field</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">field</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">field3D</span><span class="p">[:,</span><span class="mi">0</span><span class="p">:</span><span class="n">spatialDim</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="n">spatialDim</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span>
+            <span class="n">field3D</span> <span class="o">=</span> <span class="n">field3D</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">field3D</span></div>
+
+    
+    
+<div class="viewcode-block" id="VTKWriter._write_header">
+<a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter._write_header">[docs]</a>
+    <span class="k">def</span> <span class="nf">_write_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
+        <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;# vtk DataFile Version 3.0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Written from jax-fem</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vtkFormat</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;DATASET UNSTRUCTURED_GRID</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+        
+        
+<div class="viewcode-block" id="VTKWriter._write_coordinate_data">
+<a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter._write_coordinate_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">_write_coordinate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">outputNodes</span><span class="p">]</span>
+        <span class="n">nnodes</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;POINTS </span><span class="si">{}</span><span class="s1"> double</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nnodes</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spheres</span><span class="p">)))</span>
+        <span class="n">dim</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">coords3D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nnodes</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">coords3D</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">coords</span>
+        <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">write_matrix_as_table</span><span class="p">(</span><span class="n">coords3D</span><span class="p">))</span>
+        <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">spherePt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">spheres</span><span class="p">:</span>
+            <span class="n">ptLine</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">spherePt</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">spherePt</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">spherePt</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ptLine</span><span class="p">)</span></div>
+
+        
+        
+<div class="viewcode-block" id="VTKWriter._write_cell_connectivity">
+<a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter._write_cell_connectivity">[docs]</a>
+    <span class="k">def</span> <span class="nf">_write_cell_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
+        <span class="n">nelements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># strong assumption: there is only one element type</span>
+        <span class="n">conns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">[:,</span><span class="bp">self</span><span class="o">.</span><span class="n">elConn</span><span class="p">]</span>
+        <span class="n">nNodesPerElement</span> <span class="o">=</span> <span class="n">conns</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">nNodesPerElementArray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">nNodesPerElement</span><span class="p">,</span>
+                                        <span class="p">(</span><span class="n">nelements</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">nvals</span> <span class="o">=</span> <span class="n">conns</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="n">nNodesPerElementArray</span><span class="o">.</span><span class="n">size</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">contactEdges</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+
+        <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;CELLS </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nelements</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">contactEdges</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">nvals</span><span class="p">))</span>
+        <span class="n">vtkConnectivity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">nNodesPerElementArray</span><span class="p">,</span><span class="n">conns</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">write_matrix_as_table</span><span class="p">(</span><span class="n">vtkConnectivity</span><span class="p">))</span>
+        <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+        
+        
+<div class="viewcode-block" id="VTKWriter._write_contact_edges">
+<a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter._write_contact_edges">[docs]</a>
+    <span class="k">def</span> <span class="nf">_write_contact_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">contactEdges</span><span class="p">:</span>
+            <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;2 </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span></div>
+
+
+
+<div class="viewcode-block" id="VTKWriter._write_cell_types">
+<a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter._write_cell_types">[docs]</a>
+    <span class="k">def</span> <span class="nf">_write_cell_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
+        <span class="n">nelements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;CELL_TYPES </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nelements</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">contactEdges</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">vtkCellTypes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vtkCellType</span><span class="p">,</span> <span class="p">(</span><span class="n">nelements</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">write_matrix_as_table</span><span class="p">(</span><span class="n">vtkCellTypes</span><span class="p">))</span>
+        <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">contactEdges</span><span class="p">:</span>           
+            <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;3</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="VTKWriter._write_nodal_fields">
+<a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter._write_nodal_fields">[docs]</a>
+    <span class="k">def</span> <span class="nf">_write_nodal_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
+
+        <span class="n">allFieldsAreEmpty</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodalFields</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">allFieldsAreEmpty</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spheres</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">outputNodes</span><span class="p">]</span>
+            <span class="n">nnodes</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodalFields</span><span class="p">:</span>
+                <span class="n">fieldRecord</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodalFields</span><span class="p">[</span><span class="n">field</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">sphere</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">spheres</span><span class="p">:</span>
+                    <span class="n">uNew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span> <span class="p">(</span><span class="n">fieldRecord</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                                       <span class="n">default_values</span><span class="p">(</span><span class="n">fieldRecord</span><span class="o">.</span><span class="n">fieldType</span><span class="p">,</span> <span class="n">fieldRecord</span><span class="o">.</span><span class="n">dataType</span><span class="p">))</span> <span class="p">)</span>
+                    <span class="n">fieldRecord</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VTKFieldRecord</span><span class="p">(</span><span class="n">uNew</span><span class="p">,</span>
+                                                      <span class="n">fieldRecord</span><span class="o">.</span><span class="n">fieldType</span><span class="p">,</span>
+                                                      <span class="n">fieldRecord</span><span class="o">.</span><span class="n">dataType</span><span class="p">)</span>
+                    
+                <span class="bp">self</span><span class="o">.</span><span class="n">nodalFields</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="n">fieldRecord</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spheres</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">nnodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="p">(</span><span class="n">nnodes</span><span class="p">,)</span> <span class="p">)</span>
+                <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span> <span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sphereRadii</span><span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nodalFields</span><span class="p">[</span><span class="s1">&#39;sphere_radius&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VTKFieldRecord</span><span class="p">(</span><span class="n">vals</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">vals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">1</span><span class="p">),</span>
+                                                                        <span class="n">VTKFieldType</span><span class="o">.</span><span class="n">SCALARS</span><span class="p">,</span>
+                                                                        <span class="n">VTKDataType</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">)</span>
+        
+                
+            <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;POINT_DATA </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nnodes</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spheres</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_out_all_fields_in_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodalFields</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">)</span></div>
+
+            
+        
+<div class="viewcode-block" id="VTKWriter._write_cell_fields">
+<a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter._write_cell_fields">[docs]</a>
+    <span class="k">def</span> <span class="nf">_write_cell_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
+        <span class="n">allFieldsAreEmpty</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cellFields</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">allFieldsAreEmpty</span><span class="p">:</span>
+            <span class="n">ncells</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;CELL_DATA </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ncells</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_out_all_fields_in_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cellFields</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">)</span></div>
+
+        
+        
+<div class="viewcode-block" id="VTKWriter._write_out_all_fields_in_dict">
+<a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter._write_out_all_fields_in_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">_write_out_all_fields_in_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fieldDict</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fieldDict</span><span class="p">:</span>
+            <span class="n">fieldRecord</span> <span class="o">=</span> <span class="n">fieldDict</span><span class="p">[</span><span class="n">field</span><span class="p">]</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">fieldRecord</span><span class="o">.</span><span class="n">data</span>
+            <span class="n">fieldType</span> <span class="o">=</span> <span class="n">fieldRecord</span><span class="o">.</span><span class="n">fieldType</span>
+            <span class="n">dataType</span> <span class="o">=</span> <span class="n">fieldRecord</span><span class="o">.</span><span class="n">dataType</span>
+            <span class="k">if</span> <span class="n">fieldType</span> <span class="o">==</span> <span class="n">VTKFieldType</span><span class="o">.</span><span class="n">SCALARS</span><span class="p">:</span>
+                <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;SCALARS </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">dataType</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+                <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;LOOKUP_TABLE default</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">fieldType</span> <span class="o">==</span> <span class="n">VTKFieldType</span><span class="o">.</span><span class="n">VECTORS</span><span class="p">:</span>
+                <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;VECTORS </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">dataType</span><span class="o">.</span><span class="n">value</span><span class="p">));</span>
+            <span class="k">elif</span> <span class="n">fieldType</span> <span class="o">==</span> <span class="n">VTKFieldType</span><span class="o">.</span><span class="n">TENSORS</span><span class="p">:</span>
+                <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;TENSORS </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">dataType</span><span class="o">.</span><span class="n">value</span><span class="p">));</span>
+            <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">write_matrix_as_table</span><span class="p">(</span><span class="n">u</span><span class="p">))</span>
+            <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

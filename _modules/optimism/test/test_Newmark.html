@@ -1,0 +1,539 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.test.test_Newmark &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.test.test_Newmark</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.test.test_Newmark</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">EquationSolver</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">FunctionSpace</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mechanics</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Objective</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">QuadratureRule</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">SparseMatrixAssembler</span>
+
+<span class="kn">from</span> <span class="nn">optimism.material</span> <span class="kn">import</span> <span class="n">Neohookean</span><span class="p">,</span> <span class="n">LinearElastic</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">MeshFixture</span>
+
+<span class="n">E</span> <span class="o">=</span> <span class="mf">10.0</span>
+<span class="n">nu</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">rho</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+<span class="n">trSettings</span> <span class="o">=</span> <span class="n">EquationSolver</span><span class="o">.</span><span class="n">get_settings</span><span class="p">(</span><span class="n">max_cg_iters</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                                         <span class="n">max_trust_iters</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+                                         <span class="n">min_tr_size</span><span class="o">=</span><span class="mf">1e-13</span><span class="p">,</span>
+                                         <span class="n">tol</span><span class="o">=</span><span class="mf">4e-12</span><span class="p">,</span>
+                                         <span class="n">use_incremental_objective</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DynamicsFixture">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Newmark.DynamicsFixture">[docs]</a>
+<span class="k">class</span> <span class="nc">DynamicsFixture</span><span class="p">(</span><span class="n">MeshFixture</span><span class="o">.</span><span class="n">MeshFixture</span><span class="p">):</span>
+<div class="viewcode-block" id="DynamicsFixture.setUp">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Newmark.DynamicsFixture.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="n">xRange</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">]</span>
+        <span class="n">yRange</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">]</span>
+        <span class="n">mesh</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_mesh_and_disp</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">xRange</span><span class="p">,</span> <span class="n">yRange</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">X</span><span class="p">:</span> <span class="mi">0</span><span class="o">*</span><span class="n">X</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">create_higher_order_mesh_from_simplex_mesh</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">createNodeSetsFromSideSets</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">quadPrecision</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">parentElement</span><span class="o">.</span><span class="n">degree</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">quadRule</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">create_quadrature_rule_on_triangle</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="n">quadPrecision</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fs</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">construct_function_space</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fieldShape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">ebcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">FunctionSpace</span><span class="o">.</span><span class="n">EssentialBC</span><span class="p">(</span><span class="n">nodeSet</span><span class="o">=</span><span class="s1">&#39;bottom&#39;</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span> <span class="o">=</span>  <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">DofManager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fieldShape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ebcs</span><span class="p">)</span>
+
+        <span class="n">props</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">:</span> <span class="n">E</span><span class="p">,</span>
+                 <span class="s1">&#39;poisson ratio&#39;</span><span class="p">:</span> <span class="n">nu</span><span class="p">,</span>
+                 <span class="s1">&#39;density&#39;</span><span class="p">:</span> <span class="n">rho</span><span class="p">}</span>
+        <span class="n">materialModel</span> <span class="o">=</span> <span class="n">LinearElastic</span><span class="o">.</span><span class="n">create_material_model_functions</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
+        <span class="n">newmarkParams</span> <span class="o">=</span> <span class="n">Mechanics</span><span class="o">.</span><span class="n">NewmarkParameters</span><span class="p">(</span><span class="n">gamma</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dynamicsFunctions</span> <span class="o">=</span> <span class="n">Mechanics</span><span class="o">.</span><span class="n">create_dynamics_functions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span>
+                                                                     <span class="s1">&#39;plane strain&#39;</span><span class="p">,</span>
+                                                                     <span class="n">materialModel</span><span class="p">,</span>
+                                                                     <span class="n">newmarkParams</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">staticsFunctions</span> <span class="o">=</span> <span class="n">Mechanics</span><span class="o">.</span><span class="n">create_mechanics_functions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span>
+                                                                     <span class="s1">&#39;plane strain&#39;</span><span class="p">,</span>
+                                                                     <span class="n">materialModel</span><span class="p">)</span>
+        
+        <span class="c1"># using an elastic model, so we can neglect internal var updating</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">internalVariables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamicsFunctions</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="DynamicsFixture.test_potential">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Newmark.DynamicsFixture.test_potential">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_potential</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">U</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="mf">0.1</span><span class="o">*</span><span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">subkey</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">subkey</span><span class="p">)</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">subkey</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="n">UPre</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamicsFunctions</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamicsFunctions</span><span class="o">.</span><span class="n">compute_algorithmic_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">UPre</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">internalVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertGreater</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">action</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="DynamicsFixture.test_hessian_matrix_is_symmetric">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Newmark.DynamicsFixture.test_hessian_matrix_is_symmetric">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_hessian_matrix_is_symmetric</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">U</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="mf">0.1</span><span class="o">*</span><span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">subkey</span><span class="p">,</span> <span class="n">U</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">subkey</span><span class="p">)</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">subkey</span><span class="p">,</span> <span class="n">U</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="n">UPre</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamicsFunctions</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="n">elementHessians</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamicsFunctions</span><span class="o">.</span><span class="n">compute_element_hessians</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">UPre</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">internalVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="n">SparseMatrixAssembler</span><span class="o">.</span><span class="n">assemble_sparse_stiffness_matrix</span><span class="p">(</span><span class="n">elementHessians</span><span class="p">,</span>
+                                                                   <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">,</span>
+                                                                   <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="p">)</span>
+        <span class="n">KSkew</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span> <span class="o">-</span> <span class="n">K</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="n">asymmetry</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">KSkew</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertLessEqual</span><span class="p">(</span><span class="n">asymmetry</span><span class="p">,</span> <span class="mf">1e-12</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="DynamicsFixture.test_compute_kinetic_energy">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Newmark.DynamicsFixture.test_compute_kinetic_energy">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_compute_kinetic_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">velocity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">3.1</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">])</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">V</span><span class="o">.</span><span class="n">at</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">velocity</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">V</span><span class="o">.</span><span class="n">at</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">velocity</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamicsFunctions</span><span class="o">.</span><span class="n">compute_output_kinetic_energy</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="o">*</span><span class="n">rho</span>
+        <span class="n">TExact</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">m</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">velocity</span><span class="p">,</span> <span class="n">velocity</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">TExact</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="DynamicsFixture.test_integration_of_rigid_motion_is_exact">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Newmark.DynamicsFixture.test_integration_of_rigid_motion_is_exact">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_integration_of_rigid_motion_is_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">Uu</span><span class="p">,</span> <span class="n">Vu</span><span class="p">,</span> <span class="n">Au</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_initial_conditions</span><span class="p">()</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="mf">0.75</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">tOld</span> <span class="o">=</span> <span class="o">-</span><span class="n">dt</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">internalVariables</span><span class="p">,</span>
+                             <span class="kc">None</span><span class="p">,</span>
+                             <span class="kc">None</span><span class="p">,</span>
+                             <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="n">tOld</span><span class="p">]),</span>
+                             <span class="n">Uu</span><span class="p">)</span>
+
+        
+        <span class="k">def</span> <span class="nf">objective_function</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+            <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+            <span class="n">UuPre</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">dynamic_data</span>
+            <span class="n">UPre</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">UuPre</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+            <span class="n">internalVariables</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamicsFunctions</span><span class="o">.</span><span class="n">compute_algorithmic_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">UPre</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        
+        <span class="n">objective</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Objective</span><span class="p">(</span><span class="n">objective_function</span><span class="p">,</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">15</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;---------------------------&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Time Step &#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="n">Uu</span><span class="p">,</span> <span class="n">Vu</span><span class="p">,</span> <span class="n">Au</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_step</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Vu</span><span class="p">,</span> <span class="n">Au</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+            <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">Uexact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fieldShape</span><span class="p">)</span><span class="o">.</span><span class="n">at</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">Uexact</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="DynamicsFixture.test_integration_of_constant_acceleration_is_exact">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Newmark.DynamicsFixture.test_integration_of_constant_acceleration_is_exact">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_integration_of_constant_acceleration_is_exact</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">Uu</span><span class="p">,</span> <span class="n">Vu</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_initial_conditions</span><span class="p">()</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="mf">0.75</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">tOld</span> <span class="o">=</span> <span class="o">-</span><span class="n">dt</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">internalVariables</span><span class="p">,</span>
+                             <span class="kc">None</span><span class="p">,</span>
+                             <span class="kc">None</span><span class="p">,</span>
+                             <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="n">tOld</span><span class="p">]),</span>
+                             <span class="n">Uu</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">objective_function</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+            <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+            <span class="n">UuPre</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">dynamic_data</span>
+            <span class="n">UPre</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">UuPre</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+            <span class="n">internalVariables</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamicsFunctions</span><span class="o">.</span><span class="n">compute_algorithmic_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">UPre</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span> \
+                <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">constant_body_force_potential</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+    
+        <span class="n">objective</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Objective</span><span class="p">(</span><span class="n">objective_function</span><span class="p">,</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+
+        <span class="c1"># set constant acceleration of 1.0 in x direction</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span><span class="o">.</span><span class="n">at</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">Au</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">get_unknown_values</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">15</span><span class="p">):</span>
+            <span class="n">Uu</span><span class="p">,</span> <span class="n">Vu</span><span class="p">,</span> <span class="n">Au</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_step</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Vu</span><span class="p">,</span> <span class="n">Au</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+            <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ubcs</span><span class="p">())</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">UExact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">U</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">at</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">t</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">UExact</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span></div>
+
+
+            
+    <span class="c1">#        </span>
+    <span class="c1"># helper functions</span>
+    <span class="c1">#</span>
+
+    
+<div class="viewcode-block" id="DynamicsFixture.time_step">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Newmark.DynamicsFixture.time_step">[docs]</a>
+    <span class="k">def</span> <span class="nf">time_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">Vu</span><span class="p">,</span> <span class="n">Au</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="n">tOld</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">tOld</span> <span class="o">+</span> <span class="n">dt</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">time = &#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">dt = &#39;</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="n">objective</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">param_index_update</span><span class="p">(</span><span class="n">objective</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="n">tOld</span><span class="p">]))</span>
+        
+        <span class="n">UuPredicted</span><span class="p">,</span> <span class="n">Vu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamicsFunctions</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Vu</span><span class="p">,</span> <span class="n">Au</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="n">objective</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">param_index_update</span><span class="p">(</span><span class="n">objective</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">UuPredicted</span><span class="p">)</span>
+
+        <span class="n">Uu</span><span class="p">,</span> <span class="n">solverSuccess</span> <span class="o">=</span> <span class="n">EquationSolver</span><span class="o">.</span><span class="n">nonlinear_equation_solve</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span>
+                                                                    <span class="n">UuPredicted</span><span class="p">,</span>
+                                                                    <span class="n">objective</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
+                                                                    <span class="n">trSettings</span><span class="p">,</span>
+                                                                    <span class="n">useWarmStart</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">UuCorrection</span> <span class="o">=</span> <span class="n">Uu</span> <span class="o">-</span> <span class="n">UuPredicted</span>
+        <span class="n">Vu</span><span class="p">,</span> <span class="n">Au</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamicsFunctions</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">UuCorrection</span><span class="p">,</span> <span class="n">Vu</span><span class="p">,</span> <span class="n">Au</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">Vu</span><span class="p">,</span> <span class="n">Au</span></div>
+
+
+
+<div class="viewcode-block" id="DynamicsFixture.set_initial_conditions">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Newmark.DynamicsFixture.set_initial_conditions">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_initial_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">zeroField</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">Uu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">get_unknown_values</span><span class="p">(</span><span class="n">zeroField</span><span class="p">)</span>
+
+        <span class="n">v0</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="n">zeroField</span><span class="o">.</span><span class="n">at</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">v0</span><span class="p">)</span>
+        <span class="n">Vu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">get_unknown_values</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
+
+        <span class="n">Au</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">get_unknown_values</span><span class="p">(</span><span class="n">zeroField</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">Vu</span><span class="p">,</span> <span class="n">Au</span></div>
+
+
+
+<div class="viewcode-block" id="DynamicsFixture.get_ubcs">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Newmark.DynamicsFixture.get_ubcs">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_ubcs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">Ubc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">get_bc_values</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+        <span class="c1">#Vbc = self.dofManager.get_bc_values(np.zeros(self.mesh.coords.shape))</span>
+        <span class="c1">#Abc = self.dofManager.get_bc_values(np.zeros(self.mesh.coords.shape))</span>
+        <span class="k">return</span> <span class="n">Ubc</span></div>
+
+
+    
+<div class="viewcode-block" id="DynamicsFixture.create_field">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Newmark.DynamicsFixture.create_field">[docs]</a>
+    <span class="k">def</span> <span class="nf">create_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+        <span class="n">Ubc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ubcs</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="p">)</span></div>
+
+
+    
+<div class="viewcode-block" id="DynamicsFixture.constant_body_force_potential">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Newmark.DynamicsFixture.constant_body_force_potential">[docs]</a>
+    <span class="k">def</span> <span class="nf">constant_body_force_potential</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+        <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ubcs</span><span class="p">())</span>
+        <span class="n">internalVariables</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">dtUnused</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">u</span><span class="p">,</span> <span class="n">du</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="n">dtUnused</span><span class="p">,</span>
+                                                  <span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="s1">&#39;block&#39;</span><span class="p">])</span></div>
+</div>
+
+
+<div class="viewcode-block" id="DynamicPatchTest">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Newmark.DynamicPatchTest">[docs]</a>
+<span class="k">class</span> <span class="nc">DynamicPatchTest</span><span class="p">(</span><span class="n">MeshFixture</span><span class="o">.</span><span class="n">MeshFixture</span><span class="p">):</span>
+<div class="viewcode-block" id="DynamicPatchTest.setUp">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Newmark.DynamicPatchTest.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Nx</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ny</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="n">xRange</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]</span>
+        <span class="n">yRange</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">targetDispGradRate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">],</span>
+                                            <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">]])</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_mesh_and_disp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ny</span><span class="p">,</span> <span class="n">xRange</span><span class="p">,</span> <span class="n">yRange</span><span class="p">,</span>
+                                                      <span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetDispGradRate</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+        <span class="n">quadRule</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">create_quadrature_rule_on_triangle</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fs</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">construct_function_space</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qr1d</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">create_padded_quadrature_rule_1D</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">props</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">:</span> <span class="n">E</span><span class="p">,</span>
+                 <span class="s1">&#39;poisson ratio&#39;</span><span class="p">:</span> <span class="n">nu</span><span class="p">,</span>
+                 <span class="s1">&#39;strain measure&#39;</span><span class="p">:</span> <span class="s1">&#39;linear&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;density&#39;</span><span class="p">:</span> <span class="mf">20.0</span><span class="p">}</span>
+        <span class="c1"># density chosen to make kinetic energy and strain energy comparable</span>
+        <span class="c1"># Want bugs in either to show up appreciably in error</span>
+        <span class="n">materialModel</span> <span class="o">=</span> <span class="n">Neohookean</span><span class="o">.</span><span class="n">create_material_model_functions</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
+
+        <span class="n">newmarkParams</span> <span class="o">=</span> <span class="n">Mechanics</span><span class="o">.</span><span class="n">NewmarkParameters</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span> <span class="o">=</span> <span class="n">Mechanics</span><span class="o">.</span><span class="n">create_dynamics_functions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="s1">&#39;plane strain&#39;</span><span class="p">,</span> <span class="n">materialModel</span><span class="p">,</span> <span class="n">newmarkParams</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">compute_stress</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jacfwd</span><span class="p">(</span><span class="n">materialModel</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="DynamicPatchTest.test_patch_test">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Newmark.DynamicPatchTest.test_patch_test">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_patch_test</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">ebcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">FunctionSpace</span><span class="o">.</span><span class="n">EssentialBC</span><span class="p">(</span><span class="n">nodeSet</span><span class="o">=</span><span class="s1">&#39;all_boundary&#39;</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">EssentialBC</span><span class="p">(</span><span class="n">nodeSet</span><span class="o">=</span><span class="s1">&#39;all_boundary&#39;</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
+        <span class="n">dofManager</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">DofManager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">EssentialBCs</span><span class="o">=</span><span class="n">ebcs</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">t</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">Ubc</span> <span class="o">=</span> <span class="n">dofManager</span><span class="o">.</span><span class="n">get_bc_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
+            <span class="n">U</span> <span class="o">=</span> <span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="p">)</span>
+            <span class="n">UPre</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">dynamic_data</span>
+            <span class="n">internalVariables</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">compute_algorithmic_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">UPre</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+
+        <span class="c1"># initial conditions</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
+        <span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
+        <span class="n">Uu</span> <span class="o">=</span> <span class="n">dofManager</span><span class="o">.</span><span class="n">get_unknown_values</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
+        <span class="n">internals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">internals</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="n">dt</span><span class="p">]),</span> <span class="n">U</span><span class="p">)</span>
+        <span class="n">objective</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Objective</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;--------------------&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;LOAD STEP &#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+
+            <span class="n">tOld</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">tOld</span> <span class="o">+</span> <span class="n">dt</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">time = &#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">dt = &#39;</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+
+            <span class="n">objective</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">param_index_update</span><span class="p">(</span><span class="n">objective</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="n">tOld</span><span class="p">]))</span>
+
+            <span class="n">UPrediction</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+            <span class="n">objective</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">param_index_update</span><span class="p">(</span><span class="n">objective</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">UPrediction</span><span class="p">)</span>
+
+            <span class="c1"># The predictor value is exact.</span>
+            <span class="c1"># Choose a bad initial guess (zero) to force an actual solve.</span>
+            <span class="n">Uu</span><span class="p">,</span> <span class="n">solverSuccess</span> <span class="o">=</span> <span class="n">EquationSolver</span><span class="o">.</span><span class="n">nonlinear_equation_solve</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span>
+                                                                        <span class="n">dofManager</span><span class="o">.</span><span class="n">get_unknown_values</span><span class="p">(</span><span class="n">UPrediction</span><span class="p">),</span>
+                                                                        <span class="n">objective</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
+                                                                        <span class="n">trSettings</span><span class="p">,</span>
+                                                                        <span class="n">useWarmStart</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="n">U</span> <span class="o">=</span> <span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">dofManager</span><span class="o">.</span><span class="n">get_bc_values</span><span class="p">(</span><span class="n">V</span><span class="o">*</span><span class="n">t</span><span class="p">))</span>
+            <span class="n">UCorrection</span> <span class="o">=</span> <span class="n">U</span> <span class="o">-</span> <span class="n">UPrediction</span>
+            <span class="n">V</span><span class="p">,</span> <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">UCorrection</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+            <span class="n">internals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">compute_updated_internal_variables</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">internals</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+            <span class="n">objective</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">param_index_update</span><span class="p">(</span><span class="n">objective</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">internals</span><span class="p">)</span>
+
+            <span class="n">UExact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">t</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">targetDispGradRate</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">((</span><span class="n">U</span> <span class="o">-</span> <span class="n">UExact</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">UExact</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertLess</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="mf">1e-14</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="DynamicPatchTest.test_traction_patch_test">
+<a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Newmark.DynamicPatchTest.test_traction_patch_test">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_traction_patch_test</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ebcs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">dofManager</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">DofManager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">EssentialBCs</span><span class="o">=</span><span class="n">ebcs</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            
+            <span class="k">def</span> <span class="nf">traction</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+                <span class="n">dispGrad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetDispGradRate</span><span class="o">*</span><span class="n">t</span>
+                <span class="n">dispGrad3D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">at</span><span class="p">[:</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">)</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">])</span>
+                <span class="n">dt</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="n">P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_stress</span><span class="p">(</span><span class="n">dispGrad3D</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">dt</span><span class="p">)[:</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+            
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">t</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">U</span> <span class="o">=</span> <span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">)</span>
+            <span class="n">UPre</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">dynamic_data</span>
+            <span class="n">internalVariables</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">loadPotential</span> <span class="o">=</span> <span class="n">Mechanics</span><span class="o">.</span><span class="n">compute_traction_potential_energy</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qr1d</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">sideSets</span><span class="p">[</span><span class="s2">&quot;all_boundary&quot;</span><span class="p">],</span> <span class="n">traction</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">compute_algorithmic_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">UPre</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span> <span class="o">+</span> <span class="n">loadPotential</span>
+
+        <span class="n">dt</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+        <span class="c1"># initial conditions</span>
+        <span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">)</span>
+        <span class="n">internals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span>
+        <span class="n">Uu</span> <span class="o">=</span> <span class="n">dofManager</span><span class="o">.</span><span class="n">get_unknown_values</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">internals</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="n">dt</span><span class="p">]),</span> <span class="n">U</span><span class="p">)</span>
+        <span class="n">objective</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Objective</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;--------------------&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;LOAD STEP &#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+
+            <span class="n">tOld</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">tOld</span> <span class="o">+</span> <span class="n">dt</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">time = &#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">dt = &#39;</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+
+            <span class="n">objective</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">param_index_update</span><span class="p">(</span><span class="n">objective</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="n">tOld</span><span class="p">]))</span>
+
+            <span class="n">UPrediction</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+            <span class="n">objective</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">param_index_update</span><span class="p">(</span><span class="n">objective</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">UPrediction</span><span class="p">)</span>
+
+            <span class="c1"># The predictor value is exact.</span>
+            <span class="c1"># Choose a bad initial guess (zero) to force an actual solve.</span>
+            <span class="n">Uu</span><span class="p">,</span> <span class="n">solverSuccess</span> <span class="o">=</span> <span class="n">EquationSolver</span><span class="o">.</span><span class="n">nonlinear_equation_solve</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span>
+                                                                        <span class="n">dofManager</span><span class="o">.</span><span class="n">get_unknown_values</span><span class="p">(</span><span class="n">UPrediction</span><span class="p">),</span>
+                                                                        <span class="n">objective</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
+                                                                        <span class="n">trSettings</span><span class="p">,</span>
+                                                                        <span class="n">useWarmStart</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="n">U</span> <span class="o">=</span> <span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">)</span>
+            <span class="n">UCorrection</span> <span class="o">=</span> <span class="n">U</span> <span class="o">-</span> <span class="n">UPrediction</span>
+            <span class="n">V</span><span class="p">,</span> <span class="n">A</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">UCorrection</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+            <span class="n">internals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="o">.</span><span class="n">compute_updated_internal_variables</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">internals</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+            <span class="n">objective</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">param_index_update</span><span class="p">(</span><span class="n">objective</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">internals</span><span class="p">)</span>
+
+            <span class="n">UExact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">t</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">targetDispGradRate</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">((</span><span class="n">U</span> <span class="o">-</span> <span class="n">UExact</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">UExact</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertLess</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="mf">1e-13</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

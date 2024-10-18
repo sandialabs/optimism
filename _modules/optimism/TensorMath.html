@@ -1,0 +1,694 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.TensorMath &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.TensorMath</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.TensorMath</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Provide differentiable operations on 3x3 tensors.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="n">if_then_else</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Math</span>
+
+<div class="viewcode-block" id="trace">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.trace">[docs]</a>
+<span class="k">def</span> <span class="nf">trace</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="I2">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.I2">[docs]</a>
+<span class="k">def</span> <span class="nf">I2</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">trA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">trA</span><span class="o">*</span><span class="n">trA</span> <span class="o">-</span> <span class="n">A</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="nd">@A</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="det">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.det">[docs]</a>
+<span class="k">def</span> <span class="nf">det</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> \
+        <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="detpIm1">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.detpIm1">[docs]</a>
+<span class="k">def</span> <span class="nf">detpIm1</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute det(A + I) - 1 while preserving precision when A is small compared to the identity.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">trace</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">+</span> <span class="n">I2</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">+</span> <span class="n">det</span><span class="p">(</span><span class="n">A</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="inv">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.inv">[docs]</a>
+<span class="k">def</span> <span class="nf">inv</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">invA00</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">invA01</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">invA02</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">invA10</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">invA11</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">invA12</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">invA20</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">invA21</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">invA22</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">invA</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="n">det</span><span class="p">(</span><span class="n">A</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">invA00</span><span class="p">,</span> <span class="n">invA01</span><span class="p">,</span> <span class="n">invA02</span><span class="p">],</span>
+                                    <span class="p">[</span><span class="n">invA10</span><span class="p">,</span> <span class="n">invA11</span><span class="p">,</span> <span class="n">invA12</span><span class="p">],</span>
+                                    <span class="p">[</span><span class="n">invA20</span><span class="p">,</span> <span class="n">invA21</span><span class="p">,</span> <span class="n">invA22</span><span class="p">]])</span>
+    <span class="k">return</span> <span class="n">invA</span></div>
+
+
+<div class="viewcode-block" id="deviator">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.deviator">[docs]</a>
+<span class="k">def</span> <span class="nf">deviator</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">dil</span> <span class="o">=</span> <span class="n">trace</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">A</span> <span class="o">-</span> <span class="p">(</span><span class="n">dil</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="dev">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.dev">[docs]</a>
+<span class="k">def</span> <span class="nf">dev</span><span class="p">(</span><span class="n">strain</span><span class="p">):</span> <span class="k">return</span> <span class="n">deviator</span><span class="p">(</span><span class="n">strain</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="sym">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.sym">[docs]</a>
+<span class="k">def</span> <span class="nf">sym</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">A</span> <span class="o">+</span> <span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="skw">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.skw">[docs]</a>
+<span class="k">def</span> <span class="nf">skw</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">A</span> <span class="o">-</span> <span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="norm">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.norm">[docs]</a>
+<span class="k">def</span> <span class="nf">norm</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Math</span><span class="o">.</span><span class="n">safe_sqrt</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="o">@</span> <span class="n">A</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="norm_of_deviator_squared">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.norm_of_deviator_squared">[docs]</a>
+<span class="k">def</span> <span class="nf">norm_of_deviator_squared</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+    <span class="n">dev</span> <span class="o">=</span> <span class="n">deviator</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="n">dev</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="norm_of_deviator">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.norm_of_deviator">[docs]</a>
+<span class="k">def</span> <span class="nf">norm_of_deviator</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">norm</span><span class="p">(</span> <span class="n">deviator</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span> <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="mises_invariant">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.mises_invariant">[docs]</a>
+<span class="k">def</span> <span class="nf">mises_invariant</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span><span class="o">*</span><span class="n">norm_of_deviator</span><span class="p">(</span><span class="n">S</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="triaxiality">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.triaxiality">[docs]</a>
+<span class="k">def</span> <span class="nf">triaxiality</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="n">mean_normal</span> <span class="o">=</span> <span class="n">trace</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">/</span><span class="mf">3.0</span>
+    <span class="n">mises_norm</span> <span class="o">=</span> <span class="n">mises_invariant</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="c1"># avoid division by zero in case of spherical tensor</span>
+    <span class="n">mises_norm</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;float64&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">eps</span>
+    <span class="k">return</span> <span class="n">mean_normal</span><span class="o">/</span><span class="n">mises_norm</span></div>
+
+
+<div class="viewcode-block" id="right_polar_decomposition">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.right_polar_decomposition">[docs]</a>
+<span class="k">def</span> <span class="nf">right_polar_decomposition</span><span class="p">(</span><span class="n">F</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the right polar decomposition of a tensor.</span>
+
+<span class="sd">    Computes the factors R and U such that R@U = F, where R is an</span>
+<span class="sd">    orthogonal matrix and U is symmetric positive semi-definite.</span>
+
+<span class="sd">    Parameters: F : 3x3 matrix</span>
+
+<span class="sd">    Returns: a tuple of the following arrays</span>
+<span class="sd">             R : orthogonal matrix</span>
+<span class="sd">             U : right stretch matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">T</span><span class="nd">@F</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">sqrt_symm</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">F</span><span class="nd">@inv</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">R</span><span class="p">,</span> <span class="n">U</span></div>
+
+
+<div class="viewcode-block" id="tensor_2D_to_3D">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.tensor_2D_to_3D">[docs]</a>
+<span class="k">def</span> <span class="nf">tensor_2D_to_3D</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">at</span><span class="p">[</span> <span class="mi">0</span><span class="p">:</span><span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">:</span><span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">H</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="gradient_2D_to_axisymmetric">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.gradient_2D_to_axisymmetric">[docs]</a>
+<span class="k">def</span> <span class="nf">gradient_2D_to_axisymmetric</span><span class="p">(</span><span class="n">dudX_2D</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+    <span class="n">dudX</span> <span class="o">=</span> <span class="n">tensor_2D_to_3D</span><span class="p">(</span><span class="n">dudX_2D</span><span class="p">)</span>
+    <span class="n">dudX</span> <span class="o">=</span> <span class="n">dudX</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">dudX</span></div>
+
+
+<div class="viewcode-block" id="eigen_sym33_non_unit">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.eigen_sym33_non_unit">[docs]</a>
+<span class="k">def</span> <span class="nf">eigen_sym33_non_unit</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute eigen values and vectors of a symmetric 3x3 tensor.</span>
+
+<span class="sd">    Note, returned eigen vectors may not be unit length</span>
+<span class="sd">    Note, this routine involves high powers of the input tensor (~M^8).</span>
+<span class="sd">    Thus results can start to denormalize when the infinity norm of the input</span>
+<span class="sd">    tensor falls outside the range 1.0e-40 to 1.0e+40.</span>
+<span class="sd">    Outside this range use eigen_sym33_unit</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cxx</span> <span class="o">=</span> <span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">cyy</span> <span class="o">=</span> <span class="n">tensor</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">czz</span> <span class="o">=</span> <span class="n">tensor</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">cxy</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">tensor</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">cyz</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">tensor</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="n">tensor</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">czx</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">tensor</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">c1</span> <span class="o">=</span> <span class="p">(</span><span class="n">cxx</span> <span class="o">+</span> <span class="n">cyy</span> <span class="o">+</span> <span class="n">czz</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">3.0</span><span class="p">)</span>
+
+    <span class="n">cxx</span> <span class="o">-=</span> <span class="n">c1</span>
+    <span class="n">cyy</span> <span class="o">-=</span> <span class="n">c1</span>
+    <span class="n">czz</span> <span class="o">-=</span> <span class="n">c1</span>
+  
+    <span class="n">cxy_cxy</span> <span class="o">=</span> <span class="n">cxy</span><span class="o">*</span><span class="n">cxy</span>
+    <span class="n">cyz_cyz</span> <span class="o">=</span> <span class="n">cyz</span><span class="o">*</span><span class="n">cyz</span>
+    <span class="n">czx_czx</span> <span class="o">=</span> <span class="n">czx</span><span class="o">*</span><span class="n">czx</span>
+    <span class="n">cxx_cyy</span> <span class="o">=</span> <span class="n">cxx</span><span class="o">*</span><span class="n">cyy</span>
+    
+    <span class="n">c2</span> <span class="o">=</span> <span class="n">cxx_cyy</span> <span class="o">+</span> <span class="n">cyy</span><span class="o">*</span><span class="n">czz</span> <span class="o">+</span> <span class="n">czz</span><span class="o">*</span><span class="n">cxx</span> <span class="o">-</span> <span class="n">cxy_cxy</span> <span class="o">-</span> <span class="n">cyz_cyz</span> <span class="o">-</span> <span class="n">czx_czx</span>
+    
+
+    <span class="n">c2Negative</span> <span class="o">=</span> <span class="n">c2</span> <span class="o">&lt;</span> <span class="mi">0</span>
+    <span class="n">denom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">c2Negative</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">ThreeOverA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">c2Negative</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.0</span><span class="o">/</span><span class="n">denom</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">sqrtThreeOverA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">c2Negative</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ThreeOverA</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
+    
+    <span class="n">c3</span> <span class="o">=</span> <span class="n">cxx</span><span class="o">*</span><span class="n">cyz_cyz</span> <span class="o">+</span> <span class="n">cyy</span><span class="o">*</span><span class="n">czx_czx</span> <span class="o">-</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">cxy</span><span class="o">*</span><span class="n">cyz</span><span class="o">*</span><span class="n">czx</span> <span class="o">+</span> <span class="n">czz</span><span class="o">*</span><span class="p">(</span><span class="n">cxy_cxy</span> <span class="o">-</span> <span class="n">cxx_cyy</span><span class="p">)</span>
+
+    <span class="n">rr</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">c3</span><span class="o">*</span><span class="n">ThreeOverA</span><span class="o">*</span><span class="n">sqrtThreeOverA</span>
+    
+    <span class="n">arg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">rr</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span> <span class="c1"># Check in the case rr = -1-eps</span>
+    
+    <span class="n">cos_thd3</span> <span class="o">=</span> <span class="n">cos_of_acos_divided_by_3</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+
+    <span class="n">two_cos_thd3</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">cos_thd3</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">rr</span><span class="p">)</span>
+
+    <span class="n">eval2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">c2Negative</span><span class="p">,</span> <span class="n">two_cos_thd3</span><span class="o">/</span><span class="n">sqrtThreeOverA</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    
+    <span class="n">crow0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">cxx</span> <span class="o">-</span> <span class="n">eval2</span><span class="p">,</span> <span class="n">cxy</span><span class="p">,</span>         <span class="n">czx</span>        <span class="p">])</span>
+    <span class="n">crow1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">cxy</span><span class="p">,</span>         <span class="n">cyy</span> <span class="o">-</span> <span class="n">eval2</span><span class="p">,</span> <span class="n">cyz</span>        <span class="p">])</span>
+    <span class="n">crow2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">czx</span><span class="p">,</span>         <span class="n">cyz</span><span class="p">,</span>         <span class="n">czz</span> <span class="o">-</span> <span class="n">eval2</span><span class="p">])</span>
+
+    <span class="c1">#</span>
+    <span class="c1"># do QR decomposition with column pivoting</span>
+    <span class="c1">#</span>
+    <span class="n">k0</span> <span class="o">=</span> <span class="n">crow0</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">crow0</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">cxy_cxy</span>           <span class="o">+</span> <span class="n">czx_czx</span>
+    <span class="n">k1</span> <span class="o">=</span> <span class="n">cxy_cxy</span>           <span class="o">+</span> <span class="n">crow1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">crow1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">cyz_cyz</span>
+    <span class="n">k2</span> <span class="o">=</span> <span class="n">czx_czx</span>           <span class="o">+</span> <span class="n">cyz_cyz</span>           <span class="o">+</span> <span class="n">crow2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">crow2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    
+    <span class="c1"># returns zero or nan</span>
+    <span class="n">k0gk1</span> <span class="o">=</span> <span class="n">k1</span><span class="o">&lt;=</span><span class="n">k0</span>
+    <span class="n">k0gk2</span> <span class="o">=</span> <span class="n">k2</span><span class="o">&lt;=</span><span class="n">k0</span>
+    <span class="n">k1gk2</span> <span class="o">=</span> <span class="n">k2</span><span class="o">&lt;=</span><span class="n">k1</span>
+    
+    <span class="n">k0_largest</span> <span class="o">=</span> <span class="n">k0gk1</span> <span class="o">&amp;</span> <span class="n">k0gk2</span>
+    <span class="n">k1_largest</span> <span class="o">=</span> <span class="n">k1gk2</span> <span class="o">&amp;</span> <span class="p">(</span><span class="o">~</span> <span class="n">k0gk1</span><span class="p">)</span>
+    <span class="n">k2_largest</span> <span class="o">=</span> <span class="o">~</span> <span class="p">(</span><span class="n">k0_largest</span> <span class="o">|</span> <span class="n">k1_largest</span><span class="p">)</span>
+    <span class="n">k_largest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">k0_largest</span><span class="p">,</span> <span class="n">k1_largest</span><span class="p">,</span> <span class="n">k2_largest</span><span class="p">])</span>
+
+    <span class="n">k_row1_0</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">k0_largest</span><span class="p">,</span> <span class="n">crow0</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">)</span>   \
+        <span class="o">+</span>         <span class="n">if_then_else</span><span class="p">(</span><span class="n">k1_largest</span><span class="p">,</span> <span class="n">crow1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">)</span> \
+        <span class="o">+</span>         <span class="n">if_then_else</span><span class="p">(</span><span class="n">k2_largest</span><span class="p">,</span> <span class="n">crow2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="n">k_row1_1</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">k0_largest</span><span class="p">,</span> <span class="n">crow0</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">)</span>   \
+        <span class="o">+</span>         <span class="n">if_then_else</span><span class="p">(</span><span class="n">k1_largest</span><span class="p">,</span> <span class="n">crow1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">)</span> \
+        <span class="o">+</span>         <span class="n">if_then_else</span><span class="p">(</span><span class="n">k2_largest</span><span class="p">,</span> <span class="n">crow2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="n">k_row1_2</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">k0_largest</span><span class="p">,</span> <span class="n">crow0</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">)</span>   \
+        <span class="o">+</span>         <span class="n">if_then_else</span><span class="p">(</span><span class="n">k1_largest</span><span class="p">,</span> <span class="n">crow1</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">)</span> \
+        <span class="o">+</span>         <span class="n">if_then_else</span><span class="p">(</span><span class="n">k2_largest</span><span class="p">,</span> <span class="n">crow2</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="n">k_row1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">k_row1_0</span><span class="p">,</span> <span class="n">k_row1_1</span><span class="p">,</span> <span class="n">k_row1_2</span><span class="p">])</span>
+    
+    <span class="n">row2_0</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">k0_largest</span><span class="p">,</span> <span class="n">crow1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">crow0</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">row2_1</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">k0_largest</span><span class="p">,</span> <span class="n">crow1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">crow0</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">row2_2</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">k0_largest</span><span class="p">,</span> <span class="n">crow1</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">crow0</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">row2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">row2_0</span><span class="p">,</span> <span class="n">row2_1</span><span class="p">,</span> <span class="n">row2_2</span><span class="p">])</span>
+
+    <span class="n">row3_0</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">k2_largest</span><span class="p">,</span> <span class="n">crow1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">crow2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">row3_1</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">k2_largest</span><span class="p">,</span> <span class="n">crow1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">crow2</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">row3_2</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">k2_largest</span><span class="p">,</span> <span class="n">crow1</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">crow2</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">row3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">row3_0</span><span class="p">,</span> <span class="n">row3_1</span><span class="p">,</span> <span class="n">row3_2</span><span class="p">])</span>
+
+    <span class="n">ki_ki</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">k0_largest</span><span class="p">,</span> <span class="n">k0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>   \
+                    <span class="o">+</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">k1_largest</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> \
+                    <span class="o">+</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">k2_largest</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="p">)</span>
+    
+    <span class="n">ki_dpr1</span> <span class="o">=</span> <span class="n">ki_ki</span><span class="o">*</span><span class="p">(</span><span class="n">k_row1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">row2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">k_row1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">row2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">k_row1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">row2</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">ki_dpr2</span> <span class="o">=</span> <span class="n">ki_ki</span><span class="o">*</span><span class="p">(</span><span class="n">k_row1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">row3</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">k_row1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">row3</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">k_row1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">row3</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">row2</span> <span class="o">=</span> <span class="n">row2</span> <span class="o">-</span> <span class="n">ki_dpr1</span><span class="o">*</span><span class="n">k_row1</span>
+    <span class="n">row3</span> <span class="o">=</span> <span class="n">row3</span> <span class="o">-</span> <span class="n">ki_dpr2</span><span class="o">*</span><span class="n">k_row1</span>
+
+    <span class="n">a0</span> <span class="o">=</span> <span class="n">row2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">row2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">row2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">row2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">row2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">row2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">a1</span> <span class="o">=</span> <span class="n">row3</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">row3</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">row3</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">row3</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">row3</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">row3</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">a0lea1</span> <span class="o">=</span> <span class="n">a0</span> <span class="o">&lt;=</span> <span class="n">a1</span>
+
+    <span class="n">a_row2</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">a0lea1</span><span class="p">,</span> <span class="n">row3</span><span class="p">,</span> <span class="n">row2</span><span class="p">)</span>
+    <span class="n">ai_ai</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">a0lea1</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a0</span><span class="p">)</span>
+    
+    <span class="n">evec2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">k_row1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">a_row2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">k_row1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">a_row2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                      <span class="n">k_row1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">a_row2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">k_row1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">a_row2</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                      <span class="n">k_row1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">a_row2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">k_row1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">a_row2</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+
+    <span class="n">k_atr11</span> <span class="o">=</span> <span class="n">cxx</span><span class="o">*</span><span class="n">k_row1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">cxy</span><span class="o">*</span><span class="n">k_row1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">czx</span><span class="o">*</span><span class="n">k_row1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">k_atr21</span> <span class="o">=</span> <span class="n">cxy</span><span class="o">*</span><span class="n">k_row1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">cyy</span><span class="o">*</span><span class="n">k_row1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">cyz</span><span class="o">*</span><span class="n">k_row1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">k_atr31</span> <span class="o">=</span> <span class="n">czx</span><span class="o">*</span><span class="n">k_row1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">cyz</span><span class="o">*</span><span class="n">k_row1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">czz</span><span class="o">*</span><span class="n">k_row1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">a_atr12</span> <span class="o">=</span> <span class="n">cxx</span><span class="o">*</span><span class="n">a_row2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">cxy</span><span class="o">*</span><span class="n">a_row2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">czx</span><span class="o">*</span><span class="n">a_row2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">a_atr22</span> <span class="o">=</span> <span class="n">cxy</span><span class="o">*</span><span class="n">a_row2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">cyy</span><span class="o">*</span><span class="n">a_row2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">cyz</span><span class="o">*</span><span class="n">a_row2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">a_atr32</span> <span class="o">=</span> <span class="n">czx</span><span class="o">*</span><span class="n">a_row2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">cyz</span><span class="o">*</span><span class="n">a_row2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">czz</span><span class="o">*</span><span class="n">a_row2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">rm2xx</span>     <span class="o">=</span> <span class="p">(</span><span class="n">k_row1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">k_atr11</span> <span class="o">+</span> <span class="n">k_row1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">k_atr21</span> <span class="o">+</span> <span class="n">k_row1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">k_atr31</span><span class="p">)</span><span class="o">*</span><span class="n">ki_ki</span>
+    <span class="n">k_a_rm2xy</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_row1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">a_atr12</span> <span class="o">+</span> <span class="n">k_row1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">a_atr22</span> <span class="o">+</span> <span class="n">k_row1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">a_atr32</span><span class="p">)</span>
+    <span class="n">rm2yy</span>     <span class="o">=</span> <span class="p">(</span><span class="n">a_row2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">a_atr12</span> <span class="o">+</span> <span class="n">a_row2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">a_atr22</span> <span class="o">+</span> <span class="n">a_row2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">a_atr32</span><span class="p">)</span><span class="o">*</span><span class="n">ai_ai</span>
+    <span class="n">rm2xy_rm2xy</span> <span class="o">=</span> <span class="n">k_a_rm2xy</span><span class="o">*</span><span class="n">k_a_rm2xy</span><span class="o">*</span><span class="n">ai_ai</span><span class="o">*</span><span class="n">ki_ki</span>
+
+    <span class="c1">#</span>
+    <span class="c1"># Wilkinson shift</span>
+    <span class="c1">#</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">rm2xx</span><span class="o">-</span><span class="n">rm2yy</span><span class="p">)</span>
+
+    <span class="n">sqrtTerm</span> <span class="o">=</span> <span class="n">Math</span><span class="o">.</span><span class="n">safe_sqrt</span><span class="p">(</span><span class="n">b</span><span class="o">*</span><span class="n">b</span><span class="o">+</span><span class="n">rm2xy_rm2xy</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="c1">#sqrtTerm = np.sqrt(b*b+rm2xy_rm2xy)*np.sign(b)</span>
+    
+    <span class="n">eval0</span> <span class="o">=</span> <span class="n">rm2yy</span> <span class="o">+</span> <span class="n">b</span> <span class="o">-</span> <span class="n">sqrtTerm</span>
+    <span class="n">eval1</span> <span class="o">=</span> <span class="n">rm2xx</span> <span class="o">+</span> <span class="n">rm2yy</span> <span class="o">-</span> <span class="n">eval0</span>
+
+    <span class="n">rm2xx</span> <span class="o">-=</span> <span class="n">eval0</span>
+    <span class="n">rm2yy</span> <span class="o">-=</span> <span class="n">eval0</span>
+
+    <span class="n">rm2xx2</span> <span class="o">=</span> <span class="n">rm2xx</span><span class="o">*</span><span class="n">rm2xx</span>
+    <span class="n">rm2yy2</span> <span class="o">=</span> <span class="n">rm2yy</span><span class="o">*</span><span class="n">rm2yy</span>
+
+    <span class="n">fac1</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">rm2xx2</span> <span class="o">&lt;</span> <span class="n">rm2yy2</span><span class="p">,</span> <span class="n">k_a_rm2xy</span><span class="o">*</span><span class="n">ai_ai</span><span class="p">,</span> <span class="n">rm2xx</span><span class="p">)</span>
+    <span class="n">fac2</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">rm2xx2</span> <span class="o">&lt;</span> <span class="n">rm2yy2</span><span class="p">,</span> <span class="n">rm2yy</span><span class="p">,</span> <span class="n">ki_ki</span><span class="o">*</span><span class="n">k_a_rm2xy</span><span class="p">)</span>
+
+    <span class="n">evec0</span> <span class="o">=</span> <span class="n">fac1</span><span class="o">*</span><span class="n">a_row2</span> <span class="o">-</span> <span class="n">fac2</span><span class="o">*</span><span class="n">k_row1</span>
+
+    <span class="n">rm2xx2iszero</span> <span class="o">=</span> <span class="n">rm2xx2</span> <span class="o">==</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">rm2xy_rm2xyiszero</span> <span class="o">=</span> <span class="n">rm2xy_rm2xy</span> <span class="o">==</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">both_zero</span> <span class="o">=</span> <span class="n">rm2xx2iszero</span> <span class="o">&amp;</span> <span class="n">rm2xy_rm2xyiszero</span>
+
+    <span class="c1"># check degeneracy</span>
+    
+    <span class="n">evec0</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">both_zero</span><span class="p">,</span> <span class="n">a_row2</span><span class="p">,</span> <span class="n">evec0</span><span class="p">)</span>
+
+    <span class="n">evec1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">evec2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">evec0</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">evec2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">evec0</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                      <span class="n">evec2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">evec0</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">evec2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">evec0</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                      <span class="n">evec2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">evec0</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">evec2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">evec0</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+
+    <span class="n">eval0</span> <span class="o">=</span> <span class="n">eval0</span> <span class="o">+</span> <span class="n">c1</span>
+    <span class="n">eval1</span> <span class="o">=</span> <span class="n">eval1</span> <span class="o">+</span> <span class="n">c1</span>
+    <span class="n">eval2</span> <span class="o">=</span> <span class="n">eval2</span> <span class="o">+</span> <span class="n">c1</span>
+    
+    <span class="n">c2tol</span> <span class="o">=</span> <span class="p">(</span><span class="n">c1</span><span class="o">*</span><span class="n">c1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0e-30</span><span class="p">)</span>
+
+    <span class="n">c2lsmall_neg</span> <span class="o">=</span> <span class="n">c2</span> <span class="o">&lt;</span> <span class="n">c2tol</span>
+    
+    <span class="n">eval0</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">c2lsmall_neg</span><span class="p">,</span> <span class="n">eval0</span><span class="p">,</span> <span class="n">c1</span><span class="p">)</span>
+    <span class="n">eval1</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">c2lsmall_neg</span><span class="p">,</span> <span class="n">eval1</span><span class="p">,</span> <span class="n">c1</span><span class="p">)</span>
+    <span class="n">eval2</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">c2lsmall_neg</span><span class="p">,</span> <span class="n">eval2</span><span class="p">,</span> <span class="n">c1</span><span class="p">)</span>
+
+    <span class="n">evec0</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">c2lsmall_neg</span><span class="p">,</span> <span class="n">evec0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]))</span>
+    <span class="n">evec1</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">c2lsmall_neg</span><span class="p">,</span> <span class="n">evec1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]))</span>
+    <span class="n">evec2</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">c2lsmall_neg</span><span class="p">,</span> <span class="n">evec2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]))</span>
+    
+    <span class="n">evals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">eval0</span><span class="p">,</span> <span class="n">eval1</span><span class="p">,</span> <span class="n">eval2</span><span class="p">])</span>
+    <span class="n">evecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">evec0</span><span class="p">,</span><span class="n">evec1</span><span class="p">,</span><span class="n">evec2</span><span class="p">))</span>
+
+    <span class="c1">#idx = np.arange(3)  # np.argsort(evals)</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">evals</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">evals</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span><span class="n">evecs</span><span class="p">[:,</span><span class="n">idx</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="eigen_sym33_unit">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.eigen_sym33_unit">[docs]</a>
+<span class="k">def</span> <span class="nf">eigen_sym33_unit</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+    <span class="n">cmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+    <span class="n">cmaxInv</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">cmax</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">cmax</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">scaledTensor</span> <span class="o">=</span> <span class="n">cmaxInv</span> <span class="o">*</span> <span class="n">tensor</span>
+   
+    <span class="n">evals</span><span class="p">,</span> <span class="n">evecs</span> <span class="o">=</span> <span class="n">eigen_sym33_non_unit</span><span class="p">(</span><span class="n">scaledTensor</span><span class="p">)</span>
+    
+    <span class="n">evec0</span> <span class="o">=</span> <span class="n">evecs</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">evecs</span><span class="p">[:,</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">evec1</span> <span class="o">=</span> <span class="n">evecs</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">evecs</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">evec2</span> <span class="o">=</span> <span class="n">evecs</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">evecs</span><span class="p">[:,</span><span class="mi">2</span><span class="p">])</span>
+    
+    <span class="n">evecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">evec0</span><span class="p">,</span><span class="n">evec1</span><span class="p">,</span><span class="n">evec2</span><span class="p">))</span>
+    <span class="n">evals</span> <span class="o">=</span> <span class="n">cmax</span><span class="o">*</span><span class="n">evals</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">evals</span><span class="p">,</span><span class="n">evecs</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># Helper function for 3x3 spectral decompositions</span>
+<span class="c1"># Pade approximation to cos( acos(x)/3 )</span>
+<span class="c1"># was obtained from Mathematica with the following commands:</span>
+<span class="c1">#  </span>
+<span class="c1"># Needs[&quot;FunctionApproximations`&quot;]</span>
+<span class="c1"># r1 = MiniMaxApproximation[Cos[ArcCos[x]/3], {x, {0, 1}, 6, 5}, WorkingPrecision -&gt; 18, MaxIterations -&gt; 500]</span>
+<span class="c1">#</span>
+<span class="c1"># 6 and 5 indicate the polynomial order in the numerator and denominator.</span>
+<div class="viewcode-block" id="cos_of_acos_divided_by_3">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.cos_of_acos_divided_by_3">[docs]</a>
+<span class="k">def</span> <span class="nf">cos_of_acos_divided_by_3</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    
+    <span class="n">x2</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
+    <span class="n">x4</span> <span class="o">=</span> <span class="n">x2</span><span class="o">*</span><span class="n">x2</span>
+
+    <span class="n">numer</span> <span class="o">=</span> <span class="mf">0.866025403784438713</span> <span class="o">+</span> <span class="mf">2.12714890259493060</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> \
+        <span class="p">(</span> <span class="p">(</span> <span class="mf">1.89202064815951569</span>  <span class="o">+</span> <span class="mf">0.739603278343401613</span> <span class="o">*</span> <span class="n">x</span> <span class="p">)</span> <span class="o">*</span> <span class="n">x2</span> <span class="o">+</span> \
+          <span class="p">(</span> <span class="mf">0.121973926953064794</span> <span class="o">+</span> <span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.00655637626263929360</span> <span class="o">+</span> <span class="mf">0.0000390884982780803443</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="p">)</span> <span class="o">*</span><span class="n">x4</span> <span class="p">)</span>
+
+    <span class="n">denom</span> <span class="o">=</span>     <span class="mf">1.0</span> <span class="o">+</span> <span class="mf">2.26376989330935617</span><span class="o">*</span> <span class="n">x</span> <span class="o">+</span> \
+        <span class="p">(</span> <span class="p">(</span> <span class="mf">1.80461009751278976</span> <span class="o">+</span> <span class="mf">0.603976798217196003</span> <span class="o">*</span> <span class="n">x</span> <span class="p">)</span> <span class="o">*</span> <span class="n">x2</span> <span class="o">+</span> \
+         <span class="p">(</span> <span class="mf">0.0783255761115461708</span> <span class="o">+</span> <span class="mf">0.00268525944538021629</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">x4</span> <span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">numer</span><span class="o">/</span><span class="n">denom</span></div>
+
+
+
+<span class="c1"># This is an alternative way of computing the relative difference in the log of the eigenvalues.</span>
+<span class="c1"># We&#39;re using a different method, but let&#39;s keep these functions for reference.</span>
+
+<div class="viewcode-block" id="_relative_log_difference_taylor">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._relative_log_difference_taylor">[docs]</a>
+<span class="k">def</span> <span class="nf">_relative_log_difference_taylor</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">):</span>
+    <span class="c1"># Compute a more accurate (mtk::log(lam1) - log(lam2)) / (lam1-lam2) as lam1 -&gt; lam2</span>
+    <span class="n">third2</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">3.0</span>
+    <span class="n">fifth2</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">5.0</span>
+    <span class="n">seventh2</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">7.0</span>
+    <span class="n">ninth2</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">9.0</span>
+    
+    <span class="n">frac</span> <span class="o">=</span> <span class="p">(</span><span class="n">lam1</span> <span class="o">-</span> <span class="n">lam2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">lam1</span> <span class="o">+</span> <span class="n">lam2</span><span class="p">)</span>
+    <span class="n">frac2</span> <span class="o">=</span> <span class="n">frac</span><span class="o">*</span><span class="n">frac</span>
+    <span class="n">frac4</span> <span class="o">=</span> <span class="n">frac2</span><span class="o">*</span><span class="n">frac2</span>
+    
+    <span class="c1"># relative tolerance of 0.05 for this approx (with more terms its valid over larger range)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">+</span> <span class="n">third2</span> <span class="o">*</span> <span class="n">frac2</span> <span class="o">+</span> <span class="n">fifth2</span> <span class="o">*</span> <span class="n">frac4</span> <span class="o">+</span> <span class="n">seventh2</span> <span class="o">*</span> <span class="n">frac4</span> <span class="o">*</span> <span class="n">frac2</span> <span class="o">+</span> <span class="n">ninth2</span> <span class="o">*</span> <span class="n">frac4</span> <span class="o">*</span> <span class="n">frac4</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">lam1</span> <span class="o">+</span> <span class="n">lam2</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_relative_log_difference_no_tolerance_check">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._relative_log_difference_no_tolerance_check">[docs]</a>
+<span class="k">def</span> <span class="nf">_relative_log_difference_no_tolerance_check</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">lam1</span> <span class="o">/</span> <span class="n">lam2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">lam1</span> <span class="o">-</span> <span class="n">lam2</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_relative_log_difference">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._relative_log_difference">[docs]</a>
+<span class="k">def</span> <span class="nf">_relative_log_difference</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">):</span>
+    <span class="n">haveLargeDiff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lam1</span> <span class="o">-</span> <span class="n">lam2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.05</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">)</span>
+    <span class="n">lamFake</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">haveLargeDiff</span><span class="p">,</span> <span class="n">lam2</span><span class="p">,</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">lam2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">haveLargeDiff</span><span class="p">,</span>
+                    <span class="n">_relative_log_difference_no_tolerance_check</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lamFake</span><span class="p">),</span>
+                    <span class="n">_relative_log_difference_taylor</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="symmetric_matrix_function">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.symmetric_matrix_function">[docs]</a>
+<span class="k">def</span> <span class="nf">symmetric_matrix_function</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a function on symmetric matrices from a scalar function.&quot;&quot;&quot;</span>
+    <span class="n">lam</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">eigen_sym33_unit</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">V</span><span class="nd">@np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="n">lam</span><span class="p">))</span><span class="nd">@V</span><span class="o">.</span><span class="n">T</span></div>
+
+
+<span class="c1"># Helper function to define the JVP for any matrix function created from a</span>
+<span class="c1"># scalar function func.</span>
+<span class="c1"># To use, you must provide the function</span>
+<span class="c1"># relative_difference: lam1, lam2 -&gt; (func(lam1) - func(lam2))/(lam1 - lam2)</span>
+<span class="c1"># Ideally, this should be formulated such that it does not suffer from cancellation</span>
+<span class="c1"># error as lam1 -&gt; lam2.</span>
+<div class="viewcode-block" id="_symmetric_matrix_function_jvp_helper">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._symmetric_matrix_function_jvp_helper">[docs]</a>
+<span class="k">def</span> <span class="nf">_symmetric_matrix_function_jvp_helper</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">relative_difference</span><span class="p">,</span> <span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
+    <span class="n">C</span><span class="p">,</span> <span class="o">=</span> <span class="n">primals</span>
+    <span class="n">Cdot</span><span class="p">,</span> <span class="o">=</span> <span class="n">tangents</span>
+
+    <span class="c1"># it is tempting to compute the primal output here as </span>
+    <span class="c1"># V@np.diag(func(lam))@V.T</span>
+    <span class="c1"># and avoid the cost of doing the eigendecomp twice.</span>
+    <span class="c1"># Hoever, this will not attach the custom jvp to the primal output</span>
+    <span class="c1"># computation, making higher order derivatives wrong!</span>
+    <span class="n">lam</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">eigen_sym33_unit</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jacfwd</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="n">h_diag</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">df</span><span class="p">)(</span><span class="n">lam</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">rd</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">):</span>
+        <span class="n">x2_safe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x2</span> <span class="o">==</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">x2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x2</span> <span class="o">==</span> <span class="n">x1</span><span class="p">,</span> <span class="n">df</span><span class="p">(</span><span class="n">x1</span><span class="p">),</span> <span class="n">relative_difference</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2_safe</span><span class="p">))</span>
+    <span class="n">h12</span> <span class="o">=</span> <span class="n">rd</span><span class="p">(</span><span class="n">lam</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lam</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">h23</span> <span class="o">=</span> <span class="n">rd</span><span class="p">(</span><span class="n">lam</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">lam</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">h31</span> <span class="o">=</span> <span class="n">rd</span><span class="p">(</span><span class="n">lam</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">lam</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">h_diag</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">h12</span><span class="p">,</span> <span class="n">h31</span><span class="p">],</span>
+                  <span class="p">[</span><span class="n">h12</span><span class="p">,</span> <span class="n">h_diag</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">h23</span><span class="p">],</span>
+                  <span class="p">[</span><span class="n">h31</span><span class="p">,</span> <span class="n">h23</span><span class="p">,</span> <span class="n">h_diag</span><span class="p">[</span><span class="mi">2</span><span class="p">]]])</span>
+    <span class="n">W</span> <span class="o">=</span> <span class="n">V</span><span class="o">.</span><span class="n">T</span><span class="nd">@sym</span><span class="p">(</span><span class="n">Cdot</span><span class="p">)</span><span class="nd">@V</span>
+    <span class="n">h</span> <span class="o">*=</span> <span class="n">W</span>
+
+    <span class="n">t00</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="nd">@h@V</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">t11</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="nd">@h@V</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">t22</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="nd">@h@V</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">t01</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">V</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="nd">@h@V</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">V</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="nd">@h@V</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">t12</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">V</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="nd">@h@V</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">V</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="nd">@h@V</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">t20</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">V</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="nd">@h@V</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">V</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="nd">@h@V</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="p">[</span><span class="n">t00</span><span class="p">,</span> <span class="n">t01</span><span class="p">,</span> <span class="n">t20</span><span class="p">],</span>
+                     <span class="p">[</span><span class="n">t01</span><span class="p">,</span> <span class="n">t11</span><span class="p">,</span> <span class="n">t12</span><span class="p">],</span>
+                     <span class="p">[</span><span class="n">t20</span><span class="p">,</span> <span class="n">t12</span><span class="p">,</span> <span class="n">t22</span><span class="p">]</span> <span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">sol</span></div>
+
+
+<span class="nd">@jax</span><span class="o">.</span><span class="n">custom_jvp</span>
+<span class="k">def</span> <span class="nf">sqrt_symm</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Square root of a symmetric positive semi-definite tensor.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">symmetric_matrix_function</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">Math</span><span class="o">.</span><span class="n">safe_sqrt</span><span class="p">)</span>
+
+<div class="viewcode-block" id="_sqrt_relative_difference">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._sqrt_relative_difference">[docs]</a>
+<span class="k">def</span> <span class="nf">_sqrt_relative_difference</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">lam1</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">lam2</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="_sqrt_symm_jvp">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._sqrt_symm_jvp">[docs]</a>
+<span class="nd">@sqrt_symm</span><span class="o">.</span><span class="n">defjvp</span>
+<span class="k">def</span> <span class="nf">_sqrt_symm_jvp</span><span class="p">(</span><span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
+    <span class="n">primal_out</span> <span class="o">=</span> <span class="n">sqrt_symm</span><span class="p">(</span><span class="o">*</span><span class="n">primals</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">primal_out</span><span class="p">,</span> <span class="n">_symmetric_matrix_function_jvp_helper</span><span class="p">(</span><span class="n">Math</span><span class="o">.</span><span class="n">safe_sqrt</span><span class="p">,</span> <span class="n">_sqrt_relative_difference</span><span class="p">,</span> <span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">)</span></div>
+
+
+
+<span class="nd">@jax</span><span class="o">.</span><span class="n">custom_jvp</span>
+<span class="k">def</span> <span class="nf">exp_symm</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the matrix exponential of a symmetric matrix.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">symmetric_matrix_function</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">)</span>
+
+<div class="viewcode-block" id="_exp_relative_difference">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._exp_relative_difference">[docs]</a>
+<span class="k">def</span> <span class="nf">_exp_relative_difference</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">):</span>
+    <span class="n">arg</span> <span class="o">=</span> <span class="n">lam1</span> <span class="o">-</span> <span class="n">lam2</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">lam2</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">expm1</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span><span class="o">/</span><span class="n">arg</span></div>
+
+
+<div class="viewcode-block" id="_exp_symm_jvp">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._exp_symm_jvp">[docs]</a>
+<span class="nd">@exp_symm</span><span class="o">.</span><span class="n">defjvp</span>
+<span class="k">def</span> <span class="nf">_exp_symm_jvp</span><span class="p">(</span><span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
+    <span class="n">primal_out</span> <span class="o">=</span> <span class="n">exp_symm</span><span class="p">(</span><span class="o">*</span><span class="n">primals</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">primal_out</span><span class="p">,</span> <span class="n">_symmetric_matrix_function_jvp_helper</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">,</span> <span class="n">_exp_relative_difference</span><span class="p">,</span> <span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">)</span></div>
+
+
+
+<span class="nd">@jax</span><span class="o">.</span><span class="n">custom_jvp</span>
+<span class="k">def</span> <span class="nf">log_symm</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the matrix logarithm of a symmetric positive definite matrix.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">symmetric_matrix_function</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
+
+<div class="viewcode-block" id="_log_relative_difference">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._log_relative_difference">[docs]</a>
+<span class="k">def</span> <span class="nf">_log_relative_difference</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">):</span>
+    <span class="n">lams</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">])</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lams</span><span class="p">))</span>
+    <span class="n">arg</span> <span class="o">=</span> <span class="n">lams</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">/</span><span class="n">lams</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span><span class="o">/</span><span class="n">arg</span><span class="p">)</span><span class="o">/</span><span class="n">lams</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span></div>
+
+
+<div class="viewcode-block" id="_log_symm_jvp">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._log_symm_jvp">[docs]</a>
+<span class="nd">@log_symm</span><span class="o">.</span><span class="n">defjvp</span>
+<span class="k">def</span> <span class="nf">_log_symm_jvp</span><span class="p">(</span><span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
+    <span class="n">primal_out</span> <span class="o">=</span> <span class="n">log_symm</span><span class="p">(</span><span class="o">*</span><span class="n">primals</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">primal_out</span><span class="p">,</span> <span class="n">_symmetric_matrix_function_jvp_helper</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="n">_log_relative_difference</span><span class="p">,</span> <span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="log_sqrt_symm">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.log_sqrt_symm">[docs]</a>
+<span class="k">def</span> <span class="nf">log_sqrt_symm</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute matrix logarithm of the square root of a symmetric positive definite matrix.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">log_symm</span><span class="p">(</span><span class="n">A</span><span class="p">)</span></div>
+
+
+
+<span class="nd">@jax</span><span class="o">.</span><span class="n">custom_jvp</span>
+<span class="k">def</span> <span class="nf">pow_symm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raise a symmetric matrix to a power.</span>
+<span class="sd">    </span>
+<span class="sd">    Compute m-fold iterated matrix multiplication of A. Works correctly with</span>
+<span class="sd">    negative powers, but recall that the matrix must be invertible</span>
+<span class="sd">    (or else a matrix of inf or nan will result).</span>
+<span class="sd">    </span>
+<span class="sd">    Arguments:</span>
+<span class="sd">    A: (array) symmetric matrix to raise to a power</span>
+<span class="sd">    m: (float or int) power</span>
+<span class="sd">    </span>
+<span class="sd">    .. note:: This function is not differentiable in the `m` argument.</span>
+
+<span class="sd">    .. note:: The derivative of this function is inaccurate on matrices</span>
+<span class="sd">    with nearly degenerate eigenvalues. We lack a high-quality implementation</span>
+<span class="sd">    of the relative difference of the eigenvalue function. (The derivative of</span>
+<span class="sd">    matrices with exactly equal eigenvalues is computed correctly).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">symmetric_matrix_function</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">m</span><span class="p">))</span>
+
+<span class="c1"># This function loses precision when lam1 -&gt; lam2.</span>
+<span class="c1"># Please replace with a numerically stable implmentation if you know how!</span>
+<div class="viewcode-block" id="_pow_relative_difference">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._pow_relative_difference">[docs]</a>
+<span class="k">def</span> <span class="nf">_pow_relative_difference</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+    <span class="n">lams</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">])</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lams</span><span class="p">))</span>
+    <span class="n">lam_small</span><span class="p">,</span> <span class="n">lam_big</span> <span class="o">=</span> <span class="n">lams</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">arg</span> <span class="o">=</span> <span class="n">lam_small</span><span class="o">/</span><span class="n">lam_big</span>
+    <span class="k">return</span> <span class="n">lam_big</span><span class="o">**</span><span class="p">(</span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">arg</span><span class="o">**</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">arg</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="_pow_symm_jvp">
+<a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._pow_symm_jvp">[docs]</a>
+<span class="nd">@pow_symm</span><span class="o">.</span><span class="n">defjvp</span>
+<span class="k">def</span> <span class="nf">_pow_symm_jvp</span><span class="p">(</span><span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
+    <span class="n">A</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">primals</span>
+    <span class="n">dA</span><span class="p">,</span> <span class="n">dm</span> <span class="o">=</span> <span class="n">tangents</span>
+    <span class="k">return</span> <span class="n">pow_symm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="n">_symmetric_matrix_function_jvp_helper</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="p">:</span> <span class="n">_pow_relative_difference</span><span class="p">(</span><span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="p">(</span><span class="n">A</span><span class="p">,),</span> <span class="p">(</span><span class="n">dA</span><span class="p">,))</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

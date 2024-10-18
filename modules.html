@@ -1,0 +1,979 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="optimism package" href="optimism.html" />
+    <link rel="prev" title="optimism documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">optimism</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html">optimism package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">optimism</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/modules.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="optimism">
+<h1>optimism<a class="headerlink" href="#optimism" title="Link to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="optimism.html">optimism package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.contact.html">optimism.contact package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#module-optimism.contact.Contact">optimism.contact.Contact module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#module-optimism.contact.EdgeCpp">optimism.contact.EdgeCpp module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#module-optimism.contact.EdgeIntersection">optimism.contact.EdgeIntersection module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#module-optimism.contact.Friction">optimism.contact.Friction module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#module-optimism.contact.Levelset">optimism.contact.Levelset module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#module-optimism.contact.LevelsetConstraint">optimism.contact.LevelsetConstraint module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#module-optimism.contact.MortarContact">optimism.contact.MortarContact module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#module-optimism.contact.PenaltyContact">optimism.contact.PenaltyContact module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#module-optimism.contact.Search">optimism.contact.Search module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#module-optimism.contact">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.material.html">optimism.material package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.Gent">optimism.material.Gent module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.Hardening">optimism.material.Hardening module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.HyperViscoelastic">optimism.material.HyperViscoelastic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.J2Plastic">optimism.material.J2Plastic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.LinearElastic">optimism.material.LinearElastic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.MaterialModel">optimism.material.MaterialModel module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.MaterialUniaxialSimulator">optimism.material.MaterialUniaxialSimulator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.Neohookean">optimism.material.Neohookean module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.phasefield.html">optimism.phasefield package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html#module-optimism.phasefield.MaterialPointSimulator">optimism.phasefield.MaterialPointSimulator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html#module-optimism.phasefield.PhaseField">optimism.phasefield.PhaseField module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html#optimism-phasefield-phasefieldclassic-module">optimism.phasefield.PhaseFieldClassic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html#module-optimism.phasefield.PhaseFieldLorentzPlastic">optimism.phasefield.PhaseFieldLorentzPlastic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html#module-optimism.phasefield.PhaseFieldMaterialModel">optimism.phasefield.PhaseFieldMaterialModel module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html#module-optimism.phasefield.PhaseFieldThreshold">optimism.phasefield.PhaseFieldThreshold module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html#module-optimism.phasefield.PhaseFieldThresholdPlastic">optimism.phasefield.PhaseFieldThresholdPlastic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html#module-optimism.phasefield">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.test.html">optimism.test package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.ConvexityPlot">optimism.test.ConvexityPlot module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.MeshFixture">optimism.test.MeshFixture module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.TestFixture">optimism.test.TestFixture module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_AxisymmPatchTest">optimism.test.test_AxisymmPatchTest module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_DofManager">optimism.test.test_DofManager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_EquationSolver">optimism.test.test_EquationSolver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_FunctionSpace">optimism.test.test_FunctionSpace module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_Interpolants">optimism.test.test_Interpolants module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_JaxConfig">optimism.test.test_JaxConfig module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_LinAlg">optimism.test.test_LinAlg module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_Math">optimism.test.test_Math module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_Mechanics">optimism.test.test_Mechanics module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_Mesh">optimism.test.test_Mesh module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_MinimizeScalar">optimism.test.test_MinimizeScalar module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_Newmark">optimism.test.test_Newmark module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_Objective">optimism.test.test_Objective module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_PatchTest">optimism.test.test_PatchTest module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_PatchTestPou">optimism.test.test_PatchTestPou module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_QuadratureRule">optimism.test.test_QuadratureRule module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_ReadExodusMesh">optimism.test.test_ReadExodusMesh module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_ReadMesh">optimism.test.test_ReadMesh module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_ScalarRootFinder">optimism.test.test_ScalarRootFinder module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_SmoothFunctions">optimism.test.test_SmoothFunctions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_SparseMatrix">optimism.test.test_SparseMatrix module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_SparsePreconditioner">optimism.test.test_SparsePreconditioner module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_Surface">optimism.test.test_Surface module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_TensorMath">optimism.test.test_TensorMath module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_Traction">optimism.test.test_Traction module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_TrustRegionSPG">optimism.test.test_TrustRegionSPG module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_VTKWriter">optimism.test.test_VTKWriter module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_VolumeAverageJ">optimism.test.test_VolumeAverageJ module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.AlSolver">optimism.AlSolver module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.AlSolver.Settings"><code class="docutils literal notranslate"><span class="pre">Settings</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.AlSolver.Settings._asdict"><code class="docutils literal notranslate"><span class="pre">Settings._asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.AlSolver.Settings._field_defaults"><code class="docutils literal notranslate"><span class="pre">Settings._field_defaults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.AlSolver.Settings._fields"><code class="docutils literal notranslate"><span class="pre">Settings._fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.AlSolver.Settings._make"><code class="docutils literal notranslate"><span class="pre">Settings._make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.AlSolver.Settings._replace"><code class="docutils literal notranslate"><span class="pre">Settings._replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.AlSolver.Settings.inverse_ncp_hessian_bound"><code class="docutils literal notranslate"><span class="pre">Settings.inverse_ncp_hessian_bound</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.AlSolver.Settings.max_al_iters"><code class="docutils literal notranslate"><span class="pre">Settings.max_al_iters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.AlSolver.Settings.max_gmres_iters"><code class="docutils literal notranslate"><span class="pre">Settings.max_gmres_iters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.AlSolver.Settings.num_initial_low_order_iterations"><code class="docutils literal notranslate"><span class="pre">Settings.num_initial_low_order_iterations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.AlSolver.Settings.penalty_scaling"><code class="docutils literal notranslate"><span class="pre">Settings.penalty_scaling</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.AlSolver.Settings.relative_gmres_tol"><code class="docutils literal notranslate"><span class="pre">Settings.relative_gmres_tol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.AlSolver.Settings.target_constraint_decrease_factor"><code class="docutils literal notranslate"><span class="pre">Settings.target_constraint_decrease_factor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.AlSolver.Settings.tol"><code class="docutils literal notranslate"><span class="pre">Settings.tol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.AlSolver.Settings.use_newton_only"><code class="docutils literal notranslate"><span class="pre">Settings.use_newton_only</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.AlSolver.Settings.use_second_order_update"><code class="docutils literal notranslate"><span class="pre">Settings.use_second_order_update</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.AlSolver.augmented_lagrange_solve"><code class="docutils literal notranslate"><span class="pre">augmented_lagrange_solve()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.AlSolver.get_settings"><code class="docutils literal notranslate"><span class="pre">get_settings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.AlSolver.linear_update"><code class="docutils literal notranslate"><span class="pre">linear_update()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.AlSolver.solve_sub_step"><code class="docutils literal notranslate"><span class="pre">solve_sub_step()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.BoundConstrainedObjective">optimism.BoundConstrainedObjective module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.BoundConstrainedObjective.BoundConstrainedObjective"><code class="docutils literal notranslate"><span class="pre">BoundConstrainedObjective</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.BoundConstrainedObjective.BoundConstrainedObjective.get_multipliers"><code class="docutils literal notranslate"><span class="pre">BoundConstrainedObjective.get_multipliers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.BoundConstrainedObjective.BoundConstrainedObjective.get_residual"><code class="docutils literal notranslate"><span class="pre">BoundConstrainedObjective.get_residual()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.BoundConstrainedObjective.BoundConstrainedObjective.get_total_residual"><code class="docutils literal notranslate"><span class="pre">BoundConstrainedObjective.get_total_residual()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.BoundConstrainedObjective.BoundConstrainedObjective.get_value"><code class="docutils literal notranslate"><span class="pre">BoundConstrainedObjective.get_value()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.BoundConstrainedObjective.ScaledPrecondStrategy"><code class="docutils literal notranslate"><span class="pre">ScaledPrecondStrategy</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.BoundConstrainedObjective.ScaledPrecondStrategy.initialize"><code class="docutils literal notranslate"><span class="pre">ScaledPrecondStrategy.initialize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.BoundConstrainedObjective.ScaledPrecondStrategy.precond_at_attempt"><code class="docutils literal notranslate"><span class="pre">ScaledPrecondStrategy.precond_at_attempt()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.BoundConstrainedSolver">optimism.BoundConstrainedSolver module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.BoundConstrainedSolver.bound_constrained_solve"><code class="docutils literal notranslate"><span class="pre">bound_constrained_solve()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.ConstrainedObjective">optimism.ConstrainedObjective module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedObjective"><code class="docutils literal notranslate"><span class="pre">ConstrainedObjective</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedObjective.constrained_jacobian_p_vec"><code class="docutils literal notranslate"><span class="pre">ConstrainedObjective.constrained_jacobian_p_vec()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedObjective.constrained_jacobian_vec"><code class="docutils literal notranslate"><span class="pre">ConstrainedObjective.constrained_jacobian_vec()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedObjective.constrained_residual"><code class="docutils literal notranslate"><span class="pre">ConstrainedObjective.constrained_residual()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedObjective.constraint"><code class="docutils literal notranslate"><span class="pre">ConstrainedObjective.constraint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedObjective.create_augmented_lagrangian"><code class="docutils literal notranslate"><span class="pre">ConstrainedObjective.create_augmented_lagrangian()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedObjective.gradient"><code class="docutils literal notranslate"><span class="pre">ConstrainedObjective.gradient()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedObjective.gradient_l"><code class="docutils literal notranslate"><span class="pre">ConstrainedObjective.gradient_l()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedObjective.gradient_p"><code class="docutils literal notranslate"><span class="pre">ConstrainedObjective.gradient_p()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedObjective.hessian"><code class="docutils literal notranslate"><span class="pre">ConstrainedObjective.hessian()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedObjective.hessian_vec"><code class="docutils literal notranslate"><span class="pre">ConstrainedObjective.hessian_vec()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedObjective.jacobian_l_vec"><code class="docutils literal notranslate"><span class="pre">ConstrainedObjective.jacobian_l_vec()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedObjective.jacobian_p_vec"><code class="docutils literal notranslate"><span class="pre">ConstrainedObjective.jacobian_p_vec()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedObjective.ncp"><code class="docutils literal notranslate"><span class="pre">ConstrainedObjective.ncp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedObjective.ncp_hessian"><code class="docutils literal notranslate"><span class="pre">ConstrainedObjective.ncp_hessian()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedObjective.reset_kappa"><code class="docutils literal notranslate"><span class="pre">ConstrainedObjective.reset_kappa()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedObjective.total_residual"><code class="docutils literal notranslate"><span class="pre">ConstrainedObjective.total_residual()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedObjective.update_precond"><code class="docutils literal notranslate"><span class="pre">ConstrainedObjective.update_precond()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedObjective.value"><code class="docutils literal notranslate"><span class="pre">ConstrainedObjective.value()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedQuasiObjective"><code class="docutils literal notranslate"><span class="pre">ConstrainedQuasiObjective</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.ConstrainedQuasiObjective.create_augmented_lagrangian"><code class="docutils literal notranslate"><span class="pre">ConstrainedQuasiObjective.create_augmented_lagrangian()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.PrecondStrategy"><code class="docutils literal notranslate"><span class="pre">PrecondStrategy</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.PrecondStrategy.initialize"><code class="docutils literal notranslate"><span class="pre">PrecondStrategy.initialize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.PrecondStrategy.precond_at_attempt"><code class="docutils literal notranslate"><span class="pre">PrecondStrategy.precond_at_attempt()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.fischer_burmeister"><code class="docutils literal notranslate"><span class="pre">fischer_burmeister()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ConstrainedObjective.fischer_burmeister_jac_l"><code class="docutils literal notranslate"><span class="pre">fischer_burmeister_jac_l()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.EquationSolver">optimism.EquationSolver module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings"><code class="docutils literal notranslate"><span class="pre">Settings</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings._asdict"><code class="docutils literal notranslate"><span class="pre">Settings._asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings._field_defaults"><code class="docutils literal notranslate"><span class="pre">Settings._field_defaults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings._fields"><code class="docutils literal notranslate"><span class="pre">Settings._fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings._make"><code class="docutils literal notranslate"><span class="pre">Settings._make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings._replace"><code class="docutils literal notranslate"><span class="pre">Settings._replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings.cg_inexact_solve_ratio"><code class="docutils literal notranslate"><span class="pre">Settings.cg_inexact_solve_ratio</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings.cg_tol"><code class="docutils literal notranslate"><span class="pre">Settings.cg_tol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings.check_stability"><code class="docutils literal notranslate"><span class="pre">Settings.check_stability</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings.debug_info"><code class="docutils literal notranslate"><span class="pre">Settings.debug_info</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings.eta1"><code class="docutils literal notranslate"><span class="pre">Settings.eta1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings.eta2"><code class="docutils literal notranslate"><span class="pre">Settings.eta2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings.eta3"><code class="docutils literal notranslate"><span class="pre">Settings.eta3</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings.max_cg_iters"><code class="docutils literal notranslate"><span class="pre">Settings.max_cg_iters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings.max_cumulative_cg_iters"><code class="docutils literal notranslate"><span class="pre">Settings.max_cumulative_cg_iters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings.max_trust_iters"><code class="docutils literal notranslate"><span class="pre">Settings.max_trust_iters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings.min_tr_size"><code class="docutils literal notranslate"><span class="pre">Settings.min_tr_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings.over_iters"><code class="docutils literal notranslate"><span class="pre">Settings.over_iters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings.t1"><code class="docutils literal notranslate"><span class="pre">Settings.t1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings.t2"><code class="docutils literal notranslate"><span class="pre">Settings.t2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings.tol"><code class="docutils literal notranslate"><span class="pre">Settings.tol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings.tr_size"><code class="docutils literal notranslate"><span class="pre">Settings.tr_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings.use_incremental_objective"><code class="docutils literal notranslate"><span class="pre">Settings.use_incremental_objective</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolver.Settings.use_preconditioned_inner_product_for_cg"><code class="docutils literal notranslate"><span class="pre">Settings.use_preconditioned_inner_product_for_cg</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.cg_inner_products_preconditioned"><code class="docutils literal notranslate"><span class="pre">cg_inner_products_preconditioned()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.cg_inner_products_unpreconditioned"><code class="docutils literal notranslate"><span class="pre">cg_inner_products_unpreconditioned()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.dogleg_step"><code class="docutils literal notranslate"><span class="pre">dogleg_step()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.get_settings"><code class="docutils literal notranslate"><span class="pre">get_settings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.is_converged"><code class="docutils literal notranslate"><span class="pre">is_converged()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.is_on_boundary"><code class="docutils literal notranslate"><span class="pre">is_on_boundary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.newton"><code class="docutils literal notranslate"><span class="pre">newton()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.newton_solve"><code class="docutils literal notranslate"><span class="pre">newton_solve()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.nonlinear_equation_solve"><code class="docutils literal notranslate"><span class="pre">nonlinear_equation_solve()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.output_matrix"><code class="docutils literal notranslate"><span class="pre">output_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.preconditioned_project_to_boundary"><code class="docutils literal notranslate"><span class="pre">preconditioned_project_to_boundary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.print_banner"><code class="docutils literal notranslate"><span class="pre">print_banner()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.print_min_banner"><code class="docutils literal notranslate"><span class="pre">print_min_banner()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.project_to_boundary"><code class="docutils literal notranslate"><span class="pre">project_to_boundary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.project_to_boundary_with_coefs"><code class="docutils literal notranslate"><span class="pre">project_to_boundary_with_coefs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.settings_with_new_tol"><code class="docutils literal notranslate"><span class="pre">settings_with_new_tol()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.solve_trust_region_equality_constraint"><code class="docutils literal notranslate"><span class="pre">solve_trust_region_equality_constraint()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.solve_trust_region_minimization"><code class="docutils literal notranslate"><span class="pre">solve_trust_region_minimization()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.trust_region_least_squares_solve"><code class="docutils literal notranslate"><span class="pre">trust_region_least_squares_solve()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.trust_region_minimize"><code class="docutils literal notranslate"><span class="pre">trust_region_minimize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolver.update_step_length_squared"><code class="docutils literal notranslate"><span class="pre">update_step_length_squared()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.EquationSolverSubspace">optimism.EquationSolverSubspace module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolverSubspace.ModelProblem"><code class="docutils literal notranslate"><span class="pre">ModelProblem</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolverSubspace.ModelProblem.add_vector"><code class="docutils literal notranslate"><span class="pre">ModelProblem.add_vector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolverSubspace.ModelProblem.is_initialized"><code class="docutils literal notranslate"><span class="pre">ModelProblem.is_initialized()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolverSubspace.ModelProblem.setup_system"><code class="docutils literal notranslate"><span class="pre">ModelProblem.setup_system()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.EquationSolverSubspace.ModelProblem.solve"><code class="docutils literal notranslate"><span class="pre">ModelProblem.solve()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolverSubspace.project_to_boundary_with_coefs"><code class="docutils literal notranslate"><span class="pre">project_to_boundary_with_coefs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolverSubspace.spectral_gradient_minimize"><code class="docutils literal notranslate"><span class="pre">spectral_gradient_minimize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolverSubspace.trust_region_cg"><code class="docutils literal notranslate"><span class="pre">trust_region_cg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.EquationSolverSubspace.trust_region_subspace_minimize"><code class="docutils literal notranslate"><span class="pre">trust_region_subspace_minimize()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.FunctionSpace">optimism.FunctionSpace module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.DofManager"><code class="docutils literal notranslate"><span class="pre">DofManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.DofManager._make_hessian_bc_mask"><code class="docutils literal notranslate"><span class="pre">DofManager._make_hessian_bc_mask()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.DofManager._make_hessian_coordinates"><code class="docutils literal notranslate"><span class="pre">DofManager._make_hessian_coordinates()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.DofManager.create_field"><code class="docutils literal notranslate"><span class="pre">DofManager.create_field()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.DofManager.get_bc_size"><code class="docutils literal notranslate"><span class="pre">DofManager.get_bc_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.DofManager.get_bc_values"><code class="docutils literal notranslate"><span class="pre">DofManager.get_bc_values()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.DofManager.get_unknown_size"><code class="docutils literal notranslate"><span class="pre">DofManager.get_unknown_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.DofManager.get_unknown_values"><code class="docutils literal notranslate"><span class="pre">DofManager.get_unknown_values()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.DofManager.slice_unknowns_with_dof_indices"><code class="docutils literal notranslate"><span class="pre">DofManager.slice_unknowns_with_dof_indices()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.EssentialBC"><code class="docutils literal notranslate"><span class="pre">EssentialBC</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.EssentialBC._asdict"><code class="docutils literal notranslate"><span class="pre">EssentialBC._asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.EssentialBC._field_defaults"><code class="docutils literal notranslate"><span class="pre">EssentialBC._field_defaults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.EssentialBC._fields"><code class="docutils literal notranslate"><span class="pre">EssentialBC._fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.EssentialBC._make"><code class="docutils literal notranslate"><span class="pre">EssentialBC._make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.EssentialBC._replace"><code class="docutils literal notranslate"><span class="pre">EssentialBC._replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.EssentialBC.component"><code class="docutils literal notranslate"><span class="pre">EssentialBC.component</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.EssentialBC.nodeSet"><code class="docutils literal notranslate"><span class="pre">EssentialBC.nodeSet</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.FunctionSpace"><code class="docutils literal notranslate"><span class="pre">FunctionSpace</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.FunctionSpace.shapes"><code class="docutils literal notranslate"><span class="pre">FunctionSpace.shapes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.FunctionSpace.vols"><code class="docutils literal notranslate"><span class="pre">FunctionSpace.vols</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.FunctionSpace.shapeGrads"><code class="docutils literal notranslate"><span class="pre">FunctionSpace.shapeGrads</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.FunctionSpace.mesh"><code class="docutils literal notranslate"><span class="pre">FunctionSpace.mesh</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.FunctionSpace.quadratureRule"><code class="docutils literal notranslate"><span class="pre">FunctionSpace.quadratureRule</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.FunctionSpace.isAxisymmetric"><code class="docutils literal notranslate"><span class="pre">FunctionSpace.isAxisymmetric</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.FunctionSpace._asdict"><code class="docutils literal notranslate"><span class="pre">FunctionSpace._asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.FunctionSpace._field_defaults"><code class="docutils literal notranslate"><span class="pre">FunctionSpace._field_defaults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.FunctionSpace._fields"><code class="docutils literal notranslate"><span class="pre">FunctionSpace._fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.FunctionSpace._make"><code class="docutils literal notranslate"><span class="pre">FunctionSpace._make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.FunctionSpace._replace"><code class="docutils literal notranslate"><span class="pre">FunctionSpace._replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#id0"><code class="docutils literal notranslate"><span class="pre">FunctionSpace.isAxisymmetric</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#id1"><code class="docutils literal notranslate"><span class="pre">FunctionSpace.mesh</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#id2"><code class="docutils literal notranslate"><span class="pre">FunctionSpace.quadratureRule</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#id3"><code class="docutils literal notranslate"><span class="pre">FunctionSpace.shapeGrads</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#id4"><code class="docutils literal notranslate"><span class="pre">FunctionSpace.shapes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#id5"><code class="docutils literal notranslate"><span class="pre">FunctionSpace.vols</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.average_quadrature_field_over_element"><code class="docutils literal notranslate"><span class="pre">average_quadrature_field_over_element()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.compute_element_field_gradient"><code class="docutils literal notranslate"><span class="pre">compute_element_field_gradient()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.compute_element_volumes"><code class="docutils literal notranslate"><span class="pre">compute_element_volumes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.compute_element_volumes_axisymmetric"><code class="docutils literal notranslate"><span class="pre">compute_element_volumes_axisymmetric()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.compute_field_gradient"><code class="docutils literal notranslate"><span class="pre">compute_field_gradient()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.compute_quadrature_point_field_gradient"><code class="docutils literal notranslate"><span class="pre">compute_quadrature_point_field_gradient()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.construct_function_space"><code class="docutils literal notranslate"><span class="pre">construct_function_space()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.construct_function_space_from_parent_element"><code class="docutils literal notranslate"><span class="pre">construct_function_space_from_parent_element()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.construct_weighted_function_space"><code class="docutils literal notranslate"><span class="pre">construct_weighted_function_space()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.default_modify_element_gradient"><code class="docutils literal notranslate"><span class="pre">default_modify_element_gradient()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.evaluate_on_block"><code class="docutils literal notranslate"><span class="pre">evaluate_on_block()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.evaluate_on_element"><code class="docutils literal notranslate"><span class="pre">evaluate_on_element()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.get_nodal_values_on_edge"><code class="docutils literal notranslate"><span class="pre">get_nodal_values_on_edge()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.integrate_element"><code class="docutils literal notranslate"><span class="pre">integrate_element()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.integrate_element_from_local_field"><code class="docutils literal notranslate"><span class="pre">integrate_element_from_local_field()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.integrate_function_on_edge"><code class="docutils literal notranslate"><span class="pre">integrate_function_on_edge()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.integrate_function_on_edges"><code class="docutils literal notranslate"><span class="pre">integrate_function_on_edges()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.integrate_over_block"><code class="docutils literal notranslate"><span class="pre">integrate_over_block()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.interpolate_nodal_field_on_edge"><code class="docutils literal notranslate"><span class="pre">interpolate_nodal_field_on_edge()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.interpolate_to_element_points"><code class="docutils literal notranslate"><span class="pre">interpolate_to_element_points()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.interpolate_to_point"><code class="docutils literal notranslate"><span class="pre">interpolate_to_point()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.interpolate_to_points"><code class="docutils literal notranslate"><span class="pre">interpolate_to_points()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.map_element_shape_grads"><code class="docutils literal notranslate"><span class="pre">map_element_shape_grads()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.project_quadrature_field_to_element_field"><code class="docutils literal notranslate"><span class="pre">project_quadrature_field_to_element_field()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#optimism-incompletecholesky-module">optimism.IncompleteCholesky module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Interpolants">optimism.Interpolants module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.ParentElement"><code class="docutils literal notranslate"><span class="pre">ParentElement</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.ShapeFunctions"><code class="docutils literal notranslate"><span class="pre">ShapeFunctions</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Interpolants.ShapeFunctions.values"><code class="docutils literal notranslate"><span class="pre">ShapeFunctions.values</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Interpolants.ShapeFunctions.gradients"><code class="docutils literal notranslate"><span class="pre">ShapeFunctions.gradients</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Interpolants.ShapeFunctions._asdict"><code class="docutils literal notranslate"><span class="pre">ShapeFunctions._asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Interpolants.ShapeFunctions._field_defaults"><code class="docutils literal notranslate"><span class="pre">ShapeFunctions._field_defaults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Interpolants.ShapeFunctions._fields"><code class="docutils literal notranslate"><span class="pre">ShapeFunctions._fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Interpolants.ShapeFunctions._make"><code class="docutils literal notranslate"><span class="pre">ShapeFunctions._make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Interpolants.ShapeFunctions._replace"><code class="docutils literal notranslate"><span class="pre">ShapeFunctions._replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#id6"><code class="docutils literal notranslate"><span class="pre">ShapeFunctions.gradients</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#id7"><code class="docutils literal notranslate"><span class="pre">ShapeFunctions.values</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.compute_shapes"><code class="docutils literal notranslate"><span class="pre">compute_shapes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.get_lobatto_nodes_1d"><code class="docutils literal notranslate"><span class="pre">get_lobatto_nodes_1d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.make_parent_element_1d"><code class="docutils literal notranslate"><span class="pre">make_parent_element_1d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.make_parent_element_2d"><code class="docutils literal notranslate"><span class="pre">make_parent_element_2d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.make_parent_element_2d_with_bubble"><code class="docutils literal notranslate"><span class="pre">make_parent_element_2d_with_bubble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.make_parent_elements"><code class="docutils literal notranslate"><span class="pre">make_parent_elements()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.num_nodes"><code class="docutils literal notranslate"><span class="pre">num_nodes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.pascal_triangle_monomials"><code class="docutils literal notranslate"><span class="pre">pascal_triangle_monomials()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.shape1d"><code class="docutils literal notranslate"><span class="pre">shape1d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.shape2d"><code class="docutils literal notranslate"><span class="pre">shape2d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.shape2dBubble"><code class="docutils literal notranslate"><span class="pre">shape2dBubble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.vander1d"><code class="docutils literal notranslate"><span class="pre">vander1d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.vander2d"><code class="docutils literal notranslate"><span class="pre">vander2d()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.J2PlasticPhaseField">optimism.J2PlasticPhaseField module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.J2PlasticPhaseField._compute_elastic_infinitesimal_strain"><code class="docutils literal notranslate"><span class="pre">_compute_elastic_infinitesimal_strain()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.J2PlasticPhaseField.compute_flow_direction"><code class="docutils literal notranslate"><span class="pre">compute_flow_direction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.J2PlasticPhaseField.compute_logarithmic_elastic_strain"><code class="docutils literal notranslate"><span class="pre">compute_logarithmic_elastic_strain()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.J2PlasticPhaseField.compute_state_increment"><code class="docutils literal notranslate"><span class="pre">compute_state_increment()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.J2PlasticPhaseField.compute_state_new"><code class="docutils literal notranslate"><span class="pre">compute_state_new()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.J2PlasticPhaseField.dr_dstrain_and_deqps"><code class="docutils literal notranslate"><span class="pre">dr_dstrain_and_deqps()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.J2PlasticPhaseField.elastic_deviatoric_free_energy"><code class="docutils literal notranslate"><span class="pre">elastic_deviatoric_free_energy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.J2PlasticPhaseField.elastic_free_energy"><code class="docutils literal notranslate"><span class="pre">elastic_free_energy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.J2PlasticPhaseField.elastic_volumetric_free_energy"><code class="docutils literal notranslate"><span class="pre">elastic_volumetric_free_energy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.J2PlasticPhaseField.energy_density"><code class="docutils literal notranslate"><span class="pre">energy_density()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.J2PlasticPhaseField.energy_density_generic"><code class="docutils literal notranslate"><span class="pre">energy_density_generic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.J2PlasticPhaseField.hardening_energy_density"><code class="docutils literal notranslate"><span class="pre">hardening_energy_density()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.J2PlasticPhaseField.incremental_potential"><code class="docutils literal notranslate"><span class="pre">incremental_potential()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.J2PlasticPhaseField.make_initial_state"><code class="docutils literal notranslate"><span class="pre">make_initial_state()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.J2PlasticPhaseField.make_properties"><code class="docutils literal notranslate"><span class="pre">make_properties()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.J2PlasticPhaseField.r"><code class="docutils literal notranslate"><span class="pre">r()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.J2PlasticPhaseField.r_and_deqps"><code class="docutils literal notranslate"><span class="pre">r_and_deqps()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.J2PlasticPhaseField.update_state"><code class="docutils literal notranslate"><span class="pre">update_state()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.JaxConfig">optimism.JaxConfig module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.JaxConfig.hessrayleigh"><code class="docutils literal notranslate"><span class="pre">hessrayleigh()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.JaxConfig.hessvec"><code class="docutils literal notranslate"><span class="pre">hessvec()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.JaxConfig.if_then_else"><code class="docutils literal notranslate"><span class="pre">if_then_else()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.LU">optimism.LU module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.LU.LU"><code class="docutils literal notranslate"><span class="pre">LU</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.LU.LU.dot"><code class="docutils literal notranslate"><span class="pre">LU.dot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.LU.LU.multiply_by_transpose"><code class="docutils literal notranslate"><span class="pre">LU.multiply_by_transpose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.LU.LU.solve"><code class="docutils literal notranslate"><span class="pre">LU.solve()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.LU.LU.solve_transpose"><code class="docutils literal notranslate"><span class="pre">LU.solve_transpose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.LU.LU.update"><code class="docutils literal notranslate"><span class="pre">LU.update()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.LinAlg">optimism.LinAlg module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.LinAlg._logm_iss"><code class="docutils literal notranslate"><span class="pre">_logm_iss()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.LinAlg.jvp_sqrtm"><code class="docutils literal notranslate"><span class="pre">jvp_sqrtm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.LinAlg.log_pade_pf"><code class="docutils literal notranslate"><span class="pre">log_pade_pf()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.LinAlg.logm_jvp"><code class="docutils literal notranslate"><span class="pre">logm_jvp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.LinAlg.sqrtm_dbp"><code class="docutils literal notranslate"><span class="pre">sqrtm_dbp()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Math">optimism.Math module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Math._float_split"><code class="docutils literal notranslate"><span class="pre">_float_split()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Math._two_product"><code class="docutils literal notranslate"><span class="pre">_two_product()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Math._two_sum"><code class="docutils literal notranslate"><span class="pre">_two_sum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Math.dot2"><code class="docutils literal notranslate"><span class="pre">dot2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Math.safe_sqrt_jvp"><code class="docutils literal notranslate"><span class="pre">safe_sqrt_jvp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Math.sum2"><code class="docutils literal notranslate"><span class="pre">sum2()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Mechanics">optimism.Mechanics module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.DynamicsFunctions"><code class="docutils literal notranslate"><span class="pre">DynamicsFunctions</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.DynamicsFunctions._asdict"><code class="docutils literal notranslate"><span class="pre">DynamicsFunctions._asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.DynamicsFunctions._field_defaults"><code class="docutils literal notranslate"><span class="pre">DynamicsFunctions._field_defaults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.DynamicsFunctions._fields"><code class="docutils literal notranslate"><span class="pre">DynamicsFunctions._fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.DynamicsFunctions._make"><code class="docutils literal notranslate"><span class="pre">DynamicsFunctions._make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.DynamicsFunctions._replace"><code class="docutils literal notranslate"><span class="pre">DynamicsFunctions._replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.DynamicsFunctions.compute_algorithmic_energy"><code class="docutils literal notranslate"><span class="pre">DynamicsFunctions.compute_algorithmic_energy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.DynamicsFunctions.compute_element_hessians"><code class="docutils literal notranslate"><span class="pre">DynamicsFunctions.compute_element_hessians</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.DynamicsFunctions.compute_element_masses"><code class="docutils literal notranslate"><span class="pre">DynamicsFunctions.compute_element_masses</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.DynamicsFunctions.compute_initial_state"><code class="docutils literal notranslate"><span class="pre">DynamicsFunctions.compute_initial_state</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.DynamicsFunctions.compute_output_energy_densities_and_stresses"><code class="docutils literal notranslate"><span class="pre">DynamicsFunctions.compute_output_energy_densities_and_stresses</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.DynamicsFunctions.compute_output_kinetic_energy"><code class="docutils literal notranslate"><span class="pre">DynamicsFunctions.compute_output_kinetic_energy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.DynamicsFunctions.compute_output_strain_energy"><code class="docutils literal notranslate"><span class="pre">DynamicsFunctions.compute_output_strain_energy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.DynamicsFunctions.compute_updated_internal_variables"><code class="docutils literal notranslate"><span class="pre">DynamicsFunctions.compute_updated_internal_variables</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.DynamicsFunctions.correct"><code class="docutils literal notranslate"><span class="pre">DynamicsFunctions.correct</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.DynamicsFunctions.predict"><code class="docutils literal notranslate"><span class="pre">DynamicsFunctions.predict</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.MechanicsFunctions"><code class="docutils literal notranslate"><span class="pre">MechanicsFunctions</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.MechanicsFunctions._asdict"><code class="docutils literal notranslate"><span class="pre">MechanicsFunctions._asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.MechanicsFunctions._field_defaults"><code class="docutils literal notranslate"><span class="pre">MechanicsFunctions._field_defaults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.MechanicsFunctions._fields"><code class="docutils literal notranslate"><span class="pre">MechanicsFunctions._fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.MechanicsFunctions._make"><code class="docutils literal notranslate"><span class="pre">MechanicsFunctions._make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.MechanicsFunctions._replace"><code class="docutils literal notranslate"><span class="pre">MechanicsFunctions._replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.MechanicsFunctions.compute_element_stiffnesses"><code class="docutils literal notranslate"><span class="pre">MechanicsFunctions.compute_element_stiffnesses</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.MechanicsFunctions.compute_initial_state"><code class="docutils literal notranslate"><span class="pre">MechanicsFunctions.compute_initial_state</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.MechanicsFunctions.compute_output_energy_densities_and_stresses"><code class="docutils literal notranslate"><span class="pre">MechanicsFunctions.compute_output_energy_densities_and_stresses</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.MechanicsFunctions.compute_output_material_qoi"><code class="docutils literal notranslate"><span class="pre">MechanicsFunctions.compute_output_material_qoi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.MechanicsFunctions.compute_strain_energy"><code class="docutils literal notranslate"><span class="pre">MechanicsFunctions.compute_strain_energy</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.MechanicsFunctions.compute_updated_internal_variables"><code class="docutils literal notranslate"><span class="pre">MechanicsFunctions.compute_updated_internal_variables</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.MechanicsFunctions.integrated_material_qoi"><code class="docutils literal notranslate"><span class="pre">MechanicsFunctions.integrated_material_qoi</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.NewmarkParameters"><code class="docutils literal notranslate"><span class="pre">NewmarkParameters</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.NewmarkParameters._asdict"><code class="docutils literal notranslate"><span class="pre">NewmarkParameters._asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.NewmarkParameters._field_defaults"><code class="docutils literal notranslate"><span class="pre">NewmarkParameters._field_defaults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.NewmarkParameters._fields"><code class="docutils literal notranslate"><span class="pre">NewmarkParameters._fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.NewmarkParameters._make"><code class="docutils literal notranslate"><span class="pre">NewmarkParameters._make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.NewmarkParameters._replace"><code class="docutils literal notranslate"><span class="pre">NewmarkParameters._replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.NewmarkParameters.beta"><code class="docutils literal notranslate"><span class="pre">NewmarkParameters.beta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mechanics.NewmarkParameters.gamma"><code class="docutils literal notranslate"><span class="pre">NewmarkParameters.gamma</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics._compute_element_masses"><code class="docutils literal notranslate"><span class="pre">_compute_element_masses()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics._compute_element_stiffnesses"><code class="docutils literal notranslate"><span class="pre">_compute_element_stiffnesses()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics._compute_element_stiffnesses_multi_block"><code class="docutils literal notranslate"><span class="pre">_compute_element_stiffnesses_multi_block()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics._compute_initial_state_multi_block"><code class="docutils literal notranslate"><span class="pre">_compute_initial_state_multi_block()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics._compute_kinetic_energy"><code class="docutils literal notranslate"><span class="pre">_compute_kinetic_energy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics._compute_newmark_element_hessians"><code class="docutils literal notranslate"><span class="pre">_compute_newmark_element_hessians()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics._compute_strain_energy"><code class="docutils literal notranslate"><span class="pre">_compute_strain_energy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics._compute_strain_energy_multi_block"><code class="docutils literal notranslate"><span class="pre">_compute_strain_energy_multi_block()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics._compute_updated_internal_variables"><code class="docutils literal notranslate"><span class="pre">_compute_updated_internal_variables()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics._compute_updated_internal_variables_multi_block"><code class="docutils literal notranslate"><span class="pre">_compute_updated_internal_variables_multi_block()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.axisymmetric_element_gradient_transformation"><code class="docutils literal notranslate"><span class="pre">axisymmetric_element_gradient_transformation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.axisymmetric_gradient"><code class="docutils literal notranslate"><span class="pre">axisymmetric_gradient()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.compute_element_stiffness_from_global_fields"><code class="docutils literal notranslate"><span class="pre">compute_element_stiffness_from_global_fields()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.compute_newmark_lagrangian"><code class="docutils literal notranslate"><span class="pre">compute_newmark_lagrangian()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.compute_traction_potential_energy"><code class="docutils literal notranslate"><span class="pre">compute_traction_potential_energy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.create_dynamics_functions"><code class="docutils literal notranslate"><span class="pre">create_dynamics_functions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.create_mechanics_functions"><code class="docutils literal notranslate"><span class="pre">create_mechanics_functions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.create_multi_block_mechanics_functions"><code class="docutils literal notranslate"><span class="pre">create_multi_block_mechanics_functions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.define_pressure_projection_gradient_tranformation"><code class="docutils literal notranslate"><span class="pre">define_pressure_projection_gradient_tranformation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.kinetic_energy_density"><code class="docutils literal notranslate"><span class="pre">kinetic_energy_density()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.parse_2D_to_3D_gradient_transformation"><code class="docutils literal notranslate"><span class="pre">parse_2D_to_3D_gradient_transformation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.plane_strain_gradient_transformation"><code class="docutils literal notranslate"><span class="pre">plane_strain_gradient_transformation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.strain_energy_density_to_lagrangian_density"><code class="docutils literal notranslate"><span class="pre">strain_energy_density_to_lagrangian_density()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.volume_average_J_gradient_transformation"><code class="docutils literal notranslate"><span class="pre">volume_average_J_gradient_transformation()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Mesh">optimism.Mesh module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.Mesh"><code class="docutils literal notranslate"><span class="pre">Mesh</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mesh.Mesh.coords"><code class="docutils literal notranslate"><span class="pre">Mesh.coords</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mesh.Mesh.conns"><code class="docutils literal notranslate"><span class="pre">Mesh.conns</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mesh.Mesh.simplexNodesOrdinals"><code class="docutils literal notranslate"><span class="pre">Mesh.simplexNodesOrdinals</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mesh.Mesh.parentElement"><code class="docutils literal notranslate"><span class="pre">Mesh.parentElement</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mesh.Mesh.parentElement1d"><code class="docutils literal notranslate"><span class="pre">Mesh.parentElement1d</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mesh.Mesh.blocks"><code class="docutils literal notranslate"><span class="pre">Mesh.blocks</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mesh.Mesh.nodeSets"><code class="docutils literal notranslate"><span class="pre">Mesh.nodeSets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mesh.Mesh.sideSets"><code class="docutils literal notranslate"><span class="pre">Mesh.sideSets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mesh.Mesh._asdict"><code class="docutils literal notranslate"><span class="pre">Mesh._asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mesh.Mesh._field_defaults"><code class="docutils literal notranslate"><span class="pre">Mesh._field_defaults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mesh.Mesh._fields"><code class="docutils literal notranslate"><span class="pre">Mesh._fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mesh.Mesh._make"><code class="docutils literal notranslate"><span class="pre">Mesh._make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Mesh.Mesh._replace"><code class="docutils literal notranslate"><span class="pre">Mesh._replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#id8"><code class="docutils literal notranslate"><span class="pre">Mesh.blocks</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#id9"><code class="docutils literal notranslate"><span class="pre">Mesh.conns</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#id10"><code class="docutils literal notranslate"><span class="pre">Mesh.coords</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#id11"><code class="docutils literal notranslate"><span class="pre">Mesh.nodeSets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#id12"><code class="docutils literal notranslate"><span class="pre">Mesh.parentElement</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#id13"><code class="docutils literal notranslate"><span class="pre">Mesh.parentElement1d</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#id14"><code class="docutils literal notranslate"><span class="pre">Mesh.sideSets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#id15"><code class="docutils literal notranslate"><span class="pre">Mesh.simplexNodesOrdinals</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.combine_blocks"><code class="docutils literal notranslate"><span class="pre">combine_blocks()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.combine_mesh"><code class="docutils literal notranslate"><span class="pre">combine_mesh()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.combine_nodesets"><code class="docutils literal notranslate"><span class="pre">combine_nodesets()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.combine_sidesets"><code class="docutils literal notranslate"><span class="pre">combine_sidesets()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.compute_edge_vectors"><code class="docutils literal notranslate"><span class="pre">compute_edge_vectors()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.construct_mesh_from_basic_data"><code class="docutils literal notranslate"><span class="pre">construct_mesh_from_basic_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.construct_structured_mesh"><code class="docutils literal notranslate"><span class="pre">construct_structured_mesh()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.create_edges"><code class="docutils literal notranslate"><span class="pre">create_edges()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.create_higher_order_mesh_from_simplex_mesh"><code class="docutils literal notranslate"><span class="pre">create_higher_order_mesh_from_simplex_mesh()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.create_nodesets_from_sidesets"><code class="docutils literal notranslate"><span class="pre">create_nodesets_from_sidesets()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.create_structured_mesh_data"><code class="docutils literal notranslate"><span class="pre">create_structured_mesh_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.get_blocks"><code class="docutils literal notranslate"><span class="pre">get_blocks()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.get_edge_coords"><code class="docutils literal notranslate"><span class="pre">get_edge_coords()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.get_edge_field"><code class="docutils literal notranslate"><span class="pre">get_edge_field()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.get_edge_node_indices"><code class="docutils literal notranslate"><span class="pre">get_edge_node_indices()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.mesh_with_blocks"><code class="docutils literal notranslate"><span class="pre">mesh_with_blocks()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.mesh_with_coords"><code class="docutils literal notranslate"><span class="pre">mesh_with_coords()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.mesh_with_nodesets"><code class="docutils literal notranslate"><span class="pre">mesh_with_nodesets()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.num_elements"><code class="docutils literal notranslate"><span class="pre">num_elements()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mesh.num_nodes"><code class="docutils literal notranslate"><span class="pre">num_nodes()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.MeshPlot">optimism.MeshPlot module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.MeshPlot.plot_mesh"><code class="docutils literal notranslate"><span class="pre">plot_mesh()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.MeshPlot.plot_mesh_with_field"><code class="docutils literal notranslate"><span class="pre">plot_mesh_with_field()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.MinimizeScalar">optimism.MinimizeScalar module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.MinimizeScalar.Settings"><code class="docutils literal notranslate"><span class="pre">Settings</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.MinimizeScalar.Settings._asdict"><code class="docutils literal notranslate"><span class="pre">Settings._asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.MinimizeScalar.Settings._field_defaults"><code class="docutils literal notranslate"><span class="pre">Settings._field_defaults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.MinimizeScalar.Settings._fields"><code class="docutils literal notranslate"><span class="pre">Settings._fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.MinimizeScalar.Settings._make"><code class="docutils literal notranslate"><span class="pre">Settings._make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.MinimizeScalar.Settings._replace"><code class="docutils literal notranslate"><span class="pre">Settings._replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.MinimizeScalar.Settings.max_iters"><code class="docutils literal notranslate"><span class="pre">Settings.max_iters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.MinimizeScalar.Settings.tol"><code class="docutils literal notranslate"><span class="pre">Settings.tol</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.MinimizeScalar.get_settings"><code class="docutils literal notranslate"><span class="pre">get_settings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.MinimizeScalar.line_search_backtrack"><code class="docutils literal notranslate"><span class="pre">line_search_backtrack()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.MinimizeScalar.line_search_bidirectional"><code class="docutils literal notranslate"><span class="pre">line_search_bidirectional()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.MinimizeScalar.line_search_forwardtrack"><code class="docutils literal notranslate"><span class="pre">line_search_forwardtrack()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.MinimizeScalar.minimize_scalar"><code class="docutils literal notranslate"><span class="pre">minimize_scalar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.MinimizeScalar.while_loop"><code class="docutils literal notranslate"><span class="pre">while_loop()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.NewtonSolver">optimism.NewtonSolver module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.NewtonSolver.Settings"><code class="docutils literal notranslate"><span class="pre">Settings</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.NewtonSolver.Settings._asdict"><code class="docutils literal notranslate"><span class="pre">Settings._asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.NewtonSolver.Settings._field_defaults"><code class="docutils literal notranslate"><span class="pre">Settings._field_defaults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.NewtonSolver.Settings._fields"><code class="docutils literal notranslate"><span class="pre">Settings._fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.NewtonSolver.Settings._make"><code class="docutils literal notranslate"><span class="pre">Settings._make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.NewtonSolver.Settings._replace"><code class="docutils literal notranslate"><span class="pre">Settings._replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.NewtonSolver.Settings.max_gmres_iters"><code class="docutils literal notranslate"><span class="pre">Settings.max_gmres_iters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.NewtonSolver.Settings.relative_gmres_tol"><code class="docutils literal notranslate"><span class="pre">Settings.relative_gmres_tol</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.NewtonSolver.compute_min_p"><code class="docutils literal notranslate"><span class="pre">compute_min_p()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.NewtonSolver.construct_quadratic"><code class="docutils literal notranslate"><span class="pre">construct_quadratic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.NewtonSolver.globalized_newton_step"><code class="docutils literal notranslate"><span class="pre">globalized_newton_step()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.NewtonSolver.newton_step"><code class="docutils literal notranslate"><span class="pre">newton_step()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Objective">optimism.Objective module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Objective.Objective"><code class="docutils literal notranslate"><span class="pre">Objective</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Objective.apply_precond"><code class="docutils literal notranslate"><span class="pre">Objective.apply_precond()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Objective.check_stability"><code class="docutils literal notranslate"><span class="pre">Objective.check_stability()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Objective.gradient"><code class="docutils literal notranslate"><span class="pre">Objective.gradient()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Objective.gradient_and_tangent"><code class="docutils literal notranslate"><span class="pre">Objective.gradient_and_tangent()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Objective.gradient_p"><code class="docutils literal notranslate"><span class="pre">Objective.gradient_p()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Objective.hessian"><code class="docutils literal notranslate"><span class="pre">Objective.hessian()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Objective.hessian_vec"><code class="docutils literal notranslate"><span class="pre">Objective.hessian_vec()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Objective.jacobian_p2_vec"><code class="docutils literal notranslate"><span class="pre">Objective.jacobian_p2_vec()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Objective.jacobian_p_vec"><code class="docutils literal notranslate"><span class="pre">Objective.jacobian_p_vec()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Objective.multiply_by_approx_hessian"><code class="docutils literal notranslate"><span class="pre">Objective.multiply_by_approx_hessian()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Objective.update_precond"><code class="docutils literal notranslate"><span class="pre">Objective.update_precond()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Objective.value"><code class="docutils literal notranslate"><span class="pre">Objective.value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Objective.vec_hessian"><code class="docutils literal notranslate"><span class="pre">Objective.vec_hessian()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Objective.vec_jacobian_p0"><code class="docutils literal notranslate"><span class="pre">Objective.vec_jacobian_p0()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Objective.vec_jacobian_p1"><code class="docutils literal notranslate"><span class="pre">Objective.vec_jacobian_p1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Objective.vec_jacobian_p2"><code class="docutils literal notranslate"><span class="pre">Objective.vec_jacobian_p2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Objective.vec_jacobian_p4"><code class="docutils literal notranslate"><span class="pre">Objective.vec_jacobian_p4()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Objective.Params"><code class="docutils literal notranslate"><span class="pre">Params</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Params._asdict"><code class="docutils literal notranslate"><span class="pre">Params._asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Params._field_defaults"><code class="docutils literal notranslate"><span class="pre">Params._field_defaults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Params._fields"><code class="docutils literal notranslate"><span class="pre">Params._fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Params._make"><code class="docutils literal notranslate"><span class="pre">Params._make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Params._replace"><code class="docutils literal notranslate"><span class="pre">Params._replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Params.app_data"><code class="docutils literal notranslate"><span class="pre">Params.app_data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Params.bc_data"><code class="docutils literal notranslate"><span class="pre">Params.bc_data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Params.design_data"><code class="docutils literal notranslate"><span class="pre">Params.design_data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Params.dynamic_data"><code class="docutils literal notranslate"><span class="pre">Params.dynamic_data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Params.state_data"><code class="docutils literal notranslate"><span class="pre">Params.state_data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Params.time"><code class="docutils literal notranslate"><span class="pre">Params.time</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Objective.PrecondStrategy"><code class="docutils literal notranslate"><span class="pre">PrecondStrategy</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.PrecondStrategy.initialize"><code class="docutils literal notranslate"><span class="pre">PrecondStrategy.initialize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.PrecondStrategy.precond_at_attempt"><code class="docutils literal notranslate"><span class="pre">PrecondStrategy.precond_at_attempt()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Objective.ScaledObjective"><code class="docutils literal notranslate"><span class="pre">ScaledObjective</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.ScaledObjective.get_residual"><code class="docutils literal notranslate"><span class="pre">ScaledObjective.get_residual()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.ScaledObjective.get_value"><code class="docutils literal notranslate"><span class="pre">ScaledObjective.get_value()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Objective.ScaledPrecondStrategy"><code class="docutils literal notranslate"><span class="pre">ScaledPrecondStrategy</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.ScaledPrecondStrategy.initialize"><code class="docutils literal notranslate"><span class="pre">ScaledPrecondStrategy.initialize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.ScaledPrecondStrategy.precond_at_attempt"><code class="docutils literal notranslate"><span class="pre">ScaledPrecondStrategy.precond_at_attempt()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Objective.TwoTryPrecondStrategy"><code class="docutils literal notranslate"><span class="pre">TwoTryPrecondStrategy</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.TwoTryPrecondStrategy.initialize"><code class="docutils literal notranslate"><span class="pre">TwoTryPrecondStrategy.initialize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.TwoTryPrecondStrategy.precond_at_attempt"><code class="docutils literal notranslate"><span class="pre">TwoTryPrecondStrategy.precond_at_attempt()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Objective.param_index_update"><code class="docutils literal notranslate"><span class="pre">param_index_update()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.QuadratureRule">optimism.QuadratureRule module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.QuadratureRule.QuadratureRule"><code class="docutils literal notranslate"><span class="pre">QuadratureRule</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.QuadratureRule.QuadratureRule._asdict"><code class="docutils literal notranslate"><span class="pre">QuadratureRule._asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.QuadratureRule.QuadratureRule._field_defaults"><code class="docutils literal notranslate"><span class="pre">QuadratureRule._field_defaults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.QuadratureRule.QuadratureRule._fields"><code class="docutils literal notranslate"><span class="pre">QuadratureRule._fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.QuadratureRule.QuadratureRule._make"><code class="docutils literal notranslate"><span class="pre">QuadratureRule._make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.QuadratureRule.QuadratureRule._replace"><code class="docutils literal notranslate"><span class="pre">QuadratureRule._replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.QuadratureRule.QuadratureRule.wgauss"><code class="docutils literal notranslate"><span class="pre">QuadratureRule.wgauss</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.QuadratureRule.QuadratureRule.xigauss"><code class="docutils literal notranslate"><span class="pre">QuadratureRule.xigauss</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.QuadratureRule._gauss_quad_1D_1pt"><code class="docutils literal notranslate"><span class="pre">_gauss_quad_1D_1pt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.QuadratureRule._gauss_quad_1D_2pt"><code class="docutils literal notranslate"><span class="pre">_gauss_quad_1D_2pt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.QuadratureRule._gauss_quad_1D_3pt"><code class="docutils literal notranslate"><span class="pre">_gauss_quad_1D_3pt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.QuadratureRule._gauss_quad_1D_4pt"><code class="docutils literal notranslate"><span class="pre">_gauss_quad_1D_4pt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.QuadratureRule._gauss_quad_1D_5pt"><code class="docutils literal notranslate"><span class="pre">_gauss_quad_1D_5pt()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.QuadratureRule.create_padded_quadrature_rule_1D"><code class="docutils literal notranslate"><span class="pre">create_padded_quadrature_rule_1D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.QuadratureRule.create_quadrature_rule_1D"><code class="docutils literal notranslate"><span class="pre">create_quadrature_rule_1D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.QuadratureRule.create_quadrature_rule_on_triangle"><code class="docutils literal notranslate"><span class="pre">create_quadrature_rule_on_triangle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.QuadratureRule.eval_at_iso_points"><code class="docutils literal notranslate"><span class="pre">eval_at_iso_points()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.QuadratureRule.len"><code class="docutils literal notranslate"><span class="pre">len()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.ReadExodusMesh">optimism.ReadExodusMesh module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ReadExodusMesh._get_vertex_nodes_from_exodus_tri6_mesh"><code class="docutils literal notranslate"><span class="pre">_get_vertex_nodes_from_exodus_tri6_mesh()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ReadExodusMesh._read_block_conns"><code class="docutils literal notranslate"><span class="pre">_read_block_conns()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ReadExodusMesh._read_block_variable_values"><code class="docutils literal notranslate"><span class="pre">_read_block_variable_values()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ReadExodusMesh._read_blocks"><code class="docutils literal notranslate"><span class="pre">_read_blocks()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ReadExodusMesh._read_coordinates"><code class="docutils literal notranslate"><span class="pre">_read_coordinates()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ReadExodusMesh._read_element_type"><code class="docutils literal notranslate"><span class="pre">_read_element_type()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ReadExodusMesh._read_names_list"><code class="docutils literal notranslate"><span class="pre">_read_names_list()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ReadExodusMesh._read_node_sets"><code class="docutils literal notranslate"><span class="pre">_read_node_sets()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ReadExodusMesh._read_side_sets"><code class="docutils literal notranslate"><span class="pre">_read_side_sets()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ReadExodusMesh.read_exodus_mesh"><code class="docutils literal notranslate"><span class="pre">read_exodus_mesh()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ReadExodusMesh.read_exodus_mesh_element_properties"><code class="docutils literal notranslate"><span class="pre">read_exodus_mesh_element_properties()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.ReadMesh">optimism.ReadMesh module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ReadMesh.read_json_mesh"><code class="docutils literal notranslate"><span class="pre">read_json_mesh()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.ScalarRootFind">optimism.ScalarRootFind module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.Settings"><code class="docutils literal notranslate"><span class="pre">Settings</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.Settings._asdict"><code class="docutils literal notranslate"><span class="pre">Settings._asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.Settings._field_defaults"><code class="docutils literal notranslate"><span class="pre">Settings._field_defaults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.Settings._fields"><code class="docutils literal notranslate"><span class="pre">Settings._fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.Settings._make"><code class="docutils literal notranslate"><span class="pre">Settings._make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.Settings._replace"><code class="docutils literal notranslate"><span class="pre">Settings._replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.Settings.max_iters"><code class="docutils literal notranslate"><span class="pre">Settings.max_iters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.Settings.r_tol"><code class="docutils literal notranslate"><span class="pre">Settings.r_tol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.Settings.x_tol"><code class="docutils literal notranslate"><span class="pre">Settings.x_tol</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.SolutionInfo"><code class="docutils literal notranslate"><span class="pre">SolutionInfo</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.SolutionInfo._asdict"><code class="docutils literal notranslate"><span class="pre">SolutionInfo._asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.SolutionInfo._field_defaults"><code class="docutils literal notranslate"><span class="pre">SolutionInfo._field_defaults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.SolutionInfo._fields"><code class="docutils literal notranslate"><span class="pre">SolutionInfo._fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.SolutionInfo._make"><code class="docutils literal notranslate"><span class="pre">SolutionInfo._make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.SolutionInfo._replace"><code class="docutils literal notranslate"><span class="pre">SolutionInfo._replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.SolutionInfo.converged"><code class="docutils literal notranslate"><span class="pre">SolutionInfo.converged</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.SolutionInfo.correction_norm"><code class="docutils literal notranslate"><span class="pre">SolutionInfo.correction_norm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.SolutionInfo.function_calls"><code class="docutils literal notranslate"><span class="pre">SolutionInfo.function_calls</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.SolutionInfo.iterations"><code class="docutils literal notranslate"><span class="pre">SolutionInfo.iterations</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.SolutionInfo.residual_norm"><code class="docutils literal notranslate"><span class="pre">SolutionInfo.residual_norm</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.bisection_step"><code class="docutils literal notranslate"><span class="pre">bisection_step()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.find_root"><code class="docutils literal notranslate"><span class="pre">find_root()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.get_settings"><code class="docutils literal notranslate"><span class="pre">get_settings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.newton_step"><code class="docutils literal notranslate"><span class="pre">newton_step()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.ScalarRootFind.rtsafe_"><code class="docutils literal notranslate"><span class="pre">rtsafe_()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.SmoothFunctions">optimism.SmoothFunctions module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.SmoothFunctions.abs"><code class="docutils literal notranslate"><span class="pre">abs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.SmoothFunctions.max"><code class="docutils literal notranslate"><span class="pre">max()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.SmoothFunctions.min"><code class="docutils literal notranslate"><span class="pre">min()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.SmoothFunctions.min_base"><code class="docutils literal notranslate"><span class="pre">min_base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.SmoothFunctions.zmax"><code class="docutils literal notranslate"><span class="pre">zmax()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.SparseCholesky">optimism.SparseCholesky module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.SparseCholesky.SparseCholesky"><code class="docutils literal notranslate"><span class="pre">SparseCholesky</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.SparseCholesky.SparseCholesky.apply"><code class="docutils literal notranslate"><span class="pre">SparseCholesky.apply()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.SparseCholesky.SparseCholesky.apply_transpose"><code class="docutils literal notranslate"><span class="pre">SparseCholesky.apply_transpose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.SparseCholesky.SparseCholesky.check_stability"><code class="docutils literal notranslate"><span class="pre">SparseCholesky.check_stability()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.SparseCholesky.SparseCholesky.factorize"><code class="docutils literal notranslate"><span class="pre">SparseCholesky.factorize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.SparseCholesky.SparseCholesky.get_diagonal_stiffness"><code class="docutils literal notranslate"><span class="pre">SparseCholesky.get_diagonal_stiffness()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.SparseCholesky.SparseCholesky.multiply_by_approximate"><code class="docutils literal notranslate"><span class="pre">SparseCholesky.multiply_by_approximate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.SparseCholesky.SparseCholesky.multiply_by_transpose"><code class="docutils literal notranslate"><span class="pre">SparseCholesky.multiply_by_transpose()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.SparseCholesky.SparseCholesky.update"><code class="docutils literal notranslate"><span class="pre">SparseCholesky.update()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.SparseMatrixAssembler">optimism.SparseMatrixAssembler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.SparseMatrixAssembler.assemble_sparse_stiffness_matrix"><code class="docutils literal notranslate"><span class="pre">assemble_sparse_stiffness_matrix()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Surface">optimism.Surface module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Surface.compute_edge_vectors"><code class="docutils literal notranslate"><span class="pre">compute_edge_vectors()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Surface.compute_normal"><code class="docutils literal notranslate"><span class="pre">compute_normal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Surface.create_edges"><code class="docutils literal notranslate"><span class="pre">create_edges()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Surface.eval_field"><code class="docutils literal notranslate"><span class="pre">eval_field()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Surface.get_coords"><code class="docutils literal notranslate"><span class="pre">get_coords()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Surface.get_field_index"><code class="docutils literal notranslate"><span class="pre">get_field_index()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Surface.integrate_function"><code class="docutils literal notranslate"><span class="pre">integrate_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Surface.integrate_function_on_edge"><code class="docutils literal notranslate"><span class="pre">integrate_function_on_edge()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Surface.integrate_function_on_surface"><code class="docutils literal notranslate"><span class="pre">integrate_function_on_surface()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Surface.integrate_values"><code class="docutils literal notranslate"><span class="pre">integrate_values()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.TensorMath">optimism.TensorMath module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.I2"><code class="docutils literal notranslate"><span class="pre">I2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath._exp_relative_difference"><code class="docutils literal notranslate"><span class="pre">_exp_relative_difference()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath._exp_symm_jvp"><code class="docutils literal notranslate"><span class="pre">_exp_symm_jvp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath._log_relative_difference"><code class="docutils literal notranslate"><span class="pre">_log_relative_difference()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath._log_symm_jvp"><code class="docutils literal notranslate"><span class="pre">_log_symm_jvp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath._pow_relative_difference"><code class="docutils literal notranslate"><span class="pre">_pow_relative_difference()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath._pow_symm_jvp"><code class="docutils literal notranslate"><span class="pre">_pow_symm_jvp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath._relative_log_difference"><code class="docutils literal notranslate"><span class="pre">_relative_log_difference()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath._relative_log_difference_no_tolerance_check"><code class="docutils literal notranslate"><span class="pre">_relative_log_difference_no_tolerance_check()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath._relative_log_difference_taylor"><code class="docutils literal notranslate"><span class="pre">_relative_log_difference_taylor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath._sqrt_relative_difference"><code class="docutils literal notranslate"><span class="pre">_sqrt_relative_difference()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath._sqrt_symm_jvp"><code class="docutils literal notranslate"><span class="pre">_sqrt_symm_jvp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath._symmetric_matrix_function_jvp_helper"><code class="docutils literal notranslate"><span class="pre">_symmetric_matrix_function_jvp_helper()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.cos_of_acos_divided_by_3"><code class="docutils literal notranslate"><span class="pre">cos_of_acos_divided_by_3()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.det"><code class="docutils literal notranslate"><span class="pre">det()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.detpIm1"><code class="docutils literal notranslate"><span class="pre">detpIm1()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.dev"><code class="docutils literal notranslate"><span class="pre">dev()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.deviator"><code class="docutils literal notranslate"><span class="pre">deviator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.eigen_sym33_non_unit"><code class="docutils literal notranslate"><span class="pre">eigen_sym33_non_unit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.eigen_sym33_unit"><code class="docutils literal notranslate"><span class="pre">eigen_sym33_unit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.gradient_2D_to_axisymmetric"><code class="docutils literal notranslate"><span class="pre">gradient_2D_to_axisymmetric()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.inv"><code class="docutils literal notranslate"><span class="pre">inv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.log_sqrt_symm"><code class="docutils literal notranslate"><span class="pre">log_sqrt_symm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.mises_invariant"><code class="docutils literal notranslate"><span class="pre">mises_invariant()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.norm"><code class="docutils literal notranslate"><span class="pre">norm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.norm_of_deviator"><code class="docutils literal notranslate"><span class="pre">norm_of_deviator()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.norm_of_deviator_squared"><code class="docutils literal notranslate"><span class="pre">norm_of_deviator_squared()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.right_polar_decomposition"><code class="docutils literal notranslate"><span class="pre">right_polar_decomposition()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.skw"><code class="docutils literal notranslate"><span class="pre">skw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.sym"><code class="docutils literal notranslate"><span class="pre">sym()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.symmetric_matrix_function"><code class="docutils literal notranslate"><span class="pre">symmetric_matrix_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.tensor_2D_to_3D"><code class="docutils literal notranslate"><span class="pre">tensor_2D_to_3D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.trace"><code class="docutils literal notranslate"><span class="pre">trace()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TensorMath.triaxiality"><code class="docutils literal notranslate"><span class="pre">triaxiality()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Timer">optimism.Timer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Timer.Timer"><code class="docutils literal notranslate"><span class="pre">Timer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Timer.Timer._start_time"><code class="docutils literal notranslate"><span class="pre">Timer._start_time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Timer.Timer.logger"><code class="docutils literal notranslate"><span class="pre">Timer.logger()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Timer.Timer.name"><code class="docutils literal notranslate"><span class="pre">Timer.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Timer.Timer.start"><code class="docutils literal notranslate"><span class="pre">Timer.start()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Timer.Timer.stop"><code class="docutils literal notranslate"><span class="pre">Timer.stop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Timer.Timer.text"><code class="docutils literal notranslate"><span class="pre">Timer.text</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Timer.Timer.timers"><code class="docutils literal notranslate"><span class="pre">Timer.timers</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Timer.TimerError"><code class="docutils literal notranslate"><span class="pre">TimerError</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.TrustRegionSPG">optimism.TrustRegionSPG module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings"><code class="docutils literal notranslate"><span class="pre">Settings</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings._asdict"><code class="docutils literal notranslate"><span class="pre">Settings._asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings._field_defaults"><code class="docutils literal notranslate"><span class="pre">Settings._field_defaults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings._fields"><code class="docutils literal notranslate"><span class="pre">Settings._fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings._make"><code class="docutils literal notranslate"><span class="pre">Settings._make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings._replace"><code class="docutils literal notranslate"><span class="pre">Settings._replace()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.cauchy_point_decrease_tol"><code class="docutils literal notranslate"><span class="pre">Settings.cauchy_point_decrease_tol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.cauchy_point_max_line_search_iters"><code class="docutils literal notranslate"><span class="pre">Settings.cauchy_point_max_line_search_iters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.cauchy_point_sufficient_decrease_factor"><code class="docutils literal notranslate"><span class="pre">Settings.cauchy_point_sufficient_decrease_factor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.check_stability"><code class="docutils literal notranslate"><span class="pre">Settings.check_stability</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.debug_info"><code class="docutils literal notranslate"><span class="pre">Settings.debug_info</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.eta1"><code class="docutils literal notranslate"><span class="pre">Settings.eta1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.eta2"><code class="docutils literal notranslate"><span class="pre">Settings.eta2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.eta3"><code class="docutils literal notranslate"><span class="pre">Settings.eta3</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.max_cumulative_spg_iters"><code class="docutils literal notranslate"><span class="pre">Settings.max_cumulative_spg_iters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.max_spectral_step_length"><code class="docutils literal notranslate"><span class="pre">Settings.max_spectral_step_length</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.max_spg_iters"><code class="docutils literal notranslate"><span class="pre">Settings.max_spg_iters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.max_trust_iters"><code class="docutils literal notranslate"><span class="pre">Settings.max_trust_iters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.min_spectral_step_length"><code class="docutils literal notranslate"><span class="pre">Settings.min_spectral_step_length</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.min_tr_size"><code class="docutils literal notranslate"><span class="pre">Settings.min_tr_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.spg_inexact_solve_ratio"><code class="docutils literal notranslate"><span class="pre">Settings.spg_inexact_solve_ratio</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.spg_nonmonotone_iter_limit_to_enforce_decrease"><code class="docutils literal notranslate"><span class="pre">Settings.spg_nonmonotone_iter_limit_to_enforce_decrease</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.spg_tol"><code class="docutils literal notranslate"><span class="pre">Settings.spg_tol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.spg_use_nonmonotone"><code class="docutils literal notranslate"><span class="pre">Settings.spg_use_nonmonotone</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.t1"><code class="docutils literal notranslate"><span class="pre">Settings.t1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.t2"><code class="docutils literal notranslate"><span class="pre">Settings.t2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.tol"><code class="docutils literal notranslate"><span class="pre">Settings.tol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.tr_size"><code class="docutils literal notranslate"><span class="pre">Settings.tr_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.use_incremental_objective"><code class="docutils literal notranslate"><span class="pre">Settings.use_incremental_objective</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.Settings.use_preconditioned_inner_product_for_spg"><code class="docutils literal notranslate"><span class="pre">Settings.use_preconditioned_inner_product_for_spg</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.bound_constrained_trust_region_minimize"><code class="docutils literal notranslate"><span class="pre">bound_constrained_trust_region_minimize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.find_generalized_cauchy_point"><code class="docutils literal notranslate"><span class="pre">find_generalized_cauchy_point()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.get_settings"><code class="docutils literal notranslate"><span class="pre">get_settings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.is_converged"><code class="docutils literal notranslate"><span class="pre">is_converged()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.is_on_boundary"><code class="docutils literal notranslate"><span class="pre">is_on_boundary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.kouri_exact_line_search"><code class="docutils literal notranslate"><span class="pre">kouri_exact_line_search()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.nonmonotone_line_search"><code class="docutils literal notranslate"><span class="pre">nonmonotone_line_search()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.output_matrix"><code class="docutils literal notranslate"><span class="pre">output_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.print_min_banner"><code class="docutils literal notranslate"><span class="pre">print_min_banner()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.project"><code class="docutils literal notranslate"><span class="pre">project()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.project_onto_tr"><code class="docutils literal notranslate"><span class="pre">project_onto_tr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.settings_with_new_tol"><code class="docutils literal notranslate"><span class="pre">settings_with_new_tol()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.solve"><code class="docutils literal notranslate"><span class="pre">solve()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.solve_spg_subproblem"><code class="docutils literal notranslate"><span class="pre">solve_spg_subproblem()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.TrustRegionSPG.subproblem_optimality"><code class="docutils literal notranslate"><span class="pre">subproblem_optimality()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.VTKWriter">optimism.VTKWriter module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKDataType"><code class="docutils literal notranslate"><span class="pre">VTKDataType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKDataType.BIT"><code class="docutils literal notranslate"><span class="pre">VTKDataType.BIT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKDataType.CHAR"><code class="docutils literal notranslate"><span class="pre">VTKDataType.CHAR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKDataType.DOUBLE"><code class="docutils literal notranslate"><span class="pre">VTKDataType.DOUBLE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKDataType.FLOAT"><code class="docutils literal notranslate"><span class="pre">VTKDataType.FLOAT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKDataType.INT"><code class="docutils literal notranslate"><span class="pre">VTKDataType.INT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKDataType.LONG"><code class="docutils literal notranslate"><span class="pre">VTKDataType.LONG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKDataType.SHORT"><code class="docutils literal notranslate"><span class="pre">VTKDataType.SHORT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKDataType.UNSIGNED_CHAR"><code class="docutils literal notranslate"><span class="pre">VTKDataType.UNSIGNED_CHAR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKDataType.UNSIGNED_INT"><code class="docutils literal notranslate"><span class="pre">VTKDataType.UNSIGNED_INT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKDataType.UNSIGNED_LONG"><code class="docutils literal notranslate"><span class="pre">VTKDataType.UNSIGNED_LONG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKDataType.UNSIGNED_SHORT"><code class="docutils literal notranslate"><span class="pre">VTKDataType.UNSIGNED_SHORT</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKFieldType"><code class="docutils literal notranslate"><span class="pre">VTKFieldType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKFieldType.SCALARS"><code class="docutils literal notranslate"><span class="pre">VTKFieldType.SCALARS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKFieldType.TENSORS"><code class="docutils literal notranslate"><span class="pre">VTKFieldType.TENSORS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKFieldType.VECTORS"><code class="docutils literal notranslate"><span class="pre">VTKFieldType.VECTORS</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKWriter"><code class="docutils literal notranslate"><span class="pre">VTKWriter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKWriter.VTKFieldRecord"><code class="docutils literal notranslate"><span class="pre">VTKWriter.VTKFieldRecord</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKWriter._check_and_format_data"><code class="docutils literal notranslate"><span class="pre">VTKWriter._check_and_format_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKWriter._write_cell_connectivity"><code class="docutils literal notranslate"><span class="pre">VTKWriter._write_cell_connectivity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKWriter._write_cell_fields"><code class="docutils literal notranslate"><span class="pre">VTKWriter._write_cell_fields()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKWriter._write_cell_types"><code class="docutils literal notranslate"><span class="pre">VTKWriter._write_cell_types()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKWriter._write_contact_edges"><code class="docutils literal notranslate"><span class="pre">VTKWriter._write_contact_edges()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKWriter._write_coordinate_data"><code class="docutils literal notranslate"><span class="pre">VTKWriter._write_coordinate_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKWriter._write_header"><code class="docutils literal notranslate"><span class="pre">VTKWriter._write_header()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKWriter._write_nodal_fields"><code class="docutils literal notranslate"><span class="pre">VTKWriter._write_nodal_fields()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKWriter._write_out_all_fields_in_dict"><code class="docutils literal notranslate"><span class="pre">VTKWriter._write_out_all_fields_in_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKWriter.add_cell_field"><code class="docutils literal notranslate"><span class="pre">VTKWriter.add_cell_field()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKWriter.add_contact_edges"><code class="docutils literal notranslate"><span class="pre">VTKWriter.add_contact_edges()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKWriter.add_nodal_field"><code class="docutils literal notranslate"><span class="pre">VTKWriter.add_nodal_field()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKWriter.add_sphere"><code class="docutils literal notranslate"><span class="pre">VTKWriter.add_sphere()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.VTKWriter.VTKWriter.write"><code class="docutils literal notranslate"><span class="pre">VTKWriter.write()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.VTKWriter.default_values"><code class="docutils literal notranslate"><span class="pre">default_values()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.VTKWriter.write_matrix_as_table"><code class="docutils literal notranslate"><span class="pre">write_matrix_as_table()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.WarmStart">optimism.WarmStart module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.WarmStart.warm_start_increment"><code class="docutils literal notranslate"><span class="pre">warm_start_increment()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.WarmStart.warm_start_increment_jax_safe"><code class="docutils literal notranslate"><span class="pre">warm_start_increment_jax_safe()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="optimism documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="optimism.html" class="btn btn-neutral float-right" title="optimism package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

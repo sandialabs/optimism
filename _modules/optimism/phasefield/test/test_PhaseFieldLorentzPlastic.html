@@ -1,0 +1,238 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.phasefield.test.test_PhaseFieldLorentzPlastic &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.phasefield.test.test_PhaseFieldLorentzPlastic</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.phasefield.test.test_PhaseFieldLorentzPlastic</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">random</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial.transform</span> <span class="kn">import</span> <span class="n">Rotation</span> <span class="k">as</span> <span class="n">R</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">EquationSolver</span> <span class="k">as</span> <span class="n">EqSolver</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Objective</span>
+<span class="kn">from</span> <span class="nn">optimism.test</span> <span class="kn">import</span> <span class="n">TestFixture</span>
+<span class="kn">from</span> <span class="nn">optimism.test.MeshFixture</span> <span class="kn">import</span> <span class="n">MeshFixture</span>
+<span class="kn">from</span> <span class="nn">optimism.phasefield</span> <span class="kn">import</span> <span class="n">PhaseFieldLorentzPlastic</span> <span class="k">as</span> <span class="n">Model</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">SparseMatrixAssembler</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">TensorMath</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mesh</span>
+
+
+<span class="n">plotting</span><span class="o">=</span><span class="kc">False</span>
+
+
+<div class="viewcode-block" id="GradOfPlasticPhaseFieldModelFixture">
+<a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture">[docs]</a>
+<span class="k">class</span> <span class="nc">GradOfPlasticPhaseFieldModelFixture</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
+    
+<div class="viewcode-block" id="GradOfPlasticPhaseFieldModelFixture.setUp">
+<a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="o">=</span> <span class="mf">100.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">=</span> <span class="mf">0.321</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Gc</span> <span class="o">=</span> <span class="mf">40.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">psiC</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">E</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Y0</span> <span class="o">=</span> <span class="mf">0.3</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">E</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">H</span> <span class="o">=</span> <span class="mf">1.0e-2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">E</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="p">,</span>
+                 <span class="s1">&#39;poisson ratio&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">,</span>
+                 <span class="s1">&#39;critical energy release rate&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Gc</span><span class="p">,</span>
+                 <span class="s1">&#39;critical strain energy density&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">psiC</span><span class="p">,</span>
+                 <span class="s1">&#39;regularization length&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">,</span>
+                 <span class="s1">&#39;yield strength&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y0</span><span class="p">,</span>
+                 <span class="s1">&#39;hardening model&#39;</span><span class="p">:</span> <span class="s1">&#39;linear&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;hardening modulus&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">,</span>
+                 <span class="s1">&#39;kinematics&#39;</span><span class="p">:</span> <span class="s1">&#39;large deformations&#39;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">create_material_model_functions</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flux_func</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">internalVariables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="mf">1.0</span></div>
+
+
+
+<div class="viewcode-block" id="GradOfPlasticPhaseFieldModelFixture.test_zero_point">
+<a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_zero_point">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_zero_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">dispGrad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">phaseGrad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="n">energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">internalVariables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+
+        <span class="n">stress</span><span class="p">,</span> <span class="n">phaseForce</span><span class="p">,</span> <span class="n">phaseGradForce</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux_func</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">internalVariables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">stress</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)),</span> <span class="mi">12</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">phaseForce</span><span class="p">,</span> <span class="mf">3.0</span><span class="o">/</span><span class="mf">8.0</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Gc</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">phaseGradForce</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mi">12</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="GradOfPlasticPhaseFieldModelFixture.test_rotation_invariance">
+<a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_rotation_invariance">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_rotation_invariance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">dispGrad</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+        <span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">subkey</span><span class="p">)</span>
+        <span class="n">key</span><span class="p">,</span><span class="n">subkey</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">phaseGrad</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">subkey</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,))</span>
+        <span class="n">energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">internalVariables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+        
+        <span class="n">Q</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">1234</span><span class="p">)</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
+        <span class="n">dispGradStar</span> <span class="o">=</span> <span class="n">Q</span><span class="o">@</span><span class="p">(</span><span class="n">dispGrad</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">phaseStar</span> <span class="o">=</span> <span class="n">phase</span>
+        <span class="n">phaseGradStar</span> <span class="o">=</span> <span class="n">Q</span><span class="nd">@phaseGrad</span>
+        <span class="n">internalVariablesStar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">internalVariables</span>
+        <span class="n">energyStar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">(</span><span class="n">dispGradStar</span><span class="p">,</span> <span class="n">phaseStar</span><span class="p">,</span> <span class="n">phaseGradStar</span><span class="p">,</span> <span class="n">internalVariablesStar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">energyStar</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="GradOfPlasticPhaseFieldModelFixture.test_elastic_energy">
+<a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_elastic_energy">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_elastic_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">strainBelowYield</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Y0</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="c1"># engineering strain</span>
+        <span class="n">dispGrad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">strainBelowYield</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">])))</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">phaseGrad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="n">energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">internalVariables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+        <span class="n">energyExact</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="o">*</span><span class="n">strainBelowYield</span><span class="o">**</span><span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">energyExact</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+
+        <span class="n">piolaStress</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux_func</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">internalVariables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+        <span class="n">mandelStress</span> <span class="o">=</span> <span class="n">piolaStress</span><span class="o">@</span><span class="p">(</span><span class="n">dispGrad</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">stressExact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="o">*</span><span class="n">strainBelowYield</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">mandelStress</span><span class="p">,</span> <span class="n">stressExact</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="GradOfPlasticPhaseFieldModelFixture.test_plastic_stress">
+<a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_plastic_stress">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_plastic_stress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    
+        <span class="n">strain11</span> <span class="o">=</span> <span class="mf">1.1</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Y0</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">E</span>
+        <span class="n">eqps</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="o">*</span><span class="n">strain11</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="p">)</span>
+        <span class="n">elasticStrain11</span> <span class="o">=</span> <span class="n">strain11</span> <span class="o">-</span> <span class="n">eqps</span>
+        <span class="n">lateralStrain</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="o">*</span><span class="n">elasticStrain11</span> <span class="o">-</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">eqps</span>
+        <span class="n">strains</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">strain11</span><span class="p">,</span> <span class="n">lateralStrain</span><span class="p">,</span> <span class="n">lateralStrain</span><span class="p">])</span>
+        <span class="n">dispGrad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">strains</span><span class="p">))</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">phaseGrad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="n">energyExact</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="o">*</span><span class="n">elasticStrain11</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y0</span><span class="o">*</span><span class="n">eqps</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="o">*</span><span class="n">eqps</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">internalVariables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">energyExact</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+        
+        <span class="n">stress</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux_func</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">internalVariables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+        <span class="n">mandelStress</span> <span class="o">=</span> <span class="n">stress</span><span class="o">@</span><span class="p">(</span><span class="n">dispGrad</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">mandelStress11Exact</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="o">*</span><span class="p">(</span><span class="n">strain11</span> <span class="o">-</span> <span class="n">eqps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">mandelStress</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">mandelStress11Exact</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>      </div>
+</div>
+
+        
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

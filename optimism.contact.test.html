@@ -1,0 +1,751 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.contact.test package &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="optimism.material package" href="optimism.material.html" />
+    <link rel="prev" title="optimism.contact package" href="optimism.contact.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">optimism</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="optimism.html">optimism package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="optimism.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="optimism.contact.html">optimism.contact package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html">optimism.material package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.phasefield.html">optimism.phasefield package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html">optimism.test package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.AlSolver">optimism.AlSolver module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.BoundConstrainedObjective">optimism.BoundConstrainedObjective module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.BoundConstrainedSolver">optimism.BoundConstrainedSolver module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.ConstrainedObjective">optimism.ConstrainedObjective module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.EquationSolver">optimism.EquationSolver module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.EquationSolverSubspace">optimism.EquationSolverSubspace module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.FunctionSpace">optimism.FunctionSpace module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism-incompletecholesky-module">optimism.IncompleteCholesky module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Interpolants">optimism.Interpolants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.J2PlasticPhaseField">optimism.J2PlasticPhaseField module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.JaxConfig">optimism.JaxConfig module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.LU">optimism.LU module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.LinAlg">optimism.LinAlg module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Math">optimism.Math module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Mechanics">optimism.Mechanics module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Mesh">optimism.Mesh module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.MeshPlot">optimism.MeshPlot module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.MinimizeScalar">optimism.MinimizeScalar module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.NewtonSolver">optimism.NewtonSolver module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Objective">optimism.Objective module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.QuadratureRule">optimism.QuadratureRule module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.ReadExodusMesh">optimism.ReadExodusMesh module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.ReadMesh">optimism.ReadMesh module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.ScalarRootFind">optimism.ScalarRootFind module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.SmoothFunctions">optimism.SmoothFunctions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.SparseCholesky">optimism.SparseCholesky module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.SparseMatrixAssembler">optimism.SparseMatrixAssembler module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Surface">optimism.Surface module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.TensorMath">optimism.TensorMath module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.Timer">optimism.Timer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.TrustRegionSPG">optimism.TrustRegionSPG module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.VTKWriter">optimism.VTKWriter module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism.WarmStart">optimism.WarmStart module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#module-optimism">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="optimism.html">optimism package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="optimism.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="optimism.contact.html">optimism.contact package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="optimism.contact.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#module-optimism.contact.Contact">optimism.contact.Contact module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#module-optimism.contact.EdgeCpp">optimism.contact.EdgeCpp module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#module-optimism.contact.EdgeIntersection">optimism.contact.EdgeIntersection module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#module-optimism.contact.Friction">optimism.contact.Friction module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#module-optimism.contact.Levelset">optimism.contact.Levelset module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#module-optimism.contact.LevelsetConstraint">optimism.contact.LevelsetConstraint module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#module-optimism.contact.MortarContact">optimism.contact.MortarContact module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#module-optimism.contact.PenaltyContact">optimism.contact.PenaltyContact module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#module-optimism.contact.Search">optimism.contact.Search module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.html#module-optimism.contact">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.material.html">optimism.material package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.phasefield.html">optimism.phasefield package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.test.html">optimism.test package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.AlSolver">optimism.AlSolver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.BoundConstrainedObjective">optimism.BoundConstrainedObjective module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.BoundConstrainedSolver">optimism.BoundConstrainedSolver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.ConstrainedObjective">optimism.ConstrainedObjective module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.EquationSolver">optimism.EquationSolver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.EquationSolverSubspace">optimism.EquationSolverSubspace module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.FunctionSpace">optimism.FunctionSpace module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#optimism-incompletecholesky-module">optimism.IncompleteCholesky module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Interpolants">optimism.Interpolants module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.J2PlasticPhaseField">optimism.J2PlasticPhaseField module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.JaxConfig">optimism.JaxConfig module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.LU">optimism.LU module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.LinAlg">optimism.LinAlg module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Math">optimism.Math module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Mechanics">optimism.Mechanics module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Mesh">optimism.Mesh module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.MeshPlot">optimism.MeshPlot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.MinimizeScalar">optimism.MinimizeScalar module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.NewtonSolver">optimism.NewtonSolver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Objective">optimism.Objective module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.QuadratureRule">optimism.QuadratureRule module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.ReadExodusMesh">optimism.ReadExodusMesh module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.ReadMesh">optimism.ReadMesh module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.ScalarRootFind">optimism.ScalarRootFind module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.SmoothFunctions">optimism.SmoothFunctions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.SparseCholesky">optimism.SparseCholesky module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.SparseMatrixAssembler">optimism.SparseMatrixAssembler module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Surface">optimism.Surface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.TensorMath">optimism.TensorMath module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Timer">optimism.Timer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.TrustRegionSPG">optimism.TrustRegionSPG module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.VTKWriter">optimism.VTKWriter module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.WarmStart">optimism.WarmStart module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">optimism</a></li>
+          <li class="breadcrumb-item"><a href="optimism.html">optimism package</a></li>
+          <li class="breadcrumb-item"><a href="optimism.contact.html">optimism.contact package</a></li>
+      <li class="breadcrumb-item active">optimism.contact.test package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/optimism.contact.test.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="optimism-contact-test-package">
+<h1>optimism.contact.test package<a class="headerlink" href="#optimism-contact-test-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-optimism.contact.test.test_Contact">
+<span id="optimism-contact-test-test-contact-module"></span><h2>optimism.contact.test.test_Contact module<a class="headerlink" href="#module-optimism.contact.test.test_Contact" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Contact.TestContactFrictionData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_Contact.</span></span><span class="sig-name descname"><span class="pre">TestContactFrictionData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Contact.html#TestContactFrictionData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Contact.TestContactFrictionData" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.MeshFixture.MeshFixture" title="optimism.test.MeshFixture.MeshFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeshFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Contact.TestContactFrictionData.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Contact.html#TestContactFrictionData.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Contact.TestContactFrictionData.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Contact.TestContactFrictionData.test_friction_search_after_motion">
+<span class="sig-name descname"><span class="pre">test_friction_search_after_motion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Contact.html#TestContactFrictionData.test_friction_search_after_motion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Contact.TestContactFrictionData.test_friction_search_after_motion" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Contact.TestContactFrictionData.test_friction_search_static">
+<span class="sig-name descname"><span class="pre">test_friction_search_static</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Contact.html#TestContactFrictionData.test_friction_search_static"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Contact.TestContactFrictionData.test_friction_search_static" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Contact.sort_uniq">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_Contact.</span></span><span class="sig-name descname"><span class="pre">sort_uniq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Contact.html#sort_uniq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Contact.sort_uniq" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-optimism.contact.test.test_Cpp">
+<span id="optimism-contact-test-test-cpp-module"></span><h2>optimism.contact.test.test_Cpp module<a class="headerlink" href="#module-optimism.contact.test.test_Cpp" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Cpp.TestEdgeIntersection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_Cpp.</span></span><span class="sig-name descname"><span class="pre">TestEdgeIntersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Cpp.html#TestEdgeIntersection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Cpp.TestEdgeIntersection" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Cpp.TestEdgeIntersection.plot_grid">
+<span class="sig-name descname"><span class="pre">plot_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Cpp.html#TestEdgeIntersection.plot_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Cpp.TestEdgeIntersection.plot_grid" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Cpp.TestEdgeIntersection.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Cpp.html#TestEdgeIntersection.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Cpp.TestEdgeIntersection.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Cpp.TestEdgeIntersection.test_cpp_dist_corner1">
+<span class="sig-name descname"><span class="pre">test_cpp_dist_corner1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Cpp.html#TestEdgeIntersection.test_cpp_dist_corner1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Cpp.TestEdgeIntersection.test_cpp_dist_corner1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Cpp.TestEdgeIntersection.test_cpp_dist_corner2">
+<span class="sig-name descname"><span class="pre">test_cpp_dist_corner2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Cpp.html#TestEdgeIntersection.test_cpp_dist_corner2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Cpp.TestEdgeIntersection.test_cpp_dist_corner2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Cpp.TestEdgeIntersection.test_cpp_dist_exterior">
+<span class="sig-name descname"><span class="pre">test_cpp_dist_exterior</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Cpp.html#TestEdgeIntersection.test_cpp_dist_exterior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Cpp.TestEdgeIntersection.test_cpp_dist_exterior" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Cpp.TestEdgeIntersection.test_cpp_dist_interior">
+<span class="sig-name descname"><span class="pre">test_cpp_dist_interior</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Cpp.html#TestEdgeIntersection.test_cpp_dist_interior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Cpp.TestEdgeIntersection.test_cpp_dist_interior" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Cpp.TestEdgeIntersection.test_limits">
+<span class="sig-name descname"><span class="pre">test_limits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Cpp.html#TestEdgeIntersection.test_limits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Cpp.TestEdgeIntersection.test_limits" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Cpp.TestEdgeIntersection.test_plot_smooth_min">
+<span class="sig-name descname"><span class="pre">test_plot_smooth_min</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Cpp.html#TestEdgeIntersection.test_plot_smooth_min"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Cpp.TestEdgeIntersection.test_plot_smooth_min" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Cpp.TestEdgeIntersection.test_smooth_1">
+<span class="sig-name descname"><span class="pre">test_smooth_1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Cpp.html#TestEdgeIntersection.test_smooth_1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Cpp.TestEdgeIntersection.test_smooth_1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Cpp.TestEdgeIntersection.test_smooth_2">
+<span class="sig-name descname"><span class="pre">test_smooth_2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Cpp.html#TestEdgeIntersection.test_smooth_2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Cpp.TestEdgeIntersection.test_smooth_2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Cpp.compute_grid_field">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_Cpp.</span></span><span class="sig-name descname"><span class="pre">compute_grid_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluation_function</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Cpp.html#compute_grid_field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Cpp.compute_grid_field" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Cpp.edges_from_points">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_Cpp.</span></span><span class="sig-name descname"><span class="pre">edges_from_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Cpp.html#edges_from_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Cpp.edges_from_points" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-optimism.contact.test.test_EdgeIntersection">
+<span id="optimism-contact-test-test-edgeintersection-module"></span><h2>optimism.contact.test.test_EdgeIntersection module<a class="headerlink" href="#module-optimism.contact.test.test_EdgeIntersection" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_EdgeIntersection.</span></span><span class="sig-name descname"><span class="pre">TestEdgeIntersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_EdgeIntersection.html#TestEdgeIntersection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.compute_ray_trace">
+<span class="sig-name descname"><span class="pre">compute_ray_trace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_EdgeIntersection.html#TestEdgeIntersection.compute_ray_trace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.compute_ray_trace" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.get_edge">
+<span class="sig-name descname"><span class="pre">get_edge</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_EdgeIntersection.html#TestEdgeIntersection.get_edge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.get_edge" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.get_ray">
+<span class="sig-name descname"><span class="pre">get_ray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_EdgeIntersection.html#TestEdgeIntersection.get_ray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.get_ray" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.get_ray_length_arg_x">
+<span class="sig-name descname"><span class="pre">get_ray_length_arg_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xComp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_EdgeIntersection.html#TestEdgeIntersection.get_ray_length_arg_x"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.get_ray_length_arg_x" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.get_ray_length_arg_y">
+<span class="sig-name descname"><span class="pre">get_ray_length_arg_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yComp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_EdgeIntersection.html#TestEdgeIntersection.get_ray_length_arg_y"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.get_ray_length_arg_y" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_EdgeIntersection.html#TestEdgeIntersection.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_limit_of_ray_smoothing">
+<span class="sig-name descname"><span class="pre">test_limit_of_ray_smoothing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_EdgeIntersection.html#TestEdgeIntersection.test_limit_of_ray_smoothing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_limit_of_ray_smoothing" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_plot">
+<span class="sig-name descname"><span class="pre">test_plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_EdgeIntersection.html#TestEdgeIntersection.test_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_plot" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_plot2">
+<span class="sig-name descname"><span class="pre">test_plot2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_EdgeIntersection.html#TestEdgeIntersection.test_plot2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_plot2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_smooth_gradient_on_either_side_of_left_edge">
+<span class="sig-name descname"><span class="pre">test_smooth_gradient_on_either_side_of_left_edge</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_EdgeIntersection.html#TestEdgeIntersection.test_smooth_gradient_on_either_side_of_left_edge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_smooth_gradient_on_either_side_of_left_edge" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_smooth_gradient_on_either_side_of_right_edge">
+<span class="sig-name descname"><span class="pre">test_smooth_gradient_on_either_side_of_right_edge</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_EdgeIntersection.html#TestEdgeIntersection.test_smooth_gradient_on_either_side_of_right_edge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_smooth_gradient_on_either_side_of_right_edge" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_valid_intersection">
+<span class="sig-name descname"><span class="pre">test_valid_intersection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_EdgeIntersection.html#TestEdgeIntersection.test_valid_intersection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_valid_intersection" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_valid_intersection_on_edge">
+<span class="sig-name descname"><span class="pre">test_valid_intersection_on_edge</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_EdgeIntersection.html#TestEdgeIntersection.test_valid_intersection_on_edge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_valid_intersection_on_edge" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optimism.contact.test.test_LevelsetConstraint">
+<span id="optimism-contact-test-test-levelsetconstraint-module"></span><h2>optimism.contact.test.test_LevelsetConstraint module<a class="headerlink" href="#module-optimism.contact.test.test_LevelsetConstraint" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_LevelsetConstraint.</span></span><span class="sig-name descname"><span class="pre">TestLevelsetContactConstraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_LevelsetConstraint.html#TestLevelsetContactConstraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.MeshFixture.MeshFixture" title="optimism.test.MeshFixture.MeshFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeshFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_LevelsetConstraint.html#TestLevelsetContactConstraint.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint.test_compute_all_positive_constraints_for_far_away_levelset">
+<span class="sig-name descname"><span class="pre">test_compute_all_positive_constraints_for_far_away_levelset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_LevelsetConstraint.html#TestLevelsetContactConstraint.test_compute_all_positive_constraints_for_far_away_levelset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint.test_compute_all_positive_constraints_for_far_away_levelset" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint.test_friction">
+<span class="sig-name descname"><span class="pre">test_friction</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_LevelsetConstraint.html#TestLevelsetContactConstraint.test_friction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint.test_friction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint.test_solve">
+<span class="sig-name descname"><span class="pre">test_solve</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_LevelsetConstraint.html#TestLevelsetContactConstraint.test_solve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint.test_solve" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint.test_some_positive_some_negative_constraints_for_small_sphere_on_edge">
+<span class="sig-name descname"><span class="pre">test_some_positive_some_negative_constraints_for_small_sphere_on_edge</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_LevelsetConstraint.html#TestLevelsetContactConstraint.test_some_positive_some_negative_constraints_for_small_sphere_on_edge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint.test_some_positive_some_negative_constraints_for_small_sphere_on_edge" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optimism.contact.test.test_MortarGeom">
+<span id="optimism-contact-test-test-mortargeom-module"></span><h2>optimism.contact.test.test_MortarGeom module<a class="headerlink" href="#module-optimism.contact.test.test_MortarGeom" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.contact.test.test_MortarGeom.TestMortarGeom">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_MortarGeom.</span></span><span class="sig-name descname"><span class="pre">TestMortarGeom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_MortarGeom.html#TestMortarGeom"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_MortarGeom.TestMortarGeom" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_MortarGeom.TestMortarGeom.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_MortarGeom.html#TestMortarGeom.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_MortarGeom.TestMortarGeom.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_MortarGeom.TestMortarGeom.testAreaIntegrals">
+<span class="sig-name descname"><span class="pre">testAreaIntegrals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_MortarGeom.html#TestMortarGeom.testAreaIntegrals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_MortarGeom.TestMortarGeom.testAreaIntegrals" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_MortarGeom.TestMortarGeom.testEdgesWithCommonPoint">
+<span class="sig-name descname"><span class="pre">testEdgesWithCommonPoint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_MortarGeom.html#TestMortarGeom.testEdgesWithCommonPoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_MortarGeom.TestMortarGeom.testEdgesWithCommonPoint" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_MortarGeom.TestMortarGeom.testEdgesWithTwoCommonPoints">
+<span class="sig-name descname"><span class="pre">testEdgesWithTwoCommonPoints</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_MortarGeom.html#TestMortarGeom.testEdgesWithTwoCommonPoints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_MortarGeom.TestMortarGeom.testEdgesWithTwoCommonPoints" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_MortarGeom.TestMortarGeom.testMortarIntegralOneSided">
+<span class="sig-name descname"><span class="pre">testMortarIntegralOneSided</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_MortarGeom.html#TestMortarGeom.testMortarIntegralOneSided"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_MortarGeom.TestMortarGeom.testMortarIntegralOneSided" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_MortarGeom.TestMortarGeom.testOffEdges">
+<span class="sig-name descname"><span class="pre">testOffEdges</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_MortarGeom.html#TestMortarGeom.testOffEdges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_MortarGeom.TestMortarGeom.testOffEdges" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_MortarGeom.TestMortarGeom.testSpline">
+<span class="sig-name descname"><span class="pre">testSpline</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_MortarGeom.html#TestMortarGeom.testSpline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_MortarGeom.TestMortarGeom.testSpline" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.test.test_MortarGeom.compute_error">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_MortarGeom.</span></span><span class="sig-name descname"><span class="pre">compute_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edgeA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edgeB</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xiA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xiB</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_common_normal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_MortarGeom.html#compute_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_MortarGeom.compute_error" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.test.test_MortarGeom.spline_ramp">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_MortarGeom.</span></span><span class="sig-name descname"><span class="pre">spline_ramp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_MortarGeom.html#spline_ramp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_MortarGeom.spline_ramp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-optimism.contact.test.test_NewtonGlobalization">
+<span id="optimism-contact-test-test-newtonglobalization-module"></span><h2>optimism.contact.test.test_NewtonGlobalization module<a class="headerlink" href="#module-optimism.contact.test.test_NewtonGlobalization" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.TestGMRESSolver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_NewtonGlobalization.</span></span><span class="sig-name descname"><span class="pre">TestGMRESSolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#TestGMRESSolver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.TestGMRESSolver" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.TestGMRESSolver.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#TestGMRESSolver.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.TestGMRESSolver.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.TestGMRESSolver.test_al_solver">
+<span class="sig-name descname"><span class="pre">test_al_solver</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#TestGMRESSolver.test_al_solver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.TestGMRESSolver.test_al_solver" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.TestGMRESSolver.test_globalized_newton_step_nonconvex">
+<span class="sig-name descname"><span class="pre">test_globalized_newton_step_nonconvex</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#TestGMRESSolver.test_globalized_newton_step_nonconvex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.TestGMRESSolver.test_globalized_newton_step_nonconvex" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.TestGMRESSolver.test_globalized_newton_step_with_cubic">
+<span class="sig-name descname"><span class="pre">test_globalized_newton_step_with_cubic</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#TestGMRESSolver.test_globalized_newton_step_with_cubic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.TestGMRESSolver.test_globalized_newton_step_with_cubic" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.TestGMRESSolver.test_newton_step">
+<span class="sig-name descname"><span class="pre">test_newton_step</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#TestGMRESSolver.test_newton_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.TestGMRESSolver.test_newton_step" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_NewtonGlobalization.</span></span><span class="sig-name descname"><span class="pre">TestQuadraticSolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#TestQuadraticSolver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.check_quadratic">
+<span class="sig-name descname"><span class="pre">check_quadratic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#TestQuadraticSolver.check_quadratic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.check_quadratic" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#TestQuadraticSolver.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.test_constant">
+<span class="sig-name descname"><span class="pre">test_constant</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#TestQuadraticSolver.test_constant"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.test_constant" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.test_linear">
+<span class="sig-name descname"><span class="pre">test_linear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#TestQuadraticSolver.test_linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.test_linear" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.test_negative_curvature">
+<span class="sig-name descname"><span class="pre">test_negative_curvature</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#TestQuadraticSolver.test_negative_curvature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.test_negative_curvature" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.test_negative_linear">
+<span class="sig-name descname"><span class="pre">test_negative_linear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#TestQuadraticSolver.test_negative_linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.test_negative_linear" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.test_positive_curvature">
+<span class="sig-name descname"><span class="pre">test_positive_curvature</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#TestQuadraticSolver.test_positive_curvature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.test_positive_curvature" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.test_positive_curvature2">
+<span class="sig-name descname"><span class="pre">test_positive_curvature2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#TestQuadraticSolver.test_positive_curvature2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.test_positive_curvature2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.test_positive_curvature3">
+<span class="sig-name descname"><span class="pre">test_positive_curvature3</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#TestQuadraticSolver.test_positive_curvature3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.test_positive_curvature3" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.constraint">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_NewtonGlobalization.</span></span><span class="sig-name descname"><span class="pre">constraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#constraint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.constraint" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.create_linear_op">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_NewtonGlobalization.</span></span><span class="sig-name descname"><span class="pre">create_linear_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">residual</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#create_linear_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.create_linear_op" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.dConstraint">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_NewtonGlobalization.</span></span><span class="sig-name descname"><span class="pre">dConstraint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.dConstraint" title="Link to this definition"></a></dt>
+<dd><p>Gradient of &lt;lambda&gt; with respect to positional argument(s) 0. Takes the same arguments as &lt;lambda&gt; but returns the gradient, which has the same shape as the arguments at positions 0.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.dObjective">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_NewtonGlobalization.</span></span><span class="sig-name descname"><span class="pre">dObjective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.dObjective" title="Link to this definition"></a></dt>
+<dd><p>Gradient of objective with respect to positional argument(s) 0. Takes the same arguments as objective but returns the gradient, which has the same shape as the arguments at positions 0.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.fischer_burmeister">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_NewtonGlobalization.</span></span><span class="sig-name descname"><span class="pre">fischer_burmeister</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#fischer_burmeister"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.fischer_burmeister" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.linear_op">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_NewtonGlobalization.</span></span><span class="sig-name descname"><span class="pre">linear_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xlam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#linear_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.linear_op" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.my_func">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_NewtonGlobalization.</span></span><span class="sig-name descname"><span class="pre">my_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#my_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.my_func" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.objective">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_NewtonGlobalization.</span></span><span class="sig-name descname"><span class="pre">objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#objective"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.objective" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.test.test_NewtonGlobalization.residual">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_NewtonGlobalization.</span></span><span class="sig-name descname"><span class="pre">residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xlam</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_NewtonGlobalization.html#residual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_NewtonGlobalization.residual" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-optimism.contact.test.test_Search">
+<span id="optimism-contact-test-test-search-module"></span><h2>optimism.contact.test.test_Search module<a class="headerlink" href="#module-optimism.contact.test.test_Search" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Search.TestDoubleMeshFixture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_Search.</span></span><span class="sig-name descname"><span class="pre">TestDoubleMeshFixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Search.html#TestDoubleMeshFixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Search.TestDoubleMeshFixture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.MeshFixture.MeshFixture" title="optimism.test.MeshFixture.MeshFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeshFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Search.TestDoubleMeshFixture.is_contact_edge">
+<span class="sig-name descname"><span class="pre">is_contact_edge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Search.html#TestDoubleMeshFixture.is_contact_edge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Search.TestDoubleMeshFixture.is_contact_edge" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Search.TestDoubleMeshFixture.is_integration_edge">
+<span class="sig-name descname"><span class="pre">is_integration_edge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Search.html#TestDoubleMeshFixture.is_integration_edge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Search.TestDoubleMeshFixture.is_integration_edge" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Search.TestDoubleMeshFixture.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Search.html#TestDoubleMeshFixture.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Search.TestDoubleMeshFixture.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Search.TestDoubleMeshFixture.test_contact_distance_constraint_evaluation">
+<span class="sig-name descname"><span class="pre">test_contact_distance_constraint_evaluation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Search.html#TestDoubleMeshFixture.test_contact_distance_constraint_evaluation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Search.TestDoubleMeshFixture.test_contact_distance_constraint_evaluation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Search.TestDoubleMeshFixture.test_correct_number_of_edges_created_for_contact">
+<span class="sig-name descname"><span class="pre">test_correct_number_of_edges_created_for_contact</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Search.html#TestDoubleMeshFixture.test_correct_number_of_edges_created_for_contact"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Search.TestDoubleMeshFixture.test_correct_number_of_edges_created_for_contact" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Search.TestDoubleMeshFixture.test_surface_integral_of_linears">
+<span class="sig-name descname"><span class="pre">test_surface_integral_of_linears</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Search.html#TestDoubleMeshFixture.test_surface_integral_of_linears"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Search.TestDoubleMeshFixture.test_surface_integral_of_linears" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Search.TestDoubleMeshFixture.test_surface_integral_of_quadratics">
+<span class="sig-name descname"><span class="pre">test_surface_integral_of_quadratics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Search.html#TestDoubleMeshFixture.test_surface_integral_of_quadratics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Search.TestDoubleMeshFixture.test_surface_integral_of_quadratics" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.test.test_Search.get_best_overlap_vector">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_Search.</span></span><span class="sig-name descname"><span class="pre">get_best_overlap_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">listOfEdges</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_Search.html#get_best_overlap_vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_Search.get_best_overlap_vector" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-optimism.contact.test.test_TwoBodyContact">
+<span id="optimism-contact-test-test-twobodycontact-module"></span><h2>optimism.contact.test.test_TwoBodyContact module<a class="headerlink" href="#module-optimism.contact.test.test_TwoBodyContact" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_TwoBodyContact.</span></span><span class="sig-name descname"><span class="pre">TwoBodyContactFixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_TwoBodyContact.html#TwoBodyContactFixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.MeshFixture.MeshFixture" title="optimism.test.MeshFixture.MeshFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeshFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.plot_solution">
+<span class="sig-name descname"><span class="pre">plot_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plotName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_TwoBodyContact.html#TwoBodyContactFixture.plot_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.plot_solution" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_TwoBodyContact.html#TwoBodyContactFixture.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.test_combining_nodesets">
+<span class="sig-name descname"><span class="pre">test_combining_nodesets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_TwoBodyContact.html#TwoBodyContactFixture.test_combining_nodesets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.test_combining_nodesets" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.test_combining_sidesets">
+<span class="sig-name descname"><span class="pre">test_combining_sidesets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_TwoBodyContact.html#TwoBodyContactFixture.test_combining_sidesets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.test_combining_sidesets" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.test_contact_search">
+<span class="sig-name descname"><span class="pre">test_contact_search</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_TwoBodyContact.html#TwoBodyContactFixture.test_contact_search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.test_contact_search" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.test.test_TwoBodyContact.get_best_overlap_vector">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_TwoBodyContact.</span></span><span class="sig-name descname"><span class="pre">get_best_overlap_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">listOfEdges</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_TwoBodyContact.html#get_best_overlap_vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_TwoBodyContact.get_best_overlap_vector" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.test.test_TwoBodyContact.get_side_set_segments">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_TwoBodyContact.</span></span><span class="sig-name descname"><span class="pre">get_side_set_segments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sideset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_TwoBodyContact.html#get_side_set_segments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_TwoBodyContact.get_side_set_segments" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-optimism.contact.test.test_TwoBodyMortarContact">
+<span id="optimism-contact-test-test-twobodymortarcontact-module"></span><h2>optimism.contact.test.test_TwoBodyMortarContact module<a class="headerlink" href="#module-optimism.contact.test.test_TwoBodyMortarContact" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.contact.test.test_TwoBodyMortarContact.TwoBodyContactFixture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.contact.test.test_TwoBodyMortarContact.</span></span><span class="sig-name descname"><span class="pre">TwoBodyContactFixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_TwoBodyMortarContact.html#TwoBodyContactFixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_TwoBodyMortarContact.TwoBodyContactFixture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.MeshFixture.MeshFixture" title="optimism.test.MeshFixture.MeshFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeshFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_TwoBodyMortarContact.TwoBodyContactFixture.plot_solution">
+<span class="sig-name descname"><span class="pre">plot_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plotName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_TwoBodyMortarContact.html#TwoBodyContactFixture.plot_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_TwoBodyMortarContact.TwoBodyContactFixture.plot_solution" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_TwoBodyMortarContact.TwoBodyContactFixture.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_TwoBodyMortarContact.html#TwoBodyContactFixture.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_TwoBodyMortarContact.TwoBodyContactFixture.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_TwoBodyMortarContact.TwoBodyContactFixture.test_contact_constraints">
+<span class="sig-name descname"><span class="pre">test_contact_constraints</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_TwoBodyMortarContact.html#TwoBodyContactFixture.test_contact_constraints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_TwoBodyMortarContact.TwoBodyContactFixture.test_contact_constraints" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.contact.test.test_TwoBodyMortarContact.TwoBodyContactFixture.test_contact_search">
+<span class="sig-name descname"><span class="pre">test_contact_search</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/test/test_TwoBodyMortarContact.html#TwoBodyContactFixture.test_contact_search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.test.test_TwoBodyMortarContact.TwoBodyContactFixture.test_contact_search" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optimism.contact.test">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-optimism.contact.test" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="optimism.contact.html" class="btn btn-neutral float-left" title="optimism.contact package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="optimism.material.html" class="btn btn-neutral float-right" title="optimism.material package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

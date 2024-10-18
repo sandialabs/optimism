@@ -1,0 +1,634 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.TrustRegionSPG &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.TrustRegionSPG</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.TrustRegionSPG</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">save_npz</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">optimize</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
+
+<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="c1"># from optimism import ScalarRootFind</span>
+<span class="c1"># from optimism.Timer import Timer</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">WarmStart</span>
+
+
+<span class="n">Settings</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Settings&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;t1&#39;</span><span class="p">,</span><span class="s1">&#39;t2&#39;</span><span class="p">,</span><span class="s1">&#39;eta1&#39;</span><span class="p">,</span><span class="s1">&#39;eta2&#39;</span><span class="p">,</span><span class="s1">&#39;eta3&#39;</span><span class="p">,</span><span class="s1">&#39;max_trust_iters&#39;</span><span class="p">,</span><span class="s1">&#39;tol&#39;</span><span class="p">,</span><span class="s1">&#39;max_spg_iters&#39;</span><span class="p">,</span><span class="s1">&#39;max_cumulative_spg_iters&#39;</span><span class="p">,</span><span class="s1">&#39;spg_tol&#39;</span><span class="p">,</span><span class="s1">&#39;spg_inexact_solve_ratio&#39;</span><span class="p">,</span><span class="s1">&#39;tr_size&#39;</span><span class="p">,</span><span class="s1">&#39;min_tr_size&#39;</span><span class="p">,</span><span class="s1">&#39;check_stability&#39;</span><span class="p">,</span><span class="s1">&#39;use_preconditioned_inner_product_for_spg&#39;</span><span class="p">,</span><span class="s1">&#39;spg_use_nonmonotone&#39;</span><span class="p">,</span><span class="s1">&#39;spg_nonmonotone_iter_limit_to_enforce_decrease&#39;</span><span class="p">,</span><span class="s1">&#39;use_incremental_objective&#39;</span><span class="p">,</span><span class="s1">&#39;cauchy_point_sufficient_decrease_factor&#39;</span><span class="p">,</span><span class="s1">&#39;cauchy_point_decrease_tol&#39;</span><span class="p">,</span><span class="s1">&#39;cauchy_point_max_line_search_iters&#39;</span><span class="p">,</span><span class="s1">&#39;min_spectral_step_length&#39;</span><span class="p">,</span><span class="s1">&#39;max_spectral_step_length&#39;</span><span class="p">,</span><span class="s1">&#39;debug_info&#39;</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="get_settings">
+<a class="viewcode-back" href="../../optimism.html#optimism.TrustRegionSPG.get_settings">[docs]</a>
+<span class="k">def</span> <span class="nf">get_settings</span><span class="p">(</span><span class="n">t1</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">t2</span><span class="o">=</span><span class="mf">1.75</span><span class="p">,</span> <span class="n">eta1</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">eta2</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">eta3</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                 <span class="n">max_trust_iters</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                 <span class="n">tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
+                 <span class="n">max_spg_iters</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+                 <span class="n">max_cumulative_spg_iters</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                 <span class="n">spg_tol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">spg_inexact_solve_ratio</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span>
+                 <span class="n">tr_size</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+                 <span class="n">min_tr_size</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
+                 <span class="n">check_stability</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">use_preconditioned_inner_product_for_spg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">spg_use_nonmonotone</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">spg_nonmonotone_iter_limit_to_enforce_decrease</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                 <span class="n">use_incremental_objective</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">cauchy_point_sufficient_decrease_factor</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span>
+                 <span class="n">cauchy_point_decrease_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
+                 <span class="n">cauchy_point_max_line_search_iters</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+                 <span class="n">min_spectral_step_length</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
+                 <span class="n">max_spectral_step_length</span><span class="o">=</span><span class="mf">1e12</span><span class="p">,</span>
+                 <span class="n">debug_info</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Must have spg_tol &lt; tol to avoid inexactness of subproblem</span>
+<span class="sd">    solves preventing convergence of trust region algorithm.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">spg_tol</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span>
+        <span class="n">spg_tol</span> <span class="o">=</span> <span class="mf">0.2</span><span class="o">*</span><span class="n">tol</span>
+
+    <span class="k">return</span> <span class="n">Settings</span><span class="p">(</span><span class="n">t1</span><span class="p">,</span> <span class="n">t2</span><span class="p">,</span> <span class="n">eta1</span><span class="p">,</span> <span class="n">eta2</span><span class="p">,</span> <span class="n">eta3</span><span class="p">,</span>
+                    <span class="n">max_trust_iters</span><span class="o">=</span><span class="n">max_trust_iters</span><span class="p">,</span>
+                    <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span>
+                    <span class="n">max_spg_iters</span><span class="o">=</span><span class="n">max_spg_iters</span><span class="p">,</span>
+                    <span class="n">max_cumulative_spg_iters</span><span class="o">=</span><span class="n">max_cumulative_spg_iters</span><span class="p">,</span>
+                    <span class="n">spg_tol</span><span class="o">=</span><span class="n">spg_tol</span><span class="p">,</span>
+                    <span class="n">spg_inexact_solve_ratio</span><span class="o">=</span><span class="n">spg_inexact_solve_ratio</span><span class="p">,</span>
+                    <span class="n">tr_size</span><span class="o">=</span><span class="n">tr_size</span><span class="p">,</span>
+                    <span class="n">min_tr_size</span><span class="o">=</span><span class="n">min_tr_size</span><span class="p">,</span>
+                    <span class="n">check_stability</span><span class="o">=</span><span class="n">check_stability</span><span class="p">,</span>
+                    <span class="n">use_preconditioned_inner_product_for_spg</span><span class="o">=</span><span class="n">use_preconditioned_inner_product_for_spg</span><span class="p">,</span>
+                    <span class="n">spg_use_nonmonotone</span><span class="o">=</span><span class="n">spg_use_nonmonotone</span><span class="p">,</span>
+                    <span class="n">spg_nonmonotone_iter_limit_to_enforce_decrease</span><span class="o">=</span><span class="n">spg_nonmonotone_iter_limit_to_enforce_decrease</span><span class="p">,</span>
+                    <span class="n">use_incremental_objective</span><span class="o">=</span><span class="n">use_incremental_objective</span><span class="p">,</span>
+                    <span class="n">cauchy_point_sufficient_decrease_factor</span><span class="o">=</span><span class="n">cauchy_point_sufficient_decrease_factor</span><span class="p">,</span>
+                    <span class="n">cauchy_point_decrease_tol</span><span class="o">=</span><span class="n">cauchy_point_decrease_tol</span><span class="p">,</span>
+                    <span class="n">cauchy_point_max_line_search_iters</span><span class="o">=</span><span class="n">cauchy_point_max_line_search_iters</span><span class="p">,</span>
+                    <span class="n">min_spectral_step_length</span><span class="o">=</span><span class="n">min_spectral_step_length</span><span class="p">,</span>
+                    <span class="n">max_spectral_step_length</span><span class="o">=</span><span class="n">max_spectral_step_length</span><span class="p">,</span>
+                    <span class="n">debug_info</span><span class="o">=</span><span class="n">debug_info</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="settings_with_new_tol">
+<a class="viewcode-back" href="../../optimism.html#optimism.TrustRegionSPG.settings_with_new_tol">[docs]</a>
+<span class="k">def</span> <span class="nf">settings_with_new_tol</span><span class="p">(</span><span class="n">oldSettings</span><span class="p">,</span> <span class="n">newTol</span><span class="p">):</span>
+    <span class="n">newSettings</span> <span class="o">=</span> <span class="n">Settings</span><span class="p">(</span><span class="n">t1</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">t1</span><span class="p">,</span>
+                           <span class="n">t2</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">t2</span><span class="p">,</span>
+                           <span class="n">eta1</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">eta1</span><span class="p">,</span>
+                           <span class="n">eta2</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">eta2</span><span class="p">,</span>
+                           <span class="n">eta3</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">eta3</span><span class="p">,</span>
+                           <span class="n">max_trust_iters</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">max_trust_iters</span><span class="p">,</span>
+                           <span class="n">tol</span><span class="o">=</span><span class="n">newTol</span><span class="p">,</span> <span class="c1"># here</span>
+                           <span class="n">max_spg_iters</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">max_spg_iters</span><span class="p">,</span>
+                           <span class="n">max_cumulative_spg_iters</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">max_cumulative_spg_iters</span><span class="p">,</span>
+                           <span class="n">spg_tol</span><span class="o">=</span><span class="mf">0.2</span><span class="o">*</span><span class="n">newTol</span><span class="p">,</span> <span class="c1"># here</span>
+                           <span class="n">spg_inexact_solve_ratio</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">spg_inexact_solve_ratio</span><span class="p">,</span>
+                           <span class="n">tr_size</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">tr_size</span><span class="p">,</span>
+                           <span class="n">min_tr_size</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">min_tr_size</span><span class="p">,</span>
+                           <span class="n">check_stability</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">check_stability</span><span class="p">,</span>
+                           <span class="n">use_preconditioned_inner_product_for_spg</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">use_preconditioned_inner_product_for_spg</span><span class="p">,</span>
+                           <span class="n">spg_use_nonmonotone</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">spg_use_nonmonotone</span><span class="p">,</span>
+                           <span class="n">spg_nonmonotone_iter_limit_to_enforce_decrease</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">spg_nonmonotone_iter_limit_to_enforce_decrease</span><span class="p">,</span>
+                           <span class="n">use_incremental_objective</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">use_incremental_objective</span><span class="p">,</span>
+                           <span class="n">cauchy_point_sufficient_decrease_factor</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">cauchy_point_sufficient_decrease_factor</span><span class="p">,</span>
+                           <span class="n">cauchy_point_decrease_tol</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">cauchy_point_decrease_tol</span><span class="p">,</span>
+                           <span class="n">cauchy_point_max_line_search_iters</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">cauchy_point_max_line_search_iters</span><span class="p">,</span>
+                           <span class="n">min_spectral_step_length</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">min_spectral_step_length</span><span class="p">,</span>
+                           <span class="n">max_spectral_step_length</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">max_spectral_step_length</span><span class="p">,</span>
+                           <span class="n">debug_info</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">debug_info</span><span class="p">)</span>
+                           
+
+    <span class="k">return</span> <span class="n">newSettings</span></div>
+
+
+
+<span class="n">boundaryString</span><span class="o">=</span><span class="s1">&#39;boundary&#39;</span>
+<span class="n">interiorString</span><span class="o">=</span><span class="s1">&#39;interior&#39;</span>
+<span class="n">cauchyString</span><span class="o">=</span><span class="s1">&#39;cauchy pt&#39;</span>
+
+
+<div class="viewcode-block" id="is_on_boundary">
+<a class="viewcode-back" href="../../optimism.html#optimism.TrustRegionSPG.is_on_boundary">[docs]</a>
+<span class="k">def</span> <span class="nf">is_on_boundary</span><span class="p">(</span><span class="n">stepType</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">stepType</span><span class="o">==</span><span class="n">boundaryString</span></div>
+
+
+
+<div class="viewcode-block" id="subproblem_optimality">
+<a class="viewcode-back" href="../../optimism.html#optimism.TrustRegionSPG.subproblem_optimality">[docs]</a>
+<span class="k">def</span> <span class="nf">subproblem_optimality</span><span class="p">(</span><span class="n">xNew</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">trSize</span><span class="p">):</span>
+    <span class="n">chi</span> <span class="o">=</span> <span class="n">project_onto_tr</span><span class="p">(</span><span class="n">xNew</span> <span class="o">-</span> <span class="n">d</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">trSize</span><span class="p">)</span> <span class="o">-</span> <span class="n">xNew</span>
+    <span class="k">return</span> <span class="n">chi</span><span class="nd">@chi</span></div>
+
+
+
+<div class="viewcode-block" id="kouri_exact_line_search">
+<a class="viewcode-back" href="../../optimism.html#optimism.TrustRegionSPG.kouri_exact_line_search">[docs]</a>
+<span class="k">def</span> <span class="nf">kouri_exact_line_search</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">sBs</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">qMax</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="o">-</span><span class="n">ds</span><span class="o">/</span><span class="n">sBs</span>
+    <span class="k">return</span> <span class="n">alpha</span></div>
+
+
+
+<div class="viewcode-block" id="nonmonotone_line_search">
+<a class="viewcode-back" href="../../optimism.html#optimism.TrustRegionSPG.nonmonotone_line_search">[docs]</a>
+<span class="k">def</span> <span class="nf">nonmonotone_line_search</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">sBs</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">qMax</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+    <span class="n">gamma</span> <span class="o">=</span> <span class="mf">1e-4</span> <span class="c1"># Armijo sufficient decrease parameter</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">gamma</span><span class="p">)</span><span class="o">*</span><span class="n">ds</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">b</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">sBs</span><span class="o">*</span><span class="p">(</span><span class="n">q</span> <span class="o">-</span> <span class="n">qMax</span><span class="p">)))</span> <span class="o">/</span> <span class="n">sBs</span>
+    <span class="k">return</span> <span class="n">alpha</span></div>
+
+
+
+<div class="viewcode-block" id="solve_spg_subproblem">
+<a class="viewcode-back" href="../../optimism.html#optimism.TrustRegionSPG.solve_spg_subproblem">[docs]</a>
+<span class="k">def</span> <span class="nf">solve_spg_subproblem</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">cauchyStep</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">hess_vec_func</span><span class="p">,</span> <span class="n">precond</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+    <span class="c1"># minimize r@z + 0.5*z@B@z st y in C, ||y|| &lt;= delta</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">cauchyStep</span>
+    <span class="n">xNew</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">z</span>
+    <span class="n">Bz</span> <span class="o">=</span> <span class="n">hess_vec_func</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="n">Bz</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">r</span><span class="nd">@z</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">z</span><span class="nd">@Bz</span>
+    <span class="n">chi2</span> <span class="o">=</span> <span class="n">subproblem_optimality</span><span class="p">(</span><span class="n">xNew</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">trSize</span><span class="p">)</span>
+
+    <span class="c1"># print(&#39;norm g&#39;, np.linalg.norm(r))</span>
+
+    <span class="n">spgTolSquared</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">spg_tol</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
+                        <span class="n">chi2</span><span class="o">*</span><span class="n">settings</span><span class="o">.</span><span class="n">spg_inexact_solve_ratio</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">chi2</span> <span class="o">&lt;</span> <span class="n">spgTolSquared</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">chi2</span><span class="p">),</span> <span class="n">cauchyString</span><span class="p">,</span> <span class="mi">0</span>
+
+    <span class="n">lamMin</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">min_spectral_step_length</span>
+    <span class="n">lamMax</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">max_spectral_step_length</span>
+    <span class="n">lam</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">lamMin</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="n">lamMax</span><span class="p">))</span>
+    <span class="c1"># print(&#39;initial lam&#39;, lam)</span>
+
+    <span class="n">line_search</span> <span class="o">=</span> <span class="n">nonmonotone_line_search</span> <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">spg_use_nonmonotone</span> <span class="k">else</span> <span class="n">kouri_exact_line_search</span>
+
+    <span class="c1"># set up nonmonotone descent check data</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">spg_nonmonotone_iter_limit_to_enforce_decrease</span>
+    <span class="n">qHistory</span> <span class="o">=</span> <span class="n">deque</span><span class="p">([</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="o">-</span><span class="mi">1</span><span class="p">)])</span>
+    <span class="n">qHistory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">q</span><span class="p">))</span>
+
+    <span class="c1"># SPG iterations</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">max_spg_iters</span><span class="p">):</span>
+        <span class="c1"># print(&#39;\t----------&#39;)</span>
+        <span class="c1"># print(&#39;\tspg iteration &#39;, i)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">project_onto_tr</span><span class="p">(</span><span class="n">xNew</span> <span class="o">-</span> <span class="n">lam</span><span class="o">*</span><span class="n">d</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">trSize</span><span class="p">)</span> <span class="o">-</span> <span class="n">xNew</span>
+        <span class="c1"># print(&#39;\tnorm of tentative subproblem solution&#39;, np.linalg.norm(z + s))</span>
+        <span class="n">Bs</span> <span class="o">=</span> <span class="n">hess_vec_func</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">sBs</span> <span class="o">=</span> <span class="n">s</span><span class="nd">@Bs</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">d</span><span class="nd">@s</span>
+        <span class="n">qMax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">qHistory</span><span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">line_search</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">sBs</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">qMax</span><span class="p">,</span> <span class="n">settings</span><span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span> <span class="k">if</span> <span class="n">sBs</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">1.0</span>
+
+        <span class="n">z</span> <span class="o">+=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">s</span>
+        <span class="n">d</span> <span class="o">+=</span> <span class="n">alpha</span><span class="o">*</span><span class="n">Bs</span>
+        <span class="n">q</span> <span class="o">+=</span> <span class="n">alpha</span><span class="o">*</span><span class="p">(</span><span class="n">ds</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">alpha</span><span class="o">*</span><span class="n">sBs</span><span class="p">)</span>
+        <span class="n">xNew</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">z</span>
+
+        <span class="n">chi2</span> <span class="o">=</span> <span class="n">subproblem_optimality</span><span class="p">(</span><span class="n">xNew</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">trSize</span><span class="p">)</span>
+
+        <span class="c1"># print(&#39;\txNew = &#39;, xNew)</span>
+        <span class="c1"># print(&#39;\tq = &#39;, q)</span>
+        <span class="c1"># print(&#39;\tlam = &#39;, lam)</span>
+        <span class="c1"># print(&#39;\toptimality&#39;, np.sqrt(chi2))</span>
+        <span class="c1"># print(&#39;\tstep length alpha&#39;, alpha)</span>
+        <span class="c1"># print(&#39;\tsubproblem step length&#39;, np.linalg.norm(z))</span>
+
+        <span class="n">qHistory</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+        <span class="n">qHistory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">q</span><span class="p">))</span>
+        
+        <span class="k">if</span> <span class="n">chi2</span> <span class="o">&lt;</span> <span class="n">spgTolSquared</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">chi2</span><span class="p">),</span> <span class="n">boundaryString</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+
+        <span class="n">lam</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">lamMin</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">lamMax</span><span class="p">,</span> <span class="n">s</span><span class="nd">@s</span><span class="o">/</span><span class="n">sBs</span><span class="p">))</span> <span class="k">if</span> <span class="n">sBs</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">lamMax</span>
+            
+    <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">chi2</span><span class="p">),</span> <span class="n">interiorString</span><span class="o">+</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span></div>
+
+
+    
+<div class="viewcode-block" id="print_min_banner">
+<a class="viewcode-back" href="../../optimism.html#optimism.TrustRegionSPG.print_min_banner">[docs]</a>
+<span class="k">def</span> <span class="nf">print_min_banner</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">modelObjective</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">modelRes</span><span class="p">,</span> <span class="n">spgIters</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">onBoundary</span><span class="p">,</span> <span class="n">willAccept</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">debug_info</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span> <span class="k">return</span>
+    
+    <span class="n">willAccept</span> <span class="o">=</span> <span class="s2">&quot; True&quot;</span> <span class="k">if</span> <span class="n">willAccept</span> <span class="k">else</span> <span class="s2">&quot;False&quot;</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;obj=&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">objective</span><span class="si">:</span><span class="s2">15.9</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+          <span class="s1">&#39;, model obj=&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">modelObjective</span><span class="si">:</span><span class="s2">15.9</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+          <span class="s1">&#39;, res=&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">res</span><span class="si">:</span><span class="s2">15.9</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s1">&#39;, model res=&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">modelRes</span><span class="si">:</span><span class="s2">15.9</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+          <span class="s1">&#39;, spg iters=&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">spgIters</span><span class="si">:</span><span class="s2">3</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+          <span class="s1">&#39;, tr size=&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">trSize</span><span class="si">:</span><span class="s2">12.6</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+          <span class="s1">&#39;, &#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">onBoundary</span><span class="si">:</span><span class="s2">9</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+          <span class="s1">&#39;, accepted=&#39;</span><span class="p">,</span> <span class="n">willAccept</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># utility function to save a matrix for later analysis offline</span>
+<div class="viewcode-block" id="output_matrix">
+<a class="viewcode-back" href="../../optimism.html#optimism.TrustRegionSPG.output_matrix">[docs]</a>
+<span class="k">def</span> <span class="nf">output_matrix</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">hess</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">hessian</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">hess</span> <span class="o">=</span> <span class="n">SparseCholesky</span><span class="o">.</span><span class="n">convert_to_sparse</span><span class="p">(</span><span class="n">hess</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;saving matrix&#39;</span><span class="p">)</span>
+    <span class="n">save_npz</span><span class="p">(</span><span class="s1">&#39;matrix&#39;</span><span class="p">,</span> <span class="n">hess</span><span class="p">)</span>
+    <span class="n">exit</span><span class="p">()</span> </div>
+
+
+
+<div class="viewcode-block" id="is_converged">
+<a class="viewcode-back" href="../../optimism.html#optimism.TrustRegionSPG.is_converged">[docs]</a>
+<span class="k">def</span> <span class="nf">is_converged</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">realO</span><span class="p">,</span> <span class="n">modelO</span><span class="p">,</span> <span class="n">realOptimality</span><span class="p">,</span>
+                 <span class="n">modelOptimality</span><span class="p">,</span> <span class="n">spgIters</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">realOptimality</span> <span class="o">&lt;</span> <span class="n">settings</span><span class="o">.</span><span class="n">tol</span><span class="p">:</span>
+        <span class="n">print_min_banner</span><span class="p">(</span><span class="n">realO</span><span class="p">,</span>
+                         <span class="n">modelO</span><span class="p">,</span>
+                         <span class="n">realOptimality</span><span class="p">,</span>
+                         <span class="n">modelOptimality</span><span class="p">,</span>
+                         <span class="n">spgIters</span><span class="p">,</span>
+                         <span class="n">trSize</span><span class="p">,</span>
+                         <span class="n">interiorString</span><span class="p">,</span>
+                         <span class="kc">True</span><span class="p">,</span>
+                         <span class="n">settings</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">check_stability</span><span class="p">:</span>
+            <span class="n">objective</span><span class="o">.</span><span class="n">check_stability</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="c1"># a bit of output formatting</span>
+            
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="project">
+<a class="viewcode-back" href="../../optimism.html#optimism.TrustRegionSPG.project">[docs]</a>
+<span class="k">def</span> <span class="nf">project</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bounds</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Projects onto the feasible set. &quot;&quot;&quot;</span>
+    <span class="n">lb</span> <span class="o">=</span> <span class="n">bounds</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">ub</span> <span class="o">=</span> <span class="n">bounds</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">lb</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ub</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+
+<div class="viewcode-block" id="project_onto_tr">
+<a class="viewcode-back" href="../../optimism.html#optimism.TrustRegionSPG.project_onto_tr">[docs]</a>
+<span class="k">def</span> <span class="nf">project_onto_tr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">xk</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">trSize</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Projects onto intersection of feasible set and trust region boundary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">project</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span> <span class="o">-</span> <span class="n">xk</span>
+    <span class="n">dd</span> <span class="o">=</span> <span class="n">d</span><span class="nd">@d</span>
+    <span class="k">if</span> <span class="n">dd</span> <span class="o">&lt;=</span> <span class="n">trSize</span><span class="o">*</span><span class="n">trSize</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">project</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">project</span><span class="p">(</span><span class="n">xk</span> <span class="o">+</span> <span class="n">t</span><span class="o">*</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">xk</span><span class="p">),</span> <span class="n">bounds</span><span class="p">)</span> <span class="o">-</span> <span class="n">xk</span>
+        <span class="k">return</span> <span class="n">r</span><span class="nd">@r</span> <span class="o">-</span> <span class="n">trSize</span><span class="o">*</span><span class="n">trSize</span>
+
+    <span class="c1">#t = ScalarRootFind.rtsafe(f, x, np.array([0.0, 1.0]), rtsafeSettings)</span>
+    <span class="n">t</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">brentq</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">full_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># print(&#39;Brent method iterations&#39;, results.iterations)</span>
+    <span class="c1">#if not results.converged:</span>
+    <span class="c1">#    raise RuntimeError(&#39;TrustRegionSPG: Root finder failed&#39;)</span>
+    <span class="k">return</span> <span class="n">project</span><span class="p">(</span><span class="n">xk</span> <span class="o">+</span> <span class="n">t</span><span class="o">*</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">xk</span><span class="p">),</span> <span class="n">bounds</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="find_generalized_cauchy_point">
+<a class="viewcode-back" href="../../optimism.html#optimism.TrustRegionSPG.find_generalized_cauchy_point">[docs]</a>
+<span class="k">def</span> <span class="nf">find_generalized_cauchy_point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">hess_vec_func</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+    <span class="n">mu0</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">cauchy_point_sufficient_decrease_factor</span>
+    <span class="n">qTol</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">cauchy_point_decrease_tol</span>
+    <span class="n">cutback</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">maxLineSearchIters</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">cauchy_point_max_line_search_iters</span>
+
+    <span class="k">def</span> <span class="nf">m</span><span class="p">(</span><span class="n">s</span><span class="p">):</span> <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">s</span><span class="nd">@hess_vec_func</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="n">g</span><span class="nd">@s</span>
+    <span class="n">deltaSquared</span> <span class="o">=</span> <span class="n">trSize</span><span class="o">*</span><span class="n">trSize</span>
+
+    <span class="c1"># print(&#39;CP line seach&#39;)</span>
+    <span class="c1"># print(&#39;g = &#39;, g, &#39;alpha = &#39;, alpha)</span>
+    
+    <span class="n">s</span> <span class="o">=</span> <span class="n">project</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">alpha</span><span class="o">*</span><span class="n">g</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span> <span class="o">-</span> <span class="n">x</span>
+    <span class="n">intialStepAcceptable</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">mu0</span><span class="o">*</span><span class="n">g</span><span class="nd">@s</span>
+    <span class="k">if</span> <span class="n">intialStepAcceptable</span><span class="p">:</span>
+        <span class="c1"># forward track</span>
+        <span class="c1"># print(&#39;Forward tracking cp&#39;)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">alphaTry</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">/</span><span class="n">cutback</span>
+        <span class="n">sTry</span> <span class="o">=</span> <span class="n">project</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">alphaTry</span><span class="o">*</span><span class="n">g</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span> <span class="o">-</span> <span class="n">x</span>
+        <span class="n">qTry</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="n">sTry</span><span class="p">)</span>
+        <span class="n">search</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">search</span><span class="p">:</span>
+            <span class="c1"># print(&#39;i&#39;, i)</span>
+            <span class="k">if</span> <span class="n">qTry</span> <span class="o">&lt;=</span> <span class="n">mu0</span><span class="o">*</span><span class="n">g</span><span class="nd">@sTry</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="n">qTry</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">qTol</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+                <span class="n">alpha</span> <span class="o">=</span> <span class="n">alphaTry</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">sTry</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">search</span> <span class="o">=</span> <span class="kc">False</span>
+                             
+            <span class="n">alphaTry</span> <span class="o">/=</span> <span class="n">cutback</span>
+            <span class="n">sTry</span> <span class="o">=</span> <span class="n">project</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">alphaTry</span><span class="o">*</span><span class="n">g</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span> <span class="o">-</span> <span class="n">x</span>
+            <span class="n">qTry</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="n">sTry</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="c1"># We need to check against the trust region size</span>
+            <span class="c1"># here in case the Hessian has negative eigenvalues.</span>
+            <span class="k">if</span> <span class="n">sTry</span><span class="nd">@sTry</span> <span class="o">&gt;=</span> <span class="n">deltaSquared</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">==</span> <span class="n">maxLineSearchIters</span><span class="p">:</span>
+                <span class="n">search</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># back track</span>
+        <span class="c1"># print(&#39;Back tracking cp&#39;)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">search</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">while</span> <span class="n">search</span><span class="p">:</span>
+            <span class="c1"># print(&#39;i&#39;, i)</span>
+            <span class="n">alpha</span> <span class="o">*=</span> <span class="n">cutback</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">project</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">alpha</span><span class="o">*</span><span class="n">g</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span> <span class="o">-</span> <span class="n">x</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">search</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">mu0</span><span class="o">*</span><span class="n">g</span><span class="nd">@s</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">maxLineSearchIters</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">maxLineSearchIters</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;No acceptable Cauchy point found after maximum allowed line search iterations&#39;</span><span class="p">)</span>
+            
+    <span class="n">ss</span> <span class="o">=</span> <span class="n">s</span><span class="nd">@s</span>
+    <span class="k">if</span> <span class="n">ss</span> <span class="o">&gt;</span> <span class="n">deltaSquared</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;generalized cauchy step outside trust region at radius&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ss</span><span class="p">))</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">search</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">while</span> <span class="n">search</span><span class="p">:</span>
+            <span class="n">alpha</span> <span class="o">*=</span> <span class="n">cutback</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">project</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">alpha</span><span class="o">*</span><span class="n">g</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span> <span class="o">-</span> <span class="n">x</span>
+            <span class="n">ss</span> <span class="o">=</span> <span class="n">s</span><span class="nd">@s</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">search</span> <span class="o">=</span> <span class="n">ss</span> <span class="o">&gt;</span> <span class="n">deltaSquared</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">maxLineSearchIters</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">maxLineSearchIters</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;No acceptable Cauchy point found after maximum allowed line search iterations&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">s</span></div>
+
+
+
+<div class="viewcode-block" id="bound_constrained_trust_region_minimize">
+<a class="viewcode-back" href="../../optimism.html#optimism.TrustRegionSPG.bound_constrained_trust_region_minimize">[docs]</a>
+<span class="k">def</span> <span class="nf">bound_constrained_trust_region_minimize</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">trSize</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">tr_size</span>
+    <span class="n">triedNewPrecond</span> <span class="o">=</span> <span class="kc">False</span>
+    
+    <span class="n">gradient</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">gradient</span>
+
+    <span class="n">g</span> <span class="o">=</span> <span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">o</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">project</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">g</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span> <span class="o">-</span> <span class="n">x</span>
+    <span class="n">prevOptimality</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Initial objective, optimality = &quot;</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">prevOptimality</span><span class="p">)</span>
+
+    <span class="c1"># this could potentially return an unstable solution</span>
+    <span class="k">if</span> <span class="n">is_converged</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">prevOptimality</span><span class="p">,</span> <span class="n">prevOptimality</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">callback</span><span class="p">:</span> <span class="n">callback</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="kc">True</span>
+
+    <span class="c1"># Set guess for first cauchy point step length</span>
+    <span class="n">gHg</span> <span class="o">=</span> <span class="n">g</span><span class="nd">@objective</span><span class="o">.</span><span class="n">hessian_vec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">gHg</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="p">(</span><span class="n">g</span><span class="nd">@g</span><span class="p">)</span> <span class="o">/</span> <span class="n">gHg</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">trSize</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+    
+    <span class="n">cumulativeSpgIters</span><span class="o">=</span><span class="mi">0</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">max_trust_iters</span><span class="p">):</span>
+        <span class="c1"># minimize 0.5*(2*r + J_sd)*d = r + 0.5*dJd</span>
+        
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">use_incremental_objective</span><span class="p">:</span>
+            <span class="n">incremental_objective</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">((</span><span class="n">g</span> <span class="o">+</span> <span class="n">objective</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">d</span><span class="p">))</span> <span class="o">@</span> <span class="n">d</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">incremental_objective</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">objective</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">d</span><span class="p">)</span> <span class="o">-</span> <span class="n">o</span>
+        
+        <span class="n">hess_vec_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">objective</span><span class="o">.</span><span class="n">hessian_vec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">use_preconditioned_inner_product_for_spg</span><span class="p">:</span>
+            <span class="n">mult_by_approx_hessian</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">multiply_by_approx_hessian</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mult_by_approx_hessian</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span>
+
+        <span class="n">alpha</span><span class="p">,</span> <span class="n">cauchyPoint</span> <span class="o">=</span> <span class="n">find_generalized_cauchy_point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">hess_vec_func</span><span class="p">,</span>
+                                                           <span class="n">bounds</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">)</span>
+
+        <span class="n">s</span><span class="p">,</span> <span class="n">modelObjective</span><span class="p">,</span> <span class="n">modelOptimality</span><span class="p">,</span> <span class="n">stepType</span><span class="p">,</span> <span class="n">spgIters</span> <span class="o">=</span> <span class="n">solve_spg_subproblem</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">cauchyPoint</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">hess_vec_func</span><span class="p">,</span>
+            <span class="n">objective</span><span class="o">.</span><span class="n">apply_precond</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">)</span>
+            
+        <span class="n">cumulativeSpgIters</span> <span class="o">+=</span> <span class="n">spgIters</span>
+        
+        <span class="n">trSizeUsed</span> <span class="o">=</span> <span class="n">trSize</span>
+        
+        <span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">s</span>
+        <span class="n">realObjective</span> <span class="o">=</span> <span class="n">incremental_objective</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">gy</span> <span class="o">=</span> <span class="n">gradient</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">project</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">gy</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span> <span class="o">-</span> <span class="n">y</span>
+        <span class="n">realOptimality</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
+
+        <span class="c1"># print(&#39;xk&#39;, y)</span>
+            
+        <span class="k">if</span> <span class="n">is_converged</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">realObjective</span><span class="p">,</span> <span class="n">modelObjective</span><span class="p">,</span>
+                        <span class="n">realOptimality</span><span class="p">,</span> <span class="n">modelOptimality</span><span class="p">,</span> <span class="n">spgIters</span><span class="p">,</span> <span class="n">trSizeUsed</span><span class="p">,</span>
+                        <span class="n">settings</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">callback</span><span class="p">:</span> <span class="n">callback</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="kc">True</span>
+        
+        <span class="n">modelImprove</span> <span class="o">=</span> <span class="o">-</span><span class="n">modelObjective</span>
+        <span class="n">realImprove</span> <span class="o">=</span> <span class="o">-</span><span class="n">realObjective</span>
+
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">realImprove</span> <span class="o">/</span> <span class="n">modelImprove</span>
+
+        <span class="k">if</span> <span class="n">modelObjective</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Model objective increased.  Debug if you see this.&#39;</span><span class="p">)</span>
+            <span class="n">rho</span> <span class="o">=</span> <span class="n">realImprove</span> <span class="o">/</span> <span class="o">-</span><span class="n">modelImprove</span>
+            <span class="c1">#exit(1)</span>
+            
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">rho</span> <span class="o">&gt;=</span> <span class="n">settings</span><span class="o">.</span><span class="n">eta2</span><span class="p">:</span>  <span class="c1"># write it this way to handle NaNs</span>
+            <span class="n">trSize</span> <span class="o">*=</span> <span class="n">settings</span><span class="o">.</span><span class="n">t1</span>
+        <span class="k">elif</span> <span class="n">rho</span> <span class="o">&gt;</span> <span class="n">settings</span><span class="o">.</span><span class="n">eta3</span> <span class="ow">and</span> <span class="n">is_on_boundary</span><span class="p">(</span><span class="n">stepType</span><span class="p">):</span>
+            <span class="n">trSize</span> <span class="o">*=</span> <span class="n">settings</span><span class="o">.</span><span class="n">t2</span>
+
+        <span class="n">willAccept</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">&gt;=</span> <span class="n">settings</span><span class="o">.</span><span class="n">eta1</span> <span class="ow">or</span> <span class="p">(</span><span class="n">rho</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">realOptimality</span> <span class="o">&lt;=</span> <span class="n">prevOptimality</span><span class="p">)</span>
+            
+        <span class="n">print_min_banner</span><span class="p">(</span><span class="n">realObjective</span><span class="p">,</span> <span class="n">modelObjective</span><span class="p">,</span>
+                         <span class="n">realOptimality</span><span class="p">,</span> <span class="n">modelOptimality</span><span class="p">,</span>
+                         <span class="n">spgIters</span><span class="p">,</span> <span class="n">trSizeUsed</span><span class="p">,</span> <span class="n">stepType</span><span class="p">,</span>
+                         <span class="n">willAccept</span><span class="p">,</span>
+                         <span class="n">settings</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">willAccept</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">y</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">gy</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">prevOptimality</span> <span class="o">=</span> <span class="n">realOptimality</span>
+            <span class="n">triedNewPrecond</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">callback</span><span class="p">:</span> <span class="n">callback</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+
+                
+        <span class="k">if</span> <span class="p">(</span><span class="n">spgIters</span> <span class="o">&gt;=</span> <span class="n">settings</span><span class="o">.</span><span class="n">max_spg_iters</span>
+            <span class="ow">or</span> <span class="n">cumulativeSpgIters</span> <span class="o">&gt;=</span> <span class="n">settings</span><span class="o">.</span><span class="n">max_cumulative_spg_iters</span><span class="p">):</span>
+            <span class="c1"># TODO: Talk to Drew Kouri about preconditioning SPG</span>
+            <span class="c1"># BT 11/2021</span>
+            <span class="c1"># precond update suppressed because we don&#39;t use it</span>
+            <span class="c1"># objective.update_precond(x)</span>
+            <span class="n">cumulativeSpgIters</span><span class="o">=</span><span class="mi">0</span>
+ 
+        <span class="n">trSizeUsed</span> <span class="o">=</span> <span class="n">trSize</span>
+        
+        <span class="k">if</span> <span class="n">trSize</span> <span class="o">&lt;</span> <span class="n">settings</span><span class="o">.</span><span class="n">min_tr_size</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">triedNewPrecond</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The trust region is too small, updating precond and trying again.&quot;</span><span class="p">)</span>
+                <span class="n">objective</span><span class="o">.</span><span class="n">update_precond</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">cumulativeSpgIters</span><span class="o">=</span><span class="mi">0</span>
+                <span class="n">triedNewPrecond</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">trSize</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">tr_size</span>                    
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The trust region is still too small.  Accepting, but be careful.&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">callback</span><span class="p">:</span> <span class="n">callback</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="kc">False</span>
+                    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reached the maximum number of trust region iterations.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">check_stability</span><span class="p">:</span>
+        <span class="n">objective</span><span class="o">.</span><span class="n">check_stability</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">callback</span><span class="p">:</span> <span class="n">callback</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="solve">
+<a class="viewcode-back" href="../../optimism.html#optimism.TrustRegionSPG.solve">[docs]</a>
+<span class="k">def</span> <span class="nf">solve</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">lowerBounds</span><span class="p">,</span> <span class="n">upperBounds</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+          <span class="n">useWarmStart</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">updatePrecond</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">xBar0</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">scaling</span> <span class="o">*</span> <span class="n">x0</span>
+    <span class="n">lBar</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">scaling</span> <span class="o">*</span> <span class="n">lowerBounds</span>
+    <span class="n">uBar</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">scaling</span> <span class="o">*</span> <span class="n">upperBounds</span>
+    
+    <span class="k">if</span> <span class="n">useWarmStart</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">updatePrecond</span><span class="p">:</span>
+            <span class="n">objective</span><span class="o">.</span><span class="n">update_precond</span><span class="p">(</span><span class="n">xBar0</span><span class="p">)</span>
+        
+        <span class="n">dxBar</span> <span class="o">=</span> <span class="n">WarmStart</span><span class="o">.</span><span class="n">warm_start_increment</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span>
+                                               <span class="n">xBar0</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="n">xBar0</span> <span class="o">+=</span> <span class="n">dxBar</span>
+        <span class="n">objective</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">objective</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
+
+    <span class="k">if</span> <span class="n">updatePrecond</span><span class="p">:</span>
+        <span class="n">objective</span><span class="o">.</span><span class="n">update_precond</span><span class="p">(</span><span class="n">xBar0</span><span class="p">)</span>
+
+    <span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">lBar</span><span class="p">,</span> <span class="n">uBar</span><span class="p">))</span>
+        
+    <span class="n">xBar</span><span class="p">,</span> <span class="n">solverSuccess</span> <span class="o">=</span> <span class="n">bound_constrained_trust_region_minimize</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">xBar0</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span>
+                                                   <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">objective</span><span class="o">.</span><span class="n">invScaling</span> <span class="o">*</span> <span class="n">xBar</span><span class="p">,</span> <span class="n">solverSuccess</span></div>
+
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

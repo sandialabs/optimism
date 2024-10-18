@@ -1,0 +1,259 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.contact.test.test_MortarGeom &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.contact.test.test_MortarGeom</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.contact.test.test_MortarGeom</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">optimism.test.TestFixture</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">QuadratureRule</span>
+<span class="kn">from</span> <span class="nn">optimism.contact</span> <span class="kn">import</span> <span class="n">MortarContact</span>
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
+
+<span class="n">usingTestingFilter</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<div class="viewcode-block" id="spline_ramp">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_MortarGeom.spline_ramp">[docs]</a>
+<span class="k">def</span> <span class="nf">spline_ramp</span><span class="p">(</span><span class="n">eta</span><span class="p">):</span>
+    <span class="c1"># return 3*eta*eta - 2*eta*eta*eta # a less smoothing ramp</span>
+    <span class="c1">#K = np.array([[3,4,5],[6,12,20],[1,1,1]])</span>
+    <span class="c1">#r = np.array([0,0,1])</span>
+    <span class="c1">#abc = np.linalg.solve(K,r)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="o">-</span><span class="mi">15</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">eta2</span> <span class="o">=</span> <span class="n">eta</span><span class="o">*</span><span class="n">eta</span>
+    <span class="n">eta3</span> <span class="o">=</span> <span class="n">eta2</span><span class="o">*</span><span class="n">eta</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">eta</span> <span class="o">&gt;=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">a</span> <span class="o">*</span> <span class="n">eta3</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="n">eta2</span><span class="o">*</span><span class="n">eta2</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">eta2</span><span class="o">*</span><span class="n">eta3</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_error">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_MortarGeom.compute_error">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_error</span><span class="p">(</span><span class="n">edgeA</span><span class="p">,</span> <span class="n">edgeB</span><span class="p">,</span> <span class="n">xiA</span><span class="p">,</span> <span class="n">xiB</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">f_common_normal</span><span class="p">):</span>
+    <span class="n">normal</span> <span class="o">=</span> <span class="n">f_common_normal</span><span class="p">(</span><span class="n">edgeA</span><span class="p">,</span> <span class="n">edgeB</span><span class="p">)</span>
+    <span class="n">xA</span> <span class="o">=</span> <span class="n">MortarContact</span><span class="o">.</span><span class="n">eval_linear_field_on_edge</span><span class="p">(</span><span class="n">edgeA</span><span class="p">,</span> <span class="n">xiA</span><span class="p">)</span>
+    <span class="n">xB</span> <span class="o">=</span> <span class="n">MortarContact</span><span class="o">.</span><span class="n">eval_linear_field_on_edge</span><span class="p">(</span><span class="n">edgeB</span><span class="p">,</span> <span class="n">xiB</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">xA</span> <span class="o">-</span> <span class="n">xB</span> <span class="o">+</span> <span class="n">g</span> <span class="o">*</span> <span class="n">normal</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestMortarGeom">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_MortarGeom.TestMortarGeom">[docs]</a>
+<span class="k">class</span> <span class="nc">TestMortarGeom</span><span class="p">(</span><span class="n">TestFixture</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TestMortarGeom.setUp">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_MortarGeom.TestMortarGeom.setUp">[docs]</a>
+    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_common_normal</span> <span class="o">=</span> <span class="n">MortarContact</span><span class="o">.</span><span class="n">compute_average_normal</span> <span class="c1">#compute_normal_from_a</span></div>
+
+
+<div class="viewcode-block" id="TestMortarGeom.testOffEdges">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_MortarGeom.TestMortarGeom.testOffEdges">[docs]</a>
+    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">usingTestingFilter</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">testOffEdges</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">edgeA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">]])</span>
+        <span class="n">edgeB</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.28</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.15</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.25</span><span class="p">]])</span>
+        <span class="n">xiA</span><span class="p">,</span><span class="n">xiB</span><span class="p">,</span><span class="n">g</span> <span class="o">=</span> <span class="n">MortarContact</span><span class="o">.</span><span class="n">compute_intersection</span><span class="p">(</span><span class="n">edgeA</span><span class="p">,</span> <span class="n">edgeB</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_common_normal</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)):</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="n">compute_error</span><span class="p">(</span><span class="n">edgeA</span><span class="p">,</span> <span class="n">edgeB</span><span class="p">,</span> <span class="n">xiA</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">xiB</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">g</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_common_normal</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">err</span> <span class="o">&lt;</span> <span class="mf">1e-15</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestMortarGeom.testEdgesWithCommonPoint">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_MortarGeom.TestMortarGeom.testEdgesWithCommonPoint">[docs]</a>
+    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">usingTestingFilter</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">testEdgesWithCommonPoint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">edgeA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">]])</span>
+        <span class="n">edgeB</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.15</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.25</span><span class="p">]])</span>
+        <span class="n">xiA</span><span class="p">,</span><span class="n">xiB</span><span class="p">,</span><span class="n">g</span> <span class="o">=</span> <span class="n">MortarContact</span><span class="o">.</span><span class="n">compute_intersection</span><span class="p">(</span><span class="n">edgeA</span><span class="p">,</span> <span class="n">edgeB</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_common_normal</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)):</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="n">compute_error</span><span class="p">(</span><span class="n">edgeA</span><span class="p">,</span> <span class="n">edgeB</span><span class="p">,</span> <span class="n">xiA</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">xiB</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">g</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_common_normal</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">err</span> <span class="o">&lt;</span> <span class="mf">1e-15</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestMortarGeom.testEdgesWithTwoCommonPoints">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_MortarGeom.TestMortarGeom.testEdgesWithTwoCommonPoints">[docs]</a>
+    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">usingTestingFilter</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">testEdgesWithTwoCommonPoints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">edgeA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">]])</span>
+        <span class="n">edgeB</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]])</span>
+        <span class="n">xiA</span><span class="p">,</span><span class="n">xiB</span><span class="p">,</span><span class="n">g</span> <span class="o">=</span> <span class="n">MortarContact</span><span class="o">.</span><span class="n">compute_intersection</span><span class="p">(</span><span class="n">edgeA</span><span class="p">,</span> <span class="n">edgeB</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_common_normal</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)):</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="n">compute_error</span><span class="p">(</span><span class="n">edgeA</span><span class="p">,</span> <span class="n">edgeB</span><span class="p">,</span> <span class="n">xiA</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">xiB</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">g</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_common_normal</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">err</span> <span class="o">&lt;</span> <span class="mf">1e-15</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestMortarGeom.testAreaIntegrals">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_MortarGeom.TestMortarGeom.testAreaIntegrals">[docs]</a>
+    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">usingTestingFilter</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">testAreaIntegrals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">edgeA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]])</span>
+        <span class="n">edgeB</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.22</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.18</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span>
+        <span class="c1"># eventually...</span>
+        <span class="c1"># can give options on integrating on common vs different surfaces</span>
+        <span class="c1"># can give options on quadrature rule on common surface</span>
+        <span class="n">commonArea</span> <span class="o">=</span> <span class="n">MortarContact</span><span class="o">.</span><span class="n">integrate_with_mortar</span><span class="p">(</span><span class="n">edgeA</span><span class="p">,</span> <span class="n">edgeB</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_common_normal</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">xiA</span><span class="p">,</span> <span class="n">xiB</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="n">g</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">commonArea</span><span class="p">,</span> <span class="mf">0.002</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestMortarGeom.testSpline">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_MortarGeom.TestMortarGeom.testSpline">[docs]</a>
+    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Used to visually explore smoothing&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">testSpline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">spline_ramp</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+        <span class="c1">#y = jax.vmap(smooth_linear,(0,None))(x,0.1)    </span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;tmp.png&#39;</span><span class="p">)</span></div>
+
+    
+
+<div class="viewcode-block" id="TestMortarGeom.testMortarIntegralOneSided">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_MortarGeom.TestMortarGeom.testMortarIntegralOneSided">[docs]</a>
+    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;Used to visually explore contact behavior&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">testMortarIntegralOneSided</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+        <span class="k">def</span> <span class="nf">integrate_multipliers</span><span class="p">(</span><span class="n">edgeA</span><span class="p">,</span> <span class="n">edgeB</span><span class="p">,</span> <span class="n">lambdaA</span><span class="p">,</span> <span class="n">lambdaB</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">q</span><span class="p">(</span><span class="n">xiA</span><span class="p">,</span> <span class="n">xiB</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
+                <span class="n">lamA</span> <span class="o">=</span> <span class="n">MortarContact</span><span class="o">.</span><span class="n">eval_linear_field_on_edge</span><span class="p">(</span><span class="n">lambdaA</span><span class="p">,</span> <span class="n">xiA</span><span class="p">)</span>
+                <span class="n">lamB</span> <span class="o">=</span> <span class="n">MortarContact</span><span class="o">.</span><span class="n">eval_linear_field_on_edge</span><span class="p">(</span><span class="n">lambdaB</span><span class="p">,</span> <span class="n">xiB</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">g</span> <span class="o">*</span> <span class="p">(</span><span class="n">lamA</span> <span class="o">+</span> <span class="n">lamB</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">MortarContact</span><span class="o">.</span><span class="n">integrate_with_mortar</span><span class="p">(</span><span class="n">edgeA</span><span class="p">,</span> <span class="n">edgeB</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_common_normal</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">relativeSmoothingSize</span> <span class="o">=</span> <span class="mf">0.03</span><span class="p">)</span>
+
+        <span class="n">edgeA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]])</span>
+        <span class="n">edgeB</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span>
+
+        <span class="n">lambdaA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
+        <span class="n">lambdaB</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">gap_of_y</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+            <span class="n">ea</span> <span class="o">=</span> <span class="n">edgeA</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="n">ea</span> <span class="o">=</span> <span class="n">ea</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">y</span><span class="o">+</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">integrate_multipliers</span><span class="p">(</span><span class="n">ea</span><span class="p">,</span> <span class="n">edgeB</span><span class="p">,</span> <span class="n">lambdaA</span><span class="p">,</span> <span class="n">lambdaB</span><span class="p">)</span>
+
+        <span class="n">N</span> <span class="o">=</span> <span class="mi">500</span>
+        <span class="n">edgeAy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">3.1</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+        <span class="n">energy</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">gap_of_y</span><span class="p">)(</span><span class="n">edgeAy</span><span class="p">)</span>
+        <span class="n">force</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">gap_of_y</span><span class="p">))(</span><span class="n">edgeAy</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">edgeAy</span><span class="p">,</span> <span class="n">energy</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;energy.png&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">edgeAy</span><span class="p">,</span> <span class="n">force</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;force.png&#39;</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

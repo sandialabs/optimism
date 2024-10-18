@@ -1,0 +1,219 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.contact.EdgeCpp &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.contact.EdgeCpp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.contact.EdgeCpp</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Surface</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">SmoothFunctions</span>
+
+<div class="viewcode-block" id="norm_squared">
+<a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.EdgeCpp.norm_squared">[docs]</a>
+<span class="k">def</span> <span class="nf">norm_squared</span><span class="p">(</span><span class="n">vec</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">vec</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">vec</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="dot">
+<a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.EdgeCpp.dot">[docs]</a>
+<span class="k">def</span> <span class="nf">dot</span><span class="p">(</span><span class="n">vec1</span><span class="p">,</span> <span class="n">vec2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">vec1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">vec2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">vec1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">vec2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="cross">
+<a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.EdgeCpp.cross">[docs]</a>
+<span class="k">def</span> <span class="nf">cross</span><span class="p">(</span><span class="n">vec1</span><span class="p">,</span> <span class="n">vec2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">vec1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">vec2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">vec1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">vec2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="cpp_line">
+<a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.EdgeCpp.cpp_line">[docs]</a>
+<span class="k">def</span> <span class="nf">cpp_line</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">b</span><span class="o">-</span><span class="n">a</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="o">-</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">a</span><span class="o">-</span><span class="n">p</span><span class="p">)</span> <span class="o">/</span> <span class="n">norm_squared</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">-</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">a</span> <span class="o">+</span> <span class="n">t</span><span class="o">*</span><span class="n">b</span><span class="p">,</span> <span class="n">t</span></div>
+
+
+
+<div class="viewcode-block" id="cpp">
+<a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.EdgeCpp.cpp">[docs]</a>
+<span class="k">def</span> <span class="nf">cpp</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">b</span><span class="o">-</span><span class="n">a</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="o">-</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">a</span><span class="o">-</span><span class="n">p</span><span class="p">)</span> <span class="o">/</span> <span class="n">norm_squared</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">t</span> <span class="o">&lt;</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">t</span> <span class="o">&gt;</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">-</span><span class="n">t</span><span class="p">)</span><span class="o">*</span><span class="n">a</span> <span class="o">+</span> <span class="n">t</span><span class="o">*</span><span class="n">b</span><span class="p">,</span> <span class="n">t</span></div>
+
+
+
+<div class="viewcode-block" id="cpp_distance">
+<a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.EdgeCpp.cpp_distance">[docs]</a>
+<span class="k">def</span> <span class="nf">cpp_distance</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="n">Surface</span><span class="o">.</span><span class="n">compute_normal</span><span class="p">(</span><span class="n">edge</span><span class="p">)</span>
+    <span class="n">cppPoint</span><span class="p">,</span><span class="n">t</span> <span class="o">=</span> <span class="n">cpp_line</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">norm</span><span class="p">,</span> <span class="n">p</span><span class="o">-</span><span class="n">cppPoint</span><span class="p">)</span>
+    <span class="n">sgn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+    <span class="n">sgn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sgn</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">sgn</span><span class="p">)</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">t</span> <span class="o">&lt;</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">norm_squared</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">p</span><span class="p">))</span> <span class="o">*</span> <span class="n">sgn</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">t</span> <span class="o">&gt;</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">norm_squared</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">p</span><span class="p">))</span> <span class="o">*</span> <span class="n">sgn</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dist</span></div>
+
+
+
+<span class="c1">#unused, but a nice function anyways</span>
+<div class="viewcode-block" id="smoothstep">
+<a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.EdgeCpp.smoothstep">[docs]</a>
+<span class="k">def</span> <span class="nf">smoothstep</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mi">3</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">3</span> </div>
+
+
+
+<div class="viewcode-block" id="area">
+<a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.EdgeCpp.area">[docs]</a>
+<span class="k">def</span> <span class="nf">area</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">p0</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">p2</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="n">p1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">p2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">p0</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="o">+</span> <span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">p0</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">p1</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="smooth_distance">
+<a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.EdgeCpp.smooth_distance">[docs]</a>
+<span class="k">def</span> <span class="nf">smooth_distance</span><span class="p">(</span><span class="n">twoEdges</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">smoothingTol</span><span class="p">):</span>
+    <span class="c1"># this can probably be computed externally for efficiency</span>
+    <span class="n">a1</span> <span class="o">=</span> <span class="n">area</span><span class="p">(</span><span class="n">twoEdges</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">twoEdges</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">twoEdges</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">a2</span> <span class="o">=</span> <span class="n">area</span><span class="p">(</span><span class="n">twoEdges</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">twoEdges</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">twoEdges</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">sign</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">a1</span><span class="o">+</span><span class="n">a2</span><span class="p">)</span>
+    <span class="n">sign</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">sign</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">sign</span><span class="p">)</span>
+    
+    <span class="n">p0</span> <span class="o">=</span> <span class="n">cpp</span><span class="p">(</span><span class="n">twoEdges</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">cpp</span><span class="p">(</span><span class="n">twoEdges</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        
+    <span class="n">d0</span> <span class="o">=</span> <span class="n">p</span><span class="o">-</span><span class="n">p0</span>
+    <span class="n">d1</span> <span class="o">=</span> <span class="n">p</span><span class="o">-</span><span class="n">p1</span>
+    
+    <span class="n">n0</span> <span class="o">=</span> <span class="n">Surface</span><span class="o">.</span><span class="n">compute_normal</span><span class="p">(</span><span class="n">twoEdges</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">n1</span> <span class="o">=</span> <span class="n">Surface</span><span class="o">.</span><span class="n">compute_normal</span><span class="p">(</span><span class="n">twoEdges</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">pd0</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">d0</span><span class="p">,</span> <span class="n">n0</span><span class="p">)</span>
+    <span class="n">pd1</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">d1</span><span class="p">,</span> <span class="n">n1</span><span class="p">)</span>
+
+    <span class="c1"># tolerance approaches 0 as the normal point in the same direction</span>
+    <span class="c1"># this ensures the min smoothing gap goes to zero as the outer boundary flips between</span>
+    <span class="c1"># concave and convex</span>
+
+    <span class="n">crossN</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">cross</span><span class="p">(</span><span class="n">n0</span><span class="p">,</span> <span class="n">n1</span><span class="p">))</span>
+    <span class="n">tol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">crossN</span> <span class="o">&gt;</span> <span class="mf">1e-14</span><span class="p">,</span> <span class="n">crossN</span><span class="o">*</span><span class="n">smoothingTol</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="c1">#sign = 1.0</span>
+    <span class="k">return</span> <span class="n">sign</span><span class="o">*</span><span class="n">SmoothFunctions</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">sign</span><span class="o">*</span><span class="n">pd0</span><span class="p">,</span> <span class="n">sign</span><span class="o">*</span><span class="n">pd1</span><span class="p">,</span> <span class="n">tol</span><span class="p">)</span></div>
+
+
+
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
