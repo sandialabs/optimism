@@ -43,7 +43,6 @@ jobs:
           cd docs
           sphinx-apidoc -o source/ ../optimism -P
           make html
-          mv 
       - name: codecov
         uses: codecov/codecov-action@v4
         with:
