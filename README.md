@@ -1,6 +1,8 @@
 # OptimiSM: Computational solid mechanics made easy with Jax
 
 ![Continuous integration](https://github.com/sandialabs/optimism/actions/workflows/ci-build.yml/badge.svg)
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://sandialabs.github.io/optimism/) 
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://sandialabs.github.io/optimism/dev/) 
 [![Coverage](https://codecov.io/gh/sandialabs/optimism/branch/main/graph/badge.svg)](https://codecov.io/gh/sandialabs/optimism)
 ## What is OptimiSM?
 
