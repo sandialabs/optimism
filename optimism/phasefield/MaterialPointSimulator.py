@@ -3,7 +3,7 @@ import numpy as onp
 from jax import disable_jit
 
 from optimism.JaxConfig import *
-from optimism import EquationSolver as EqSolver
+from . import EquationSolver_Immersed_2 as EqSolver
 from optimism import AlSolver
 from optimism import Objective
 from optimism import ConstrainedObjective

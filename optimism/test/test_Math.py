@@ -5,7 +5,7 @@ import jax
 import jax.numpy as np
 
 from optimism import Math
-from optimism.test import TestFixture
+from . import TestFixture
 
 SUM_TESTDATA_FILENAME = os.path.join(os.path.dirname(__file__), 'ill_conditioned_sum_data.npz')
 DOTPROD_TESTDATA_FILENAME = os.path.join(os.path.dirname(__file__), 'ill_conditioned_dot_product_data.npz')

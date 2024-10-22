@@ -1,5 +1,5 @@
 from optimism.JaxConfig import *
-import optimism.EquationSolver as EqSolver
+import EquationSolver_Immersed_2 as EqSolver
 from optimism.NewtonSolver import globalized_newton_step
 from optimism.NewtonSolver import newton_step
 from optimism import WarmStart

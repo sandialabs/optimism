@@ -3,7 +3,7 @@ from optimism.JaxConfig import *
 #from optimism import ConstrainedObjective
 from optimism import AlSolver
 from optimism import WarmStart
-from optimism import EquationSolver
+from . import EquationSolver_Immersed_2
 
     
 def bound_constrained_solve(boundConstrainedObjective,
@@ -13,7 +13,7 @@ def bound_constrained_solve(boundConstrainedObjective,
                             sub_problem_callback=None,
                             useWarmStart=True,
                             updatePrecond=True,
-                            sub_problem_solver=EquationSolver.trust_region_minimize):
+                            sub_problem_solver=EquationSolver_Immersed_2.trust_region_minimize):
 
     boundConstrainedObjective.reset_kappa()
     

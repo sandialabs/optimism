@@ -144,7 +144,7 @@ class ContactArch(MeshFixture):
         p = Objective.Params(disp, ivs)
 
         precondStrategy = Objective.PrecondStrategy(self.assemble_sparse)
-        objective = Objective.Objective(self.energy_function, Uu, p, precondStrategy)
+        objective = Objective.Objective(self.energy_function, Uu, p, 1.0, precondStrategy)
 
         self.write_output(Uu, p, step=0)
         

@@ -237,13 +237,14 @@ def print_min_banner(objective, modelObjective, res, modelRes, cgIters, trSize, 
     
     willAccept = " True" if willAccept else "False"
     
-    print('obj=', f"{objective:15.9}",
-          ', model obj=', f"{modelObjective:15.9}",
-          ', res=', f"{res:15.9}", ', model res=', f"{modelRes:15.9}",
-          ', cg iters=', f"{cgIters:3}",
-          ', tr size=', f"{trSize:12.6}",
-          ', ', f"{onBoundary:9}",
-          ', accepted=', willAccept)
+    with open('./log_regsolve.txt', 'a') as f:
+         print('obj=', f"{objective:15.9}",
+                       ', model obj=', f"{modelObjective:15.9}",
+                       ', res=', f"{res:15.9}", ', model res=', f"{modelRes:15.9}",
+                       ', cg iters=', f"{cgIters:3}",
+                       ', tr size=', f"{trSize:12.6}",
+                       ', ', f"{onBoundary:9}",
+                       ', accepted=', willAccept)
 
 
 # utility function to save a matrix for later analysis offline
@@ -426,7 +427,7 @@ def trust_region_minimize(objective, x, settings, callback=None):
             if is_converged(objective, y, realObjective, modelObjective,
                             gy, g + Jd, cgIters, trSizeUsed, settings):
                 if callback: callback(y, objective)
-                return y, True
+                return d, y, True
         
             modelImprove = -modelObjective
             realImprove = -realObjective
@@ -584,7 +585,7 @@ def newton_solve(objective_func, solution, maxSteps=1):
 def nonlinear_equation_solve(objective, x0, p, settings,
                              solver_algorithm=trust_region_minimize,
                              callback=None,
-                             useWarmStart=True,
+                             useWarmStart=False,
                              updatePrecond=True):
     xBar0 = objective.scaling * x0
     
