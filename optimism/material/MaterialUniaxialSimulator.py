@@ -4,7 +4,7 @@ import numpy as onp
 import jax
 import jax.numpy as np
 
-from optimism import EquationSolver as EqSolver
+from . import EquationSolver_Immersed_2 as EqSolver
 from optimism import Objective
 from optimism import TensorMath
 

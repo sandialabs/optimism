@@ -12,7 +12,7 @@ except ImportError:
     
 from optimism import FunctionSpace
 from optimism.material import LinearElastic as MaterialModel
-from optimism.EquationSolver import newton_solve
+from EquationSolver_Immersed_2 import newton_solve
 from optimism import QuadratureRule
 from . import TestFixture
 from optimism import Mechanics

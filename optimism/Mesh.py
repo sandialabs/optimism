@@ -303,7 +303,7 @@ def num_elements(mesh):
 
 
 def num_nodes(mesh):
-    return mesh.coords.shape[0]
+    return np.shape(np.reshape(np.unique(mesh.conns),-1))[0]#mesh.coords.shape[0]
 
 
 def get_edge_node_indices(mesh : Mesh, edge):
@@ -347,4 +347,4 @@ def compute_edge_vectors(mesh : Mesh, edgeCoords):
     tangent = Xv[1] - Xv[0]
     normal = np.array([tangent[1], -tangent[0]])
     jac = np.linalg.norm(tangent)
-    return tangent/jac, normal/jac, jac
+    return tangent/jac, normal/jac, jac, normal

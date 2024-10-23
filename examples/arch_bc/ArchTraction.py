@@ -1,5 +1,7 @@
 import jax
 import jax.numpy as np
+import numpy as onp
+import h5py as h5p
 
 from optimism import EquationSolver as EqSolver
 from optimism import EquationSolverSubspace as SolverSubspace
@@ -15,7 +17,7 @@ from optimism import QuadratureRule
 from optimism.Timer import Timer
 from optimism import VTKWriter
 from optimism.test.MeshFixture import MeshFixture           
-
+from optimism.ReadExodusMesh import read__mesh
 useNewton=False
 
 if useNewton:
@@ -28,32 +30,32 @@ else:
 class TractionArch(MeshFixture):
 
     def setUp(self):
-        self.w = 0.035
+        self.w = 0.3
         self.archRadius = 1.5
         self.ballRadius = self.archRadius/5.0
         self.initialBallLoc = self.archRadius + self.w + self.ballRadius
         N = 5
         M = 65
         
-        mesh, _ = \
-            self.create_arch_mesh_disp_and_edges(N, M,
-                                                 self.w, self.archRadius, self.w)
+        #mesh, _ = \
+        #    self.create_arch_mesh_disp_and_edges(N, M,
+        #                                         self.w, self.archRadius, self.w)
 
-        mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(mesh, order=2, copyNodeSets=False)
+        mesh = read__mesh('./foreground_mesh_shallow_arch_C.exo')
+        #mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(mesh, order=2, copyNodeSets=False)
         nodeSets = Mesh.create_nodesets_from_sidesets(mesh)
         self.mesh = Mesh.mesh_with_nodesets(mesh, nodeSets)
         
         quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2)
         self.fs = FunctionSpace.construct_function_space(self.mesh, quadRule)
         
-        ebcs = [EssentialBC(nodeSet='left', component=0),
-                EssentialBC(nodeSet='left', component=1),
-                EssentialBC(nodeSet='right', component=0),
-                EssentialBC(nodeSet='right', component=1)]
+        ebcs = [EssentialBC(nodeSet='iside_b0_0_b1_3', component=0),
+                EssentialBC(nodeSet='iside_b0_0_b1_3', component=1)]
+
         self.dofManager = DofManager(self.fs, dim=self.mesh.coords.shape[1], EssentialBCs=ebcs)
 
         self.lineQuadRule = QuadratureRule.create_quadrature_rule_1D(degree=2)
-        self.pushArea = (np.pi*self.archRadius/M)*self.mesh.sideSets['push'].shape[0]
+        self.pushArea = 0.0396*self.mesh.sideSets['iside_b0_0_b1_2'].shape[0]
         
         kappa = 10.0
         nu = 0.3
@@ -73,7 +75,7 @@ class TractionArch(MeshFixture):
             strainEnergy = self.bvpFuncs.compute_strain_energy(U, internalVariables)
             F = p[0]
             loadPotential = Mechanics.compute_traction_potential_energy(
-                self.fs, U, self.lineQuadRule, self.mesh.sideSets['push'], 
+                self.fs, U, self.lineQuadRule, self.mesh.sideSets['iside_b0_0_b1_2'], 
                 lambda x, n: np.array([0.0, -F/self.pushArea]))
             return strainEnergy + loadPotential
         
@@ -90,7 +92,7 @@ class TractionArch(MeshFixture):
         internalVariables = p[1]
         strainEnergy = self.bvpFuncs.compute_strain_energy(U, internalVariables)
         F = p[0]
-        loadPotential = Mechanics.compute_traction_potential_energy(self.fs, U, self.lineQuadRule, self.mesh.sideSets['push'], 
+        loadPotential = Mechanics.compute_traction_potential_energy(self.fs, U, self.lineQuadRule, self.mesh.sideSets['iside_b0_0_b1_2'], 
                                                                     lambda x, n: np.array([0.0, -F/self.pushArea]))
         return strainEnergy + loadPotential
 
@@ -106,7 +108,7 @@ class TractionArch(MeshFixture):
 
     def write_output(self, Uu, p, step):
         U = self.create_field(Uu, p)
-        plotName = 'arch_traction-'+str(step).zfill(3)
+        plotName = 'arch_traction_C-'+str(step).zfill(3)
         writer = VTKWriter.VTKWriter(self.mesh, baseFileName=plotName)
         
         writer.add_nodal_field(name='displacement', nodalData=U, fieldType=VTKWriter.VTKFieldType.VECTORS)
@@ -136,9 +138,11 @@ class TractionArch(MeshFixture):
         force = p[0]
         force2 = np.sum(reactions[:,1])
         print("applied force, reaction", force, force2)
-        disp = np.max(np.abs(U[self.mesh.nodeSets['push'],1]))
+        disp = np.max(np.abs(U[self.mesh.nodeSets['iside_b0_0_b1_2'],1]))
         self.outputForce.append(float(force))
         self.outputDisp.append(float(disp))
+        self.dispmax = disp
+        self.forcev = force
 
         with open('arch_traction_Fd.npz','wb') as f:
             np.savez(f, force=np.array(self.outputForce), displacement=np.array(self.outputDisp))
@@ -160,12 +164,15 @@ class TractionArch(MeshFixture):
         p = Objective.Params(force, ivs)
 
         precondStrategy = Objective.PrecondStrategy(self.assemble_sparse)
-        objective = Objective.Objective(self.energy_function, Uu, p, precondStrategy)
+        objective = Objective.Objective(self.energy_function, Uu, p, 1.0, precondStrategy)
+
+        self.disp = np.array([])
+        self.force = np.array([]) 
 
         self.write_output(Uu, p, step=0)
         
         steps = 40
-        maxForce = 0.01
+        maxForce = 0.1
         for i in range(1, steps):
             print('--------------------------------------')
             print('LOAD STEP ', i)
@@ -175,8 +182,16 @@ class TractionArch(MeshFixture):
             Uu, solverSuccess = EqSolver.nonlinear_equation_solve(objective, Uu, p, self.trSettings, solver_algorithm=solver)
             
             self.write_output(Uu, p, i)
+            self.disp = onp.array(np.append(self.disp,self.dispmax))
+            self.force = onp.array(np.append(self.force,self.forcev))
+        
+        dispf = onp.append(self.disp,self.force,axis=0)    
 
-        unload = True
+        T_matrix_file_2 = h5p.File('./FDPlot_Buckling_Arch_BF_C.h5','w')
+        T_matrix_file_2.create_dataset('FD', data=dispf)
+        T_matrix_file_2.close()
+
+        unload = False
         if unload:
             for i in range(steps, 2*steps - 1):
                 print('--------------------------------------')

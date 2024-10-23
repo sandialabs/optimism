@@ -1,5 +1,5 @@
 import jax.numpy as np
-
+import jax
 from optimism.material.MaterialModel import MaterialModel
 
 # props
@@ -48,6 +48,7 @@ def _make_properties(E, nu):
 def _neohookean_3D_energy_density(dispGrad, internalVariables, props):
     F = dispGrad + np.eye(3)
     J = np.linalg.det(F)
+
 
     #Wvol = 0.125*props[PROPS_LAMBDA]*(J - 1.0/J)**2
     Wvol = 0.5*props[PROPS_LAMBDA]*np.log(J)**2

@@ -1,5 +1,5 @@
 from optimism.JaxConfig import *
-import optimism.EquationSolver as EquationSolver
+import EquationSolver_Immersed_2 as EquationSolver_Immersed_2
 from optimism.Objective import Objective
 from optimism.Objective import param_index_update
 from optimism.SparseCholesky import SparseCholesky

@@ -5,7 +5,7 @@ from optimism import FunctionSpace
 from optimism.material import LinearElastic as MaterialModel
 from optimism import Mesh
 from optimism.Timer import Timer
-from optimism.EquationSolver import newton_solve
+from EquationSolver_Immersed_2 import newton_solve
 from optimism import QuadratureRule
 from optimism import Surface
 from . import TestFixture

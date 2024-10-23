@@ -2,7 +2,7 @@ from optimism.JaxConfig import *
 from optimism import FunctionSpace
 from optimism.material import LinearElastic as MatModel
 from optimism import Mechanics
-from optimism.EquationSolver import newton_solve
+from EquationSolver_Immersed_2 import newton_solve
 from optimism import QuadratureRule
 from . import MeshFixture
 

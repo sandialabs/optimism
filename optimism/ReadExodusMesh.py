@@ -7,12 +7,36 @@ import numpy as onp
 exodusToNativeTri6NodeOrder = np.array([0, 3, 1, 5, 4, 2])
 
 
-def read_exodus_mesh(fileName):
+def read__mesh(fileName):
     with netCDF4.Dataset(fileName) as exData:
         coords = _read_coordinates(exData)
         conns, blocks = _read_blocks(exData)
         nodeSets = _read_node_sets(exData)
         sideSets = _read_side_sets(exData)
+        connsn = onp.array(conns)
+
+
+        # Rearranging arrays; we are only reading one block so stuff should only come from there.
+        # Get foreground Node indices first.
+        FG_Node_Indices = onp.transpose(onp.unique(onp.reshape(connsn,-1)))
+        
+        # Now, get the coordinates corresponding to that
+        coords_FG = onp.array(coords[FG_Node_Indices,:])
+
+        
+        
+        # Now, overwrite conns, because that still uses the old indices
+        for i in range(onp.shape(connsn)[0]):
+            for j in range(onp.shape(connsn)[1]):
+                val = connsn[i,j]
+                ind = onp.where(FG_Node_Indices == val)
+                indv = ind[0].item()
+                connsn[i,j] = indv
+        
+        conns = np.array(connsn)
+
+        # Finally, overwrite coords, so that all the other stuff can come from it.
+        coords = np.array(coords_FG)
 
         elementType = _read_element_type(exData).lower()
         if elementType == "tri3" or elementType == "tri":
@@ -22,9 +46,10 @@ def read_exodus_mesh(fileName):
             basis, basis1d = Interpolants.make_parent_elements(degree = 2)
             simplexNodesOrdinals = _get_vertex_nodes_from_exodus_tri6_mesh(conns)
             conns = conns[:, exodusToNativeTri6NodeOrder]
-        else:
-            raise
-
+        #else:
+        #    raise Exception('Cannot work with higher than 2nd order elements.')
+        
+     
         return Mesh.Mesh(coords, conns, simplexNodesOrdinals, basis, basis1d,
                          blocks, nodeSets, sideSets)
         
@@ -75,7 +100,7 @@ def _read_blocks(exodusDataset):
     blockConns = []
     blocks = {}
     firstElemInBlock = 0
-    for i in range(nBlocks):
+    for i in range(1):
         nodesPerElemInBlock = len(exodusDataset.dimensions['num_nod_per_el' + str(i+1)])
         assert nodesPerElemInBlock == nodesPerElem
 

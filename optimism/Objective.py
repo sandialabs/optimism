@@ -77,7 +77,11 @@ class TwoTryPrecondStrategy(PrecondStrategy):
     
 class Objective:
 
-    def __init__(self, f, x, p, precondStrategy=None):
+    def __init__(self, f, x, p, T, precondStrategy=None):
+        
+        # Define the transposed extraction operator here -
+        self.Tt = np.transpose(T)
+        self.Tm = T
 
         self.precond = SparseCholesky()
         self.precondStrategy = precondStrategy
@@ -85,14 +89,15 @@ class Objective:
         self.p = p
         
         self.objective=jit(f)
-        self.grad_x = jit(grad(f,0))
+        self.grad_x = jit((grad(f,0)))
         self.grad_p = jit(grad(f,1))
         
         self.hess_vec   = jit(lambda x, p, vx:
                               jvp(lambda z: self.grad_x(z,p), (x,), (vx,))[1])
+        
 
         self.vec_hess   = jit(lambda x, p, vx:
-                              vjp(lambda z: self.grad_x(z,p), x)[1](vx))
+                              (vjp(lambda z: self.grad_x(z,p), x)[1](vx)))
         
         self.jac_xp_vec = jit(lambda x, p, vp0:
                               jvp(lambda q0: self.grad_x(x, param_index_update(p,0,q0)),
@@ -116,10 +121,10 @@ class Objective:
         self.vec_jac_xp4 = jit(lambda x, p, vx:
                                vjp(lambda q4: self.grad_x(x, param_index_update(p,4,q4)), p[4])[1](vx))
 
-
+        # Doubt here.
         self.grad_and_tangent = lambda x, p: linearize(lambda z: self.grad_x(z,p), x)
         
-        self.hess = jit(jacfwd(self.grad_x, 0))
+        self.hess = jit((jacfwd(self.grad_x, 0)))
 
         self.scaling = 1.0
         self.invScaling = 1.0
@@ -129,19 +134,19 @@ class Objective:
         return self.objective(x, self.p)
 
     def gradient(self, x):
-        return self.grad_x(x, self.p)
+        return (self.grad_x(x, self.p))
     
     def gradient_p(self, x):
         return self.grad_p(x, self.p)
 
     def hessian_vec(self, x, vx):
-        return self.hess_vec(x, self.p, vx)
+        return (self.hess_vec(x, self.p, vx))
 
     def gradient_and_tangent(self, x):
-        return self.grad_and_tangent(x, self.p)
+        return (self.grad_and_tangent(x, self.p))
     
     def vec_hessian(self, x, vx):
-        return self.vec_hess(x, self.p, vx)
+        return (self.vec_hess(x, self.p, vx))
                               
     def hessian(self, x):
         return self.hess(x, self.p)

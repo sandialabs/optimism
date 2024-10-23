@@ -12,7 +12,7 @@ from optimism.JaxConfig import *
 class SparseCholesky:
     
     def factorize(self): 
-
+         
         print('Assembling preconditioner', 0)
         stiffnessTryStep = 0
         self.A = self.new_stiffness_func(stiffnessTryStep)

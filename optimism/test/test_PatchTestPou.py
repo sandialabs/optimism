@@ -7,7 +7,7 @@ from optimism.material import LinearElastic as MatModel
 #from optimism.material import Neohookean as MatModel
 from optimism import Mesh
 from optimism import Mechanics
-from optimism.EquationSolver import newton_solve
+from EquationSolver_Immersed_2 import newton_solve
 from optimism import QuadratureRule
 from . import MeshFixture
 from optimism.TensorMath import tensor_2D_to_3D
