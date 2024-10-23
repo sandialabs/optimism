@@ -500,7 +500,7 @@ def compute_displacement_penalty(fs, U, quadRule, edge, dispTarget, comp, penalt
         elif comp == 0:
            return penalty*(u[0]-(traction)[0])**2
     return FunctionSpace.integrate_function_on_edges(fs, compute_energy_density, U, quadRule, edge)
-
+# THIS IS NOT COMPLETELY CORRECT AND IS NOT BEING USED ANYWHERE
 def compute_nitsche_term(fs, U, quadRule, edge):
     """Compute Nitsche. IMPORTANT - ONLY VALID FOR LINEAR ELASTICITY.
 
