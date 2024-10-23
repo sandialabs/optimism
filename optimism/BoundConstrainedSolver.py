@@ -3,7 +3,7 @@ from optimism.JaxConfig import *
 #from optimism import ConstrainedObjective
 from optimism import AlSolver
 from optimism import WarmStart
-from . import EquationSolver_Immersed_2
+from optimism import EquationSolver_Immersed_2
 
     
 def bound_constrained_solve(boundConstrainedObjective,
