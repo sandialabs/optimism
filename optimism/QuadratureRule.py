@@ -1,4 +1,3 @@
-# from collections import namedtuple
 from jax.lax import switch
 from jaxtyping import Array, Float
 import equinox as eqx
@@ -6,20 +5,6 @@ import jax.numpy as np
 import math
 import numpy as onp
 import scipy.special
-
-
-
-# QuadratureRule_old = namedtuple('QuadratureRule_old', ['xigauss', 'wgauss'])
-# QuadratureRule_old.__doc__ = """Quadrature rule points and weights.
-#     A ``namedtuple`` containing ``xigauss``, a numpy array of the
-#     coordinates of the sample points in the reference domain, and
-#     ``wgauss``, a numpy array with the weights.
-#     """
-
-# def len(quadRule):
-#     """Gets the number of points in a quadrature rule."""
-#     return quadRule.xigauss.shape[0]
-
 
 
 class QuadratureRule(eqx.Module):
