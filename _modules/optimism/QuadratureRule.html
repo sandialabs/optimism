@@ -73,28 +73,13 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.QuadratureRule</h1><div class="highlight"><pre>
-<span></span><span class="c1"># from collections import namedtuple</span>
-<span class="kn">from</span> <span class="nn">jax.lax</span> <span class="kn">import</span> <span class="n">switch</span>
+<span></span><span class="kn">from</span> <span class="nn">jax.lax</span> <span class="kn">import</span> <span class="n">switch</span>
 <span class="kn">from</span> <span class="nn">jaxtyping</span> <span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Float</span>
 <span class="kn">import</span> <span class="nn">equinox</span> <span class="k">as</span> <span class="nn">eqx</span>
 <span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
 <span class="kn">import</span> <span class="nn">scipy.special</span>
-
-
-
-<span class="c1"># QuadratureRule_old = namedtuple(&#39;QuadratureRule_old&#39;, [&#39;xigauss&#39;, &#39;wgauss&#39;])</span>
-<span class="c1"># QuadratureRule_old.__doc__ = &quot;&quot;&quot;Quadrature rule points and weights.</span>
-<span class="c1">#     A ``namedtuple`` containing ``xigauss``, a numpy array of the</span>
-<span class="c1">#     coordinates of the sample points in the reference domain, and</span>
-<span class="c1">#     ``wgauss``, a numpy array with the weights.</span>
-<span class="c1">#     &quot;&quot;&quot;</span>
-
-<span class="c1"># def len(quadRule):</span>
-<span class="c1">#     &quot;&quot;&quot;Gets the number of points in a quadrature rule.&quot;&quot;&quot;</span>
-<span class="c1">#     return quadRule.xigauss.shape[0]</span>
-
 
 
 <div class="viewcode-block" id="QuadratureRule">
