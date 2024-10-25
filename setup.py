@@ -5,11 +5,13 @@ setuptools.setup(
     description='Rapid development platform for solid mechanics research using optimization tools',
     author="Michael Tupek and Brandon Talamini",
     author_email='talamini1@llnl.gov', # todo: make an email list
-    install_requires=['jax[cpu]==0.4.28',
-                      'scipy',
+    install_requires=['equinox',
+                      'jax[cpu]==0.4.28',
+                      'jaxtyping',
                       'matplotlib', # this is not strictly necessary
+                      'metis',
                       'netcdf4',
-                      'metis'],
+                      'scipy',],
     #tests_require=[], # could put chex and pytest here
     extras_require={'sparse': ['scikit-sparse'],
                     'test': ['pytest', 'pytest-cov', 'pytest-xdist'],

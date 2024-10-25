@@ -30,9 +30,9 @@ class TestInterpolants(TestFixture.TestFixture):
         self.elements1d = []
         self.elements = []
         self.qr1d = QuadratureRule.create_quadrature_rule_1D(degree=maxDegree)
-        self.nQPts1d = QuadratureRule.len(self.qr1d)
+        self.nQPts1d = len(self.qr1d)
         self.qr = QuadratureRule.create_quadrature_rule_on_triangle(degree=maxDegree)
-        self.nQPts = QuadratureRule.len(self.qr)
+        self.nQPts = len(self.qr)
         for degree in range(1, maxDegree + 1):
             self.elements1d.append(Interpolants.make_parent_element_1d(degree))
             self.elements.append(Interpolants.make_parent_element_2d(degree))
@@ -171,7 +171,7 @@ class TestBubbleInterpolants(TestFixture.TestFixture):
         maxDegree = 5
         self.elements = []
         self.qr = QuadratureRule.create_quadrature_rule_on_triangle(degree=maxDegree)
-        self.nQPts = QuadratureRule.len(self.qr)
+        self.nQPts = len(self.qr)
         for degree in range(2, maxDegree + 1):
             self.elements.append(Interpolants.make_parent_element_2d_with_bubble(degree))
 

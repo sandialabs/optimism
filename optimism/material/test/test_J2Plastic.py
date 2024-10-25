@@ -293,7 +293,7 @@ class PlasticityOnMesh(MeshFixture):
         Ubc = dofManager.get_bc_values(U)
 
         nElems = Mesh.num_elements(mesh)
-        nQpsPerElem = QuadratureRule.len(quadRule)
+        nQpsPerElem = len(quadRule)
         internalVariables = mechFuncs.compute_initial_state()
 
         tOld = 0.0

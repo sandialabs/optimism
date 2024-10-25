@@ -156,7 +156,7 @@ def create_phasefield_functions(functionSpace, mode2D,
         return FunctionSpace.evaluate_on_block(fs, U, Q, dt, L_strain, slice(None), modify_element_gradient=modify_element_gradient)
 
     def compute_initial_state():
-        return materialModel.compute_initial_state((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule), 1))
+        return materialModel.compute_initial_state((Mesh.num_elements(fs.mesh), len(fs.quadratureRule), 1))
 
     L_compute_state_new = energy_density_to_lagrangian_density(materialModel.compute_state_new)
     

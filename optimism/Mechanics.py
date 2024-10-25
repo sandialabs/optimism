@@ -145,7 +145,7 @@ def _compute_updated_internal_variables_multi_block(functionSpace, U, states, dt
 
 def _compute_initial_state_multi_block(fs, blockModels):
 
-    numQuadPoints = QuadratureRule.len(fs.quadratureRule)
+    numQuadPoints = len(fs.quadratureRule)
     # Store the same number of state variables for every material to make
     # vmapping easy.
     #
@@ -225,8 +225,8 @@ def create_multi_block_mechanics_functions(functionSpace, mode2D, materialModels
 
 
     def compute_output_energy_densities_and_stresses(U, stateVariables, dt=0.0):
-        energy_densities = np.zeros((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule)))
-        stresses = np.zeros((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule), 3, 3))
+        energy_densities = np.zeros((Mesh.num_elements(fs.mesh), len(fs.quadratureRule)))
+        stresses = np.zeros((Mesh.num_elements(fs.mesh), len(fs.quadratureRule), 3, 3))
         for blockKey in materialModels:
             compute_output_energy_density = materialModels[blockKey].compute_energy_density
             output_lagrangian = strain_energy_density_to_lagrangian_density(compute_output_energy_density)
@@ -291,7 +291,7 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel,
 
     
     def compute_initial_state():
-        shape = Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule), 1
+        shape = Mesh.num_elements(fs.mesh), len(fs.quadratureRule), 1
         return np.tile(materialModel.compute_initial_state(), shape)
 
     def lagrangian_qoi(U, gradU, Q, X, dt):
@@ -414,19 +414,19 @@ def create_dynamics_functions(functionSpace, mode2D, materialModel, newmarkParam
         return FunctionSpace.evaluate_on_block(fs, U, stateVariables, dt, output_constitutive, slice(None), modify_element_gradient=modify_element_gradient)
 
     def compute_kinetic_energy(V):
-        stateVariables = np.zeros((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule)))
+        stateVariables = np.zeros((Mesh.num_elements(fs.mesh), len(fs.quadratureRule)))
         return _compute_kinetic_energy(functionSpace, V, stateVariables, materialModel.density)
 
     def compute_output_strain_energy(U, stateVariables, dt):
         return _compute_strain_energy(functionSpace, U, stateVariables, dt, materialModel.compute_energy_density, modify_element_gradient)
 
     def compute_initial_state():
-        shape = Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule), 1
+        shape = Mesh.num_elements(fs.mesh), len(fs.quadratureRule), 1
         return np.tile(materialModel.compute_initial_state(), shape)
 
     def compute_element_masses():
         V = np.zeros_like(fs.mesh.coords)
-        stateVariables = np.zeros((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule)))
+        stateVariables = np.zeros((Mesh.num_elements(fs.mesh), len(fs.quadratureRule)))
         return _compute_element_masses(functionSpace, V, stateVariables, materialModel.density, modify_element_gradient)
 
     def predict(U, V, A, dt):

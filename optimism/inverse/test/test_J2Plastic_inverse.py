@@ -181,7 +181,7 @@ class J2GlobalMeshUpdateGradsFixture(MeshFixture):
         dc_du, dc_dc_n = update_internal_variables_derivs(Uu, self.ivs_prev)
 
         nElems = Mesh.num_elements(self.mesh)
-        nQpsPerElem = QuadratureRule.len(self.quadRule)
+        nQpsPerElem = len(self.quadRule)
         nIntVars = 10
         nFreeDofs = Uu.shape[0]
 
@@ -205,7 +205,7 @@ class J2GlobalMeshUpdateGradsFixture(MeshFixture):
         dc_du, dc_dc_n = update_internal_variables_derivs(U, self.ivs_prev)
 
         nElems = Mesh.num_elements(self.mesh)
-        nQpsPerElem = QuadratureRule.len(self.quadRule)
+        nQpsPerElem = len(self.quadRule)
         nIntVars = 10
         nDims = 2
         nNodes = Mesh.num_nodes(self.mesh)
@@ -252,7 +252,7 @@ class J2GlobalMeshUpdateGradsFixture(MeshFixture):
         dc_dc_n = ivsUpdateInverseFuncs.ivs_update_jac_ivs_prev(U, self.ivs_prev)
 
         nElems = Mesh.num_elements(self.mesh)
-        nQpsPerElem = QuadratureRule.len(self.quadRule)
+        nQpsPerElem = len(self.quadRule)
         nIntVars = 10
 
         self.assertEqual(dc_dc_n.shape, (nElems,nQpsPerElem,nIntVars,nIntVars))

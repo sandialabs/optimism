@@ -82,7 +82,7 @@ class TestFunctionSpaceSingleQuadPointFixture(MeshFixture.MeshFixture):
                                                          self.quadratureRule)
 
         nElements = Mesh.num_elements(self.mesh)
-        nQuadPoints = QuadratureRule.len(self.quadratureRule)
+        nQuadPoints = len(self.quadratureRule)
         self.state = np.zeros((nElements,nQuadPoints,1))
         self.dt = 0.0
 
@@ -151,7 +151,7 @@ class TestFunctionSpaceMultiQuadPointFixture(MeshFixture.MeshFixture):
         # function space
         self.fs = FunctionSpace.construct_function_space(self.mesh, self.quadratureRule)
         nElements = Mesh.num_elements(self.mesh)
-        nQuadPoints = QuadratureRule.len(self.quadratureRule)
+        nQuadPoints = len(self.quadratureRule)
         self.state = np.zeros((nElements,nQuadPoints,))
         self.dt = 0.0
 
@@ -269,7 +269,7 @@ class ParameterizationTestSuite(MeshFixture.MeshFixture):
         # function space
         self.fs = FunctionSpace.construct_function_space(self.mesh, self.quadratureRule)
         nElements = Mesh.num_elements(self.mesh)
-        nQuadPoints = QuadratureRule.len(self.quadratureRule)
+        nQuadPoints = len(self.quadratureRule)
         self.state = np.zeros((nElements,nQuadPoints,))
         self.dt = 0.0
 
