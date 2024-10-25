@@ -14,7 +14,7 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -173,7 +173,7 @@
                                                          <span class="bp">self</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">)</span>
 
         <span class="n">nElements</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
-        <span class="n">nQuadPoints</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">)</span>
+        <span class="n">nQuadPoints</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nElements</span><span class="p">,</span><span class="n">nQuadPoints</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="mf">0.0</span></div>
 
@@ -260,7 +260,7 @@
         <span class="c1"># function space</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fs</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">construct_function_space</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">)</span>
         <span class="n">nElements</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
-        <span class="n">nQuadPoints</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">)</span>
+        <span class="n">nQuadPoints</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nElements</span><span class="p">,</span><span class="n">nQuadPoints</span><span class="p">,))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="mf">0.0</span></div>
 
@@ -408,7 +408,7 @@
         <span class="c1"># function space</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fs</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">construct_function_space</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">)</span>
         <span class="n">nElements</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
-        <span class="n">nQuadPoints</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">)</span>
+        <span class="n">nQuadPoints</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nElements</span><span class="p">,</span><span class="n">nQuadPoints</span><span class="p">,))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="mf">0.0</span></div>
 

@@ -14,7 +14,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -73,27 +73,48 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.QuadratureRule</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span></span><span class="c1"># from collections import namedtuple</span>
+<span class="kn">from</span> <span class="nn">jax.lax</span> <span class="kn">import</span> <span class="n">switch</span>
+<span class="kn">from</span> <span class="nn">jaxtyping</span> <span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Float</span>
+<span class="kn">import</span> <span class="nn">equinox</span> <span class="k">as</span> <span class="nn">eqx</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
 <span class="kn">import</span> <span class="nn">scipy.special</span>
 
-<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">jax.lax</span> <span class="kn">import</span> <span class="n">switch</span>
 
 
-<span class="n">QuadratureRule</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;QuadratureRule&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;xigauss&#39;</span><span class="p">,</span> <span class="s1">&#39;wgauss&#39;</span><span class="p">])</span>
-<span class="n">QuadratureRule</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Quadrature rule points and weights.</span>
-<span class="s2">    A ``namedtuple`` containing ``xigauss``, a numpy array of the</span>
-<span class="s2">    coordinates of the sample points in the reference domain, and</span>
-<span class="s2">    ``wgauss``, a numpy array with the weights.</span>
-<span class="s2">    &quot;&quot;&quot;</span>
+<span class="c1"># QuadratureRule_old = namedtuple(&#39;QuadratureRule_old&#39;, [&#39;xigauss&#39;, &#39;wgauss&#39;])</span>
+<span class="c1"># QuadratureRule_old.__doc__ = &quot;&quot;&quot;Quadrature rule points and weights.</span>
+<span class="c1">#     A ``namedtuple`` containing ``xigauss``, a numpy array of the</span>
+<span class="c1">#     coordinates of the sample points in the reference domain, and</span>
+<span class="c1">#     ``wgauss``, a numpy array with the weights.</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="len">
-<a class="viewcode-back" href="../../optimism.html#optimism.QuadratureRule.len">[docs]</a>
-<span class="k">def</span> <span class="nf">len</span><span class="p">(</span><span class="n">quadRule</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets the number of points in a quadrature rule.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">quadRule</span><span class="o">.</span><span class="n">xigauss</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+<span class="c1"># def len(quadRule):</span>
+<span class="c1">#     &quot;&quot;&quot;Gets the number of points in a quadrature rule.&quot;&quot;&quot;</span>
+<span class="c1">#     return quadRule.xigauss.shape[0]</span>
+
+
+
+<div class="viewcode-block" id="QuadratureRule">
+<a class="viewcode-back" href="../../optimism.html#optimism.QuadratureRule.QuadratureRule">[docs]</a>
+<span class="k">class</span> <span class="nc">QuadratureRule</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Quadrature rule points and weights.</span>
+<span class="sd">    An ``equinox`` ``Module`` containing ``xigauss``, a ``jax.numpy`` array of the</span>
+<span class="sd">    coordinates of the sample points in the reference domain, and</span>
+<span class="sd">    ``wgauss``, a ``jax.numpy`` array with the weights.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">xigauss</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;nq 2&quot;</span><span class="p">]</span>
+    <span class="n">wgauss</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;nq&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">xigauss</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">wgauss</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xigauss</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
 
@@ -150,33 +171,33 @@
 <span class="sd">    and the weights.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">degree</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">xi</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">3.33333333333333333E-01</span><span class="p">,</span>  <span class="mf">3.33333333333333333E-01</span><span class="p">]])</span>
+        <span class="n">xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">3.33333333333333333E-01</span><span class="p">,</span>  <span class="mf">3.33333333333333333E-01</span><span class="p">]])</span>
 
-        <span class="n">w</span>  <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="mf">5.00000000000000000E-01</span> <span class="p">])</span>
+        <span class="n">w</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="mf">5.00000000000000000E-01</span> <span class="p">])</span>
     <span class="k">elif</span> <span class="n">degree</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">xi</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">6.66666666666666667E-01</span><span class="p">,</span>  <span class="mf">1.66666666666666667E-01</span><span class="p">],</span>
+        <span class="n">xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">6.66666666666666667E-01</span><span class="p">,</span>  <span class="mf">1.66666666666666667E-01</span><span class="p">],</span>
                         <span class="p">[</span><span class="mf">1.66666666666666667E-01</span><span class="p">,</span>  <span class="mf">6.66666666666666667E-01</span><span class="p">],</span>
                         <span class="p">[</span><span class="mf">1.66666666666666667E-01</span><span class="p">,</span>  <span class="mf">1.66666666666666667E-01</span><span class="p">]])</span>
 
-        <span class="n">w</span>  <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.66666666666666666E-01</span><span class="p">,</span>
+        <span class="n">w</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.66666666666666666E-01</span><span class="p">,</span>
                         <span class="mf">1.66666666666666667E-01</span><span class="p">,</span>
                         <span class="mf">1.66666666666666667E-01</span><span class="p">])</span>
     <span class="k">elif</span> <span class="n">degree</span> <span class="o">&lt;=</span> <span class="mi">4</span><span class="p">:</span>
-        <span class="n">xi</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.081030181680700E-01</span><span class="p">,</span>  <span class="mf">4.459484909159650E-01</span><span class="p">],</span>
+        <span class="n">xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.081030181680700E-01</span><span class="p">,</span>  <span class="mf">4.459484909159650E-01</span><span class="p">],</span>
                         <span class="p">[</span><span class="mf">4.459484909159650E-01</span><span class="p">,</span>  <span class="mf">1.081030181680700E-01</span><span class="p">],</span>
                         <span class="p">[</span><span class="mf">4.459484909159650E-01</span><span class="p">,</span>  <span class="mf">4.459484909159650E-01</span><span class="p">],</span>
                         <span class="p">[</span><span class="mf">8.168475729804590E-01</span><span class="p">,</span>  <span class="mf">9.157621350977100E-02</span><span class="p">],</span>
                         <span class="p">[</span><span class="mf">9.157621350977100E-02</span><span class="p">,</span>  <span class="mf">8.168475729804590E-01</span><span class="p">],</span>
                         <span class="p">[</span><span class="mf">9.157621350977100E-02</span><span class="p">,</span>  <span class="mf">9.157621350977100E-02</span><span class="p">]])</span>
 
-        <span class="n">w</span>  <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.116907948390055E-01</span><span class="p">,</span>
+        <span class="n">w</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.116907948390055E-01</span><span class="p">,</span>
                         <span class="mf">1.116907948390055E-01</span><span class="p">,</span>
                         <span class="mf">1.116907948390055E-01</span><span class="p">,</span>
                         <span class="mf">5.497587182766100E-02</span><span class="p">,</span>
                         <span class="mf">5.497587182766100E-02</span><span class="p">,</span>
                         <span class="mf">5.497587182766100E-02</span><span class="p">])</span>
     <span class="k">elif</span> <span class="n">degree</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">:</span>
-        <span class="n">xi</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">3.33333333333333E-01</span><span class="p">,</span>  <span class="mf">3.33333333333333E-01</span><span class="p">],</span>
+        <span class="n">xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">3.33333333333333E-01</span><span class="p">,</span>  <span class="mf">3.33333333333333E-01</span><span class="p">],</span>
                         <span class="p">[</span><span class="mf">5.97158717897700E-02</span><span class="p">,</span>  <span class="mf">4.70142064105115E-01</span><span class="p">],</span>
                         <span class="p">[</span><span class="mf">4.70142064105115E-01</span><span class="p">,</span>  <span class="mf">5.97158717897700E-02</span><span class="p">],</span>
                         <span class="p">[</span><span class="mf">4.70142064105115E-01</span><span class="p">,</span>  <span class="mf">4.70142064105115E-01</span><span class="p">],</span>
@@ -184,7 +205,7 @@
                         <span class="p">[</span><span class="mf">1.01286507323456E-01</span><span class="p">,</span>  <span class="mf">7.97426985353087E-01</span><span class="p">],</span>
                         <span class="p">[</span><span class="mf">1.01286507323456E-01</span><span class="p">,</span>  <span class="mf">1.01286507323456E-01</span><span class="p">]])</span>
 
-        <span class="n">w</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.12500000000000E-01</span><span class="p">,</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.12500000000000E-01</span><span class="p">,</span>
                        <span class="mf">6.61970763942530E-02</span><span class="p">,</span>
                        <span class="mf">6.61970763942530E-02</span><span class="p">,</span>
                        <span class="mf">6.61970763942530E-02</span><span class="p">,</span>
@@ -192,7 +213,7 @@
                        <span class="mf">6.29695902724135E-02</span><span class="p">,</span>
                        <span class="mf">6.29695902724135E-02</span><span class="p">])</span>
     <span class="k">elif</span> <span class="n">degree</span> <span class="o">&lt;=</span> <span class="mi">6</span><span class="p">:</span>
-        <span class="n">xi</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">5.01426509658179E-01</span><span class="p">,</span>  <span class="mf">2.49286745170910E-01</span><span class="p">],</span>
+        <span class="n">xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">5.01426509658179E-01</span><span class="p">,</span>  <span class="mf">2.49286745170910E-01</span><span class="p">],</span>
                         <span class="p">[</span><span class="mf">2.49286745170910E-01</span><span class="p">,</span>  <span class="mf">5.01426509658179E-01</span><span class="p">],</span>
                         <span class="p">[</span><span class="mf">2.49286745170910E-01</span><span class="p">,</span>  <span class="mf">2.49286745170910E-01</span><span class="p">],</span>
                         <span class="p">[</span><span class="mf">8.73821971016996E-01</span><span class="p">,</span>  <span class="mf">6.30890144915020E-02</span><span class="p">],</span>
@@ -205,7 +226,7 @@
                         <span class="p">[</span><span class="mf">6.36502499121399E-01</span><span class="p">,</span>  <span class="mf">3.10352451033784E-01</span><span class="p">],</span>
                         <span class="p">[</span><span class="mf">3.10352451033784E-01</span><span class="p">,</span>  <span class="mf">5.31450498448170E-02</span><span class="p">]])</span>
 
-        <span class="n">w</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">5.83931378631895E-02</span><span class="p">,</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">5.83931378631895E-02</span><span class="p">,</span>
                        <span class="mf">5.83931378631895E-02</span><span class="p">,</span>
                        <span class="mf">5.83931378631895E-02</span><span class="p">,</span>
                        <span class="mf">2.54224531851035E-02</span><span class="p">,</span>
@@ -218,7 +239,7 @@
                        <span class="mf">4.14255378091870E-02</span><span class="p">,</span>
                        <span class="mf">4.14255378091870E-02</span><span class="p">])</span>
     <span class="k">elif</span> <span class="n">degree</span> <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">:</span>
-        <span class="n">xi</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.33333333333333333E+00</span><span class="p">,</span> <span class="mf">0.33333333333333333E+00</span><span class="p">],</span>
+        <span class="n">xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.33333333333333333E+00</span><span class="p">,</span> <span class="mf">0.33333333333333333E+00</span><span class="p">],</span>
                         <span class="p">[</span><span class="mf">0.4269134091050342E-02</span><span class="p">,</span>  <span class="mf">0.49786543295447483E+00</span><span class="p">],</span>
                         <span class="p">[</span><span class="mf">0.49786543295447483E+00</span><span class="p">,</span> <span class="mf">0.4269134091050342E-02</span><span class="p">],</span>
                         <span class="p">[</span><span class="mf">0.49786543295447483E+00</span><span class="p">,</span> <span class="mf">0.49786543295447483E+00</span><span class="p">],</span>
@@ -244,7 +265,7 @@
                         <span class="p">[</span><span class="mf">0.6297073291529187E+00</span><span class="p">,</span>  <span class="mf">0.3327436005886386E+00</span><span class="p">],</span>
                         <span class="p">[</span><span class="mf">0.37549070258442674E-01</span><span class="p">,</span> <span class="mf">0.6297073291529187E+00</span><span class="p">]])</span>
 
-        <span class="n">w</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4176169990259819E-01</span><span class="p">,</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4176169990259819E-01</span><span class="p">,</span>
                        <span class="mf">0.36149252960283717E-02</span><span class="p">,</span>
                        <span class="mf">0.36149252960283717E-02</span><span class="p">,</span>
                        <span class="mf">0.36149252960283717E-02</span><span class="p">,</span>
@@ -328,6 +349,7 @@
     <span class="n">w</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="mf">0.5555555555555557</span><span class="p">,</span>  <span class="mf">0.8888888888888888</span><span class="p">,</span>  <span class="mf">0.5555555555555557</span><span class="p">,</span>
                     <span class="mf">0.</span><span class="p">,</span>                  <span class="mf">0.</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">xi</span><span class="p">,</span><span class="n">w</span></div>
+
 
 
 <div class="viewcode-block" id="_gauss_quad_1D_4pt">

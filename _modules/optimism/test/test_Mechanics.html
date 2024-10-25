@@ -14,7 +14,7 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -121,7 +121,7 @@
 <div class="viewcode-block" id="MechanicsFunctionsFixture.test_internal_variables_initialization_on_multi_block">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Mechanics.MechanicsFunctionsFixture.test_internal_variables_initialization_on_multi_block">[docs]</a>
     <span class="k">def</span> <span class="nf">test_internal_variables_initialization_on_multi_block</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">nQuadPoints</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quadRule</span><span class="p">)</span>
+        <span class="n">nQuadPoints</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quadRule</span><span class="p">)</span>
         <span class="n">internals</span> <span class="o">=</span> <span class="n">Mechanics</span><span class="o">.</span><span class="n">_compute_initial_state_multi_block</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">blockModels</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">internals</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">(</span><span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">),</span> <span class="n">nQuadPoints</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayEqual</span><span class="p">(</span><span class="n">internals</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">J2Plastic</span><span class="o">.</span><span class="n">NUM_STATE_VARS</span><span class="p">))</span>
