@@ -1,22 +1,28 @@
-from collections import namedtuple
+from jax.lax import switch
+from jaxtyping import Array, Float
+import equinox as eqx
+import jax.numpy as np
 import math
 import numpy as onp
 import scipy.special
 
-import jax.numpy as np
-from jax.lax import switch
 
-
-QuadratureRule = namedtuple('QuadratureRule', ['xigauss', 'wgauss'])
-QuadratureRule.__doc__ = """Quadrature rule points and weights.
-    A ``namedtuple`` containing ``xigauss``, a numpy array of the
-    coordinates of the sample points in the reference domain, and
-    ``wgauss``, a numpy array with the weights.
+class QuadratureRule(eqx.Module):
     """
+    Quadrature rule points and weights.
+    An ``equinox`` ``Module`` containing ``xigauss``, a ``jax.numpy`` array of the
+    coordinates of the sample points in the reference domain, and
+    ``wgauss``, a ``jax.numpy`` array with the weights.
+    """
+    xigauss: Float[Array, "nq 2"]
+    wgauss: Float[Array, "nq"]
 
-def len(quadRule):
-    """Gets the number of points in a quadrature rule."""
-    return quadRule.xigauss.shape[0]
+    def __iter__(self):
+        yield self.xigauss
+        yield self.wgauss
+
+    def __len__(self):
+        return self.xigauss.shape[0]
 
 
 def create_quadrature_rule_1D(degree):
@@ -64,33 +70,33 @@ def create_quadrature_rule_on_triangle(degree):
     and the weights.
     """
     if degree <= 1:
-        xi = onp.array([[3.33333333333333333E-01,  3.33333333333333333E-01]])
+        xi = np.array([[3.33333333333333333E-01,  3.33333333333333333E-01]])
 
-        w  = onp.array([ 5.00000000000000000E-01 ])
+        w  = np.array([ 5.00000000000000000E-01 ])
     elif degree == 2:
-        xi = onp.array([[6.66666666666666667E-01,  1.66666666666666667E-01],
+        xi = np.array([[6.66666666666666667E-01,  1.66666666666666667E-01],
                         [1.66666666666666667E-01,  6.66666666666666667E-01],
                         [1.66666666666666667E-01,  1.66666666666666667E-01]])
 
-        w  = onp.array([1.66666666666666666E-01,
+        w  = np.array([1.66666666666666666E-01,
                         1.66666666666666667E-01,
                         1.66666666666666667E-01])
     elif degree <= 4:
-        xi = onp.array([[1.081030181680700E-01,  4.459484909159650E-01],
+        xi = np.array([[1.081030181680700E-01,  4.459484909159650E-01],
                         [4.459484909159650E-01,  1.081030181680700E-01],
                         [4.459484909159650E-01,  4.459484909159650E-01],
                         [8.168475729804590E-01,  9.157621350977100E-02],
                         [9.157621350977100E-02,  8.168475729804590E-01],
                         [9.157621350977100E-02,  9.157621350977100E-02]])
 
-        w  = onp.array([1.116907948390055E-01,
+        w  = np.array([1.116907948390055E-01,
                         1.116907948390055E-01,
                         1.116907948390055E-01,
                         5.497587182766100E-02,
                         5.497587182766100E-02,
                         5.497587182766100E-02])
     elif degree <= 5:
-        xi = onp.array([[3.33333333333333E-01,  3.33333333333333E-01],
+        xi = np.array([[3.33333333333333E-01,  3.33333333333333E-01],
                         [5.97158717897700E-02,  4.70142064105115E-01],
                         [4.70142064105115E-01,  5.97158717897700E-02],
                         [4.70142064105115E-01,  4.70142064105115E-01],
@@ -98,7 +104,7 @@ def create_quadrature_rule_on_triangle(degree):
                         [1.01286507323456E-01,  7.97426985353087E-01],
                         [1.01286507323456E-01,  1.01286507323456E-01]])
 
-        w = onp.array([1.12500000000000E-01,
+        w = np.array([1.12500000000000E-01,
                        6.61970763942530E-02,
                        6.61970763942530E-02,
                        6.61970763942530E-02,
@@ -106,7 +112,7 @@ def create_quadrature_rule_on_triangle(degree):
                        6.29695902724135E-02,
                        6.29695902724135E-02])
     elif degree <= 6:
-        xi = onp.array([[5.01426509658179E-01,  2.49286745170910E-01],
+        xi = np.array([[5.01426509658179E-01,  2.49286745170910E-01],
                         [2.49286745170910E-01,  5.01426509658179E-01],
                         [2.49286745170910E-01,  2.49286745170910E-01],
                         [8.73821971016996E-01,  6.30890144915020E-02],
@@ -119,7 +125,7 @@ def create_quadrature_rule_on_triangle(degree):
                         [6.36502499121399E-01,  3.10352451033784E-01],
                         [3.10352451033784E-01,  5.31450498448170E-02]])
 
-        w = onp.array([5.83931378631895E-02,
+        w = np.array([5.83931378631895E-02,
                        5.83931378631895E-02,
                        5.83931378631895E-02,
                        2.54224531851035E-02,
@@ -132,7 +138,7 @@ def create_quadrature_rule_on_triangle(degree):
                        4.14255378091870E-02,
                        4.14255378091870E-02])
     elif degree <= 10:
-        xi = onp.array([[0.33333333333333333E+00, 0.33333333333333333E+00],
+        xi = np.array([[0.33333333333333333E+00, 0.33333333333333333E+00],
                         [0.4269134091050342E-02,  0.49786543295447483E+00],
                         [0.49786543295447483E+00, 0.4269134091050342E-02],
                         [0.49786543295447483E+00, 0.49786543295447483E+00],
@@ -158,7 +164,7 @@ def create_quadrature_rule_on_triangle(degree):
                         [0.6297073291529187E+00,  0.3327436005886386E+00],
                         [0.37549070258442674E-01, 0.6297073291529187E+00]])
 
-        w = onp.array([0.4176169990259819E-01,
+        w = np.array([0.4176169990259819E-01,
                        0.36149252960283717E-02,
                        0.36149252960283717E-02,
                        0.36149252960283717E-02,
@@ -230,6 +236,7 @@ def _gauss_quad_1D_3pt(_):
     w  = np.array([ 0.5555555555555557,  0.8888888888888888,  0.5555555555555557,
                     0.,                  0.])
     return xi,w
+
 
 def _gauss_quad_1D_4pt(_):
     xi = np.array([-0.8611363115940526 , -0.33998104358485626,  0.33998104358485626,

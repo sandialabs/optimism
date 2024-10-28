@@ -62,7 +62,7 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
                                                                     materialModel)
 
         self.nElements = Mesh.num_elements(self.mesh)
-        self.nQuadPtsPerElem = QuadratureRule.len(quadRule)
+        self.nQuadPtsPerElem = len(quadRule)
         self.stateVars = self.bvpFunctions.compute_initial_state()
 
         dofToUnknown = self.dofManager.dofToUnknown.reshape(self.U.shape)
