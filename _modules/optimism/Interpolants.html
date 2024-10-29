@@ -14,7 +14,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -73,16 +73,16 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.Interpolants</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
+<span></span><span class="kn">from</span> <span class="nn">jaxtyping</span> <span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Float</span><span class="p">,</span> <span class="n">Int</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">special</span>
-
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
+<span class="kn">import</span> <span class="nn">equinox</span> <span class="k">as</span> <span class="nn">eqx</span>
 <span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 
-<span class="n">ParentElement</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;NodalBasis&#39;</span><span class="p">,</span>
-                        <span class="p">[</span><span class="s1">&#39;elementType&#39;</span><span class="p">,</span> <span class="s1">&#39;degree&#39;</span><span class="p">,</span> <span class="s1">&#39;coordinates&#39;</span><span class="p">,</span> <span class="s1">&#39;vertexNodes&#39;</span><span class="p">,</span> <span class="s1">&#39;faceNodes&#39;</span><span class="p">,</span> <span class="s1">&#39;interiorNodes&#39;</span><span class="p">])</span>
-<span class="n">ParentElement</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> \
+<div class="viewcode-block" id="ParentElement">
+<a class="viewcode-back" href="../../optimism.html#optimism.Interpolants.ParentElement">[docs]</a>
+<span class="k">class</span> <span class="nc">ParentElement</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Finite element on reference domain.</span>
 
 <span class="sd">    Attributes:</span>
@@ -100,9 +100,21 @@
 <span class="sd">        interiorNodes: Indices of nodes that are not on the boundary of the</span>
 <span class="sd">            element.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">elementType</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">degree</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">coordinates</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;nn nd&quot;</span><span class="p">]</span>
+    <span class="n">vertexNodes</span><span class="p">:</span> <span class="n">Int</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;nn&quot;</span><span class="p">]</span>
+    <span class="n">faceNodes</span><span class="p">:</span> <span class="n">Int</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;nf nnpf&quot;</span><span class="p">]</span>
+    <span class="n">interiorNodes</span><span class="p">:</span> <span class="n">Int</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;ni&quot;</span><span class="p">]</span>
 
-<span class="n">ShapeFunctions</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;ShapeFunctions&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;values&#39;</span><span class="p">,</span> <span class="s1">&#39;gradients&#39;</span><span class="p">])</span>
-<span class="n">ShapeFunctions</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> \
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ShapeFunctions">
+<a class="viewcode-back" href="../../optimism.html#optimism.Interpolants.ShapeFunctions">[docs]</a>
+<span class="k">class</span> <span class="nc">ShapeFunctions</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Shape functions and shape function gradients (in the parametric space).</span>
 
 <span class="sd">    Attributes:</span>
@@ -116,6 +128,13 @@
 <span class="sd">            of spatial dimensions. Line elements are an exception, which</span>
 <span class="sd">            have shape ``(nPts, nNdodes)``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">values</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;nq nn&quot;</span><span class="p">]</span>
+    <span class="n">gradients</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;nq nn nd&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradients</span></div>
+
 
 <span class="c1"># element types</span>
 <span class="n">LINE_ELEMENT</span> <span class="o">=</span> <span class="mi">0</span>
@@ -370,11 +389,11 @@
     <span class="n">baseMaster</span> <span class="o">=</span> <span class="n">make_parent_element_2d</span><span class="p">(</span><span class="n">degree</span><span class="p">)</span>
     <span class="n">bubbleMaster</span> <span class="o">=</span> <span class="n">make_parent_element_2d</span><span class="p">(</span><span class="n">degree</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
-    <span class="n">nNodesFromBase</span> <span class="o">=</span> <span class="n">num_nodes</span><span class="p">(</span><span class="n">baseMaster</span><span class="p">)</span> <span class="o">-</span> <span class="n">baseMaster</span><span class="o">.</span><span class="n">interiorNodes</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">nNodesFromBase</span> <span class="o">=</span> <span class="n">baseMaster</span><span class="o">.</span><span class="n">num_nodes</span> <span class="o">-</span> <span class="n">baseMaster</span><span class="o">.</span><span class="n">interiorNodes</span><span class="o">.</span><span class="n">size</span>
     <span class="n">nBubbleNodes</span> <span class="o">=</span> <span class="n">bubbleMaster</span><span class="o">.</span><span class="n">interiorNodes</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">nNodes</span> <span class="o">=</span> <span class="n">nNodesFromBase</span> <span class="o">+</span> <span class="n">nBubbleNodes</span>
 
-    <span class="n">retainedBaseNodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">(</span><span class="n">baseMaster</span><span class="p">),</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">retainedBaseNodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">baseMaster</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
     <span class="n">retainedBaseNodes</span> <span class="o">=</span> <span class="n">retainedBaseNodes</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">baseMaster</span><span class="o">.</span><span class="n">interiorNodes</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nNodes</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
@@ -401,7 +420,7 @@
     <span class="c1"># base shape function values at eval points</span>
     <span class="n">baseElement</span> <span class="o">=</span> <span class="n">make_parent_element_2d</span><span class="p">(</span><span class="n">refElement</span><span class="o">.</span><span class="n">degree</span><span class="p">)</span>
     <span class="n">baseShapes</span><span class="p">,</span> <span class="n">baseShapeGrads</span> <span class="o">=</span> <span class="n">shape2d</span><span class="p">(</span><span class="n">baseElement</span><span class="o">.</span><span class="n">degree</span><span class="p">,</span> <span class="n">baseElement</span><span class="o">.</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">evaluationPoints</span><span class="p">)</span>
-    <span class="n">nodesFromBase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_nodes</span><span class="p">(</span><span class="n">baseElement</span><span class="p">)),</span>
+    <span class="n">nodesFromBase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">baseElement</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">),</span>
                                  <span class="n">baseElement</span><span class="o">.</span><span class="n">interiorNodes</span><span class="p">,</span>
                                  <span class="n">assume_unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">baseShapes</span> <span class="o">=</span> <span class="n">baseShapes</span><span class="p">[:,</span> <span class="n">nodesFromBase</span><span class="p">]</span>
@@ -424,13 +443,6 @@
     <span class="n">dshapes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">baseShapeGrads</span><span class="p">,</span> <span class="n">bubbleShapeGrads</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">ShapeFunctions</span><span class="p">(</span><span class="n">shapes</span><span class="p">,</span> <span class="n">dshapes</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="num_nodes">
-<a class="viewcode-back" href="../../optimism.html#optimism.Interpolants.num_nodes">[docs]</a>
-<span class="k">def</span> <span class="nf">num_nodes</span><span class="p">(</span><span class="n">master</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">master</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 </pre></div>
 
