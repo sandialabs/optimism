@@ -1,13 +1,11 @@
-from collections import namedtuple
-import numpy as onp
+from jaxtyping import Array, Float, Int
 from scipy import special
-
+import numpy as onp
+import equinox as eqx
 import jax.numpy as np
 
 
-ParentElement = namedtuple('NodalBasis',
-                        ['elementType', 'degree', 'coordinates', 'vertexNodes', 'faceNodes', 'interiorNodes'])
-ParentElement.__doc__ = \
+class ParentElement(eqx.Module):
     """Finite element on reference domain.
 
     Attributes:
@@ -25,9 +23,18 @@ ParentElement.__doc__ = \
         interiorNodes: Indices of nodes that are not on the boundary of the
             element.
     """
+    elementType: int
+    degree: int
+    coordinates: Float[Array, "nn nd"]
+    vertexNodes: Int[Array, "nn"]
+    faceNodes: Int[Array, "nf nnpf"]
+    interiorNodes: Int[Array, "ni"]
 
-ShapeFunctions = namedtuple('ShapeFunctions', ['values', 'gradients'])
-ShapeFunctions.__doc__ = \
+    @property
+    def num_nodes(self):
+        return self.coordinates.shape[0]
+
+class ShapeFunctions(eqx.Module):
     """Shape functions and shape function gradients (in the parametric space).
 
     Attributes:
@@ -41,6 +48,12 @@ ShapeFunctions.__doc__ = \
             of spatial dimensions. Line elements are an exception, which
             have shape ``(nPts, nNdodes)``.
     """
+    values: Float[Array, "nq nn"]
+    gradients: Float[Array, "nq nn nd"]
+
+    def __iter__(self):
+        yield self.values
+        yield self.gradients
 
 # element types
 LINE_ELEMENT = 0
@@ -263,11 +276,11 @@ def make_parent_element_2d_with_bubble(degree):
     baseMaster = make_parent_element_2d(degree)
     bubbleMaster = make_parent_element_2d(degree + 1)
 
-    nNodesFromBase = num_nodes(baseMaster) - baseMaster.interiorNodes.size
+    nNodesFromBase = baseMaster.num_nodes - baseMaster.interiorNodes.size
     nBubbleNodes = bubbleMaster.interiorNodes.shape[0]
     nNodes = nNodesFromBase + nBubbleNodes
 
-    retainedBaseNodes = np.full(num_nodes(baseMaster), True)
+    retainedBaseNodes = np.full(baseMaster.num_nodes, True)
     retainedBaseNodes = retainedBaseNodes.at[baseMaster.interiorNodes].set(False)
 
     coords = np.zeros((nNodes, 2))
@@ -291,7 +304,7 @@ def shape2dBubble(refElement, evaluationPoints):
     # base shape function values at eval points
     baseElement = make_parent_element_2d(refElement.degree)
     baseShapes, baseShapeGrads = shape2d(baseElement.degree, baseElement.coordinates, evaluationPoints)
-    nodesFromBase = np.setdiff1d(np.arange(num_nodes(baseElement)),
+    nodesFromBase = np.setdiff1d(np.arange(baseElement.num_nodes),
                                  baseElement.interiorNodes,
                                  assume_unique=True)
     baseShapes = baseShapes[:, nodesFromBase]
@@ -314,7 +327,3 @@ def shape2dBubble(refElement, evaluationPoints):
     dshapes = np.hstack((baseShapeGrads, bubbleShapeGrads))
 
     return ShapeFunctions(shapes, dshapes)
-
-
-def num_nodes(master):
-    return master.coordinates.shape[0]
