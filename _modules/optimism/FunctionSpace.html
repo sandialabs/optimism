@@ -14,7 +14,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -73,19 +73,29 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.FunctionSpace</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
-
-<span class="kn">import</span> <span class="nn">jax</span>
-<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">jax.scipy.linalg</span> <span class="kn">import</span> <span class="n">solve</span>
-
+<span></span><span class="kn">from</span> <span class="nn">jax.scipy.linalg</span> <span class="kn">import</span> <span class="n">solve</span>
+<span class="kn">from</span> <span class="nn">jaxtyping</span> <span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Float</span>
 <span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Interpolants</span>
 <span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">QuadratureRule</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">equinox</span> <span class="k">as</span> <span class="nn">eqx</span>
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
 
 
-<span class="n">FunctionSpace</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;FunctionSpace&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;shapes&#39;</span><span class="p">,</span> <span class="s1">&#39;vols&#39;</span><span class="p">,</span> <span class="s1">&#39;shapeGrads&#39;</span><span class="p">,</span> <span class="s1">&#39;mesh&#39;</span><span class="p">,</span> <span class="s1">&#39;quadratureRule&#39;</span><span class="p">,</span> <span class="s1">&#39;isAxisymmetric&#39;</span><span class="p">])</span>
-<span class="n">FunctionSpace</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> \
+<div class="viewcode-block" id="EssentialBC">
+<a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.EssentialBC">[docs]</a>
+<span class="k">class</span> <span class="nc">EssentialBC</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="n">nodeSet</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">component</span><span class="p">:</span> <span class="nb">int</span></div>
+
+
+
+<div class="viewcode-block" id="FunctionSpace">
+<a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.FunctionSpace">[docs]</a>
+<span class="k">class</span> <span class="nc">FunctionSpace</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Data needed for calculus on functions in the discrete function space.</span>
 
 <span class="sd">    In describing the shape of the attributes, ``ne`` is the number of</span>
@@ -107,8 +117,13 @@
 <span class="sd">        isAxisymmetric: boolean indicating if the function space data are</span>
 <span class="sd">            axisymmetric.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">shapes</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;ne nqpe nn&quot;</span><span class="p">]</span>
+    <span class="n">vols</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;ne nqpe&quot;</span><span class="p">]</span>
+    <span class="n">shapeGrads</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;ne nqpe nn nd&quot;</span><span class="p">]</span>
+    <span class="n">mesh</span><span class="p">:</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">Mesh</span>
+    <span class="n">quadratureRule</span><span class="p">:</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">QuadratureRule</span>
+    <span class="n">isAxisymmetric</span><span class="p">:</span> <span class="nb">bool</span></div>
 
-<span class="n">EssentialBC</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;EssentialBC&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nodeSet&#39;</span><span class="p">,</span> <span class="s1">&#39;component&#39;</span><span class="p">])</span>
 
 
 <div class="viewcode-block" id="construct_function_space">
@@ -503,25 +518,43 @@
 
 <div class="viewcode-block" id="DofManager">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.DofManager">[docs]</a>
-<span class="k">class</span> <span class="nc">DofManager</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">DofManager</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="c1"># TODO get type hints below correct</span>
+    <span class="c1"># TODO this one could be moved to jax types if we move towards</span>
+    <span class="c1"># TODO jit safe preconditioners/solvers</span>
+    <span class="n">fieldShape</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">isBc</span><span class="p">:</span> <span class="nb">any</span>
+    <span class="n">isUnknown</span><span class="p">:</span> <span class="nb">any</span>
+    <span class="n">ids</span><span class="p">:</span> <span class="nb">any</span>
+    <span class="n">unknownIndices</span><span class="p">:</span> <span class="nb">any</span>
+    <span class="n">bcIndices</span><span class="p">:</span> <span class="nb">any</span>
+    <span class="n">dofToUnknown</span><span class="p">:</span> <span class="nb">any</span>
+    <span class="n">HessRowCoords</span><span class="p">:</span> <span class="nb">any</span>
+    <span class="n">HessColCoords</span><span class="p">:</span> <span class="nb">any</span>
+    <span class="n">hessian_bc_mask</span><span class="p">:</span> <span class="nb">any</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">functionSpace</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">EssentialBCs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fieldShape</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">(</span><span class="n">functionSpace</span><span class="o">.</span><span class="n">mesh</span><span class="p">),</span> <span class="n">dim</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">isBc</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fieldShape</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="n">isBc</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fieldShape</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">ebc</span> <span class="ow">in</span> <span class="n">EssentialBCs</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">isBc</span><span class="p">[</span><span class="n">functionSpace</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodeSets</span><span class="p">[</span><span class="n">ebc</span><span class="o">.</span><span class="n">nodeSet</span><span class="p">],</span> <span class="n">ebc</span><span class="o">.</span><span class="n">component</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">isBc</span><span class="p">[</span><span class="n">functionSpace</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodeSets</span><span class="p">[</span><span class="n">ebc</span><span class="o">.</span><span class="n">nodeSet</span><span class="p">],</span> <span class="n">ebc</span><span class="o">.</span><span class="n">component</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isBc</span> <span class="o">=</span> <span class="n">isBc</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">isUnknown</span> <span class="o">=</span> <span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">isBc</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">isBc</span><span class="o">.</span><span class="n">size</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fieldShape</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ids</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">isBc</span><span class="o">.</span><span class="n">size</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fieldShape</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">unknownIndices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">isUnknown</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bcIndices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">isBc</span><span class="p">]</span>
 
-        <span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">isBc</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dofToUnknown</span> <span class="o">=</span> <span class="n">ones</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">unknownIndices</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unknownIndices</span><span class="o">.</span><span class="n">size</span><span class="p">))</span> 
+        <span class="n">ones</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">isBc</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="c1"># self.dofToUnknown = ones.at[self.unknownIndices].set(np.arange(self.unknownIndices.size)) </span>
+        <span class="n">dofToUnknown</span> <span class="o">=</span> <span class="n">ones</span>
+        <span class="n">dofToUnknown</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">unknownIndices</span><span class="p">]</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unknownIndices</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dofToUnknown</span> <span class="o">=</span> <span class="n">dofToUnknown</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">HessRowCoords</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">HessColCoords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_hessian_coordinates</span><span class="p">(</span><span class="n">functionSpace</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">hessian_bc_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_hessian_bc_mask</span><span class="p">(</span><span class="n">functionSpace</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hessian_bc_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_hessian_bc_mask</span><span class="p">(</span><span class="n">onp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">functionSpace</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">))</span>
 
 
 <div class="viewcode-block" id="DofManager.get_bc_size">
@@ -593,7 +626,7 @@
             <span class="n">rowCoords</span><span class="p">[</span><span class="n">rangeBegin</span><span class="p">:</span><span class="n">rangeEnd</span><span class="p">]</span> <span class="o">=</span> <span class="n">elHessCoords</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
             <span class="n">colCoords</span><span class="p">[</span><span class="n">rangeBegin</span><span class="p">:</span><span class="n">rangeEnd</span><span class="p">]</span> <span class="o">=</span> <span class="n">elHessCoords</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
 
-            <span class="n">rangeBegin</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">nElUnknowns</span><span class="p">[</span><span class="n">e</span><span class="p">])</span>
+            <span class="n">rangeBegin</span> <span class="o">+=</span> <span class="n">onp</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">nElUnknowns</span><span class="p">[</span><span class="n">e</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">rowCoords</span><span class="p">,</span> <span class="n">colCoords</span></div>
 
 
