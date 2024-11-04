@@ -108,7 +108,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-optimism.material.LinearElastic">optimism.material.LinearElastic module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-optimism.material.MaterialModel">optimism.material.MaterialModel module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-optimism.material.MaterialUniaxialSimulator">optimism.material.MaterialUniaxialSimulator module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-optimism.material.MultiBranchHyperViscoelastic">optimism.material.MultiBranchHyperViscoelastic module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-optimism.material.Neohookean">optimism.material.Neohookean module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-optimism.material">Module contents</a></li>
 </ul>
@@ -292,21 +291,6 @@
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_MaterialUniaxialSimulator.MaterialUniaxialSimulatorFixture._classSetupFailed"><code class="docutils literal notranslate"><span class="pre">MaterialUniaxialSimulatorFixture._classSetupFailed</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_MaterialUniaxialSimulator.MaterialUniaxialSimulatorFixture._class_cleanups"><code class="docutils literal notranslate"><span class="pre">MaterialUniaxialSimulatorFixture._class_cleanups</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_MaterialUniaxialSimulator.MaterialUniaxialSimulatorFixture.test_uniaxial_state_achieved"><code class="docutils literal notranslate"><span class="pre">MaterialUniaxialSimulatorFixture.test_uniaxial_state_achieved()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="optimism.material.test.html#module-optimism.material.test.test_MultiBranchHyperVisco">optimism.material.test.test_MultiBranchHyperVisco module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_MultiBranchHyperVisco.HyperViscoModelFixture"><code class="docutils literal notranslate"><span class="pre">HyperViscoModelFixture</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_MultiBranchHyperVisco.HyperViscoModelFixture._classSetupFailed"><code class="docutils literal notranslate"><span class="pre">HyperViscoModelFixture._classSetupFailed</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_MultiBranchHyperVisco.HyperViscoModelFixture._class_cleanups"><code class="docutils literal notranslate"><span class="pre">HyperViscoModelFixture._class_cleanups</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_MultiBranchHyperVisco.HyperViscoModelFixture.setUp"><code class="docutils literal notranslate"><span class="pre">HyperViscoModelFixture.setUp()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_MultiBranchHyperVisco.HyperViscoUniaxialStrain"><code class="docutils literal notranslate"><span class="pre">HyperViscoUniaxialStrain</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_MultiBranchHyperVisco.HyperViscoUniaxialStrain._classSetupFailed"><code class="docutils literal notranslate"><span class="pre">HyperViscoUniaxialStrain._classSetupFailed</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_MultiBranchHyperVisco.HyperViscoUniaxialStrain._class_cleanups"><code class="docutils literal notranslate"><span class="pre">HyperViscoUniaxialStrain._class_cleanups</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_MultiBranchHyperVisco.HyperViscoUniaxialStrain.test_loading_only"><code class="docutils literal notranslate"><span class="pre">HyperViscoUniaxialStrain.test_loading_only()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -946,59 +930,6 @@
 </dd>
 </dl>
 </dd></dl>
-
-</section>
-<section id="module-optimism.material.MultiBranchHyperViscoelastic">
-<span id="optimism-material-multibranchhyperviscoelastic-module"></span><h2>optimism.material.MultiBranchHyperViscoelastic module<a class="headerlink" href="#module-optimism.material.MultiBranchHyperViscoelastic" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="optimism.material.MultiBranchHyperViscoelastic._compute_dissipated_energy">
-<span class="sig-prename descclassname"><span class="pre">optimism.material.MultiBranchHyperViscoelastic.</span></span><span class="sig-name descname"><span class="pre">_compute_dissipated_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/MultiBranchHyperViscoelastic.html#_compute_dissipated_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.MultiBranchHyperViscoelastic._compute_dissipated_energy" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="optimism.material.MultiBranchHyperViscoelastic._compute_elastic_logarithmic_strain">
-<span class="sig-prename descclassname"><span class="pre">optimism.material.MultiBranchHyperViscoelastic.</span></span><span class="sig-name descname"><span class="pre">_compute_elastic_logarithmic_strain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stateOld</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/MultiBranchHyperViscoelastic.html#_compute_elastic_logarithmic_strain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.MultiBranchHyperViscoelastic._compute_elastic_logarithmic_strain" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="optimism.material.MultiBranchHyperViscoelastic._compute_state_increment">
-<span class="sig-prename descclassname"><span class="pre">optimism.material.MultiBranchHyperViscoelastic.</span></span><span class="sig-name descname"><span class="pre">_compute_state_increment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elasticStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/MultiBranchHyperViscoelastic.html#_compute_state_increment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.MultiBranchHyperViscoelastic._compute_state_increment" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="optimism.material.MultiBranchHyperViscoelastic._compute_state_new">
-<span class="sig-prename descclassname"><span class="pre">optimism.material.MultiBranchHyperViscoelastic.</span></span><span class="sig-name descname"><span class="pre">_compute_state_new</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stateOld</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/MultiBranchHyperViscoelastic.html#_compute_state_new"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.MultiBranchHyperViscoelastic._compute_state_new" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="optimism.material.MultiBranchHyperViscoelastic._dissipation_potential">
-<span class="sig-prename descclassname"><span class="pre">optimism.material.MultiBranchHyperViscoelastic.</span></span><span class="sig-name descname"><span class="pre">_dissipation_potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Dv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/MultiBranchHyperViscoelastic.html#_dissipation_potential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.MultiBranchHyperViscoelastic._dissipation_potential" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="optimism.material.MultiBranchHyperViscoelastic._energy_density">
-<span class="sig-prename descclassname"><span class="pre">optimism.material.MultiBranchHyperViscoelastic.</span></span><span class="sig-name descname"><span class="pre">_energy_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/MultiBranchHyperViscoelastic.html#_energy_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.MultiBranchHyperViscoelastic._energy_density" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="optimism.material.MultiBranchHyperViscoelastic._eq_strain_energy">
-<span class="sig-prename descclassname"><span class="pre">optimism.material.MultiBranchHyperViscoelastic.</span></span><span class="sig-name descname"><span class="pre">_eq_strain_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/MultiBranchHyperViscoelastic.html#_eq_strain_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.MultiBranchHyperViscoelastic._eq_strain_energy" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="optimism.material.MultiBranchHyperViscoelastic._make_properties">
-<span class="sig-prename descclassname"><span class="pre">optimism.material.MultiBranchHyperViscoelastic.</span></span><span class="sig-name descname"><span class="pre">_make_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/MultiBranchHyperViscoelastic.html#_make_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.MultiBranchHyperViscoelastic._make_properties" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="optimism.material.MultiBranchHyperViscoelastic._neq_strain_energy">
-<span class="sig-prename descclassname"><span class="pre">optimism.material.MultiBranchHyperViscoelastic.</span></span><span class="sig-name descname"><span class="pre">_neq_strain_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elasticStrain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/MultiBranchHyperViscoelastic.html#_neq_strain_energy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.MultiBranchHyperViscoelastic._neq_strain_energy" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="optimism.material.MultiBranchHyperViscoelastic.create_material_model_functions">
-<span class="sig-prename descclassname"><span class="pre">optimism.material.MultiBranchHyperViscoelastic.</span></span><span class="sig-name descname"><span class="pre">create_material_model_functions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/MultiBranchHyperViscoelastic.html#create_material_model_functions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.MultiBranchHyperViscoelastic.create_material_model_functions" title="Link to this definition"></a></dt>
-<dd></dd></dl>
 
 </section>
 <section id="module-optimism.material.Neohookean">
