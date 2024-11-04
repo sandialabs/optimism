@@ -392,7 +392,6 @@ class DofManager(eqx.Module):
         self.bcIndices = self.ids[self.isBc]
 
         ones = onp.ones(self.isBc.size, dtype=int) * -1
-        # self.dofToUnknown = ones.at[self.unknownIndices].set(np.arange(self.unknownIndices.size)) 
         dofToUnknown = ones
         dofToUnknown[self.unknownIndices] = onp.arange(self.unknownIndices.size)
         self.dofToUnknown = dofToUnknown
