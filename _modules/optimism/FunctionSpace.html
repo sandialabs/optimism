@@ -14,7 +14,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -547,7 +547,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">bcIndices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">isBc</span><span class="p">]</span>
 
         <span class="n">ones</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">isBc</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="c1"># self.dofToUnknown = ones.at[self.unknownIndices].set(np.arange(self.unknownIndices.size)) </span>
         <span class="n">dofToUnknown</span> <span class="o">=</span> <span class="n">ones</span>
         <span class="n">dofToUnknown</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">unknownIndices</span><span class="p">]</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unknownIndices</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dofToUnknown</span> <span class="o">=</span> <span class="n">dofToUnknown</span>
