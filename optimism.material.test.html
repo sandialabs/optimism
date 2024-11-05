@@ -108,6 +108,7 @@
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.LinearElastic">optimism.material.LinearElastic module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.MaterialModel">optimism.material.MaterialModel module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.MaterialUniaxialSimulator">optimism.material.MaterialUniaxialSimulator module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.MultiBranchHyperViscoelastic">optimism.material.MultiBranchHyperViscoelastic module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.Neohookean">optimism.material.Neohookean module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material">Module contents</a></li>
 </ul>
@@ -437,6 +438,32 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="optimism.material.test.test_MaterialUniaxialSimulator.MaterialUniaxialSimulatorFixture.test_uniaxial_state_achieved">
 <span class="sig-name descname"><span class="pre">test_uniaxial_state_achieved</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_MaterialUniaxialSimulator.html#MaterialUniaxialSimulatorFixture.test_uniaxial_state_achieved"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_MaterialUniaxialSimulator.MaterialUniaxialSimulatorFixture.test_uniaxial_state_achieved" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-optimism.material.test.test_MultiBranchHyperVisco">
+<span id="optimism-material-test-test-multibranchhypervisco-module"></span><h2>optimism.material.test.test_MultiBranchHyperVisco module<a class="headerlink" href="#module-optimism.material.test.test_MultiBranchHyperVisco" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.material.test.test_MultiBranchHyperVisco.HyperViscoModelFixture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.material.test.test_MultiBranchHyperVisco.</span></span><span class="sig-name descname"><span class="pre">HyperViscoModelFixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_MultiBranchHyperVisco.html#HyperViscoModelFixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_MultiBranchHyperVisco.HyperViscoModelFixture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="optimism.test.html#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_MultiBranchHyperVisco.HyperViscoModelFixture.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_MultiBranchHyperVisco.html#HyperViscoModelFixture.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_MultiBranchHyperVisco.HyperViscoModelFixture.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.material.test.test_MultiBranchHyperVisco.HyperViscoUniaxialStrain">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.material.test.test_MultiBranchHyperVisco.</span></span><span class="sig-name descname"><span class="pre">HyperViscoUniaxialStrain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_MultiBranchHyperVisco.html#HyperViscoUniaxialStrain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_MultiBranchHyperVisco.HyperViscoUniaxialStrain" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#optimism.material.test.test_MultiBranchHyperVisco.HyperViscoModelFixture" title="optimism.material.test.test_MultiBranchHyperVisco.HyperViscoModelFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">HyperViscoModelFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.material.test.test_MultiBranchHyperVisco.HyperViscoUniaxialStrain.test_loading_only">
+<span class="sig-name descname"><span class="pre">test_loading_only</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/test/test_MultiBranchHyperVisco.html#HyperViscoUniaxialStrain.test_loading_only"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.test.test_MultiBranchHyperVisco.HyperViscoUniaxialStrain.test_loading_only" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
