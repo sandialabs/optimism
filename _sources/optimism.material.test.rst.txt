@@ -67,15 +67,6 @@ optimism.material.test.test\_MaterialUniaxialSimulator module
    :show-inheritance:
    :private-members:
 
-optimism.material.test.test\_MultiBranchHyperVisco module
----------------------------------------------------------
-
-.. automodule:: optimism.material.test.test_MultiBranchHyperVisco
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :private-members:
-
 optimism.material.test.test\_RateSensitivity module
 ---------------------------------------------------
 
