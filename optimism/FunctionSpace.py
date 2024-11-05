@@ -346,15 +346,16 @@ def interpolate_nodal_field_on_edge(functionSpace, U, interpolationPoints, edge)
     """
     edgeShapes = Interpolants.compute_shapes(functionSpace.mesh.parentElement1d, interpolationPoints)
     edgeU = get_nodal_values_on_edge(functionSpace, U, edge)
-    return edgeShapes.values.T@edgeU
+    return edgeShapes.values.T@edgeU, edgeShapes.gradients.T@edgeU
 
 
 def integrate_function_on_edge(functionSpace, func, U, quadRule, edge):
-    uq = interpolate_nodal_field_on_edge(functionSpace, U, quadRule.xigauss, edge)
+    uq, uq_eta = interpolate_nodal_field_on_edge(functionSpace, U, quadRule.xigauss, edge)
     Xq = interpolate_nodal_field_on_edge(functionSpace, functionSpace.mesh.coords, quadRule.xigauss, edge)
     edgeCoords = Mesh.get_edge_coords(functionSpace.mesh, edge)
-    _, normal, jac = Mesh.compute_edge_vectors(functionSpace.mesh, edgeCoords)
-    integrand = jax.vmap(func, (0, 0, None))(uq, Xq, normal)
+    _, normal, jac, normals = Mesh.compute_edge_vectors(functionSpace.mesh, edgeCoords)
+    uq_x = np.array([np.multiply(uq_eta[0,:],normals[0]),np.multiply(uq_eta[1,:],normals[1])])
+    integrand = jax.vmap(func, (0, 0, None, None))(uq, Xq, normal, uq_x)
     return np.dot(integrand, jac*quadRule.wgauss)
 
 

@@ -3,7 +3,7 @@ import unittest
 import jax
 import jax.numpy as np
 
-from optimism import EquationSolver
+from . import EquationSolver_Immersed_2
 from optimism import FunctionSpace
 from optimism import Mechanics
 from optimism import Mesh
@@ -18,7 +18,7 @@ E = 10.0
 nu = 0.0
 rho = 1.0
 
-trSettings = EquationSolver.get_settings(max_cg_iters=50,
+trSettings = EquationSolver_Immersed_2.get_settings(max_cg_iters=50,
                                          max_trust_iters=500,
                                          min_tr_size=1e-13,
                                          tol=4e-12,
@@ -184,7 +184,7 @@ class DynamicsFixture(MeshFixture.MeshFixture):
         UuPredicted, Vu = self.dynamicsFunctions.predict(Uu, Vu, Au, dt)
         objective.p = Objective.param_index_update(objective.p, 5, UuPredicted)
 
-        Uu, solverSuccess = EquationSolver.nonlinear_equation_solve(objective,
+        Uu, solverSuccess = EquationSolver_Immersed_2.nonlinear_equation_solve(objective,
                                                                     UuPredicted,
                                                                     objective.p,
                                                                     trSettings,
@@ -299,7 +299,7 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
 
             # The predictor value is exact.
             # Choose a bad initial guess (zero) to force an actual solve.
-            Uu, solverSuccess = EquationSolver.nonlinear_equation_solve(objective,
+            Uu, solverSuccess = EquationSolver_Immersed_2.nonlinear_equation_solve(objective,
                                                                         dofManager.get_unknown_values(UPrediction),
                                                                         objective.p,
                                                                         trSettings,
@@ -365,7 +365,7 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
 
             # The predictor value is exact.
             # Choose a bad initial guess (zero) to force an actual solve.
-            Uu, solverSuccess = EquationSolver.nonlinear_equation_solve(objective,
+            Uu, solverSuccess = EquationSolver_Immersed_2.nonlinear_equation_solve(objective,
                                                                         dofManager.get_unknown_values(UPrediction),
                                                                         objective.p,
                                                                         trSettings,

@@ -7,6 +7,8 @@ from optimism import Mesh
 from optimism.TensorMath import tensor_2D_to_3D
 from optimism import QuadratureRule
 from optimism import Interpolants
+import jax.numpy as np
+
 
 MechanicsFunctions = namedtuple('MechanicsFunctions',
                                 ['compute_strain_energy',
@@ -466,7 +468,57 @@ def compute_traction_potential_energy(fs, U, quadRule, edges, load):
         outward unit normal.
     time: current time
     """
-    def compute_energy_density(u, X, n):
+    def compute_energy_density(u, X, n, f):
+        f = 1
         traction = load(X, n)
         return -np.dot(u, traction)
     return FunctionSpace.integrate_function_on_edges(fs, compute_energy_density, U, quadRule, edges)
+
+# Penalty Function
+def compute_displacement_penalty(fs, U, quadRule, edge, dispTarget, comp, penalty):
+    """Compute penalty energy.
+
+    Arguments:
+    fs: a FunctionSpace object
+    U: the nodal displacements
+    quadRule: the 1D quadrature rule to use for the integration
+    edges: array of edges, each row is an edge. Each edge has two entries, the
+         element ID, and the permutation of that edge in the triangle (0, 1,
+         2).
+    load: Callable that returns the traction vector. The signature is
+        load(X, n), where X is coordinates of a material point, and n is the
+        outward unit normal.
+    time: current time
+    """
+    def compute_energy_density(u, X, n, f):
+        f = 1
+        traction = dispTarget(X, n)
+        if comp == 2:
+           return penalty*((u[1]-(traction)[1])**2 + (u[0]-(traction)[0])**2)
+        elif comp == 1:
+           return penalty*(u[1]-(traction)[1])**2
+        elif comp == 0:
+           return penalty*(u[0]-(traction)[0])**2
+    return FunctionSpace.integrate_function_on_edges(fs, compute_energy_density, U, quadRule, edge)
+# THIS IS NOT COMPLETELY CORRECT AND IS NOT BEING USED ANYWHERE
+def compute_nitsche_term(fs, U, quadRule, edge):
+    """Compute Nitsche. IMPORTANT - ONLY VALID FOR LINEAR ELASTICITY.
+
+    Arguments:
+    fs: a FunctionSpace object
+    U: the nodal displacements
+    quadRule: the 1D quadrature rule to use for the integration
+    edges: array of edges, each row is an edge. Each edge has two entries, the
+         element ID, and the permutation of that edge in the triangle (0, 1,
+         2).
+    load: Callable that returns the traction vector. The signature is
+        load(X, n), where X is coordinates of a material point, and n is the
+        outward unit normal.
+    time: current time
+    """
+    def compute_energy_density_nitsche(u, X, n, u_x):
+        # Compute displacement-normal product.
+        gradUn  = u_x@n
+        return np.dot(gradUn,u)
+        
+    return FunctionSpace.integrate_function_on_edges(fs, compute_energy_density_nitsche, U, quadRule, edge)

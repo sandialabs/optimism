@@ -8,7 +8,7 @@ from optimism import Objective
 from . import TestFixture
 
 from scipy import sparse
-from optimism import EquationSolver
+from . import EquationSolver_Immersed_2
 
 def energy(x, params):
     p = params[0]
@@ -272,8 +272,8 @@ class TestTrustRegionSPGFixture(TestFixture.TestFixture):
         # self.assertTrue(onp.testing.assert_array_less(-eigvals, np.zeros(self.x.shape)))
 
     def no_test_cgunbound(self):
-        settings = EquationSolver.get_settings()
-        sol, solverSuccess = EquationSolver.nonlinear_equation_solve(self.obj, self.x, self.p,
+        settings = EquationSolver_Immersed_2.get_settings()
+        sol, solverSuccess = EquationSolver_Immersed_2.nonlinear_equation_solve(self.obj, self.x, self.p,
                                                                      settings, useWarmStart=False)
         self.assertTrue(solverSuccess)
         self.assertNear(np.linalg.norm(self.obj.gradient(sol)), 0, 7)
@@ -314,8 +314,8 @@ class TestTrustRegionSPGRosenbrock(TestFixture.TestFixture):
 
 
     def no_test_steihaug_on_rosenbrock(self):
-        settings = EquationSolver.get_settings()
-        sol, solverSuccess = EquationSolver.nonlinear_equation_solve(self.obj, self.x, self.p,
+        settings = EquationSolver_Immersed_2.get_settings()
+        sol, solverSuccess = EquationSolver_Immersed_2.nonlinear_equation_solve(self.obj, self.x, self.p,
                                                                      settings, useWarmStart=False)
         self.assertTrue(solverSuccess)
         print('sol', sol)

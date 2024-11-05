@@ -1,14 +1,14 @@
 from optimism.JaxConfig import *
 from jax import custom_jvp, custom_vjp
 
-from optimism import EquationSolver
+from . import EquationSolver_Immersed_2
 from optimism import Objective
 from optimism import WarmStart
 
 @partial(custom_vjp, nondiff_argnums=(0,1))
 def nonlinear_solve(mechanicalEnergy, settings, UuGuess, designParams):
     p = Objective.param_index_update(mechanicalEnergy.p, 2, designParams)
-    return EquationSolver.nonlinear_equation_solve(mechanicalEnergy,
+    return EquationSolver_Immersed_2.nonlinear_equation_solve(mechanicalEnergy,
                                                    UuGuess, p, settings)[0]
 
 
@@ -23,7 +23,7 @@ def nonlinear_solve_b(mechanicalEnergy, settings, rdata, v):
     
     hess_vec_func = lambda w: mechanicalEnergy.hessian_vec(Uu, w)
     
-    results,_ = EquationSolver.solve_trust_region_minimization(0.0*Uu,
+    results,_ = EquationSolver_Immersed_2.solve_trust_region_minimization(0.0*Uu,
                                                                v,
                                                                hess_vec_func,
                                                                mechanicalEnergy.apply_precond,
@@ -45,7 +45,7 @@ def nonlinear_solve_with_state(mechanicalEnergy, settings, UuGuess, p):
     mechanicalEnergy.update_precond(UuGuess)
     UuGuess += WarmStart.warm_start_increment_jax_safe(mechanicalEnergy, UuGuess, p[0])
 
-    Uu, solverSuccess = EquationSolver.nonlinear_equation_solve(mechanicalEnergy,
+    Uu, solverSuccess = EquationSolver_Immersed_2.nonlinear_equation_solve(mechanicalEnergy,
                                                                 UuGuess,
                                                                 p,
                                                                 settings,
@@ -65,7 +65,7 @@ def nonlinear_solve_with_state_b(mechanicalEnergy, settings, rdata, v):
     hess_vec_func = lambda w: mechanicalEnergy.hessian_vec(Uu, w)
 
     UuZeros = np.zeros_like(Uu)
-    results = EquationSolver.solve_trust_region_minimization(UuZeros,
+    results = EquationSolver_Immersed_2.solve_trust_region_minimization(UuZeros,
                                                              v,
                                                              hess_vec_func,
                                                              mechanicalEnergy.apply_precond,

@@ -1,5 +1,5 @@
 from optimism.JaxConfig import *
-from optimism import EquationSolver as es
+from . import EquationSolver_Immersed_2 as es
 from optimism import Objective
 from .TestFixture import TestFixture
 import unittest

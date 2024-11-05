@@ -9,7 +9,7 @@ from optimism.material import LinearElastic as MatModel
 from optimism import Mesh
 from optimism import Mechanics
 from optimism.Timer import Timer
-from optimism.EquationSolver import newton_solve
+from EquationSolver_Immersed_2 import newton_solve
 from optimism import QuadratureRule
 from . import MeshFixture
 
