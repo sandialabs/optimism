@@ -7,30 +7,48 @@ from optimism import Mesh
 from optimism.TensorMath import tensor_2D_to_3D
 from optimism import QuadratureRule
 from optimism import Interpolants
+from typing import Callable
 
-MechanicsFunctions = namedtuple('MechanicsFunctions',
-                                ['compute_strain_energy',
-                                 'compute_updated_internal_variables',
-                                 'compute_element_stiffnesses',
-                                 'compute_output_energy_densities_and_stresses',
-                                 'compute_initial_state',
-                                 'integrated_material_qoi',
-                                 'compute_output_material_qoi'])
+import equinox as eqx
 
 
-DynamicsFunctions = namedtuple('DynamicsFunctions',
-                               ['compute_algorithmic_energy',
-                                'compute_updated_internal_variables',
-                                'compute_element_hessians',
-                                'compute_output_energy_densities_and_stresses',
-                                'compute_output_kinetic_energy',
-                                'compute_output_strain_energy',
-                                'compute_initial_state',
-                                'compute_element_masses', # not used for time integration, provided for convenience (spectral analysis, eg)
-                                'predict',
-                                'correct'])
+# TODO
+# eventually let's move to some kind of class hierarchy like below
+# that we can derive off of with shared behavior
+#
+# normal python inheritance rules apply to equinox Modules
+# class BaseFunctions(eqx.Module):
+#     compute_output_energy_densities_and_stresses: Callable
+#     compute_initial_state: Callable
 
-NewmarkParameters = namedtuple('NewmarkParameters', ['gamma', 'beta'], defaults=[0.5, 0.25])
+
+# TODO further type below so Callable refelcts the actual called arguments and returns
+class MechanicsFunctions(eqx.Module):
+    compute_strain_energy: Callable
+    compute_updated_internal_variables: Callable
+    compute_element_stiffnesses: Callable
+    compute_output_energy_densities_and_stresses: Callable
+    compute_initial_state: Callable
+    integrated_material_qoi: Callable
+    compute_output_material_qoi: Callable
+
+
+class DynamicsFunctions(eqx.Module):
+    compute_algorithmic_energy: Callable
+    compute_updated_internal_variables: Callable
+    compute_element_hessians: Callable
+    compute_output_energy_densities_and_stresses: Callable
+    compute_output_kinetic_energy: Callable
+    compute_output_strain_energy: Callable
+    compute_initial_state: Callable
+    compute_element_masses: Callable # not used for time integration, provided for convenience (spectral analysis, eg)
+    predict: Callable
+    correct: Callable
+
+
+class NewmarkParameters(eqx.Module):
+    gamma: float = 0.5
+    beta: float = 0.25
 
 
 def plane_strain_gradient_transformation(elemDispGrads, elemShapes, elemVols, elemNodalDisps, elemNodalCoords):
