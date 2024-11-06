@@ -75,15 +75,6 @@ optimism.material.MaterialUniaxialSimulator module
    :show-inheritance:
    :private-members:
 
-optimism.material.MultiBranchHyperViscoelastic module
------------------------------------------------------
-
-.. automodule:: optimism.material.MultiBranchHyperViscoelastic
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :private-members:
-
 optimism.material.Neohookean module
 -----------------------------------
 
