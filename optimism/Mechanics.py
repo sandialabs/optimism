@@ -22,7 +22,7 @@ import equinox as eqx
 #     compute_initial_state: Callable
 
 
-# TODO further type below so Callable refelcts the actual called argsuments and returns
+# TODO further type below so Callable refelcts the actual called arguments and returns
 class MechanicsFunctions(eqx.Module):
     compute_strain_energy: Callable
     compute_updated_internal_variables: Callable
