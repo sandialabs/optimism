@@ -14,9 +14,9 @@ PROPS_TAU_2   = 5
 PROPS_G_neq_3 = 6
 PROPS_TAU_3   = 7
 
-NUM_PRONY_TERMS = 3
 
-VISCOUS_DISTORTION = slice(0, NUM_PRONY_TERMS * 9)
+NUM_PRONY_TERMS = 3
+VISCOUS_DISTORTION_SIZE = 9
 
 def create_material_model_functions(properties):
     
@@ -73,14 +73,14 @@ def _energy_density(dispGrad, state, dt, props):
     W_neq = 0.0
     Psi = 0.0
     for n in range(NUM_PRONY_TERMS):
-      state_temp = state.at[9 * n:(n + 1) * 9].get()
+      state_temp = _return_state_for_branch(state, n)
       Ee_trial = _compute_elastic_logarithmic_strain(dispGrad, state_temp)
-      delta_Ev = _compute_state_increment(Ee_trial, dt, props, PROPS_G_neq_1 + 2 * n)
+      delta_Ev = _compute_state_increment(Ee_trial, dt, props, _return_Gneq_id_for_branch(n))
       Ee = Ee_trial - delta_Ev 
-      W_neq = W_neq + _neq_strain_energy(Ee, props, PROPS_G_neq_1 + 2 * n)
+      W_neq = W_neq + _neq_strain_energy(Ee, props, _return_Gneq_id_for_branch(n))
     
       Dv = delta_Ev / dt
-      Psi = Psi + _dissipation_potential(Dv, props, PROPS_G_neq_1 + 2 * n)
+      Psi = Psi + _dissipation_potential(Dv, props, _return_Gneq_id_for_branch(n))
 
     return W_eq + W_neq + dt * Psi
 
@@ -108,20 +108,20 @@ def _dissipation_potential(Dv, props, prop_id):
 def _compute_dissipated_energy(dispGrad, state, dt, props):
     Psi = 0.0
     for n in range(NUM_PRONY_TERMS):
-      state_temp = state.at[9 * n:9 * (n + 1)].get()
+      state_temp = _return_state_for_branch(state, n)
       Ee_trial = _compute_elastic_logarithmic_strain(dispGrad, state_temp)
-      delta_Ev = _compute_state_increment(Ee_trial, dt, props, PROPS_G_neq_1 + 2 * n)
+      delta_Ev = _compute_state_increment(Ee_trial, dt, props, _return_Gneq_id_for_branch(n))
       Dv = delta_Ev / dt
-      Psi = Psi + dt * _dissipation_potential(Dv, props, PROPS_G_neq_1 + 2 * n)
+      Psi = Psi + dt * _dissipation_potential(Dv, props, _return_Gneq_id_for_branch(n))
 
     return Psi
 
 def _compute_state_new(dispGrad, stateOld, dt, props):
     state_new = np.array([])
     for n in range(NUM_PRONY_TERMS):
-      state_temp = stateOld.at[9 * n:9 * (n + 1)].get()
+      state_temp = _return_state_for_branch(stateOld, n)
       Ee_trial = _compute_elastic_logarithmic_strain(dispGrad, state_temp)
-      delta_Ev = _compute_state_increment(Ee_trial, dt, props, PROPS_G_neq_1 + 2 * n)
+      delta_Ev = _compute_state_increment(Ee_trial, dt, props, _return_Gneq_id_for_branch(n))
 
       Fv_old = state_temp.reshape((3, 3))
       Fv_new = linalg.expm(delta_Ev)@Fv_old
@@ -141,3 +141,9 @@ def _compute_elastic_logarithmic_strain(dispGrad, stateOld):
 
     Fe_trial = F @ np.linalg.inv(Fv_old)
     return TensorMath.log_sqrt_symm(Fe_trial.T @ Fe_trial)
+
+def _return_state_for_branch(state, n):
+    return state.at[n * VISCOUS_DISTORTION_SIZE : (n + 1) * VISCOUS_DISTORTION_SIZE].get()
+   
+def _return_Gneq_id_for_branch(n):
+    return PROPS_G_neq_1 + 2 * n
