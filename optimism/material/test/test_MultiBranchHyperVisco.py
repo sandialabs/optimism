@@ -24,17 +24,6 @@ class HyperViscoModelFixture(TestFixture):
         tau_2 = 10.0
         G_neq_3 = 3.0
         tau_3 = 100.0
-        # self.G_neq_1 = G_neq_1
-        # self.tau_1 = tau_1 
-        # self.eta_1 = G_neq_1 * tau_1
-
-        # self.G_neq_2 = G_neq_2
-        # self.tau_2 = tau_2
-        # self.eta_2 = G_neq_2 * tau_2
-
-        # self.G_neq_3 = G_neq_3
-        # self.tau_3 = tau_3 
-        # self.eta_3 = G_neq_3 * tau_3
 
         self.G_neqs = np.array([G_neq_1, G_neq_2, G_neq_3])
         self.taus = np.array([tau_1, tau_2, tau_3])
