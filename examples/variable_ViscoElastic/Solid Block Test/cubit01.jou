@@ -1,0 +1,16 @@
+## /projects/cubit/Cubit-16.18/bin/clarox
+## Cubit Version 16.18.0
+## Cubit Build 4ee5708
+## Revised Thu Jun 6 10:47:43 2024 -0600
+## Running 10/21/2024 10:48:56 AM
+## Command Options:
+undo on
+undo group begin
+import mesh geometry "/home/lkgallu/optimism_sandbox/optimism/examples/variable_ViscoElastic/Solid Block Test/solidTest_2.exo" feature_angle 135 merge
+undo group end
+refine surface 1 numsplit 1 bias 1 depth 1 smooth
+undo group begin
+set exodus netcdf4 off
+set large exodus file on
+export mesh "/home/lkgallu/optimism-SeedMesh/solidTest_3.exo" overwrite
+undo group end

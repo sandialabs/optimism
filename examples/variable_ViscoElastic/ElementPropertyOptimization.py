@@ -36,9 +36,9 @@ class ElementPropertyOptimization:
         self.scaleObjective = -1.0 # -1.0 to maximize
         self.stateNotStored = True
 
-        self.input_mesh = './ellipse_test_LD_sinusoidal_1.exo'
+        self.input_mesh = './solidTest_Seeded.exo'
         if self.writeOutput:
-          self.output_file = 'output_ellipse_VARIABLE_1.exo'
+          self.output_file = 'output_solidTest_Seeded.exo'
 
         self.quad_rule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2)
 
@@ -81,7 +81,7 @@ class ElementPropertyOptimization:
             min_tr_size=1e-15,
             tol=5e-8
         )
-        stageTime = 1.0
+        stageTime = 0.05
         self.maxDisp = 0.2
         self.plot_file = 'disp_control_response.npz'
         self.stages = 1
