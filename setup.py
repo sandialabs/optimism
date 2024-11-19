@@ -13,7 +13,8 @@ setuptools.setup(
                       'netcdf4',
                       'scipy',],
     #tests_require=[], # could put chex and pytest here
-    extras_require={'sparse': ['scikit-sparse'],
+    extras_require={'ipc': ['ipctk', 'meshio'],
+                    'sparse': ['scikit-sparse'],
                     'test': ['pytest', 'pytest-cov', 'pytest-xdist'],
                     'docs': ['sphinx', 'sphinx-copybutton', 'sphinx-rtd-theme', 'sphinxcontrib-bibtex', 'sphinxcontrib-napoleon']},
     python_requires='>=3.7',
