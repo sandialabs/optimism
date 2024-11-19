@@ -28,17 +28,17 @@ jobs:
           sudo apt-get install -y libsuitesparse-dev
           python -m pip install --upgrade pip
           # pip install .
-          pip install -e ".[sparse]"
+          pip install -e ".[ipc,sparse]"
           # pip install flake8 pytest
           # if [ -f requirements.txt ]; then pip install -r requirements-test.txt; fi
       - name: pytest
         run: |
-          pip install -e ".[sparse,test]"
+          pip install -e ".[ipc,sparse,test]"
           python -m pytest -n auto optimism --cov=optimism -Wignore
           # we can also add the flag -n auto for parallel testing
       - name: docs
         run: |
-          pip install -e ".[docs,sparse,test]"
+          pip install -e ".[docs,ipc,sparse,test]"
           cd docs
           sphinx-apidoc -o source/ ../optimism -P
           make html
