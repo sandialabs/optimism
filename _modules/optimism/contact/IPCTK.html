@@ -1,0 +1,211 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.contact.IPCTK &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.contact.IPCTK</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.contact.IPCTK</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">QuadratureRule</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">import</span> <span class="nn">equinox</span> <span class="k">as</span> <span class="nn">eqx</span>
+<span class="kn">import</span> <span class="nn">ipctk</span>
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+<span class="kn">import</span> <span class="nn">meshio</span>
+
+
+<div class="viewcode-block" id="IPCTKContact">
+<a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.IPCTK.IPCTKContact">[docs]</a>
+<span class="k">class</span> <span class="nc">IPCTKContact</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="n">mesh</span><span class="p">:</span> <span class="nb">any</span>
+    <span class="n">collision_mesh</span><span class="p">:</span> <span class="nb">any</span>
+    <span class="n">dof_manager</span><span class="p">:</span> <span class="nb">any</span>
+    <span class="n">max_neighbors</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">q_rule</span><span class="p">:</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">QuadratureRule</span>
+    <span class="n">dhat</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">potential</span><span class="p">:</span> <span class="n">ipctk</span><span class="o">.</span><span class="n">BarrierPotential</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mesh_file</span><span class="p">,</span> <span class="n">dof_manager</span><span class="p">,</span> <span class="n">max_neighbors</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">q_degree</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">dhat</span><span class="o">=</span><span class="mf">2e-3</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span> <span class="o">=</span> <span class="n">meshio</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">mesh_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_neighbors</span> <span class="o">=</span> <span class="n">max_neighbors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q_rule</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">create_quadrature_rule_1D</span><span class="p">(</span><span class="n">q_degree</span><span class="p">)</span>
+
+        <span class="n">rest_positions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">points</span>
+        <span class="n">faces</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">cells_dict</span><span class="p">[</span><span class="s1">&#39;triangle&#39;</span><span class="p">]</span>
+        <span class="n">edges</span> <span class="o">=</span> <span class="n">ipctk</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">faces</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dhat</span> <span class="o">=</span> <span class="n">dhat</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collision_mesh</span> <span class="o">=</span> <span class="n">ipctk</span><span class="o">.</span><span class="n">CollisionMesh</span><span class="p">(</span><span class="n">rest_positions</span><span class="p">,</span> <span class="n">edges</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">potential</span> <span class="o">=</span> <span class="n">ipctk</span><span class="o">.</span><span class="n">BarrierPotential</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dhat</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dof_manager</span> <span class="o">=</span> <span class="n">dof_manager</span>
+
+<div class="viewcode-block" id="IPCTKContact.collisions">
+<a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.IPCTK.IPCTKContact.collisions">[docs]</a>
+    <span class="k">def</span> <span class="nf">collisions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="p">):</span>
+        <span class="n">collisions</span> <span class="o">=</span> <span class="n">ipctk</span><span class="o">.</span><span class="n">Collisions</span><span class="p">()</span>
+        <span class="n">collisions</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collision_mesh</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dhat</span><span class="p">)</span> <span class="c1"># performs culling to find only potential collisions with distances less than dhat</span>
+        <span class="k">return</span> <span class="n">collisions</span></div>
+
+
+<div class="viewcode-block" id="IPCTKContact.energy">
+<a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.IPCTK.IPCTKContact.energy">[docs]</a>
+    <span class="k">def</span> <span class="nf">energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="IPCTKContact.gradient">
+<a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.IPCTK.IPCTKContact.gradient">[docs]</a>
+    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="IPCTKContact.hvp">
+<a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.IPCTK.IPCTKContact.hvp">[docs]</a>
+    <span class="k">def</span> <span class="nf">hvp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">jax</span><span class="o">.</span><span class="n">jvp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="p">,</span> <span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">),</span> <span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">))[</span><span class="mi">1</span><span class="p">]</span></div>
+</div>
+
+
+<span class="c1"># annoying below since jvps don&#39;t really play nice with classes that well</span>
+
+<span class="nd">@partial</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">custom_jvp</span><span class="p">,</span> <span class="n">nondiff_argnums</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,))</span>
+<span class="k">def</span> <span class="nf">_energy</span><span class="p">(</span><span class="n">contact</span><span class="p">,</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">contact</span><span class="o">.</span><span class="n">dof_manager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">contact</span><span class="o">.</span><span class="n">collision_mesh</span><span class="o">.</span><span class="n">rest_positions</span><span class="o">.</span><span class="n">copy</span><span class="p">()[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">curr_coords</span> <span class="o">=</span> <span class="n">U</span> <span class="o">+</span> <span class="n">coords</span>
+    <span class="n">collisions</span> <span class="o">=</span> <span class="n">contact</span><span class="o">.</span><span class="n">collisions</span><span class="p">(</span><span class="n">curr_coords</span><span class="p">)</span>
+    <span class="n">barrier_energy</span> <span class="o">=</span> <span class="n">contact</span><span class="o">.</span><span class="n">potential</span><span class="p">(</span><span class="n">collisions</span><span class="p">,</span> <span class="n">contact</span><span class="o">.</span><span class="n">collision_mesh</span><span class="p">,</span> <span class="n">curr_coords</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">barrier_energy</span>
+
+<div class="viewcode-block" id="_jvp">
+<a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.IPCTK._jvp">[docs]</a>
+<span class="nd">@_energy</span><span class="o">.</span><span class="n">defjvp</span>
+<span class="k">def</span> <span class="nf">_jvp</span><span class="p">(</span><span class="n">contact</span><span class="p">,</span> <span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
+    <span class="n">Uu</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">primals</span>
+    <span class="n">dUu</span><span class="p">,</span> <span class="n">dp</span> <span class="o">=</span> <span class="n">tangents</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">contact</span><span class="o">.</span><span class="n">dof_manager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">contact</span><span class="o">.</span><span class="n">collision_mesh</span><span class="o">.</span><span class="n">rest_positions</span><span class="o">.</span><span class="n">copy</span><span class="p">()[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">curr_coords</span> <span class="o">=</span> <span class="n">U</span> <span class="o">+</span> <span class="n">coords</span>
+    <span class="n">collisions</span> <span class="o">=</span> <span class="n">contact</span><span class="o">.</span><span class="n">collisions</span><span class="p">(</span><span class="n">curr_coords</span><span class="p">)</span>
+    <span class="n">barrier_energy</span> <span class="o">=</span> <span class="n">contact</span><span class="o">.</span><span class="n">potential</span><span class="p">(</span><span class="n">collisions</span><span class="p">,</span> <span class="n">contact</span><span class="o">.</span><span class="n">collision_mesh</span><span class="p">,</span> <span class="n">curr_coords</span><span class="p">)</span>
+    <span class="n">barrier_grad</span> <span class="o">=</span> <span class="n">contact</span><span class="o">.</span><span class="n">potential</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">collisions</span><span class="p">,</span> <span class="n">contact</span><span class="o">.</span><span class="n">collision_mesh</span><span class="p">,</span> <span class="n">curr_coords</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">barrier_energy</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">barrier_grad</span><span class="p">,</span> <span class="n">dUu</span><span class="p">)</span></div>
+
+
+
+<span class="nd">@partial</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">custom_jvp</span><span class="p">,</span> <span class="n">nondiff_argnums</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,))</span>
+<span class="k">def</span> <span class="nf">_gradient</span><span class="p">(</span><span class="n">contact</span><span class="p">,</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">contact</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span> <span class="n">argnums</span><span class="o">=</span><span class="mi">0</span><span class="p">)(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="_hvp">
+<a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.IPCTK._hvp">[docs]</a>
+<span class="nd">@_gradient</span><span class="o">.</span><span class="n">defjvp</span>
+<span class="k">def</span> <span class="nf">_hvp</span><span class="p">(</span><span class="n">contact</span><span class="p">,</span> <span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
+    <span class="n">Uu</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">primals</span>
+    <span class="n">dUu</span><span class="p">,</span> <span class="n">dp</span> <span class="o">=</span> <span class="n">tangents</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">contact</span><span class="o">.</span><span class="n">dof_manager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">contact</span><span class="o">.</span><span class="n">collision_mesh</span><span class="o">.</span><span class="n">rest_positions</span><span class="o">.</span><span class="n">copy</span><span class="p">()[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">curr_coords</span> <span class="o">=</span> <span class="n">U</span> <span class="o">+</span> <span class="n">coords</span>
+    <span class="n">collisions</span> <span class="o">=</span> <span class="n">contact</span><span class="o">.</span><span class="n">collisions</span><span class="p">(</span><span class="n">curr_coords</span><span class="p">)</span>
+    <span class="n">barrier_grad</span> <span class="o">=</span> <span class="n">contact</span><span class="o">.</span><span class="n">potential</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">collisions</span><span class="p">,</span> <span class="n">contact</span><span class="o">.</span><span class="n">collision_mesh</span><span class="p">,</span> <span class="n">curr_coords</span><span class="p">)</span>
+    <span class="n">barrier_hess</span> <span class="o">=</span> <span class="n">contact</span><span class="o">.</span><span class="n">potential</span><span class="o">.</span><span class="n">hessian</span><span class="p">(</span><span class="n">collisions</span><span class="p">,</span> <span class="n">contact</span><span class="o">.</span><span class="n">collision_mesh</span><span class="p">,</span> <span class="n">curr_coords</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">barrier_grad</span><span class="p">,</span> <span class="n">barrier_hess</span> <span class="o">@</span> <span class="n">dUu</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
