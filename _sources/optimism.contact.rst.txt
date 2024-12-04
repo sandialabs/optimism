@@ -48,15 +48,6 @@ optimism.contact.Friction module
    :show-inheritance:
    :private-members:
 
-optimism.contact.IPCTK module
------------------------------
-
-.. automodule:: optimism.contact.IPCTK
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :private-members:
-
 optimism.contact.Levelset module
 --------------------------------
 

@@ -31,15 +31,6 @@ optimism.contact.test.test\_EdgeIntersection module
    :show-inheritance:
    :private-members:
 
-optimism.contact.test.test\_IPCTK module
-----------------------------------------
-
-.. automodule:: optimism.contact.test.test_IPCTK
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :private-members:
-
 optimism.contact.test.test\_LevelsetConstraint module
 -----------------------------------------------------
 
