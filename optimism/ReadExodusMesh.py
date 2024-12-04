@@ -27,7 +27,7 @@ def read_exodus_mesh(fileName):
             raise
 
         return Mesh.Mesh(coords, conns, simplexNodesOrdinals, basis, basis1d,
-                         blocks, blockMaps, nodeSets, sideSets)
+                         blocks, nodeSets, sideSets, blockMaps)
         
 
 def read_exodus_mesh_element_properties(fileName, varNames, blockNum=1):

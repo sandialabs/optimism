@@ -5,7 +5,7 @@ from optimism import Interpolants
 
 Mesh = namedtuple('Mesh', ['coords','conns','simplexNodesOrdinals',
                            'parentElement', 'parentElement1d', 'blocks',
-                           'block_maps', 'nodeSets', 'sideSets'],
+                           'nodeSets', 'sideSets', 'block_maps'],
                   defaults=(None,None,None,None))
 Mesh.__doc__ = \
     """Triangle mesh representing a domain.
@@ -19,14 +19,14 @@ Mesh.__doc__ = \
         parentElement1d:
         blocks: A dictionary mapping element block names to the indices of the
             elements in the block.
-        block_maps: An optional dictionary mapping element block names to global 
-            element ID maps that may be present in the mesh.
         nodeSets: A dictionary mapping node set names to the indices of the
             nodes.
         sideSets: A dictionary mapping side set names to the edges. The
             edge data structure is a tuple of the element index and the local
             number of the edge within that element. For example, triangle
             elements will have edge 0, 1, or 2 for this entry.
+        block_maps: An optional dictionary mapping element block names to global 
+            element ID maps that may be present in the mesh.
     """
 
 
