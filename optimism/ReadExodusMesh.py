@@ -11,6 +11,7 @@ def read_exodus_mesh(fileName):
     with netCDF4.Dataset(fileName) as exData:
         coords = _read_coordinates(exData)
         conns, blocks = _read_blocks(exData)
+        blockMaps = _read_block_maps(exData, blocks)
         nodeSets = _read_node_sets(exData)
         sideSets = _read_side_sets(exData)
 
@@ -26,7 +27,7 @@ def read_exodus_mesh(fileName):
             raise
 
         return Mesh.Mesh(coords, conns, simplexNodesOrdinals, basis, basis1d,
-                         blocks, nodeSets, sideSets)
+                         blocks, blockMaps, nodeSets, sideSets)
         
 
 def read_exodus_mesh_element_properties(fileName, varNames, blockNum=1):
@@ -89,6 +90,16 @@ def _read_blocks(exodusDataset):
     conns = np.vstack(blockConns)
     return conns, blocks
 
+def _read_block_maps(exodusDataset, blocks):
+    block_maps = {}
+    elementMap = exodusDataset.variables['elem_num_map']
+    firstElemInBlock = 0
+    for blockName, blockElems in blocks.items():
+        nElemsInBlock = len(blockElems)
+        block_maps[blockName] = elementMap[firstElemInBlock:firstElemInBlock+nElemsInBlock]
+        firstElemInBlock += nElemsInBlock
+
+    return block_maps
 
 def _read_block_variable_values(exodusDataset, blockOrdinal, variableName):
     # read element variables currently on mesh
