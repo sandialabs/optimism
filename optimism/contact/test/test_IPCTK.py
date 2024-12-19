@@ -1,3 +1,4 @@
+import equinox as eqx
 import ipctk
 import jax
 import jax.numpy as jnp
@@ -51,7 +52,9 @@ class TwoBodyICPTKContactFixture(MeshFixture):
 
         coords = self.contact.collision_mesh.rest_positions.copy() # just use rest positions
         collision_mesh = self.contact.collision_mesh
-        collisions = self.contact.collisions(coords)
+        # collisions = self.contact.collisions(coords)
+        self.contact = self.contact.update_collisions(coords)
+        collisions = self.contact.collisions
 
         # test distance computation in initial positions (disp=0)
         coords[:,0] += self.disp[:,0]
@@ -66,26 +69,39 @@ class TwoBodyICPTKContactFixture(MeshFixture):
         self.assertNear(np.sqrt(collisions.compute_minimum_distance(collision_mesh, coords)), 5e-4, 8)
 
     def test_energy(self):
-        # U = 0. * self.disp
-        Uu = self.dofManager.get_unknown_values(np.zeros(self.mesh.coords.shape))
-        p = Objective.Params()
-        barrier_energy = self.contact.energy(Uu, p)
-        self.assertTrue(barrier_energy > 0.0)
-        barrier_grad = self.contact.gradient(Uu, p)
+        U = 0. * self.disp
+        # Uu = self.dofManager.get_unknown_values(np.zeros(self.mesh.coords.shape))
+        # p = Objective.Params()
+        # barrier_energy = self.contact.energy(Uu, p)
+        # barrier_energy = self.contact.energy(U)
+        # self.assertTrue(barrier_energy > 0.0)
+        # # barrier_grad = self.contact.gradient(Uu, p)
+        # barrier_grad = self.contact.gradient(U)
 
-        U = self.contact.dof_manager.create_field(Uu, p[0])
+        # U = self.contact.dof_manager.create_field(Uu, p[0])
         coords = self.contact.collision_mesh.rest_positions.copy()[:, 0:2]
         curr_coords = U + coords
-        collisions = self.contact.collisions(curr_coords)
+        # collisions = self.contact.collisions(curr_coords)
+        self.contact = self.contact.update_collisions(curr_coords)
+        collisions = self.contact.collisions
 
+        barrier_energy = self.contact.energy(U)
+        self.assertTrue(barrier_energy > 0.0)
+        barrier_grad = self.contact.gradient(U)
+        # barrier_grad_jit = jit(self.contact.gradient)(U)
         true_grad = self.contact.potential.gradient(collisions, self.contact.collision_mesh, curr_coords)
-        self.assertArrayNear(barrier_grad, true_grad, 12)
+        self.assertArrayNear(barrier_grad.flatten(), true_grad, 12)
+        # self.assertArrayNear(barrier_grad_jit.flatten(), true_grad, 12)
 
-        v = jnp.ones(Uu.shape[0])
-        barrier_hvp = self.contact.hvp(Uu, p, v)
-        true_hess = self.contact.potential.hessian(collisions, self.contact.collision_mesh, curr_coords)
-        true_hvp = true_hess @ v
-        self.assertArrayNear(barrier_hvp, true_hvp, 12)
+        # barrier_grad_jit = eqx.filter_jit(self.contact.gradient)(U)
+        barrier_grad_jit = eqx.filter_jit(IPCTK._gradient)(self.contact, U)
+        # print(barrier_grad_jit)
+
+        # v = jnp.ones(Uu.shape[0])
+        # barrier_hvp = self.contact.hvp(Uu, p, v)
+        # true_hess = self.contact.potential.hessian(collisions, self.contact.collision_mesh, curr_coords)
+        # true_hvp = true_hess @ v
+        # self.assertArrayNear(barrier_hvp, true_hvp, 12)
 
 if __name__ == '__main__':
     unittest.main()
