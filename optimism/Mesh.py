@@ -5,8 +5,8 @@ from optimism import Interpolants
 
 Mesh = namedtuple('Mesh', ['coords','conns','simplexNodesOrdinals',
                            'parentElement', 'parentElement1d', 'blocks',
-                           'nodeSets', 'sideSets'],
-                  defaults=(None,None,None))
+                           'nodeSets', 'sideSets', 'block_maps'],
+                  defaults=(None,None,None,None))
 Mesh.__doc__ = \
     """Triangle mesh representing a domain.
 
@@ -25,6 +25,8 @@ Mesh.__doc__ = \
             edge data structure is a tuple of the element index and the local
             number of the edge within that element. For example, triangle
             elements will have edge 0, 1, or 2 for this entry.
+        block_maps: An optional dictionary mapping element block names to global 
+            element ID maps that may be present in the mesh.
     """
 
 
@@ -142,21 +144,21 @@ def combine_mesh(m1, m2):
 
 def mesh_with_coords(mesh, coords):
     return Mesh(coords, mesh.conns,mesh.simplexNodesOrdinals,
-                mesh.parentElement, mesh.parentElement1d, mesh.blocks, mesh.nodeSets, mesh.sideSets)
+                mesh.parentElement, mesh.parentElement1d, mesh.blocks, mesh.nodeSets, mesh.sideSets, mesh.block_maps)
 
 
 def mesh_with_nodesets(mesh, nodeSets):
     return Mesh(mesh.coords, mesh.conns,
                 mesh.simplexNodesOrdinals,
                 mesh.parentElement, mesh.parentElement1d,
-                mesh.blocks, nodeSets, mesh.sideSets)
+                mesh.blocks, nodeSets, mesh.sideSets, mesh.block_maps)
 
 
 def mesh_with_blocks(mesh, blocks):
     return Mesh(mesh.coords, mesh.conns,
                 mesh.simplexNodesOrdinals,
                 mesh.parentElement, mesh.parentElement1d,
-                blocks, mesh.nodeSets, mesh.sideSets)
+                blocks, mesh.nodeSets, mesh.sideSets, mesh.block_maps)
 
 
 def create_edges(conns):
@@ -274,7 +276,7 @@ def create_higher_order_mesh_from_simplex_mesh(mesh, order, useBubbleElement=Fal
     nodeSets = mesh.nodeSets if copyNodeSets else None
 
     newMesh = Mesh(coords, conns, simplexNodesOrdinals, basis,
-                   parentElement1d, mesh.blocks, nodeSets, mesh.sideSets)
+                   parentElement1d, mesh.blocks, nodeSets, mesh.sideSets, mesh.block_maps)
     
     if createNodeSetsFromSideSets:
         nodeSets = create_nodesets_from_sidesets(newMesh)
