@@ -188,17 +188,17 @@ def _compute_initial_state_multi_block(fs, blockModels):
     return initialState
 
 
-def _compute_element_stiffnesses_multi_block(U, stateVariables, functionSpace, blockModels, modify_element_gradient):
+def _compute_element_stiffnesses_multi_block(U, stateVariables, dt, functionSpace, blockModels, modify_element_gradient):
     fs = functionSpace
-    nen = Interpolants.num_nodes(functionSpace.mesh.parentElement)
+    nen = functionSpace.mesh.parentElement.num_nodes
     elementHessians = np.zeros((Mesh.num_elements(functionSpace.mesh), nen, 2, nen, 2))
     for blockKey in blockModels:
         materialModel = blockModels[blockKey]
         L = strain_energy_density_to_lagrangian_density(materialModel.compute_energy_density)
         elemIds = functionSpace.mesh.blocks[blockKey]
         f =  vmap(compute_element_stiffness_from_global_fields,
-                  (None, None, 0, 0, 0, 0, 0, None, None))
-        blockHessians = f(U, fs.mesh.coords, stateVariables[elemIds], fs.mesh.conns[elemIds],
+                  (None, None, 0, None, 0, 0, 0, 0, None, None))
+        blockHessians = f(U, fs.mesh.coords, stateVariables[elemIds], dt, fs.mesh.conns[elemIds],
                           fs.shapes[elemIds], fs.shapeGrads[elemIds], fs.vols[elemIds],
                           L, modify_element_gradient)
         elementHessians = elementHessians.at[elemIds].set(blockHessians)
@@ -239,7 +239,7 @@ def create_multi_block_mechanics_functions(functionSpace, mode2D, materialModels
 
     
     def compute_element_stiffnesses(U, stateVariables, dt=0.0):
-        return _compute_element_stiffnesses_multi_block(U, stateVariables, functionSpace, materialModels, modify_element_gradient)
+        return _compute_element_stiffnesses_multi_block(U, stateVariables, dt, functionSpace, materialModels, modify_element_gradient)
 
 
     def compute_output_energy_densities_and_stresses(U, stateVariables, dt=0.0):
