@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.ReadExodusMesh &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -73,18 +73,18 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.ReadExodusMesh</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mesh</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Interpolants</span>
-<span class="kn">import</span> <span class="nn">netCDF4</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Interpolants</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">netCDF4</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">onp</span>
 
 <span class="n">exodusToNativeTri6NodeOrder</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
 
 
 <div class="viewcode-block" id="read_exodus_mesh">
 <a class="viewcode-back" href="../../optimism.html#optimism.ReadExodusMesh.read_exodus_mesh">[docs]</a>
-<span class="k">def</span> <span class="nf">read_exodus_mesh</span><span class="p">(</span><span class="n">fileName</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_exodus_mesh</span><span class="p">(</span><span class="n">fileName</span><span class="p">):</span>
     <span class="k">with</span> <span class="n">netCDF4</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span> <span class="k">as</span> <span class="n">exData</span><span class="p">:</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="n">_read_coordinates</span><span class="p">(</span><span class="n">exData</span><span class="p">)</span>
         <span class="n">conns</span><span class="p">,</span> <span class="n">blocks</span> <span class="o">=</span> <span class="n">_read_blocks</span><span class="p">(</span><span class="n">exData</span><span class="p">)</span>
@@ -110,7 +110,7 @@
 
 <div class="viewcode-block" id="read_exodus_mesh_element_properties">
 <a class="viewcode-back" href="../../optimism.html#optimism.ReadExodusMesh.read_exodus_mesh_element_properties">[docs]</a>
-<span class="k">def</span> <span class="nf">read_exodus_mesh_element_properties</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="n">varNames</span><span class="p">,</span> <span class="n">blockNum</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_exodus_mesh_element_properties</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="n">varNames</span><span class="p">,</span> <span class="n">blockNum</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="n">varValues</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">with</span> <span class="n">netCDF4</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span> <span class="k">as</span> <span class="n">exData</span><span class="p">:</span>
         <span class="n">blockNames</span> <span class="o">=</span> <span class="n">_read_names_list</span><span class="p">(</span><span class="n">exData</span><span class="p">,</span> <span class="s1">&#39;eb_names&#39;</span><span class="p">)</span>
@@ -126,7 +126,7 @@
 
 <div class="viewcode-block" id="_read_coordinates">
 <a class="viewcode-back" href="../../optimism.html#optimism.ReadExodusMesh._read_coordinates">[docs]</a>
-<span class="k">def</span> <span class="nf">_read_coordinates</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_read_coordinates</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">):</span>
     <span class="n">nNodes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">exodusDataset</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="s1">&#39;num_nodes&#39;</span><span class="p">])</span>
     <span class="n">nDims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">exodusDataset</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="s1">&#39;num_dim&#39;</span><span class="p">])</span>
     <span class="k">assert</span> <span class="n">nDims</span> <span class="o">==</span> <span class="mi">2</span>
@@ -140,7 +140,7 @@
 
 <div class="viewcode-block" id="_read_block_conns">
 <a class="viewcode-back" href="../../optimism.html#optimism.ReadExodusMesh._read_block_conns">[docs]</a>
-<span class="k">def</span> <span class="nf">_read_block_conns</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">,</span> <span class="n">blockOrdinal</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_read_block_conns</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">,</span> <span class="n">blockOrdinal</span><span class="p">):</span>
     <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;connect&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">blockOrdinal</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">record</span> <span class="o">=</span> <span class="n">exodusDataset</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
     <span class="n">record</span><span class="o">.</span><span class="n">set_auto_mask</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
@@ -152,7 +152,7 @@
 
 <div class="viewcode-block" id="_read_blocks">
 <a class="viewcode-back" href="../../optimism.html#optimism.ReadExodusMesh._read_blocks">[docs]</a>
-<span class="k">def</span> <span class="nf">_read_blocks</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_read_blocks</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">):</span>
     <span class="n">nodesPerElem</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">exodusDataset</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="s1">&#39;num_nod_per_el1&#39;</span><span class="p">])</span>
 
     <span class="n">blockNames</span> <span class="o">=</span> <span class="n">_read_names_list</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">,</span> <span class="s1">&#39;eb_names&#39;</span><span class="p">)</span>
@@ -182,7 +182,7 @@
 
 <div class="viewcode-block" id="_read_block_maps">
 <a class="viewcode-back" href="../../optimism.html#optimism.ReadExodusMesh._read_block_maps">[docs]</a>
-<span class="k">def</span> <span class="nf">_read_block_maps</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">,</span> <span class="n">blocks</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_read_block_maps</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">,</span> <span class="n">blocks</span><span class="p">):</span>
     <span class="n">block_maps</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">elementMap</span> <span class="o">=</span> <span class="n">exodusDataset</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;elem_num_map&#39;</span><span class="p">]</span>
     <span class="n">firstElemInBlock</span> <span class="o">=</span> <span class="mi">0</span>
@@ -196,7 +196,7 @@
 
 <div class="viewcode-block" id="_read_block_variable_values">
 <a class="viewcode-back" href="../../optimism.html#optimism.ReadExodusMesh._read_block_variable_values">[docs]</a>
-<span class="k">def</span> <span class="nf">_read_block_variable_values</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">,</span> <span class="n">blockOrdinal</span><span class="p">,</span> <span class="n">variableName</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_read_block_variable_values</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">,</span> <span class="n">blockOrdinal</span><span class="p">,</span> <span class="n">variableName</span><span class="p">):</span>
     <span class="c1"># read element variables currently on mesh</span>
     <span class="n">record</span> <span class="o">=</span> <span class="n">exodusDataset</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;name_elem_var&#39;</span><span class="p">]</span>
     <span class="n">record</span><span class="o">.</span><span class="n">set_auto_mask</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
@@ -228,7 +228,7 @@
 
 <div class="viewcode-block" id="_read_node_sets">
 <a class="viewcode-back" href="../../optimism.html#optimism.ReadExodusMesh._read_node_sets">[docs]</a>
-<span class="k">def</span> <span class="nf">_read_node_sets</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_read_node_sets</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">):</span>
     <span class="k">if</span> <span class="s2">&quot;num_node_sets&quot;</span> <span class="ow">in</span> <span class="n">exodusDataset</span><span class="o">.</span><span class="n">dimensions</span><span class="p">:</span>
         <span class="n">nodeSetNames</span> <span class="o">=</span> <span class="n">_read_names_list</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">,</span> <span class="s2">&quot;ns_names&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">nodeSetNames</span><span class="p">):</span>
@@ -252,7 +252,7 @@
 
 <div class="viewcode-block" id="_read_side_sets">
 <a class="viewcode-back" href="../../optimism.html#optimism.ReadExodusMesh._read_side_sets">[docs]</a>
-<span class="k">def</span> <span class="nf">_read_side_sets</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_read_side_sets</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">):</span>
     <span class="k">if</span> <span class="s2">&quot;num_side_sets&quot;</span> <span class="ow">in</span> <span class="n">exodusDataset</span><span class="o">.</span><span class="n">dimensions</span><span class="p">:</span>
         <span class="n">sideSetNames</span> <span class="o">=</span> <span class="n">_read_names_list</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">,</span> <span class="s1">&#39;ss_names&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sideSetNames</span><span class="p">):</span>
@@ -283,7 +283,7 @@
 
 <div class="viewcode-block" id="_read_element_type">
 <a class="viewcode-back" href="../../optimism.html#optimism.ReadExodusMesh._read_element_type">[docs]</a>
-<span class="k">def</span> <span class="nf">_read_element_type</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_read_element_type</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">):</span>
     <span class="n">elemType</span> <span class="o">=</span> <span class="n">exodusDataset</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;connect1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">elem_type</span>
 
     <span class="n">nBlocks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">exodusDataset</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="s1">&#39;num_el_blk&#39;</span><span class="p">])</span>
@@ -297,7 +297,7 @@
 
 <div class="viewcode-block" id="_read_names_list">
 <a class="viewcode-back" href="../../optimism.html#optimism.ReadExodusMesh._read_names_list">[docs]</a>
-<span class="k">def</span> <span class="nf">_read_names_list</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">,</span> <span class="n">recordName</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_read_names_list</span><span class="p">(</span><span class="n">exodusDataset</span><span class="p">,</span> <span class="n">recordName</span><span class="p">):</span>
     <span class="n">record</span> <span class="o">=</span> <span class="n">exodusDataset</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">recordName</span><span class="p">]</span>
     <span class="n">record</span><span class="o">.</span><span class="n">set_auto_mask</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">namesList</span> <span class="o">=</span> <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">record</span><span class="p">[:]]</span>
@@ -307,7 +307,7 @@
 
 <div class="viewcode-block" id="_get_vertex_nodes_from_exodus_tri6_mesh">
 <a class="viewcode-back" href="../../optimism.html#optimism.ReadExodusMesh._get_vertex_nodes_from_exodus_tri6_mesh">[docs]</a>
-<span class="k">def</span> <span class="nf">_get_vertex_nodes_from_exodus_tri6_mesh</span><span class="p">(</span><span class="n">conns</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_vertex_nodes_from_exodus_tri6_mesh</span><span class="p">(</span><span class="n">conns</span><span class="p">):</span>
     <span class="n">vertexSet</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">conns</span><span class="p">[:,:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
     <span class="n">vertices</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vertexSet</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int_</span><span class="p">)</span></div>

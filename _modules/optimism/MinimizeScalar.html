@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.MinimizeScalar &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -73,8 +73,8 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.MinimizeScalar</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
-<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="c1">#from jax.lax import while_loop</span>
 
 
@@ -84,14 +84,14 @@
 
 <div class="viewcode-block" id="get_settings">
 <a class="viewcode-back" href="../../optimism.html#optimism.MinimizeScalar.get_settings">[docs]</a>
-<span class="k">def</span> <span class="nf">get_settings</span><span class="p">(</span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">max_iters</span><span class="o">=</span><span class="mi">25</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_settings</span><span class="p">(</span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">max_iters</span><span class="o">=</span><span class="mi">25</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">Settings</span><span class="p">(</span><span class="n">tol</span><span class="p">,</span> <span class="n">max_iters</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="minimize_scalar">
 <a class="viewcode-back" href="../../optimism.html#optimism.MinimizeScalar.minimize_scalar">[docs]</a>
-<span class="k">def</span> <span class="nf">minimize_scalar</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">diffArgs</span><span class="p">,</span> <span class="n">nondiffArgs</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">minimize_scalar</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">diffArgs</span><span class="p">,</span> <span class="n">nondiffArgs</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">diffArgs</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;diffArgs argument to optimism.MinimizeScalar.minimize_scalar must be a tuple, got </span><span class="si">{}</span><span class="s2">&quot;</span>
@@ -102,7 +102,7 @@
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nondiffArgs</span><span class="p">))</span>
 
     <span class="c1"># define function with args</span>
-    <span class="k">def</span> <span class="nf">F</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="k">return</span> <span class="n">objective</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">diffArgs</span><span class="p">,</span> <span class="o">*</span><span class="n">nondiffArgs</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">F</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="k">return</span> <span class="n">objective</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">diffArgs</span><span class="p">,</span> <span class="o">*</span><span class="n">nondiffArgs</span><span class="p">)</span>
     
     <span class="n">G</span> <span class="o">=</span> <span class="n">jacfwd</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
     <span class="n">GH</span> <span class="o">=</span> <span class="n">value_and_grad</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
@@ -110,12 +110,12 @@
     <span class="n">tol</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">tol</span>
     <span class="n">max_iters</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">max_iters</span>
     
-    <span class="k">def</span> <span class="nf">conditional</span><span class="p">(</span><span class="n">carry</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditional</span><span class="p">(</span><span class="n">carry</span><span class="p">):</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="n">carry</span>
         <span class="n">resNorm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">resNorm</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">max_iters</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">body</span><span class="p">(</span><span class="n">carry</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">body</span><span class="p">(</span><span class="n">carry</span><span class="p">):</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="n">carry</span>
         
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;h=&quot;</span><span class="p">,</span><span class="n">h</span><span class="p">)</span>
@@ -150,7 +150,7 @@
 
 <div class="viewcode-block" id="line_search_bidirectional">
 <a class="viewcode-back" href="../../optimism.html#optimism.MinimizeScalar.line_search_bidirectional">[docs]</a>
-<span class="k">def</span> <span class="nf">line_search_bidirectional</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">line_search_bidirectional</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
     <span class="n">c</span> <span class="o">=</span> <span class="mf">0.01</span>
     <span class="n">cgp</span> <span class="o">=</span> <span class="n">c</span><span class="o">*</span><span class="n">g</span><span class="o">*</span><span class="n">p</span>
     <span class="n">initialStepLengthSufficient</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">alpha</span><span class="o">*</span><span class="n">p</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">f</span> <span class="o">+</span> <span class="n">cgp</span><span class="o">*</span><span class="n">alpha</span>
@@ -165,16 +165,16 @@
 
 <div class="viewcode-block" id="line_search_backtrack">
 <a class="viewcode-back" href="../../optimism.html#optimism.MinimizeScalar.line_search_backtrack">[docs]</a>
-<span class="k">def</span> <span class="nf">line_search_backtrack</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">line_search_backtrack</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
     <span class="n">cutback</span> <span class="o">=</span> <span class="mf">0.2</span>
     <span class="n">c</span> <span class="o">=</span> <span class="mf">0.01</span>
     <span class="n">cgp</span> <span class="o">=</span> <span class="n">c</span><span class="o">*</span><span class="n">g</span><span class="o">*</span><span class="n">p</span>
 
-    <span class="k">def</span> <span class="nf">cond_fun</span><span class="p">(</span><span class="n">alphaAndIters</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cond_fun</span><span class="p">(</span><span class="n">alphaAndIters</span><span class="p">):</span>
         <span class="n">alpha</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="n">alphaAndIters</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">F</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">alpha</span><span class="o">*</span><span class="n">p</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">f</span> <span class="o">+</span> <span class="n">cgp</span><span class="o">*</span><span class="n">alpha</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">body_fun</span><span class="p">(</span><span class="n">alphaAndIters</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">body_fun</span><span class="p">(</span><span class="n">alphaAndIters</span><span class="p">):</span>
         <span class="n">alpha</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="n">alphaAndIters</span>
         <span class="n">alpha</span> <span class="o">*=</span> <span class="n">cutback</span>
         <span class="k">return</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
@@ -187,16 +187,16 @@
 
 <div class="viewcode-block" id="line_search_forwardtrack">
 <a class="viewcode-back" href="../../optimism.html#optimism.MinimizeScalar.line_search_forwardtrack">[docs]</a>
-<span class="k">def</span> <span class="nf">line_search_forwardtrack</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">line_search_forwardtrack</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">F</span><span class="p">):</span>
     <span class="n">growth</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="mf">0.2</span>
     <span class="n">c</span> <span class="o">=</span> <span class="mf">0.01</span>
     <span class="n">cgp</span> <span class="o">=</span> <span class="n">c</span><span class="o">*</span><span class="n">g</span><span class="o">*</span><span class="n">p</span>
 
-    <span class="k">def</span> <span class="nf">cond_fun</span><span class="p">(</span><span class="n">alphaAndIters</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cond_fun</span><span class="p">(</span><span class="n">alphaAndIters</span><span class="p">):</span>
         <span class="n">alpha</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="n">alphaAndIters</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">F</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">growth</span><span class="o">*</span><span class="n">alpha</span><span class="o">*</span><span class="n">p</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">f</span> <span class="o">+</span> <span class="n">cgp</span><span class="o">*</span><span class="n">alpha</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">body_fun</span><span class="p">(</span><span class="n">alphaAndIters</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">body_fun</span><span class="p">(</span><span class="n">alphaAndIters</span><span class="p">):</span>
         <span class="n">alpha</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="n">alphaAndIters</span>
         <span class="n">alpha</span> <span class="o">*=</span> <span class="n">growth</span>
         <span class="k">return</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
@@ -209,7 +209,7 @@
 
 <div class="viewcode-block" id="while_loop">
 <a class="viewcode-back" href="../../optimism.html#optimism.MinimizeScalar.while_loop">[docs]</a>
-<span class="k">def</span> <span class="nf">while_loop</span><span class="p">(</span><span class="n">cond_fun</span><span class="p">,</span> <span class="n">body_fun</span><span class="p">,</span> <span class="n">init_val</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">while_loop</span><span class="p">(</span><span class="n">cond_fun</span><span class="p">,</span> <span class="n">body_fun</span><span class="p">,</span> <span class="n">init_val</span><span class="p">):</span>
     <span class="n">val</span> <span class="o">=</span> <span class="n">init_val</span>
     <span class="k">while</span> <span class="n">cond_fun</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
         <span class="n">val</span> <span class="o">=</span> <span class="n">body_fun</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.Interpolants &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -73,16 +73,16 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.Interpolants</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">jaxtyping</span> <span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Float</span><span class="p">,</span> <span class="n">Int</span>
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">special</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
-<span class="kn">import</span> <span class="nn">equinox</span> <span class="k">as</span> <span class="nn">eqx</span>
-<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">jaxtyping</span><span class="w"> </span><span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Float</span><span class="p">,</span> <span class="n">Int</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">special</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">onp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">equinox</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">eqx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 
 <div class="viewcode-block" id="ParentElement">
 <a class="viewcode-back" href="../../optimism.html#optimism.Interpolants.ParentElement">[docs]</a>
-<span class="k">class</span> <span class="nc">ParentElement</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ParentElement</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Finite element on reference domain.</span>
 
 <span class="sd">    Attributes:</span>
@@ -108,13 +108,13 @@
     <span class="n">interiorNodes</span><span class="p">:</span> <span class="n">Int</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;ni&quot;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">num_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="ShapeFunctions">
 <a class="viewcode-back" href="../../optimism.html#optimism.Interpolants.ShapeFunctions">[docs]</a>
-<span class="k">class</span> <span class="nc">ShapeFunctions</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ShapeFunctions</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Shape functions and shape function gradients (in the parametric space).</span>
 
 <span class="sd">    Attributes:</span>
@@ -131,7 +131,7 @@
     <span class="n">values</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;nq nn&quot;</span><span class="p">]</span>
     <span class="n">gradients</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;nq nn nd&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span>
         <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradients</span></div>
 
@@ -144,7 +144,7 @@
 
 <div class="viewcode-block" id="make_parent_elements">
 <a class="viewcode-back" href="../../optimism.html#optimism.Interpolants.make_parent_elements">[docs]</a>
-<span class="k">def</span> <span class="nf">make_parent_elements</span><span class="p">(</span><span class="n">degree</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_parent_elements</span><span class="p">(</span><span class="n">degree</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a triangle element and the corresponding line element.&quot;&quot;&quot;</span>
     <span class="n">basis</span> <span class="o">=</span> <span class="n">make_parent_element_2d</span><span class="p">(</span><span class="n">degree</span><span class="p">)</span>
     <span class="n">basis1d</span> <span class="o">=</span> <span class="n">make_parent_element_1d</span><span class="p">(</span><span class="n">degree</span><span class="p">)</span>
@@ -154,7 +154,7 @@
 
 <div class="viewcode-block" id="make_parent_element_1d">
 <a class="viewcode-back" href="../../optimism.html#optimism.Interpolants.make_parent_element_1d">[docs]</a>
-<span class="k">def</span> <span class="nf">make_parent_element_1d</span><span class="p">(</span><span class="n">degree</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_parent_element_1d</span><span class="p">(</span><span class="n">degree</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gauss-Lobatto Interpolation points on the unit interval.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -167,7 +167,7 @@
 
 <div class="viewcode-block" id="get_lobatto_nodes_1d">
 <a class="viewcode-back" href="../../optimism.html#optimism.Interpolants.get_lobatto_nodes_1d">[docs]</a>
-<span class="k">def</span> <span class="nf">get_lobatto_nodes_1d</span><span class="p">(</span><span class="n">degree</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_lobatto_nodes_1d</span><span class="p">(</span><span class="n">degree</span><span class="p">):</span>
     <span class="n">p</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">polynomial</span><span class="o">.</span><span class="n">Legendre</span><span class="o">.</span><span class="n">basis</span><span class="p">(</span><span class="n">degree</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
     <span class="n">dp</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">deriv</span><span class="p">()</span>
     <span class="n">xInterior</span> <span class="o">=</span> <span class="n">dp</span><span class="o">.</span><span class="n">roots</span><span class="p">()</span>
@@ -178,7 +178,7 @@
 
 <div class="viewcode-block" id="shape1d">
 <a class="viewcode-back" href="../../optimism.html#optimism.Interpolants.shape1d">[docs]</a>
-<span class="k">def</span> <span class="nf">shape1d</span><span class="p">(</span><span class="n">degree</span><span class="p">,</span> <span class="n">nodalPoints</span><span class="p">,</span> <span class="n">evaluationPoints</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">shape1d</span><span class="p">(</span><span class="n">degree</span><span class="p">,</span> <span class="n">nodalPoints</span><span class="p">,</span> <span class="n">evaluationPoints</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Evaluate shape functions and derivatives at points in the master element.</span>
 
 <span class="sd">    Args:</span>
@@ -203,7 +203,7 @@
 
 <div class="viewcode-block" id="vander1d">
 <a class="viewcode-back" href="../../optimism.html#optimism.Interpolants.vander1d">[docs]</a>
-<span class="k">def</span> <span class="nf">vander1d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">degree</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">vander1d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">degree</span><span class="p">):</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">A</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">degree</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
     <span class="n">dA</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">degree</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
@@ -220,7 +220,7 @@
 
 <div class="viewcode-block" id="make_parent_element_2d">
 <a class="viewcode-back" href="../../optimism.html#optimism.Interpolants.make_parent_element_2d">[docs]</a>
-<span class="k">def</span> <span class="nf">make_parent_element_2d</span><span class="p">(</span><span class="n">degree</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_parent_element_2d</span><span class="p">(</span><span class="n">degree</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Interpolation points on the triangle that are Lobatto points on the edges.</span>
 <span class="sd">    Points have threefold rotational symmetry and low Lebesgue constants.</span>
 <span class="sd">    </span>
@@ -271,7 +271,7 @@
 
 <div class="viewcode-block" id="pascal_triangle_monomials">
 <a class="viewcode-back" href="../../optimism.html#optimism.Interpolants.pascal_triangle_monomials">[docs]</a>
-<span class="k">def</span> <span class="nf">pascal_triangle_monomials</span><span class="p">(</span><span class="n">degree</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pascal_triangle_monomials</span><span class="p">(</span><span class="n">degree</span><span class="p">):</span>
     <span class="n">p</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">q</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">degree</span> <span class="o">+</span> <span class="mi">2</span><span class="p">):</span>
@@ -285,7 +285,7 @@
 
 <div class="viewcode-block" id="vander2d">
 <a class="viewcode-back" href="../../optimism.html#optimism.Interpolants.vander2d">[docs]</a>
-<span class="k">def</span> <span class="nf">vander2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">degree</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">vander2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">degree</span><span class="p">):</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">nNodes</span> <span class="o">=</span> <span class="p">(</span><span class="n">degree</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">degree</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
     <span class="n">pq</span> <span class="o">=</span> <span class="n">pascal_triangle_monomials</span><span class="p">(</span><span class="n">degree</span><span class="p">)</span>
@@ -299,7 +299,7 @@
     <span class="c1"># switch to bi-unit triangle (-1,-1)--(1,-1)--(-1,1)</span>
     <span class="n">z</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">x</span> <span class="o">-</span> <span class="mf">1.0</span>
     
-    <span class="k">def</span> <span class="nf">map_from_tri_to_square</span><span class="p">(</span><span class="n">xi</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">map_from_tri_to_square</span><span class="p">(</span><span class="n">xi</span><span class="p">):</span>
         <span class="n">small</span> <span class="o">=</span> <span class="mf">1e-12</span>
         <span class="c1"># The mapping has a singularity at the vertex (-1, 1).</span>
         <span class="c1"># Handle that point specially.</span>
@@ -358,7 +358,7 @@
 
 <div class="viewcode-block" id="shape2d">
 <a class="viewcode-back" href="../../optimism.html#optimism.Interpolants.shape2d">[docs]</a>
-<span class="k">def</span> <span class="nf">shape2d</span><span class="p">(</span><span class="n">degree</span><span class="p">,</span> <span class="n">nodalPoints</span><span class="p">,</span> <span class="n">evaluationPoints</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">shape2d</span><span class="p">(</span><span class="n">degree</span><span class="p">,</span> <span class="n">nodalPoints</span><span class="p">,</span> <span class="n">evaluationPoints</span><span class="p">):</span>
     <span class="n">A</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">vander2d</span><span class="p">(</span><span class="n">nodalPoints</span><span class="p">,</span> <span class="n">degree</span><span class="p">)</span>
     <span class="n">nf</span><span class="p">,</span> <span class="n">nfx</span><span class="p">,</span> <span class="n">nfy</span> <span class="o">=</span> <span class="n">vander2d</span><span class="p">(</span><span class="n">evaluationPoints</span><span class="p">,</span> <span class="n">degree</span><span class="p">)</span>
     <span class="n">shapes</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">nf</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
@@ -371,7 +371,7 @@
 
 <div class="viewcode-block" id="compute_shapes">
 <a class="viewcode-back" href="../../optimism.html#optimism.Interpolants.compute_shapes">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_shapes</span><span class="p">(</span><span class="n">parentElement</span><span class="p">,</span> <span class="n">evaluationPoints</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_shapes</span><span class="p">(</span><span class="n">parentElement</span><span class="p">,</span> <span class="n">evaluationPoints</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">parentElement</span><span class="o">.</span><span class="n">elementType</span> <span class="o">==</span> <span class="n">LINE_ELEMENT</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">shape1d</span><span class="p">(</span><span class="n">parentElement</span><span class="o">.</span><span class="n">degree</span><span class="p">,</span> <span class="n">parentElement</span><span class="o">.</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">evaluationPoints</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">parentElement</span><span class="o">.</span><span class="n">elementType</span> <span class="o">==</span> <span class="n">TRIANGLE_ELEMENT</span><span class="p">:</span>
@@ -385,7 +385,7 @@
 
 <div class="viewcode-block" id="make_parent_element_2d_with_bubble">
 <a class="viewcode-back" href="../../optimism.html#optimism.Interpolants.make_parent_element_2d_with_bubble">[docs]</a>
-<span class="k">def</span> <span class="nf">make_parent_element_2d_with_bubble</span><span class="p">(</span><span class="n">degree</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_parent_element_2d_with_bubble</span><span class="p">(</span><span class="n">degree</span><span class="p">):</span>
     <span class="n">baseMaster</span> <span class="o">=</span> <span class="n">make_parent_element_2d</span><span class="p">(</span><span class="n">degree</span><span class="p">)</span>
     <span class="n">bubbleMaster</span> <span class="o">=</span> <span class="n">make_parent_element_2d</span><span class="p">(</span><span class="n">degree</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
@@ -416,7 +416,7 @@
 
 <div class="viewcode-block" id="shape2dBubble">
 <a class="viewcode-back" href="../../optimism.html#optimism.Interpolants.shape2dBubble">[docs]</a>
-<span class="k">def</span> <span class="nf">shape2dBubble</span><span class="p">(</span><span class="n">refElement</span><span class="p">,</span> <span class="n">evaluationPoints</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">shape2dBubble</span><span class="p">(</span><span class="n">refElement</span><span class="p">,</span> <span class="n">evaluationPoints</span><span class="p">):</span>
     <span class="c1"># base shape function values at eval points</span>
     <span class="n">baseElement</span> <span class="o">=</span> <span class="n">make_parent_element_2d</span><span class="p">(</span><span class="n">refElement</span><span class="o">.</span><span class="n">degree</span><span class="p">)</span>
     <span class="n">baseShapes</span><span class="p">,</span> <span class="n">baseShapeGrads</span> <span class="o">=</span> <span class="n">shape2d</span><span class="p">(</span><span class="n">baseElement</span><span class="o">.</span><span class="n">degree</span><span class="p">,</span> <span class="n">baseElement</span><span class="o">.</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">evaluationPoints</span><span class="p">)</span>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.material.HyperViscoelastic &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -73,10 +73,10 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.material.HyperViscoelastic</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">jax.scipy</span> <span class="kn">import</span> <span class="n">linalg</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">TensorMath</span>
-<span class="kn">from</span> <span class="nn">optimism.material.MaterialModel</span> <span class="kn">import</span> <span class="n">MaterialModel</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jax.scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorMath</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.material.MaterialModel</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaterialModel</span>
 
 <span class="n">PROPS_K_eq</span>  <span class="o">=</span> <span class="mi">0</span>
 <span class="n">PROPS_G_eq</span>  <span class="o">=</span> <span class="mi">1</span>
@@ -89,23 +89,23 @@
 
 <div class="viewcode-block" id="create_material_model_functions">
 <a class="viewcode-back" href="../../../optimism.material.html#optimism.material.HyperViscoelastic.create_material_model_functions">[docs]</a>
-<span class="k">def</span> <span class="nf">create_material_model_functions</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_material_model_functions</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
     
     <span class="n">density</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;density&#39;</span><span class="p">)</span>
     <span class="n">props</span> <span class="o">=</span> <span class="n">_make_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">compute_initial_state</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,)):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_initial_state</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,)):</span>
         <span class="n">state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">state</span>
 
-    <span class="k">def</span> <span class="nf">compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="n">state</span> <span class="o">=</span> <span class="n">_compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">state</span>
 
-    <span class="k">def</span> <span class="nf">compute_material_qoi</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_material_qoi</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_compute_dissipated_energy</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">MaterialModel</span><span class="p">(</span><span class="n">compute_energy_density</span> <span class="o">=</span> <span class="n">energy_density</span><span class="p">,</span>
@@ -117,7 +117,7 @@
 
 <div class="viewcode-block" id="_make_properties">
 <a class="viewcode-back" href="../../../optimism.material.html#optimism.material.HyperViscoelastic._make_properties">[docs]</a>
-<span class="k">def</span> <span class="nf">_make_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Equilibrium properties&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;  Bulk modulus    = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;equilibrium bulk modulus&#39;</span><span class="p">])</span>
@@ -138,7 +138,7 @@
 
 <div class="viewcode-block" id="_energy_density">
 <a class="viewcode-back" href="../../../optimism.material.html#optimism.material.HyperViscoelastic._energy_density">[docs]</a>
-<span class="k">def</span> <span class="nf">_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
     <span class="n">W_eq</span>  <span class="o">=</span> <span class="n">_eq_strain_energy</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
 
     <span class="n">Ee_trial</span> <span class="o">=</span> <span class="n">_compute_elastic_logarithmic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
@@ -155,7 +155,7 @@
 
 <div class="viewcode-block" id="_eq_strain_energy">
 <a class="viewcode-back" href="../../../optimism.material.html#optimism.material.HyperViscoelastic._eq_strain_energy">[docs]</a>
-<span class="k">def</span> <span class="nf">_eq_strain_energy</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_eq_strain_energy</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
     <span class="n">K</span><span class="p">,</span> <span class="n">G</span> <span class="o">=</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_K_eq</span><span class="p">],</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_G_eq</span><span class="p">]</span>
     <span class="n">F</span> <span class="o">=</span> <span class="n">dispGrad</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
@@ -168,14 +168,14 @@
 
 <div class="viewcode-block" id="_neq_strain_energy">
 <a class="viewcode-back" href="../../../optimism.material.html#optimism.material.HyperViscoelastic._neq_strain_energy">[docs]</a>
-<span class="k">def</span> <span class="nf">_neq_strain_energy</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_neq_strain_energy</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
     <span class="n">G_neq</span> <span class="o">=</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_G_neq</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">G_neq</span> <span class="o">*</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">norm_of_deviator_squared</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="_dissipation_potential">
 <a class="viewcode-back" href="../../../optimism.material.html#optimism.material.HyperViscoelastic._dissipation_potential">[docs]</a>
-<span class="k">def</span> <span class="nf">_dissipation_potential</span><span class="p">(</span><span class="n">Dv</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_dissipation_potential</span><span class="p">(</span><span class="n">Dv</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
     <span class="n">G_neq</span> <span class="o">=</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_G_neq</span><span class="p">]</span>
     <span class="n">tau</span>   <span class="o">=</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_TAU</span><span class="p">]</span>
     <span class="n">eta</span>   <span class="o">=</span> <span class="n">G_neq</span> <span class="o">*</span> <span class="n">tau</span>
@@ -185,7 +185,7 @@
 
 <div class="viewcode-block" id="_compute_dissipated_energy">
 <a class="viewcode-back" href="../../../optimism.material.html#optimism.material.HyperViscoelastic._compute_dissipated_energy">[docs]</a>
-<span class="k">def</span> <span class="nf">_compute_dissipated_energy</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_dissipated_energy</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
     <span class="n">Ee_trial</span> <span class="o">=</span> <span class="n">_compute_elastic_logarithmic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
     <span class="n">delta_Ev</span> <span class="o">=</span> <span class="n">_compute_state_increment</span><span class="p">(</span><span class="n">Ee_trial</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
     
@@ -195,7 +195,7 @@
 
 <div class="viewcode-block" id="_compute_state_new">
 <a class="viewcode-back" href="../../../optimism.material.html#optimism.material.HyperViscoelastic._compute_state_new">[docs]</a>
-<span class="k">def</span> <span class="nf">_compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
     <span class="n">Ee_trial</span> <span class="o">=</span> <span class="n">_compute_elastic_logarithmic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">)</span>
     <span class="n">delta_Ev</span> <span class="o">=</span> <span class="n">_compute_state_increment</span><span class="p">(</span><span class="n">Ee_trial</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
 
@@ -206,7 +206,7 @@
 
 <div class="viewcode-block" id="_compute_state_increment">
 <a class="viewcode-back" href="../../../optimism.material.html#optimism.material.HyperViscoelastic._compute_state_increment">[docs]</a>
-<span class="k">def</span> <span class="nf">_compute_state_increment</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_state_increment</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
     <span class="n">tau</span>   <span class="o">=</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_TAU</span><span class="p">]</span>
     <span class="n">integration_factor</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">/</span> <span class="n">tau</span><span class="p">)</span>
 
@@ -216,7 +216,7 @@
 
 <div class="viewcode-block" id="_compute_elastic_logarithmic_strain">
 <a class="viewcode-back" href="../../../optimism.material.html#optimism.material.HyperViscoelastic._compute_elastic_logarithmic_strain">[docs]</a>
-<span class="k">def</span> <span class="nf">_compute_elastic_logarithmic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_elastic_logarithmic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">):</span>
     <span class="n">F</span> <span class="o">=</span> <span class="n">dispGrad</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="n">Fv_old</span> <span class="o">=</span> <span class="n">stateOld</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 

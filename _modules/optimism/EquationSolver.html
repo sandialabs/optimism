@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.EquationSolver &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -73,12 +73,12 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.EquationSolver</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">import</span> <span class="nn">optimism.LU</span> <span class="k">as</span> <span class="nn">LU</span>
-<span class="kn">from</span> <span class="nn">optimism.Timer</span> <span class="kn">import</span> <span class="n">Timer</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">WarmStart</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">save_npz</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">LinearOperator</span><span class="p">,</span> <span class="n">gmres</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">optimism.LU</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">LU</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.Timer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">WarmStart</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">save_npz</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearOperator</span><span class="p">,</span> <span class="n">gmres</span>
 
 
 <span class="n">Settings</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Settings&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;t1&#39;</span><span class="p">,</span><span class="s1">&#39;t2&#39;</span><span class="p">,</span><span class="s1">&#39;eta1&#39;</span><span class="p">,</span><span class="s1">&#39;eta2&#39;</span><span class="p">,</span><span class="s1">&#39;eta3&#39;</span><span class="p">,</span><span class="s1">&#39;max_trust_iters&#39;</span><span class="p">,</span><span class="s1">&#39;tol&#39;</span><span class="p">,</span><span class="s1">&#39;max_cg_iters&#39;</span><span class="p">,</span><span class="s1">&#39;max_cumulative_cg_iters&#39;</span><span class="p">,</span><span class="s1">&#39;cg_tol&#39;</span><span class="p">,</span><span class="s1">&#39;cg_inexact_solve_ratio&#39;</span><span class="p">,</span><span class="s1">&#39;tr_size&#39;</span><span class="p">,</span><span class="s1">&#39;min_tr_size&#39;</span><span class="p">,</span><span class="s1">&#39;check_stability&#39;</span><span class="p">,</span><span class="s1">&#39;use_preconditioned_inner_product_for_cg&#39;</span><span class="p">,</span><span class="s1">&#39;use_incremental_objective&#39;</span><span class="p">,</span><span class="s1">&#39;debug_info&#39;</span><span class="p">,</span><span class="s1">&#39;over_iters&#39;</span><span class="p">])</span>
@@ -87,7 +87,7 @@
 <span class="c1"># consider changing to 0.5, 1.75, 1e-9, 0.1, 0.75</span>
 <div class="viewcode-block" id="get_settings">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.get_settings">[docs]</a>
-<span class="k">def</span> <span class="nf">get_settings</span><span class="p">(</span><span class="n">t1</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">t2</span><span class="o">=</span><span class="mf">1.75</span><span class="p">,</span> <span class="n">eta1</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">eta2</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">eta3</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_settings</span><span class="p">(</span><span class="n">t1</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">t2</span><span class="o">=</span><span class="mf">1.75</span><span class="p">,</span> <span class="n">eta1</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">eta2</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">eta3</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
                  <span class="n">max_trust_iters</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
                  <span class="n">tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
                  <span class="n">max_cg_iters</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
@@ -123,7 +123,7 @@
 
 <div class="viewcode-block" id="settings_with_new_tol">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.settings_with_new_tol">[docs]</a>
-<span class="k">def</span> <span class="nf">settings_with_new_tol</span><span class="p">(</span><span class="n">oldSettings</span><span class="p">,</span> <span class="n">newTol</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">settings_with_new_tol</span><span class="p">(</span><span class="n">oldSettings</span><span class="p">,</span> <span class="n">newTol</span><span class="p">):</span>
     <span class="n">newSettings</span> <span class="o">=</span> <span class="n">Settings</span><span class="p">(</span><span class="n">t1</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">t1</span><span class="p">,</span>
                            <span class="n">t2</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">t2</span><span class="p">,</span>
                            <span class="n">eta1</span><span class="o">=</span><span class="n">oldSettings</span><span class="o">.</span><span class="n">eta1</span><span class="p">,</span>
@@ -155,14 +155,14 @@
 
 <div class="viewcode-block" id="is_on_boundary">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.is_on_boundary">[docs]</a>
-<span class="k">def</span> <span class="nf">is_on_boundary</span><span class="p">(</span><span class="n">stepType</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_on_boundary</span><span class="p">(</span><span class="n">stepType</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">stepType</span><span class="o">==</span><span class="n">boundaryString</span> <span class="ow">or</span> <span class="n">stepType</span><span class="o">==</span><span class="n">negCurveString</span></div>
 
 
 
 <div class="viewcode-block" id="project_to_boundary">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.project_to_boundary">[docs]</a>
-<span class="k">def</span> <span class="nf">project_to_boundary</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">zz</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">project_to_boundary</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">zz</span><span class="p">):</span>
     <span class="c1"># find tau s.t. (z + tau*d)^2 = trSize^2</span>
     <span class="n">dd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="n">d</span><span class="p">)</span>
     <span class="n">zd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="n">d</span><span class="p">)</span>
@@ -174,7 +174,7 @@
 
 <div class="viewcode-block" id="preconditioned_project_to_boundary">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.preconditioned_project_to_boundary">[docs]</a>
-<span class="k">def</span> <span class="nf">preconditioned_project_to_boundary</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">zz</span><span class="p">,</span> <span class="n">mult_by_approx_hessian</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">preconditioned_project_to_boundary</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">zz</span><span class="p">,</span> <span class="n">mult_by_approx_hessian</span><span class="p">):</span>
     <span class="c1"># find tau s.t. (z + tau*d)^2 = trSize^2</span>
     <span class="n">Pd</span> <span class="o">=</span> <span class="n">mult_by_approx_hessian</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
     <span class="n">dd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="n">Pd</span><span class="p">)</span>
@@ -187,7 +187,7 @@
 
 <div class="viewcode-block" id="project_to_boundary_with_coefs">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.project_to_boundary_with_coefs">[docs]</a>
-<span class="k">def</span> <span class="nf">project_to_boundary_with_coefs</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">zz</span><span class="p">,</span> <span class="n">zd</span><span class="p">,</span> <span class="n">dd</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">project_to_boundary_with_coefs</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">zz</span><span class="p">,</span> <span class="n">zd</span><span class="p">,</span> <span class="n">dd</span><span class="p">):</span>
     <span class="c1"># find tau s.t. (z + tau*d)^2 = trSize^2</span>
     <span class="n">tau</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="p">(</span><span class="n">trSize</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="n">zz</span><span class="p">)</span><span class="o">*</span><span class="n">dd</span> <span class="o">+</span> <span class="n">zd</span><span class="o">**</span><span class="mi">2</span> <span class="p">)</span> <span class="o">-</span> <span class="n">zd</span><span class="p">)</span><span class="o">/</span><span class="n">dd</span>
     <span class="k">return</span> <span class="n">z</span> <span class="o">+</span> <span class="n">tau</span><span class="o">*</span><span class="n">d</span></div>
@@ -196,14 +196,14 @@
 
 <div class="viewcode-block" id="update_step_length_squared">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.update_step_length_squared">[docs]</a>
-<span class="k">def</span> <span class="nf">update_step_length_squared</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">zz</span><span class="p">,</span> <span class="n">zd</span><span class="p">,</span> <span class="n">dd</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_step_length_squared</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">zz</span><span class="p">,</span> <span class="n">zd</span><span class="p">,</span> <span class="n">dd</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">zz</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">alpha</span><span class="o">*</span><span class="n">zd</span> <span class="o">+</span> <span class="n">alpha</span><span class="o">*</span><span class="n">alpha</span><span class="o">*</span><span class="n">dd</span></div>
 
 
 
 <div class="viewcode-block" id="cg_inner_products_preconditioned">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.cg_inner_products_preconditioned">[docs]</a>
-<span class="k">def</span> <span class="nf">cg_inner_products_preconditioned</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">zd</span><span class="p">,</span> <span class="n">dd</span><span class="p">,</span> <span class="n">rPr</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cg_inner_products_preconditioned</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">zd</span><span class="p">,</span> <span class="n">dd</span><span class="p">,</span> <span class="n">rPr</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
     <span class="c1"># recurrence formulas from Gould et al. doi:10.1137/S1052623497322735</span>
     <span class="n">zd</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">*</span> <span class="p">(</span> <span class="n">zd</span> <span class="o">+</span> <span class="n">alpha</span><span class="o">*</span><span class="n">dd</span> <span class="p">)</span>
     <span class="n">dd</span> <span class="o">=</span> <span class="n">rPr</span> <span class="o">+</span> <span class="n">beta</span><span class="o">*</span><span class="n">beta</span><span class="o">*</span><span class="n">dd</span>
@@ -213,7 +213,7 @@
 
 <div class="viewcode-block" id="cg_inner_products_unpreconditioned">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.cg_inner_products_unpreconditioned">[docs]</a>
-<span class="k">def</span> <span class="nf">cg_inner_products_unpreconditioned</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">zd</span><span class="p">,</span> <span class="n">dd</span><span class="p">,</span> <span class="n">rPr</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cg_inner_products_unpreconditioned</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">zd</span><span class="p">,</span> <span class="n">dd</span><span class="p">,</span> <span class="n">rPr</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
     <span class="n">zd</span> <span class="o">=</span> <span class="n">z</span> <span class="o">@</span> <span class="n">d</span>
     <span class="n">dd</span> <span class="o">=</span> <span class="n">d</span> <span class="o">@</span> <span class="n">d</span>
     <span class="k">return</span> <span class="n">zd</span><span class="p">,</span> <span class="n">dd</span></div>
@@ -223,7 +223,7 @@
 <span class="c1"># returns increment of solution and True if the entire system is solved</span>
 <div class="viewcode-block" id="solve_trust_region_equality_constraint">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.solve_trust_region_equality_constraint">[docs]</a>
-<span class="k">def</span> <span class="nf">solve_trust_region_equality_constraint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_trust_region_equality_constraint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
     <span class="c1"># minimuze 0.5*(J*z+g)^2</span>
     
     <span class="n">r</span> <span class="o">=</span> <span class="n">J</span><span class="o">.</span><span class="n">multiply_by_transpose</span><span class="p">(</span> <span class="n">J</span><span class="o">.</span><span class="n">solve_transpose</span><span class="p">(</span><span class="n">J</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">g</span><span class="p">))</span> <span class="p">)</span>
@@ -266,7 +266,7 @@
 
 <div class="viewcode-block" id="solve_trust_region_minimization">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.solve_trust_region_minimization">[docs]</a>
-<span class="k">def</span> <span class="nf">solve_trust_region_minimization</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">hess_vec_func</span><span class="p">,</span> <span class="n">precond</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">solve_trust_region_minimization</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">hess_vec_func</span><span class="p">,</span> <span class="n">precond</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
     <span class="c1"># minimize r@z + 0.5*z@J@z</span>
     <span class="n">z</span> <span class="o">=</span> <span class="mf">0.</span><span class="o">*</span><span class="n">x</span>
     <span class="n">zz</span> <span class="o">=</span> <span class="mf">0.</span>
@@ -331,7 +331,7 @@
 <span class="c1"># essentially deprecated</span>
 <div class="viewcode-block" id="print_banner">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.print_banner">[docs]</a>
-<span class="k">def</span> <span class="nf">print_banner</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">modelObjective</span><span class="p">,</span> <span class="n">cgIters</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">onBoundary</span><span class="p">,</span> <span class="n">willAccept</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_banner</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">modelObjective</span><span class="p">,</span> <span class="n">cgIters</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">onBoundary</span><span class="p">,</span> <span class="n">willAccept</span><span class="p">):</span>
     <span class="n">willAccept</span> <span class="o">=</span> <span class="s2">&quot; True&quot;</span> <span class="k">if</span> <span class="n">willAccept</span> <span class="k">else</span> <span class="s2">&quot;False&quot;</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;obj=&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">objective</span><span class="si">:</span><span class="s2">16.11</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
@@ -345,7 +345,7 @@
     
 <div class="viewcode-block" id="print_min_banner">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.print_min_banner">[docs]</a>
-<span class="k">def</span> <span class="nf">print_min_banner</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">modelObjective</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">modelRes</span><span class="p">,</span> <span class="n">cgIters</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">onBoundary</span><span class="p">,</span> <span class="n">willAccept</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">print_min_banner</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">modelObjective</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">modelRes</span><span class="p">,</span> <span class="n">cgIters</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">onBoundary</span><span class="p">,</span> <span class="n">willAccept</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">debug_info</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span> <span class="k">return</span>
     
     <span class="n">willAccept</span> <span class="o">=</span> <span class="s2">&quot; True&quot;</span> <span class="k">if</span> <span class="n">willAccept</span> <span class="k">else</span> <span class="s2">&quot;False&quot;</span>
@@ -363,7 +363,7 @@
 <span class="c1"># utility function to save a matrix for later analysis offline</span>
 <div class="viewcode-block" id="output_matrix">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.output_matrix">[docs]</a>
-<span class="k">def</span> <span class="nf">output_matrix</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">output_matrix</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
     <span class="n">hess</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">hessian</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">hess</span> <span class="o">=</span> <span class="n">SparseCholesky</span><span class="o">.</span><span class="n">convert_to_sparse</span><span class="p">(</span><span class="n">hess</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;saving matrix&#39;</span><span class="p">)</span>
@@ -374,7 +374,7 @@
     
 <div class="viewcode-block" id="trust_region_least_squares_solve">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.trust_region_least_squares_solve">[docs]</a>
-<span class="k">def</span> <span class="nf">trust_region_least_squares_solve</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">trust_region_least_squares_solve</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
     <span class="n">trSize</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">tr_size</span>
 
     <span class="n">equation</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">gradient</span>
@@ -428,7 +428,7 @@
 
 <div class="viewcode-block" id="is_converged">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.is_converged">[docs]</a>
-<span class="k">def</span> <span class="nf">is_converged</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">realO</span><span class="p">,</span> <span class="n">modelO</span><span class="p">,</span> <span class="n">realRes</span><span class="p">,</span> <span class="n">modelRes</span><span class="p">,</span> <span class="n">cgIters</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_converged</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">realO</span><span class="p">,</span> <span class="n">modelO</span><span class="p">,</span> <span class="n">realRes</span><span class="p">,</span> <span class="n">modelRes</span><span class="p">,</span> <span class="n">cgIters</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
     <span class="n">gg</span> <span class="o">=</span> <span class="n">realRes</span><span class="nd">@realRes</span>
     <span class="k">if</span> <span class="n">gg</span> <span class="o">&lt;</span> <span class="n">settings</span><span class="o">.</span><span class="n">tol</span><span class="o">**</span><span class="mi">2</span><span class="p">:</span>
         <span class="n">modelResNorm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">modelRes</span><span class="p">)</span>
@@ -453,7 +453,7 @@
 
 <div class="viewcode-block" id="dogleg_step">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.dogleg_step">[docs]</a>
-<span class="k">def</span> <span class="nf">dogleg_step</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">newtonP</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">mat_mul</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">dogleg_step</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">newtonP</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">mat_mul</span><span class="p">):</span>
     <span class="n">cc</span> <span class="o">=</span> <span class="n">cp</span><span class="nd">@mat_mul</span><span class="p">(</span><span class="n">cp</span><span class="p">)</span>
     <span class="n">nn</span> <span class="o">=</span> <span class="n">newtonP</span><span class="nd">@mat_mul</span><span class="p">(</span><span class="n">newtonP</span><span class="p">)</span>
     <span class="n">tt</span> <span class="o">=</span> <span class="n">trSize</span><span class="o">*</span><span class="n">trSize</span>
@@ -480,7 +480,7 @@
 
 <div class="viewcode-block" id="trust_region_minimize">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.trust_region_minimize">[docs]</a>
-<span class="k">def</span> <span class="nf">trust_region_minimize</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">trust_region_minimize</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">trSize</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">tr_size</span>
     <span class="n">triedNewPrecond</span> <span class="o">=</span> <span class="kc">False</span>
     
@@ -630,7 +630,7 @@
 
 <div class="viewcode-block" id="newton">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.newton">[docs]</a>
-<span class="k">def</span> <span class="nf">newton</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">newton</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
     <span class="n">res_func</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">gradient</span>
     <span class="n">hess_func</span> <span class="o">=</span> <span class="n">objective</span><span class="o">.</span><span class="n">hessian</span>
@@ -646,7 +646,7 @@
         
         <span class="n">sparse</span><span class="o">=</span><span class="kc">True</span>
         <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
-            <span class="k">def</span> <span class="nf">apply_a</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">apply_a</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">objective</span><span class="o">.</span><span class="n">hessian_vec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
             
             <span class="n">aOp</span> <span class="o">=</span> <span class="n">LinearOperator</span><span class="p">((</span><span class="n">sz</span><span class="p">,</span><span class="n">sz</span><span class="p">),</span>
@@ -689,7 +689,7 @@
 
 <div class="viewcode-block" id="newton_solve">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.newton_solve">[docs]</a>
-<span class="k">def</span> <span class="nf">newton_solve</span><span class="p">(</span><span class="n">objective_func</span><span class="p">,</span> <span class="n">solution</span><span class="p">,</span> <span class="n">maxSteps</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">newton_solve</span><span class="p">(</span><span class="n">objective_func</span><span class="p">,</span> <span class="n">solution</span><span class="p">,</span> <span class="n">maxSteps</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="n">grad_func</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="n">objective_func</span><span class="p">)</span>
     <span class="n">hess_func</span> <span class="o">=</span> <span class="n">jacfwd</span><span class="p">(</span><span class="n">grad_func</span><span class="p">)</span>
 
@@ -718,7 +718,7 @@
 
 <div class="viewcode-block" id="nonlinear_equation_solve">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolver.nonlinear_equation_solve">[docs]</a>
-<span class="k">def</span> <span class="nf">nonlinear_equation_solve</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">nonlinear_equation_solve</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span>
                              <span class="n">solver_algorithm</span><span class="o">=</span><span class="n">trust_region_minimize</span><span class="p">,</span>
                              <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                              <span class="n">useWarmStart</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.test.test_SmoothFunctions &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -73,19 +73,19 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.test.test_SmoothFunctions</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">optimism.SmoothFunctions</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">grad</span>
-<span class="kn">from</span> <span class="nn">.TestFixture</span> <span class="kn">import</span> <span class="n">TestFixture</span>
-<span class="kn">import</span> <span class="nn">unittest</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">optimism.SmoothFunctions</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jax</span><span class="w"> </span><span class="kn">import</span> <span class="n">grad</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.TestFixture</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestFixture</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">unittest</span>
 
 
 <div class="viewcode-block" id="TestSmoothFunctions">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_SmoothFunctions.TestSmoothFunctions">[docs]</a>
-<span class="k">class</span> <span class="nc">TestSmoothFunctions</span><span class="p">(</span><span class="n">TestFixture</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestSmoothFunctions</span><span class="p">(</span><span class="n">TestFixture</span><span class="p">):</span>
 
 <div class="viewcode-block" id="TestSmoothFunctions.test_min">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_SmoothFunctions.TestSmoothFunctions.test_min">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">tol</span> <span class="o">=</span> <span class="mf">0.2</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-2</span>
         <span class="n">tolm</span> <span class="o">=</span> <span class="n">tol</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">eps</span><span class="p">)</span>
@@ -117,7 +117,7 @@
 
 <div class="viewcode-block" id="TestSmoothFunctions.test_inf_min">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_SmoothFunctions.TestSmoothFunctions.test_inf_min">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_inf_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_inf_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-5</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">eps</span><span class="p">))</span>
@@ -130,7 +130,7 @@
 
 <div class="viewcode-block" id="TestSmoothFunctions.test_inf_grad_min">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_SmoothFunctions.TestSmoothFunctions.test_inf_grad_min">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_inf_grad_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_inf_grad_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-5</span>
 
         <span class="n">grad_min</span> <span class="o">=</span> <span class="n">grad</span><span class="p">(</span><span class="nb">min</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>

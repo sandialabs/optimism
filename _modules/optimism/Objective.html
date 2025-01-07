@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.Objective &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -73,11 +73,11 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.Objective</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">optimism.SparseCholesky</span> <span class="kn">import</span> <span class="n">SparseCholesky</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">diags</span> <span class="k">as</span> <span class="n">sparse_diags</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">csc_matrix</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.SparseCholesky</span><span class="w"> </span><span class="kn">import</span> <span class="n">SparseCholesky</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">onp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">diags</span> <span class="k">as</span> <span class="n">sparse_diags</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">csc_matrix</span>
 
 <span class="c1"># static vs dynamics</span>
 <span class="c1"># differentiable vs undifferentiable</span>
@@ -93,7 +93,7 @@
 
 <div class="viewcode-block" id="param_index_update">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.param_index_update">[docs]</a>
-<span class="k">def</span> <span class="nf">param_index_update</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">newParam</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">param_index_update</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">newParam</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">index</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Params</span><span class="p">(</span><span class="n">newParam</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
     <span class="k">if</span> <span class="n">index</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
@@ -112,22 +112,22 @@
 
 <div class="viewcode-block" id="PrecondStrategy">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.PrecondStrategy">[docs]</a>
-<span class="k">class</span> <span class="nc">PrecondStrategy</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PrecondStrategy</span><span class="p">:</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objective_precond</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objective_precond</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">objective_precond</span> <span class="o">=</span> <span class="n">objective_precond</span>
         
         
 <div class="viewcode-block" id="PrecondStrategy.initialize">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.PrecondStrategy.initialize">[docs]</a>
-    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objective_precond</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span></div>
 
     
     
 <div class="viewcode-block" id="PrecondStrategy.precond_at_attempt">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.PrecondStrategy.precond_at_attempt">[docs]</a>
-    <span class="k">def</span> <span class="nf">precond_at_attempt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attempt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">precond_at_attempt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attempt</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">attempt</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span>
         <span class="k">else</span><span class="p">:</span>
@@ -140,16 +140,16 @@
 
 <div class="viewcode-block" id="TwoTryPrecondStrategy">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.TwoTryPrecondStrategy">[docs]</a>
-<span class="k">class</span> <span class="nc">TwoTryPrecondStrategy</span><span class="p">(</span><span class="n">PrecondStrategy</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TwoTryPrecondStrategy</span><span class="p">(</span><span class="n">PrecondStrategy</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f1</span> <span class="o">=</span> <span class="n">f1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f2</span> <span class="o">=</span> <span class="n">f2</span>
 
         
 <div class="viewcode-block" id="TwoTryPrecondStrategy.initialize">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.TwoTryPrecondStrategy.initialize">[docs]</a>
-    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span></div>
 
@@ -157,7 +157,7 @@
         
 <div class="viewcode-block" id="TwoTryPrecondStrategy.precond_at_attempt">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.TwoTryPrecondStrategy.precond_at_attempt">[docs]</a>
-    <span class="k">def</span> <span class="nf">precond_at_attempt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attempt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">precond_at_attempt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attempt</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">attempt</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">f1</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">attempt</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
@@ -173,9 +173,9 @@
     
 <div class="viewcode-block" id="Objective">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.Objective">[docs]</a>
-<span class="k">class</span> <span class="nc">Objective</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Objective</span><span class="p">:</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">precondStrategy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">precondStrategy</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">precond</span> <span class="o">=</span> <span class="n">SparseCholesky</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">precondStrategy</span> <span class="o">=</span> <span class="n">precondStrategy</span>
@@ -225,85 +225,85 @@
         
 <div class="viewcode-block" id="Objective.value">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.Objective.value">[docs]</a>
-    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">objective</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Objective.gradient">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.Objective.gradient">[docs]</a>
-    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grad_x</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span></div>
 
     
 <div class="viewcode-block" id="Objective.gradient_p">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.Objective.gradient_p">[docs]</a>
-    <span class="k">def</span> <span class="nf">gradient_p</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gradient_p</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grad_p</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Objective.hessian_vec">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.Objective.hessian_vec">[docs]</a>
-    <span class="k">def</span> <span class="nf">hessian_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">vx</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hessian_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">vx</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hess_vec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">vx</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Objective.gradient_and_tangent">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.Objective.gradient_and_tangent">[docs]</a>
-    <span class="k">def</span> <span class="nf">gradient_and_tangent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gradient_and_tangent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grad_and_tangent</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span></div>
 
     
 <div class="viewcode-block" id="Objective.vec_hessian">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.Objective.vec_hessian">[docs]</a>
-    <span class="k">def</span> <span class="nf">vec_hessian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">vx</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">vec_hessian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">vx</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vec_hess</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">vx</span><span class="p">)</span></div>
 
                               
 <div class="viewcode-block" id="Objective.hessian">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.Objective.hessian">[docs]</a>
-    <span class="k">def</span> <span class="nf">hessian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hessian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hess</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Objective.jacobian_p_vec">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.Objective.jacobian_p_vec">[docs]</a>
-    <span class="k">def</span> <span class="nf">jacobian_p_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">vp</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">jacobian_p_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">vp</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">jac_xp_vec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">vp</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Objective.jacobian_p2_vec">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.Objective.jacobian_p2_vec">[docs]</a>
-    <span class="k">def</span> <span class="nf">jacobian_p2_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">vp</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">jacobian_p2_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">vp</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">jac_xp2_vec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">vp</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Objective.vec_jacobian_p0">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.Objective.vec_jacobian_p0">[docs]</a>
-    <span class="k">def</span> <span class="nf">vec_jacobian_p0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">vp</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">vec_jacobian_p0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">vp</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vec_jac_xp0</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">vp</span><span class="p">)</span></div>
 
     
 <div class="viewcode-block" id="Objective.vec_jacobian_p1">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.Objective.vec_jacobian_p1">[docs]</a>
-    <span class="k">def</span> <span class="nf">vec_jacobian_p1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">vp</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">vec_jacobian_p1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">vp</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vec_jac_xp1</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">vp</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Objective.vec_jacobian_p2">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.Objective.vec_jacobian_p2">[docs]</a>
-    <span class="k">def</span> <span class="nf">vec_jacobian_p2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">vp</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">vec_jacobian_p2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">vp</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vec_jac_xp2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">vp</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Objective.vec_jacobian_p4">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.Objective.vec_jacobian_p4">[docs]</a>
-    <span class="k">def</span> <span class="nf">vec_jacobian_p4</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">vp</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">vec_jacobian_p4</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">vp</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vec_jac_xp4</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">vp</span><span class="p">)</span></div>
 
         
 <div class="viewcode-block" id="Objective.apply_precond">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.Objective.apply_precond">[docs]</a>
-    <span class="k">def</span> <span class="nf">apply_precond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vx</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply_precond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vx</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">precond</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">precond</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">vx</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -312,7 +312,7 @@
 
 <div class="viewcode-block" id="Objective.multiply_by_approx_hessian">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.Objective.multiply_by_approx_hessian">[docs]</a>
-    <span class="k">def</span> <span class="nf">multiply_by_approx_hessian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vx</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">multiply_by_approx_hessian</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vx</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">precond</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">precond</span><span class="o">.</span><span class="n">multiply_by_approximate</span><span class="p">(</span><span class="n">vx</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -321,11 +321,11 @@
 
 <div class="viewcode-block" id="Objective.update_precond">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.Objective.update_precond">[docs]</a>
-    <span class="k">def</span> <span class="nf">update_precond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_precond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">precondStrategy</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Updating with dense preconditioner in Objective.&#39;</span><span class="p">)</span>
             <span class="n">K</span> <span class="o">=</span> <span class="n">csc_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hessian</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-            <span class="k">def</span> <span class="nf">stiffness_at_attempt</span><span class="p">(</span><span class="n">attempt</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">stiffness_at_attempt</span><span class="p">(</span><span class="n">attempt</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">attempt</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
                     <span class="k">return</span> <span class="n">K</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -340,7 +340,7 @@
 
 <div class="viewcode-block" id="Objective.check_stability">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.Objective.check_stability">[docs]</a>
-    <span class="k">def</span> <span class="nf">check_stability</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_stability</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">precond</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">precond</span><span class="o">.</span><span class="n">check_stability</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">)</span></div>
 </div>
@@ -349,9 +349,9 @@
 
 <div class="viewcode-block" id="ScaledPrecondStrategy">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.ScaledPrecondStrategy">[docs]</a>
-<span class="k">class</span> <span class="nc">ScaledPrecondStrategy</span><span class="p">(</span><span class="n">PrecondStrategy</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ScaledPrecondStrategy</span><span class="p">(</span><span class="n">PrecondStrategy</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">precondStrategy</span><span class="p">,</span>
                  <span class="n">dofScaling</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ps</span> <span class="o">=</span> <span class="n">precondStrategy</span>
@@ -360,14 +360,14 @@
     
 <div class="viewcode-block" id="ScaledPrecondStrategy.initialize">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.ScaledPrecondStrategy.initialize">[docs]</a>
-    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>        
+    <span class="k">def</span><span class="w"> </span><span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>        
         <span class="bp">self</span><span class="o">.</span><span class="n">ps</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">invScaling</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span></div>
 
 
         
 <div class="viewcode-block" id="ScaledPrecondStrategy.precond_at_attempt">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.ScaledPrecondStrategy.precond_at_attempt">[docs]</a>
-    <span class="k">def</span> <span class="nf">precond_at_attempt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attempt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">precond_at_attempt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attempt</span><span class="p">):</span>
         <span class="n">K</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ps</span><span class="o">.</span><span class="n">precond_at_attempt</span><span class="p">(</span><span class="n">attempt</span><span class="p">)</span>
         <span class="n">K2</span> <span class="o">=</span> <span class="n">csc_matrix</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">invScaling</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">K</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">invScaling</span> <span class="p">)</span>
         
@@ -383,9 +383,9 @@
 
 <div class="viewcode-block" id="ScaledObjective">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.ScaledObjective">[docs]</a>
-<span class="k">class</span> <span class="nc">ScaledObjective</span><span class="p">(</span><span class="n">Objective</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ScaledObjective</span><span class="p">(</span><span class="n">Objective</span><span class="p">):</span>
     
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">objective_func</span><span class="p">,</span>
                  <span class="n">x0</span><span class="p">,</span>
                  <span class="n">p</span><span class="p">,</span>
@@ -405,7 +405,7 @@
             <span class="n">invScaling</span> <span class="o">=</span> <span class="mf">1.0</span>
             <span class="n">scaledPrecondStrategy</span> <span class="o">=</span> <span class="kc">None</span>
             
-        <span class="k">def</span> <span class="nf">scaled_objective</span><span class="p">(</span><span class="n">xBar</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">scaled_objective</span><span class="p">(</span><span class="n">xBar</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">invScaling</span> <span class="o">*</span> <span class="n">xBar</span>
             <span class="k">return</span> <span class="n">objective_func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
 
@@ -421,14 +421,14 @@
 
 <div class="viewcode-block" id="ScaledObjective.get_value">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.ScaledObjective.get_value">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaling</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span></div>
 
     
 
 <div class="viewcode-block" id="ScaledObjective.get_residual">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.ScaledObjective.get_residual">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_residual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaling</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span></div>
 </div>
 

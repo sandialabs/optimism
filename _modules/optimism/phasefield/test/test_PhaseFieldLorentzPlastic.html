@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.phasefield.test.test_PhaseFieldLorentzPlastic &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../../_static/copybutton.js?v=f281be69"></script>
@@ -73,20 +73,20 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.phasefield.test.test_PhaseFieldLorentzPlastic</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">random</span>
-<span class="kn">from</span> <span class="nn">scipy.spatial.transform</span> <span class="kn">import</span> <span class="n">Rotation</span> <span class="k">as</span> <span class="n">R</span>
-<span class="kn">import</span> <span class="nn">unittest</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jax</span><span class="w"> </span><span class="kn">import</span> <span class="n">random</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial.transform</span><span class="w"> </span><span class="kn">import</span> <span class="n">Rotation</span> <span class="k">as</span> <span class="n">R</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">unittest</span>
 
-<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">EquationSolver</span> <span class="k">as</span> <span class="n">EqSolver</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Objective</span>
-<span class="kn">from</span> <span class="nn">optimism.test</span> <span class="kn">import</span> <span class="n">TestFixture</span>
-<span class="kn">from</span> <span class="nn">optimism.test.MeshFixture</span> <span class="kn">import</span> <span class="n">MeshFixture</span>
-<span class="kn">from</span> <span class="nn">optimism.phasefield</span> <span class="kn">import</span> <span class="n">PhaseFieldLorentzPlastic</span> <span class="k">as</span> <span class="n">Model</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">SparseMatrixAssembler</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">TensorMath</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">EquationSolver</span> <span class="k">as</span> <span class="n">EqSolver</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Objective</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestFixture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.test.MeshFixture</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshFixture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.phasefield</span><span class="w"> </span><span class="kn">import</span> <span class="n">PhaseFieldLorentzPlastic</span> <span class="k">as</span> <span class="n">Model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">SparseMatrixAssembler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorMath</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mesh</span>
 
 
 <span class="n">plotting</span><span class="o">=</span><span class="kc">False</span>
@@ -94,11 +94,11 @@
 
 <div class="viewcode-block" id="GradOfPlasticPhaseFieldModelFixture">
 <a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture">[docs]</a>
-<span class="k">class</span> <span class="nc">GradOfPlasticPhaseFieldModelFixture</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GradOfPlasticPhaseFieldModelFixture</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
     
 <div class="viewcode-block" id="GradOfPlasticPhaseFieldModelFixture.setUp">
 <a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.setUp">[docs]</a>
-    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="o">=</span> <span class="mf">100.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">=</span> <span class="mf">0.321</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Gc</span> <span class="o">=</span> <span class="mf">40.0</span>
@@ -124,7 +124,7 @@
 
 <div class="viewcode-block" id="GradOfPlasticPhaseFieldModelFixture.test_zero_point">
 <a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_zero_point">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_zero_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_zero_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">dispGrad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
         <span class="n">phase</span> <span class="o">=</span> <span class="mf">0.</span>
         <span class="n">phaseGrad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
@@ -141,7 +141,7 @@
 
 <div class="viewcode-block" id="GradOfPlasticPhaseFieldModelFixture.test_rotation_invariance">
 <a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_rotation_invariance">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_rotation_invariance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_rotation_invariance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">key</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">dispGrad</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
         <span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
@@ -162,7 +162,7 @@
 
 <div class="viewcode-block" id="GradOfPlasticPhaseFieldModelFixture.test_elastic_energy">
 <a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_elastic_energy">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_elastic_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_elastic_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">strainBelowYield</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Y0</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="c1"># engineering strain</span>
         <span class="n">dispGrad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">strainBelowYield</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">])))</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
         <span class="n">phase</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -181,7 +181,7 @@
 
 <div class="viewcode-block" id="GradOfPlasticPhaseFieldModelFixture.test_plastic_stress">
 <a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_plastic_stress">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_plastic_stress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_plastic_stress</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     
         <span class="n">strain11</span> <span class="o">=</span> <span class="mf">1.1</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Y0</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">E</span>
         <span class="n">eqps</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="o">*</span><span class="n">strain11</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="p">)</span>

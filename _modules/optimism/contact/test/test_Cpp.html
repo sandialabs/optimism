@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.contact.test.test_Cpp &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../../_static/copybutton.js?v=f281be69"></script>
@@ -73,20 +73,20 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.contact.test.test_Cpp</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">unittest</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">unittest</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
-<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
-<span class="kn">from</span> <span class="nn">optimism.contact</span> <span class="kn">import</span> <span class="n">EdgeCpp</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">SmoothFunctions</span>
-<span class="kn">from</span> <span class="nn">optimism.test.TestFixture</span> <span class="kn">import</span> <span class="n">TestFixture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.contact</span><span class="w"> </span><span class="kn">import</span> <span class="n">EdgeCpp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">SmoothFunctions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.test.TestFixture</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestFixture</span>
 
 <span class="n">doPlotting</span><span class="o">=</span><span class="kc">False</span>
 
 <div class="viewcode-block" id="compute_grid_field">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_Cpp.compute_grid_field">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_grid_field</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">evaluation_function</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_grid_field</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">evaluation_function</span><span class="p">):</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
     
@@ -100,7 +100,7 @@
 
 <div class="viewcode-block" id="edges_from_points">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_Cpp.edges_from_points">[docs]</a>
-<span class="k">def</span> <span class="nf">edges_from_points</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">edges_from_points</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">):</span>
     <span class="n">edge1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">p0</span><span class="p">,</span> <span class="n">p1</span><span class="p">])</span>
     <span class="n">edge2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">edge1</span><span class="p">,</span> <span class="n">edge2</span><span class="p">])</span></div>
@@ -109,11 +109,11 @@
 
 <div class="viewcode-block" id="TestEdgeIntersection">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_Cpp.TestEdgeIntersection">[docs]</a>
-<span class="k">class</span> <span class="nc">TestEdgeIntersection</span><span class="p">(</span><span class="n">TestFixture</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestEdgeIntersection</span><span class="p">(</span><span class="n">TestFixture</span><span class="p">):</span>
 
 <div class="viewcode-block" id="TestEdgeIntersection.setUp">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_Cpp.TestEdgeIntersection.setUp">[docs]</a>
-    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="c1">#self.v1 = np.array([0., 0.])</span>
         <span class="c1">#self.v2 = np.array([ 1., 1.])</span>
@@ -133,7 +133,7 @@
         
 <div class="viewcode-block" id="TestEdgeIntersection.test_cpp_dist_interior">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_Cpp.TestEdgeIntersection.test_cpp_dist_interior">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_cpp_dist_interior</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_cpp_dist_interior</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">])</span>
         <span class="n">dist</span> <span class="o">=</span> <span class="n">EdgeCpp</span><span class="o">.</span><span class="n">cpp_distance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">0.5</span><span class="p">),</span> <span class="mi">14</span><span class="p">)</span></div>
@@ -142,7 +142,7 @@
 
 <div class="viewcode-block" id="TestEdgeIntersection.test_cpp_dist_exterior">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_Cpp.TestEdgeIntersection.test_cpp_dist_exterior">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_cpp_dist_exterior</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_cpp_dist_exterior</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
         <span class="n">dist</span> <span class="o">=</span> <span class="n">EdgeCpp</span><span class="o">.</span><span class="n">cpp_distance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">0.5</span><span class="p">),</span> <span class="mi">14</span><span class="p">)</span></div>
@@ -151,7 +151,7 @@
         
 <div class="viewcode-block" id="TestEdgeIntersection.test_cpp_dist_corner1">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_Cpp.TestEdgeIntersection.test_cpp_dist_corner1">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_cpp_dist_corner1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_cpp_dist_corner1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">])</span>
         <span class="n">dist</span> <span class="o">=</span> <span class="n">EdgeCpp</span><span class="o">.</span><span class="n">cpp_distance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">0.5</span><span class="p">),</span> <span class="mi">14</span><span class="p">)</span></div>
@@ -160,7 +160,7 @@
         
 <div class="viewcode-block" id="TestEdgeIntersection.test_cpp_dist_corner2">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_Cpp.TestEdgeIntersection.test_cpp_dist_corner2">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_cpp_dist_corner2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_cpp_dist_corner2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
         <span class="n">dist</span> <span class="o">=</span> <span class="n">EdgeCpp</span><span class="o">.</span><span class="n">cpp_distance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span></div>
@@ -169,7 +169,7 @@
 
 <div class="viewcode-block" id="TestEdgeIntersection.plot_grid">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_Cpp.TestEdgeIntersection.plot_grid">[docs]</a>
-    <span class="k">def</span> <span class="nf">plot_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">outname</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">outname</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="n">doPlotting</span><span class="p">:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
@@ -204,7 +204,7 @@
             
 <div class="viewcode-block" id="TestEdgeIntersection.test_smooth_1">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_Cpp.TestEdgeIntersection.test_smooth_1">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_smooth_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_smooth_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">N</span> <span class="o">=</span> <span class="mi">301</span>
         <span class="n">tol</span> <span class="o">=</span> <span class="mf">1e-1</span>
         
@@ -215,7 +215,7 @@
 
 <div class="viewcode-block" id="TestEdgeIntersection.test_smooth_2">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_Cpp.TestEdgeIntersection.test_smooth_2">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_smooth_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_smooth_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">N</span> <span class="o">=</span> <span class="mi">301</span>
         <span class="n">tol</span> <span class="o">=</span> <span class="mf">1e-1</span>
         
@@ -226,7 +226,7 @@
 
 <div class="viewcode-block" id="TestEdgeIntersection.test_limits">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_Cpp.TestEdgeIntersection.test_limits">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">N</span> <span class="o">=</span> <span class="mi">201</span>
         <span class="n">tol</span> <span class="o">=</span> <span class="mf">6e-1</span>
         <span class="n">Ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1.8</span><span class="p">,</span> <span class="mf">2.2</span><span class="p">,</span> <span class="mi">21</span><span class="p">)</span>
@@ -248,7 +248,7 @@
 
 <div class="viewcode-block" id="TestEdgeIntersection.test_plot_smooth_min">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_Cpp.TestEdgeIntersection.test_plot_smooth_min">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_plot_smooth_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_plot_smooth_min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">N</span> <span class="o">=</span> <span class="mi">201</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="n">N</span><span class="p">)</span>
         <span class="n">y</span> <span class="o">=</span> <span class="mf">0.5</span>

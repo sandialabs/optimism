@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.VTKWriter &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -73,15 +73,15 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.VTKWriter</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">auto</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">auto</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 
 <div class="viewcode-block" id="write_matrix_as_table">
 <a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.write_matrix_as_table">[docs]</a>
-<span class="k">def</span> <span class="nf">write_matrix_as_table</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_matrix_as_table</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
     <span class="c1"># it&#39;s insane that numpy requires this kind</span>
     <span class="c1"># of hacking to write out a matrix as a table</span>
     <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">A</span><span class="p">)</span></div>
@@ -91,7 +91,7 @@
 
 <div class="viewcode-block" id="VTKFieldType">
 <a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKFieldType">[docs]</a>
-<span class="k">class</span> <span class="nc">VTKFieldType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">VTKFieldType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">SCALARS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">VECTORS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
     <span class="n">TENSORS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></div>
@@ -100,7 +100,7 @@
 
 <div class="viewcode-block" id="VTKDataType">
 <a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKDataType">[docs]</a>
-<span class="k">class</span> <span class="nc">VTKDataType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">VTKDataType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">BIT</span> <span class="o">=</span> <span class="s1">&#39;bit&#39;</span>
     <span class="n">UNSIGNED_CHAR</span> <span class="o">=</span> <span class="s1">&#39;unsigned_char&#39;</span>
     <span class="n">CHAR</span> <span class="o">=</span> <span class="s1">&#39;char&#39;</span>
@@ -117,7 +117,7 @@
 
 <div class="viewcode-block" id="default_values">
 <a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.default_values">[docs]</a>
-<span class="k">def</span> <span class="nf">default_values</span><span class="p">(</span><span class="n">fieldType</span><span class="p">,</span> <span class="n">dataType</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">default_values</span><span class="p">(</span><span class="n">fieldType</span><span class="p">,</span> <span class="n">dataType</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">dataType</span><span class="o">==</span><span class="n">VTKDataType</span><span class="o">.</span><span class="n">FLOAT</span> <span class="ow">or</span>  <span class="n">dataType</span><span class="o">==</span><span class="n">VTKDataType</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">fieldType</span><span class="o">==</span><span class="n">VTKFieldType</span><span class="o">.</span><span class="n">SCALARS</span><span class="p">:</span>
             <span class="k">return</span> <span class="mf">0.</span>
@@ -146,8 +146,8 @@
 
 <div class="viewcode-block" id="VTKWriter">
 <a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter">[docs]</a>
-<span class="k">class</span> <span class="nc">VTKWriter</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">baseFileName</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">VTKWriter</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">baseFileName</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span> <span class="o">=</span> <span class="n">mesh</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span> <span class="o">=</span> <span class="n">baseFileName</span> <span class="o">+</span> <span class="s1">&#39;.vtk&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nodalFields</span> <span class="o">=</span> <span class="p">{}</span>
@@ -174,7 +174,7 @@
         
 <div class="viewcode-block" id="VTKWriter.add_sphere">
 <a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter.add_sphere">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_sphere</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">radius</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_sphere</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">radius</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spheres</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">])</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sphereRadii</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">radius</span> <span class="p">)</span></div>
 
@@ -182,7 +182,7 @@
 
 <div class="viewcode-block" id="VTKWriter.add_contact_edges">
 <a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter.add_contact_edges">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_contact_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edgeConns</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_contact_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edgeConns</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contactEdges</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">contactEdges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">contactEdges</span><span class="p">,</span> <span class="n">edgeConns</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
@@ -192,7 +192,7 @@
 
 <div class="viewcode-block" id="VTKWriter.add_nodal_field">
 <a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter.add_nodal_field">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_nodal_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">nodalData</span><span class="p">,</span> <span class="n">fieldType</span><span class="p">,</span> <span class="n">dataType</span><span class="o">=</span><span class="n">VTKDataType</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_nodal_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">nodalData</span><span class="p">,</span> <span class="n">fieldType</span><span class="p">,</span> <span class="n">dataType</span><span class="o">=</span><span class="n">VTKDataType</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">):</span>
         <span class="n">nnodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">outputNodes</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">nodalData</span> <span class="o">=</span> <span class="n">nodalData</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">outputNodes</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">nodalData</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">nnodes</span><span class="p">:</span>
@@ -207,7 +207,7 @@
 
 <div class="viewcode-block" id="VTKWriter.add_cell_field">
 <a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter.add_cell_field">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_cell_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">cellData</span><span class="p">,</span> <span class="n">fieldType</span><span class="p">,</span> <span class="n">dataType</span><span class="o">=</span><span class="n">VTKDataType</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_cell_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">cellData</span><span class="p">,</span> <span class="n">fieldType</span><span class="p">,</span> <span class="n">dataType</span><span class="o">=</span><span class="n">VTKDataType</span><span class="o">.</span><span class="n">DOUBLE</span><span class="p">):</span>
         <span class="n">nelements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">cellData</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">nelements</span><span class="p">:</span>
             <span class="n">cellData3D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_and_format_data</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cellData</span><span class="p">),</span> <span class="n">fieldType</span><span class="p">)</span>
@@ -221,7 +221,7 @@
         
 <div class="viewcode-block" id="VTKWriter.write">
 <a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter.write">[docs]</a>
-    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">vtkFile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
@@ -246,7 +246,7 @@
     
 <div class="viewcode-block" id="VTKWriter._check_and_format_data">
 <a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter._check_and_format_data">[docs]</a>
-    <span class="k">def</span> <span class="nf">_check_and_format_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">fieldType</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_and_format_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">fieldType</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">fieldType</span><span class="o">==</span><span class="n">VTKFieldType</span><span class="o">.</span><span class="n">SCALARS</span><span class="p">:</span>
             <span class="k">assert</span><span class="p">(</span> <span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> \
                     <span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">field</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">)</span>
@@ -269,7 +269,7 @@
     
 <div class="viewcode-block" id="VTKWriter._write_header">
 <a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter._write_header">[docs]</a>
-    <span class="k">def</span> <span class="nf">_write_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_write_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
         <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;# vtk DataFile Version 3.0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Written from jax-fem</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vtkFormat</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -279,7 +279,7 @@
         
 <div class="viewcode-block" id="VTKWriter._write_coordinate_data">
 <a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter._write_coordinate_data">[docs]</a>
-    <span class="k">def</span> <span class="nf">_write_coordinate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_write_coordinate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">outputNodes</span><span class="p">]</span>
         <span class="n">nnodes</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;POINTS </span><span class="si">{}</span><span class="s1"> double</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nnodes</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spheres</span><span class="p">)))</span>
@@ -296,7 +296,7 @@
         
 <div class="viewcode-block" id="VTKWriter._write_cell_connectivity">
 <a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter._write_cell_connectivity">[docs]</a>
-    <span class="k">def</span> <span class="nf">_write_cell_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_write_cell_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
         <span class="n">nelements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="c1"># strong assumption: there is only one element type</span>
         <span class="n">conns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">[:,</span><span class="bp">self</span><span class="o">.</span><span class="n">elConn</span><span class="p">]</span>
@@ -314,7 +314,7 @@
         
 <div class="viewcode-block" id="VTKWriter._write_contact_edges">
 <a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter._write_contact_edges">[docs]</a>
-    <span class="k">def</span> <span class="nf">_write_contact_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_write_contact_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">contactEdges</span><span class="p">:</span>
             <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;2 </span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span></div>
 
@@ -322,7 +322,7 @@
 
 <div class="viewcode-block" id="VTKWriter._write_cell_types">
 <a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter._write_cell_types">[docs]</a>
-    <span class="k">def</span> <span class="nf">_write_cell_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_write_cell_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
         <span class="n">nelements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">vtkFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;CELL_TYPES </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nelements</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">contactEdges</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
         <span class="n">vtkCellTypes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vtkCellType</span><span class="p">,</span> <span class="p">(</span><span class="n">nelements</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
@@ -335,7 +335,7 @@
 
 <div class="viewcode-block" id="VTKWriter._write_nodal_fields">
 <a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter._write_nodal_fields">[docs]</a>
-    <span class="k">def</span> <span class="nf">_write_nodal_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_write_nodal_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
 
         <span class="n">allFieldsAreEmpty</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodalFields</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">allFieldsAreEmpty</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spheres</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -369,7 +369,7 @@
         
 <div class="viewcode-block" id="VTKWriter._write_cell_fields">
 <a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter._write_cell_fields">[docs]</a>
-    <span class="k">def</span> <span class="nf">_write_cell_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_write_cell_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
         <span class="n">allFieldsAreEmpty</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cellFields</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">allFieldsAreEmpty</span><span class="p">:</span>
             <span class="n">ncells</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -380,7 +380,7 @@
         
 <div class="viewcode-block" id="VTKWriter._write_out_all_fields_in_dict">
 <a class="viewcode-back" href="../../optimism.html#optimism.VTKWriter.VTKWriter._write_out_all_fields_in_dict">[docs]</a>
-    <span class="k">def</span> <span class="nf">_write_out_all_fields_in_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fieldDict</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_write_out_all_fields_in_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fieldDict</span><span class="p">,</span> <span class="n">vtkFile</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fieldDict</span><span class="p">:</span>
             <span class="n">fieldRecord</span> <span class="o">=</span> <span class="n">fieldDict</span><span class="p">[</span><span class="n">field</span><span class="p">]</span>
             <span class="n">u</span> <span class="o">=</span> <span class="n">fieldRecord</span><span class="o">.</span><span class="n">data</span>

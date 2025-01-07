@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.material.test.test_J2Plastic &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../../_static/copybutton.js?v=f281be69"></script>
@@ -73,23 +73,23 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.material.test.test_J2Plastic</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">unittest</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">unittest</span>
 
-<span class="kn">import</span> <span class="nn">jax</span>
-<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">jax.scipy</span> <span class="kn">import</span> <span class="n">linalg</span>
-<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jax.scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">EquationSolver</span> <span class="k">as</span> <span class="n">EqSolver</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">FunctionSpace</span>
-<span class="kn">from</span> <span class="nn">optimism.material</span> <span class="kn">import</span> <span class="n">J2Plastic</span> <span class="k">as</span> <span class="n">J2</span>
-<span class="kn">from</span> <span class="nn">optimism.material</span> <span class="kn">import</span> <span class="n">MaterialUniaxialSimulator</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mechanics</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mesh</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Objective</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">QuadratureRule</span>
-<span class="kn">from</span> <span class="nn">optimism.test.TestFixture</span> <span class="kn">import</span> <span class="n">TestFixture</span>
-<span class="kn">from</span> <span class="nn">optimism.test.MeshFixture</span> <span class="kn">import</span> <span class="n">MeshFixture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">EquationSolver</span> <span class="k">as</span> <span class="n">EqSolver</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionSpace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.material</span><span class="w"> </span><span class="kn">import</span> <span class="n">J2Plastic</span> <span class="k">as</span> <span class="n">J2</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.material</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaterialUniaxialSimulator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mechanics</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Objective</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuadratureRule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.test.TestFixture</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestFixture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.test.MeshFixture</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshFixture</span>
 
 
 <span class="n">plotting</span><span class="o">=</span><span class="kc">False</span>
@@ -97,17 +97,17 @@
 
 <div class="viewcode-block" id="make_disp_grad_from_strain">
 <a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.make_disp_grad_from_strain">[docs]</a>
-<span class="k">def</span> <span class="nf">make_disp_grad_from_strain</span><span class="p">(</span><span class="n">strain</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_disp_grad_from_strain</span><span class="p">(</span><span class="n">strain</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">linalg</span><span class="o">.</span><span class="n">expm</span><span class="p">(</span><span class="n">strain</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span></div>
 
         
 
 <div class="viewcode-block" id="GradOfPlasticityModelFixture">
 <a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture">[docs]</a>
-<span class="k">class</span> <span class="nc">GradOfPlasticityModelFixture</span><span class="p">(</span><span class="n">TestFixture</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GradOfPlasticityModelFixture</span><span class="p">(</span><span class="n">TestFixture</span><span class="p">):</span>
 <div class="viewcode-block" id="GradOfPlasticityModelFixture.setUp">
 <a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.setUp">[docs]</a>
-    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     
         <span class="n">E</span> <span class="o">=</span> <span class="mf">100.0</span>
         <span class="n">poisson</span> <span class="o">=</span> <span class="mf">0.321</span>
@@ -131,7 +131,7 @@
         
 <div class="viewcode-block" id="GradOfPlasticityModelFixture.test_zero_point">
 <a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.test_zero_point">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_zero_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_zero_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">dispGrad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
         <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span>
         <span class="n">dt</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -146,7 +146,7 @@
 
 <div class="viewcode-block" id="GradOfPlasticityModelFixture.test_elastic_energy">
 <a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.test_elastic_energy">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_elastic_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_elastic_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">strainBelowYield</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;yield strength&#39;</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">]</span>
         
         <span class="n">strain</span> <span class="o">=</span> <span class="n">strainBelowYield</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;poisson ratio&#39;</span><span class="p">],</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;poisson ratio&#39;</span><span class="p">]]))</span>
@@ -168,7 +168,7 @@
         
 <div class="viewcode-block" id="GradOfPlasticityModelFixture.test_elastic_strain_path">
 <a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.test_elastic_strain_path">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_elastic_strain_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_elastic_strain_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">strain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
         <span class="n">strain_inc</span> <span class="o">=</span> <span class="mf">1e-6</span>
         <span class="n">stateOld</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span>
@@ -202,7 +202,7 @@
         
 <div class="viewcode-block" id="GradOfPlasticityModelFixture.test_plastic_strain_path">
 <a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.test_plastic_strain_path">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_plastic_strain_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_plastic_strain_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">strain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
         <span class="n">strain_inc</span> <span class="o">=</span> <span class="mf">0.2</span>
         <span class="n">stateOld</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span>
@@ -276,10 +276,10 @@
 
 <div class="viewcode-block" id="J2UpdateFixture">
 <a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.J2UpdateFixture">[docs]</a>
-<span class="k">class</span> <span class="nc">J2UpdateFixture</span><span class="p">(</span><span class="n">TestFixture</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">J2UpdateFixture</span><span class="p">(</span><span class="n">TestFixture</span><span class="p">):</span>
 <div class="viewcode-block" id="J2UpdateFixture.setUp">
 <a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.J2UpdateFixture.setUp">[docs]</a>
-    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">E</span> <span class="o">=</span> <span class="mf">100.0</span>
         <span class="n">poisson</span> <span class="o">=</span> <span class="mf">0.321</span>
         <span class="n">Y0</span> <span class="o">=</span> <span class="mf">0.3</span><span class="o">*</span><span class="n">E</span>
@@ -301,7 +301,7 @@
 
 <div class="viewcode-block" id="J2UpdateFixture.test_update_only_happens_once">
 <a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.J2UpdateFixture.test_update_only_happens_once">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_update_only_happens_once</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_update_only_happens_once</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">dt</span> <span class="o">=</span> <span class="mf">1.0</span>
 
         <span class="c1"># get 10,000 random displacement gradients</span>
@@ -321,11 +321,11 @@
 
 <div class="viewcode-block" id="J2PlasticUniaxial">
 <a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.J2PlasticUniaxial">[docs]</a>
-<span class="k">class</span> <span class="nc">J2PlasticUniaxial</span><span class="p">(</span><span class="n">TestFixture</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">J2PlasticUniaxial</span><span class="p">(</span><span class="n">TestFixture</span><span class="p">):</span>
 
 <div class="viewcode-block" id="J2PlasticUniaxial.setUp">
 <a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.J2PlasticUniaxial.setUp">[docs]</a>
-    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">E</span> <span class="o">=</span> <span class="mf">100.0e3</span>
         <span class="n">nu</span> <span class="o">=</span> <span class="mf">0.25</span>
         <span class="n">Y0</span> <span class="o">=</span> <span class="mf">30.0</span>
@@ -346,10 +346,10 @@
 
 <div class="viewcode-block" id="J2PlasticUniaxial.test_uniaxial">
 <a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.J2PlasticUniaxial.test_uniaxial">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_uniaxial</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_uniaxial</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">strainRate</span> <span class="o">=</span> <span class="mf">1e-3</span>
 
-        <span class="k">def</span> <span class="nf">constant_true_strain_rate</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">constant_true_strain_rate</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">expm1</span><span class="p">(</span><span class="n">strainRate</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
 
         <span class="n">maxTime</span> <span class="o">=</span> <span class="mf">20.0</span>
@@ -373,11 +373,11 @@
 
 <div class="viewcode-block" id="PlasticityOnMesh">
 <a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.PlasticityOnMesh">[docs]</a>
-<span class="k">class</span> <span class="nc">PlasticityOnMesh</span><span class="p">(</span><span class="n">MeshFixture</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlasticityOnMesh</span><span class="p">(</span><span class="n">MeshFixture</span><span class="p">):</span>
 
 <div class="viewcode-block" id="PlasticityOnMesh.test_plasticity_with_mesh">
 <a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_J2Plastic.PlasticityOnMesh.test_plasticity_with_mesh">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_plasticity_with_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_plasticity_with_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="n">dispGrad0</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">],</span>
                                <span class="p">[</span><span class="o">-</span><span class="mf">0.04</span><span class="p">,</span> <span class="mf">0.68</span><span class="p">]])</span>
@@ -419,7 +419,7 @@
         <span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t</span><span class="p">,</span> <span class="n">tOld</span><span class="p">]))</span>
         
         
-        <span class="k">def</span> <span class="nf">compute_energy</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">compute_energy</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
             <span class="n">U</span> <span class="o">=</span> <span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="p">)</span>
             <span class="n">internalVariables</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">dt</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>

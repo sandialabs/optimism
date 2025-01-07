@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.test.test_Mesh &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -73,23 +73,23 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.test.test_Mesh</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
-<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">onp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 
-<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">MeshFixture</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mesh</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Interpolants</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshFixture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Interpolants</span>
 
 <span class="c1">#from matplotlib import pyplot as plt</span>
 
 <div class="viewcode-block" id="TestSingleMeshFixture">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Mesh.TestSingleMeshFixture">[docs]</a>
-<span class="k">class</span> <span class="nc">TestSingleMeshFixture</span><span class="p">(</span><span class="n">MeshFixture</span><span class="o">.</span><span class="n">MeshFixture</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestSingleMeshFixture</span><span class="p">(</span><span class="n">MeshFixture</span><span class="o">.</span><span class="n">MeshFixture</span><span class="p">):</span>
     
 <div class="viewcode-block" id="TestSingleMeshFixture.setUp">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Mesh.TestSingleMeshFixture.setUp">[docs]</a>
-    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Nx</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ny</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="n">xRange</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]</span>
@@ -104,7 +104,7 @@
 
 <div class="viewcode-block" id="TestSingleMeshFixture.test_create_nodesets_from_sidesets">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Mesh.TestSingleMeshFixture.test_create_nodesets_from_sidesets">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_create_nodesets_from_sidesets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_create_nodesets_from_sidesets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">nodeSets</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">create_nodesets_from_sidesets</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
 
         <span class="c1"># this test relies on the fact that matching nodesets</span>
@@ -117,7 +117,7 @@
     
 <div class="viewcode-block" id="TestSingleMeshFixture.test_edge_connectivities">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Mesh.TestSingleMeshFixture.test_edge_connectivities">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_edge_connectivities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_edge_connectivities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">edgeConns</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">create_edges</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">)</span>
 
         <span class="n">goldBoundaryEdgeConns</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
@@ -163,7 +163,7 @@
 
 <div class="viewcode-block" id="TestSingleMeshFixture.test_edge_to_neighbor_cells_data">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Mesh.TestSingleMeshFixture.test_edge_to_neighbor_cells_data">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_edge_to_neighbor_cells_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_edge_to_neighbor_cells_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">edgeConns</span><span class="p">,</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">create_edges</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">)</span>
 
         <span class="n">goldBoundaryEdgeConns</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
@@ -210,7 +210,7 @@
 
 <div class="viewcode-block" id="TestSingleMeshFixture.test_conversion_to_quadratic_mesh_is_valid">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Mesh.TestSingleMeshFixture.test_conversion_to_quadratic_mesh_is_valid">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_conversion_to_quadratic_mesh_is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_conversion_to_quadratic_mesh_is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">newMesh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">create_higher_order_mesh_from_simplex_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
         <span class="n">nNodes</span> <span class="o">=</span> <span class="n">newMesh</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -248,7 +248,7 @@
 
 <div class="viewcode-block" id="triangle_inradius">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Mesh.triangle_inradius">[docs]</a>
-<span class="k">def</span> <span class="nf">triangle_inradius</span><span class="p">(</span><span class="n">tcoords</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">triangle_inradius</span><span class="p">(</span><span class="n">tcoords</span><span class="p">):</span>
     <span class="n">area</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">onp</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">tcoords</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">tcoords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tcoords</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">tcoords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">peri</span> <span class="o">=</span> <span class="p">(</span><span class="n">onp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">tcoords</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">tcoords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="o">+</span> <span class="n">onp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">tcoords</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">tcoords</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.test.test_MinimizeScalar &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -73,32 +73,32 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.test.test_MinimizeScalar</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">MinimizeScalar</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">TestFixture</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinimizeScalar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestFixture</span>
 
-<span class="kn">from</span> <span class="nn">optimism.material</span> <span class="kn">import</span> <span class="n">J2Plastic</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.material</span><span class="w"> </span><span class="kn">import</span> <span class="n">J2Plastic</span>
 
 <div class="viewcode-block" id="f">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_MinimizeScalar.f">[docs]</a>
-<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="k">return</span> <span class="mf">0.25</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">4</span> <span class="o">-</span> <span class="mf">50.0</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mf">2.0</span></div>
+<span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="k">return</span> <span class="mf">0.25</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">4</span> <span class="o">-</span> <span class="mf">50.0</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mf">2.0</span></div>
 
 <span class="n">df</span> <span class="o">=</span> <span class="n">jacfwd</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TestMinimizeScalarFixture">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_MinimizeScalar.TestMinimizeScalarFixture">[docs]</a>
-<span class="k">class</span> <span class="nc">TestMinimizeScalarFixture</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestMinimizeScalarFixture</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
 
 <div class="viewcode-block" id="TestMinimizeScalarFixture.setUp">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_MinimizeScalar.TestMinimizeScalarFixture.setUp">[docs]</a>
-    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">minimize_scalar_jitted</span> <span class="o">=</span> <span class="n">jit</span><span class="p">(</span><span class="n">MinimizeScalar</span><span class="o">.</span><span class="n">minimize_scalar</span><span class="p">,</span> <span class="n">static_argnums</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span></div>
 
 
 
 <div class="viewcode-block" id="TestMinimizeScalarFixture.test_solves_quadratic_problem_in_one_iteration">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_MinimizeScalar.TestMinimizeScalarFixture.test_solves_quadratic_problem_in_one_iteration">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_solves_quadratic_problem_in_one_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_solves_quadratic_problem_in_one_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">f</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
         <span class="n">x0</span> <span class="o">=</span> <span class="mf">3.5</span>
         <span class="n">settings</span> <span class="o">=</span> <span class="n">MinimizeScalar</span><span class="o">.</span><span class="n">get_settings</span><span class="p">(</span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">max_iters</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -111,7 +111,7 @@
         
 <div class="viewcode-block" id="TestMinimizeScalarFixture.test_does_not_converge_to_saddle_point">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_MinimizeScalar.TestMinimizeScalarFixture.test_does_not_converge_to_saddle_point">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_does_not_converge_to_saddle_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_does_not_converge_to_saddle_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">x0</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.001</span>
         <span class="n">settings</span> <span class="o">=</span> <span class="n">MinimizeScalar</span><span class="o">.</span><span class="n">get_settings</span><span class="p">(</span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">max_iters</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">MinimizeScalar</span><span class="o">.</span><span class="n">minimize_scalar</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span>
@@ -126,7 +126,7 @@
 
 <div class="viewcode-block" id="TestMinimizeScalarFixture.notest_jit">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_MinimizeScalar.TestMinimizeScalarFixture.notest_jit">[docs]</a>
-    <span class="k">def</span> <span class="nf">notest_jit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">notest_jit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">x0</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.001</span>
         <span class="n">settings</span> <span class="o">=</span> <span class="n">MinimizeScalar</span><span class="o">.</span><span class="n">get_settings</span><span class="p">(</span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">max_iters</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimize_scalar_jitted</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span>
@@ -139,8 +139,8 @@
 
 <div class="viewcode-block" id="TestMinimizeScalarFixture.notest_grad">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_MinimizeScalar.TestMinimizeScalarFixture.notest_grad">[docs]</a>
-    <span class="k">def</span> <span class="nf">notest_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">g</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">c</span><span class="p">):</span> <span class="k">return</span> <span class="mf">0.25</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">4</span> <span class="o">-</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">c</span><span class="o">*</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mf">2.0</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">notest_grad</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">g</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">c</span><span class="p">):</span> <span class="k">return</span> <span class="mf">0.25</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">4</span> <span class="o">-</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">c</span><span class="o">*</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mf">2.0</span>
         <span class="n">c</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.0</span>
         <span class="n">x0</span> <span class="o">=</span> <span class="o">-</span><span class="mf">3.0</span>
         <span class="n">settings</span> <span class="o">=</span> <span class="n">MinimizeScalar</span><span class="o">.</span><span class="n">get_settings</span><span class="p">(</span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">max_iters</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
@@ -154,13 +154,13 @@
 
 <div class="viewcode-block" id="TestMinimizeScalarFixture.notest_stiff_problem">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_MinimizeScalar.TestMinimizeScalarFixture.notest_stiff_problem">[docs]</a>
-    <span class="k">def</span> <span class="nf">notest_stiff_problem</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">notest_stiff_problem</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">E</span> <span class="o">=</span> <span class="mf">69.0</span>
         <span class="n">Y0</span> <span class="o">=</span> <span class="mf">350.0</span>
         <span class="n">n</span> <span class="o">=</span> <span class="mf">3.0</span>
         <span class="n">eps0</span> <span class="o">=</span> <span class="mf">1.0</span>
         <span class="n">e</span> <span class="o">=</span> <span class="mf">1.01</span><span class="o">*</span><span class="n">Y0</span><span class="o">/</span><span class="n">E</span>
-        <span class="k">def</span> <span class="nf">Wp</span><span class="p">(</span><span class="n">ep</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">Wp</span><span class="p">(</span><span class="n">ep</span><span class="p">):</span>
             <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ep</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">,</span>
                          <span class="n">Y0</span><span class="o">*</span><span class="n">ep</span> <span class="o">+</span> <span class="n">Y0</span><span class="o">*</span><span class="n">eps0</span><span class="o">*</span><span class="n">n</span><span class="o">/</span><span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">ep</span><span class="o">/</span><span class="n">eps0</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">1</span><span class="o">/</span><span class="n">n</span><span class="p">),</span>
                          <span class="n">Y0</span><span class="o">*</span><span class="n">ep</span><span class="p">)</span>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.test.test_Objective &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -73,21 +73,21 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.test.test_Objective</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Objective</span>
-<span class="kn">from</span> <span class="nn">optimism.Objective</span> <span class="kn">import</span> <span class="n">Params</span>
-<span class="kn">from</span> <span class="nn">optimism.Objective</span> <span class="kn">import</span> <span class="n">param_index_update</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">TestFixture</span>
-<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Objective</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.Objective</span><span class="w"> </span><span class="kn">import</span> <span class="n">Params</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.Objective</span><span class="w"> </span><span class="kn">import</span> <span class="n">param_index_update</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestFixture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
 
 
 <div class="viewcode-block" id="TestObjective">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Objective.TestObjective">[docs]</a>
-<span class="k">class</span> <span class="nc">TestObjective</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestObjective</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
 
 <div class="viewcode-block" id="TestObjective.test_param_change">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Objective.TestObjective.test_param_change">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_param_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_param_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">Params</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
         <span class="n">newParams</span> <span class="o">=</span> <span class="n">param_index_update</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="n">newParams</span><span class="p">,</span> <span class="n">Params</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="p">)</span></div>
@@ -96,7 +96,7 @@
 
 <div class="viewcode-block" id="TestObjective.test_param_change_first_out_of_two">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Objective.TestObjective.test_param_change_first_out_of_two">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_param_change_first_out_of_two</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_param_change_first_out_of_two</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">Params</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="mi">41</span><span class="p">])</span>
         <span class="n">newParams</span> <span class="o">=</span> <span class="n">param_index_update</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="n">newParams</span><span class="p">,</span> <span class="n">Params</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="p">[</span><span class="mi">41</span><span class="p">])</span> <span class="p">)</span></div>
@@ -105,7 +105,7 @@
 
 <div class="viewcode-block" id="TestObjective.test_param_change_second_out_of_three">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Objective.TestObjective.test_param_change_second_out_of_three">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_param_change_second_out_of_three</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_param_change_second_out_of_three</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">Params</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="mi">41</span><span class="p">],</span> <span class="s1">&#39;cat&#39;</span><span class="p">)</span>
         <span class="n">newParams</span> <span class="o">=</span> <span class="n">param_index_update</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="mi">42</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="n">newParams</span><span class="p">,</span> <span class="n">Params</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="mi">42</span><span class="p">],</span> <span class="s1">&#39;cat&#39;</span><span class="p">))</span></div>
@@ -114,7 +114,7 @@
         
 <div class="viewcode-block" id="TestObjective.test_param_change_third_out_of_four">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Objective.TestObjective.test_param_change_third_out_of_four">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_param_change_third_out_of_four</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_param_change_third_out_of_four</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">Params</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="mi">41</span><span class="p">],</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="n">newParams</span> <span class="o">=</span> <span class="n">param_index_update</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="n">newParams</span><span class="p">,</span> <span class="n">Params</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="mi">41</span><span class="p">],</span> <span class="s1">&#39;dog&#39;</span><span class="p">,</span> <span class="p">{})</span> <span class="p">)</span></div>
@@ -123,7 +123,7 @@
 
 <div class="viewcode-block" id="TestObjective.test_param_change_four_out_of_four">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Objective.TestObjective.test_param_change_four_out_of_four">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_param_change_four_out_of_four</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_param_change_four_out_of_four</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">Params</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="mi">41</span><span class="p">],</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="n">newParams</span> <span class="o">=</span> <span class="n">param_index_update</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="p">[</span><span class="mi">54</span><span class="p">,</span><span class="mi">12</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="n">newParams</span><span class="p">,</span> <span class="n">Params</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="mi">41</span><span class="p">],</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">54</span><span class="p">,</span><span class="mi">12</span><span class="p">]))</span></div>

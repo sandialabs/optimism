@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.test.test_PatchTestPou &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -73,20 +73,20 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.test.test_PatchTestPou</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">jax</span>
-<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">onp</span>
 
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">FunctionSpace</span>
-<span class="kn">from</span> <span class="nn">optimism.material</span> <span class="kn">import</span> <span class="n">LinearElastic</span> <span class="k">as</span> <span class="n">MatModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionSpace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.material</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearElastic</span> <span class="k">as</span> <span class="n">MatModel</span>
 <span class="c1">#from optimism.material import Neohookean as MatModel</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mesh</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mechanics</span>
-<span class="kn">from</span> <span class="nn">optimism.EquationSolver</span> <span class="kn">import</span> <span class="n">newton_solve</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">QuadratureRule</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">MeshFixture</span>
-<span class="kn">from</span> <span class="nn">optimism.TensorMath</span> <span class="kn">import</span> <span class="n">tensor_2D_to_3D</span>
-<span class="kn">import</span> <span class="nn">metis</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mechanics</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.EquationSolver</span><span class="w"> </span><span class="kn">import</span> <span class="n">newton_solve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuadratureRule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshFixture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.TensorMath</span><span class="w"> </span><span class="kn">import</span> <span class="n">tensor_2D_to_3D</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">metis</span>
 
 <span class="n">E</span> <span class="o">=</span> <span class="mf">1.0</span>
 <span class="n">nu</span> <span class="o">=</span> <span class="mf">0.3</span>
@@ -97,7 +97,7 @@
 
 <div class="viewcode-block" id="insort">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_PatchTestPou.insort">[docs]</a>
-<span class="k">def</span> <span class="nf">insort</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;mergesort&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">insort</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;mergesort&#39;</span><span class="p">):</span>
     <span class="n">c</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
     <span class="n">c</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">)</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
@@ -108,7 +108,7 @@
 
 <div class="viewcode-block" id="create_graph">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_PatchTestPou.create_graph">[docs]</a>
-<span class="k">def</span> <span class="nf">create_graph</span><span class="p">(</span><span class="n">conns</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_graph</span><span class="p">(</span><span class="n">conns</span><span class="p">):</span>
     
     <span class="n">elemToElem</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">conns</span><span class="p">))</span> <span class="p">]</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">edges</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">create_edges</span><span class="p">(</span><span class="n">conns</span><span class="p">)</span>
@@ -144,7 +144,7 @@
 
 <div class="viewcode-block" id="create_partitions">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_PatchTestPou.create_partitions">[docs]</a>
-<span class="k">def</span> <span class="nf">create_partitions</span><span class="p">(</span><span class="n">conns</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_partitions</span><span class="p">(</span><span class="n">conns</span><span class="p">):</span>
     <span class="n">graph</span> <span class="o">=</span> <span class="n">create_graph</span><span class="p">(</span><span class="n">conns</span><span class="p">)</span>
     <span class="p">(</span><span class="n">edgecuts</span><span class="p">,</span> <span class="n">parts</span><span class="p">)</span> <span class="o">=</span> <span class="n">metis</span><span class="o">.</span><span class="n">part_graph</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">parts</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span></div>
@@ -153,7 +153,7 @@
 
 <div class="viewcode-block" id="construct_basis_on_poly">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_PatchTestPou.construct_basis_on_poly">[docs]</a>
-<span class="k">def</span> <span class="nf">construct_basis_on_poly</span><span class="p">(</span><span class="n">elems</span><span class="p">,</span> <span class="n">conns</span><span class="p">,</span> <span class="n">fs</span> <span class="p">:</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">FunctionSpace</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">construct_basis_on_poly</span><span class="p">(</span><span class="n">elems</span><span class="p">,</span> <span class="n">conns</span><span class="p">,</span> <span class="n">fs</span> <span class="p">:</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">FunctionSpace</span><span class="p">):</span>
     <span class="n">uniqueNodes</span> <span class="o">=</span> <span class="n">conns</span><span class="p">[</span><span class="n">elems</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
     <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">elems</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
         <span class="n">uniqueNodes</span> <span class="o">=</span> <span class="n">insort</span><span class="p">(</span><span class="n">uniqueNodes</span><span class="p">,</span> <span class="n">conns</span><span class="p">[</span><span class="n">e</span><span class="p">])</span>
@@ -220,11 +220,11 @@
 
 <div class="viewcode-block" id="PatchTestQuadraticElements">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_PatchTestPou.PatchTestQuadraticElements">[docs]</a>
-<span class="k">class</span> <span class="nc">PatchTestQuadraticElements</span><span class="p">(</span><span class="n">MeshFixture</span><span class="o">.</span><span class="n">MeshFixture</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PatchTestQuadraticElements</span><span class="p">(</span><span class="n">MeshFixture</span><span class="o">.</span><span class="n">MeshFixture</span><span class="p">):</span>
     
 <div class="viewcode-block" id="PatchTestQuadraticElements.setUp">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_PatchTestPou.PatchTestQuadraticElements.setUp">[docs]</a>
-    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Nx</span> <span class="o">=</span> <span class="mi">5</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ny</span> <span class="o">=</span> <span class="mi">5</span>
 
@@ -242,7 +242,7 @@
 
 <div class="viewcode-block" id="PatchTestQuadraticElements.create_polys">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_PatchTestPou.PatchTestQuadraticElements.create_polys">[docs]</a>
-    <span class="k">def</span> <span class="nf">create_polys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_polys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">polys</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">e</span><span class="p">,</span><span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">partition</span><span class="p">):</span>
             <span class="n">p</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
@@ -257,8 +257,8 @@
 
 <div class="viewcode-block" id="PatchTestQuadraticElements.write_output">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_PatchTestPou.PatchTestQuadraticElements.write_output">[docs]</a>
-    <span class="k">def</span> <span class="nf">write_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">VTKWriter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">VTKWriter</span>
         <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="p">)</span>
         <span class="n">plotName</span> <span class="o">=</span> <span class="s1">&#39;patch-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">step</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
         <span class="n">writer</span> <span class="o">=</span> <span class="n">VTKWriter</span><span class="o">.</span><span class="n">VTKWriter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="n">baseFileName</span><span class="o">=</span><span class="n">plotName</span><span class="p">)</span>
@@ -277,7 +277,7 @@
 
 <div class="viewcode-block" id="PatchTestQuadraticElements.test_dirichlet_patch_test_with_quadratic_elements">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_PatchTestPou.PatchTestQuadraticElements.test_dirichlet_patch_test_with_quadratic_elements">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_dirichlet_patch_test_with_quadratic_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_dirichlet_patch_test_with_quadratic_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">ebcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">FunctionSpace</span><span class="o">.</span><span class="n">EssentialBC</span><span class="p">(</span><span class="n">nodeSet</span><span class="o">=</span><span class="s1">&#39;all_boundary&#39;</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
                 <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">EssentialBC</span><span class="p">(</span><span class="n">nodeSet</span><span class="o">=</span><span class="s1">&#39;all_boundary&#39;</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">DofManager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ebcs</span><span class="p">)</span>
@@ -306,9 +306,9 @@
             <span class="k">for</span> <span class="n">gradU</span> <span class="ow">in</span> <span class="n">gradUs</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">gradU</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetDispGrad</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>   
 
-        <span class="k">def</span> <span class="nf">objective_poly</span><span class="p">(</span><span class="n">Uu</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">objective_poly</span><span class="p">(</span><span class="n">Uu</span><span class="p">):</span>
 
-            <span class="k">def</span> <span class="nf">energy_density</span><span class="p">(</span><span class="n">gradu</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">energy_density</span><span class="p">(</span><span class="n">gradu</span><span class="p">):</span>
                 <span class="n">g</span> <span class="o">=</span> <span class="n">tensor_2D_to_3D</span><span class="p">(</span><span class="n">gradu</span><span class="p">)</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">materialModel</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
 
@@ -345,7 +345,7 @@
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">unittest</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">unittest</span>
     <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
 </pre></div>
 

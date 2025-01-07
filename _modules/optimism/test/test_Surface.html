@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.test.test_Surface &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -73,21 +73,21 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.test.test_Surface</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">MeshFixture</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mesh</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">QuadratureRule</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Surface</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Timer</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshFixture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuadratureRule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Surface</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timer</span>
 
 
 <div class="viewcode-block" id="TestSingleMeshFixture">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Surface.TestSingleMeshFixture">[docs]</a>
-<span class="k">class</span> <span class="nc">TestSingleMeshFixture</span><span class="p">(</span><span class="n">MeshFixture</span><span class="o">.</span><span class="n">MeshFixture</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestSingleMeshFixture</span><span class="p">(</span><span class="n">MeshFixture</span><span class="o">.</span><span class="n">MeshFixture</span><span class="p">):</span>
     
 <div class="viewcode-block" id="TestSingleMeshFixture.setUp">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Surface.TestSingleMeshFixture.setUp">[docs]</a>
-    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Nx</span> <span class="o">=</span> <span class="mi">4</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ny</span> <span class="o">=</span> <span class="mi">4</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span class="mf">1.2</span>
@@ -107,7 +107,7 @@
         
 <div class="viewcode-block" id="TestSingleMeshFixture.test_integrate_perimeter">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Surface.TestSingleMeshFixture.test_integrate_perimeter">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_integrate_perimeter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_integrate_perimeter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">Surface</span><span class="o">.</span><span class="n">integrate_function_on_surface</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quadRule</span><span class="p">,</span>
                                                   <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">sideSets</span><span class="p">[</span><span class="s1">&#39;all_boundary&#39;</span><span class="p">],</span>
                                                   <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span>
@@ -118,7 +118,7 @@
         
 <div class="viewcode-block" id="TestSingleMeshFixture.test_integrate_quadratic_fn_on_surface">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Surface.TestSingleMeshFixture.test_integrate_quadratic_fn_on_surface">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_integrate_quadratic_fn_on_surface</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_integrate_quadratic_fn_on_surface</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">I</span> <span class="o">=</span> <span class="n">Surface</span><span class="o">.</span><span class="n">integrate_function_on_surface</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quadRule</span><span class="p">,</span>
                                                   <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">sideSets</span><span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">],</span>
                                                   <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span>
@@ -129,7 +129,7 @@
         
 <div class="viewcode-block" id="TestSingleMeshFixture.test_integrate_function_on_surface_that_uses_coords_and_normal">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Surface.TestSingleMeshFixture.test_integrate_function_on_surface_that_uses_coords_and_normal">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_integrate_function_on_surface_that_uses_coords_and_normal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_integrate_function_on_surface_that_uses_coords_and_normal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">I</span> <span class="o">=</span> <span class="n">Surface</span><span class="o">.</span><span class="n">integrate_function_on_surface</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quadRule</span><span class="p">,</span>
                                                   <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">sideSets</span><span class="p">[</span><span class="s1">&#39;all_boundary&#39;</span><span class="p">],</span>
                                                   <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span>
@@ -140,7 +140,7 @@
         
 <div class="viewcode-block" id="TestSingleMeshFixture.disable_test_edge_conn">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Surface.TestSingleMeshFixture.disable_test_edge_conn">[docs]</a>
-    <span class="k">def</span> <span class="nf">disable_test_edge_conn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">disable_test_edge_conn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;coords=</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;conns=</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">)</span>
         <span class="n">edgeConn</span> <span class="o">=</span> <span class="n">Surface</span><span class="o">.</span><span class="n">create_edges_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">)</span>

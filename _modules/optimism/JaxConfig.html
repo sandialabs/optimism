@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.JaxConfig &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -73,17 +73,17 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.JaxConfig</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
-<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">grad</span><span class="p">,</span> <span class="n">jacrev</span><span class="p">,</span> <span class="n">jacfwd</span><span class="p">,</span> <span class="n">jvp</span><span class="p">,</span> <span class="n">vjp</span><span class="p">,</span> <span class="n">vmap</span><span class="p">,</span> <span class="n">value_and_grad</span><span class="p">,</span> <span class="n">hessian</span><span class="p">,</span> <span class="n">ops</span><span class="p">,</span> <span class="n">lax</span><span class="p">,</span> <span class="n">make_jaxpr</span><span class="p">,</span> <span class="n">linearize</span><span class="p">,</span> <span class="n">jit</span>
-<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">custom_jvp</span><span class="p">,</span> <span class="n">custom_vjp</span>
-<span class="kn">from</span> <span class="nn">jax.lax</span> <span class="kn">import</span> <span class="n">while_loop</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jax</span><span class="w"> </span><span class="kn">import</span> <span class="n">grad</span><span class="p">,</span> <span class="n">jacrev</span><span class="p">,</span> <span class="n">jacfwd</span><span class="p">,</span> <span class="n">jvp</span><span class="p">,</span> <span class="n">vjp</span><span class="p">,</span> <span class="n">vmap</span><span class="p">,</span> <span class="n">value_and_grad</span><span class="p">,</span> <span class="n">hessian</span><span class="p">,</span> <span class="n">ops</span><span class="p">,</span> <span class="n">lax</span><span class="p">,</span> <span class="n">make_jaxpr</span><span class="p">,</span> <span class="n">linearize</span><span class="p">,</span> <span class="n">jit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jax</span><span class="w"> </span><span class="kn">import</span> <span class="n">custom_jvp</span><span class="p">,</span> <span class="n">custom_vjp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jax.lax</span><span class="w"> </span><span class="kn">import</span> <span class="n">while_loop</span>
 
 
 <div class="viewcode-block" id="if_then_else">
 <a class="viewcode-back" href="../../optimism.html#optimism.JaxConfig.if_then_else">[docs]</a>
-<span class="k">def</span> <span class="nf">if_then_else</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">val1</span><span class="p">,</span> <span class="n">val2</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">if_then_else</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">val1</span><span class="p">,</span> <span class="n">val2</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">lax</span><span class="o">.</span><span class="n">cond</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span>
                     <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">val1</span><span class="p">,</span>
                     <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">val2</span><span class="p">,</span>
@@ -93,14 +93,14 @@
 
 <div class="viewcode-block" id="hessvec">
 <a class="viewcode-back" href="../../optimism.html#optimism.JaxConfig.hessvec">[docs]</a>
-<span class="k">def</span> <span class="nf">hessvec</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hessvec</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
     <span class="k">return</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">v</span><span class="p">:</span> <span class="n">grad</span><span class="p">(</span><span class="k">lambda</span> <span class="n">z</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">vdot</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">f</span><span class="p">)(</span><span class="n">z</span><span class="p">),</span> <span class="n">v</span><span class="p">))(</span><span class="n">x</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="hessrayleigh">
 <a class="viewcode-back" href="../../optimism.html#optimism.JaxConfig.hessrayleigh">[docs]</a>
-<span class="k">def</span> <span class="nf">hessrayleigh</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hessrayleigh</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
     <span class="k">return</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">v</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">vdot</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">grad</span><span class="p">(</span><span class="k">lambda</span> <span class="n">z</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">vdot</span><span class="p">(</span><span class="n">grad</span><span class="p">(</span><span class="n">f</span><span class="p">)(</span><span class="n">z</span><span class="p">),</span> <span class="n">v</span><span class="p">))(</span><span class="n">x</span><span class="p">))</span></div>
 
 </pre></div>

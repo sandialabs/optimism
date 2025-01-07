@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.test.test_Math &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -73,25 +73,25 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.test.test_Math</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">unittest</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">unittest</span>
 
-<span class="kn">import</span> <span class="nn">jax</span>
-<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Math</span>
-<span class="kn">from</span> <span class="nn">optimism.test</span> <span class="kn">import</span> <span class="n">TestFixture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestFixture</span>
 
 <span class="n">SUM_TESTDATA_FILENAME</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;ill_conditioned_sum_data.npz&#39;</span><span class="p">)</span>
 <span class="n">DOTPROD_TESTDATA_FILENAME</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;ill_conditioned_dot_product_data.npz&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TestMathSum">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Math.TestMathSum">[docs]</a>
-<span class="k">class</span> <span class="nc">TestMathSum</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestMathSum</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
 
 <div class="viewcode-block" id="TestMathSum.setUp">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Math.TestMathSum.setUp">[docs]</a>
-    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">SUM_TESTDATA_FILENAME</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">exactDoublePrec</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;exactDP&#39;</span><span class="p">]</span> <span class="c1">#-2.3746591162238294e-1</span></div>
@@ -99,7 +99,7 @@
 
 <div class="viewcode-block" id="TestMathSum.test_sum2_on_ill_conditioned_sum">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Math.TestMathSum.test_sum2_on_ill_conditioned_sum">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_sum2_on_ill_conditioned_sum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_sum2_on_ill_conditioned_sum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">Math</span><span class="o">.</span><span class="n">sum2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span>
         <span class="c1"># note that we are checking for exact double precision equality!</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exactDoublePrec</span><span class="p">)</span></div>
@@ -107,7 +107,7 @@
 
 <div class="viewcode-block" id="TestMathSum.test_sum2_jitted_on_ill_conditioned_sum">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Math.TestMathSum.test_sum2_jitted_on_ill_conditioned_sum">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_sum2_jitted_on_ill_conditioned_sum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_sum2_jitted_on_ill_conditioned_sum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">func</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">Math</span><span class="o">.</span><span class="n">sum2</span><span class="p">)</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exactDoublePrec</span><span class="p">)</span></div>
@@ -115,7 +115,7 @@
 
 <div class="viewcode-block" id="TestMathSum.test_numpy_sum_fails_badly_on_ill_conditioned_sum">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Math.TestMathSum.test_numpy_sum_fails_badly_on_ill_conditioned_sum">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_numpy_sum_fails_badly_on_ill_conditioned_sum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_numpy_sum_fails_badly_on_ill_conditioned_sum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span>
         <span class="c1"># numpy fails to get even 4 decimal places correct</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertNotAlmostEqual</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exactDoublePrec</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span></div>
@@ -123,7 +123,7 @@
 
 <div class="viewcode-block" id="TestMathSum.test_grad_on_sum2_works">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Math.TestMathSum.test_grad_on_sum2_works">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_grad_on_sum2_works</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_grad_on_sum2_works</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.9653214</span> <span class="p">,</span> <span class="mf">0.22515893</span><span class="p">,</span> <span class="mf">0.63302994</span><span class="p">,</span> <span class="mf">0.29638183</span><span class="p">])</span>
         <span class="n">g</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">Math</span><span class="o">.</span><span class="n">sum2</span><span class="p">)(</span><span class="n">v</span><span class="p">)</span>
         <span class="n">exact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
@@ -134,11 +134,11 @@
 
 <div class="viewcode-block" id="TestMathInnerProduct">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Math.TestMathInnerProduct">[docs]</a>
-<span class="k">class</span> <span class="nc">TestMathInnerProduct</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestMathInnerProduct</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
 
 <div class="viewcode-block" id="TestMathInnerProduct.setUp">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Math.TestMathInnerProduct.setUp">[docs]</a>
-    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">DOTPROD_TESTDATA_FILENAME</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span>
@@ -147,21 +147,21 @@
 
 <div class="viewcode-block" id="TestMathInnerProduct.test_dot2_on_ill_conditioned_inner_product">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Math.TestMathInnerProduct.test_dot2_on_ill_conditioned_inner_product">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_dot2_on_ill_conditioned_inner_product</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_dot2_on_ill_conditioned_inner_product</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">ip</span> <span class="o">=</span> <span class="n">Math</span><span class="o">.</span><span class="n">dot2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exactDoublePrec</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="TestMathInnerProduct.test_numpy_dot_fails_badly_on_ill_conditioned_inner_product">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Math.TestMathInnerProduct.test_numpy_dot_fails_badly_on_ill_conditioned_inner_product">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_numpy_dot_fails_badly_on_ill_conditioned_inner_product</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_numpy_dot_fails_badly_on_ill_conditioned_inner_product</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">ip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertNotAlmostEqual</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exactDoublePrec</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="TestMathInnerProduct.test_jit_dot2_on_ill_conditioned_inner_product">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Math.TestMathInnerProduct.test_jit_dot2_on_ill_conditioned_inner_product">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_jit_dot2_on_ill_conditioned_inner_product</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_jit_dot2_on_ill_conditioned_inner_product</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">func</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">Math</span><span class="o">.</span><span class="n">dot2</span><span class="p">)</span>
         <span class="n">ip</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exactDoublePrec</span><span class="p">)</span></div>
@@ -169,7 +169,7 @@
 
 <div class="viewcode-block" id="TestMathInnerProduct.test_grad_on_dot2_works">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Math.TestMathInnerProduct.test_grad_on_dot2_works">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_grad_on_dot2_works</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_grad_on_dot2_works</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.9653214</span> <span class="p">,</span> <span class="mf">0.22515893</span><span class="p">,</span> <span class="mf">0.63302994</span><span class="p">,</span> <span class="mf">0.29638183</span><span class="p">])</span>
         <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.87241435</span><span class="p">,</span> <span class="mf">0.44302094</span><span class="p">,</span> <span class="mf">0.27708054</span><span class="p">,</span> <span class="mf">0.786595</span>  <span class="p">])</span>
         <span class="n">g</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">Math</span><span class="o">.</span><span class="n">dot2</span><span class="p">)(</span><span class="n">v</span><span class="p">,</span><span class="n">w</span><span class="p">)</span>

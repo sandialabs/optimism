@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.LinAlg &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -73,14 +73,14 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.LinAlg</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">jax</span>
-<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="n">if_then_else</span>
-<span class="kn">from</span> <span class="nn">optimism.QuadratureRule</span> <span class="kn">import</span> <span class="n">create_padded_quadrature_rule_1D</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="n">if_then_else</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.QuadratureRule</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_padded_quadrature_rule_1D</span>
 
 <span class="nd">@jax</span><span class="o">.</span><span class="n">custom_jvp</span>
-<span class="k">def</span> <span class="nf">sqrtm</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sqrtm</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
     <span class="n">sqrtA</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">sqrtm_dbp</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">sqrtA</span>
 
@@ -88,7 +88,7 @@
 <div class="viewcode-block" id="jvp_sqrtm">
 <a class="viewcode-back" href="../../optimism.html#optimism.LinAlg.jvp_sqrtm">[docs]</a>
 <span class="nd">@sqrtm</span><span class="o">.</span><span class="n">defjvp</span>
-<span class="k">def</span> <span class="nf">jvp_sqrtm</span><span class="p">(</span><span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">jvp_sqrtm</span><span class="p">(</span><span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
     <span class="n">A</span><span class="p">,</span> <span class="o">=</span> <span class="n">primals</span>
     <span class="n">H</span><span class="p">,</span> <span class="o">=</span> <span class="n">tangents</span>
     <span class="n">sqrtA</span> <span class="o">=</span> <span class="n">sqrtm</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
@@ -105,7 +105,7 @@
 
 <div class="viewcode-block" id="sqrtm_dbp">
 <a class="viewcode-back" href="../../optimism.html#optimism.LinAlg.sqrtm_dbp">[docs]</a>
-<span class="k">def</span> <span class="nf">sqrtm_dbp</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sqrtm_dbp</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Matrix square root by product form of Denman-Beavers iteration.</span>
 <span class="sd">    </span>
 <span class="sd">    Translated from the Matrix Function Toolbox</span>
@@ -118,17 +118,17 @@
     <span class="n">maxIters</span>   <span class="o">=</span> <span class="mi">32</span>
     <span class="n">scaleTol</span>   <span class="o">=</span> <span class="mf">0.01</span>
 
-    <span class="k">def</span> <span class="nf">scaling</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scaling</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
         <span class="n">d</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">M</span><span class="p">))</span><span class="o">**</span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">dim</span><span class="p">))</span>
         <span class="n">g</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">d</span>
         <span class="k">return</span> <span class="n">g</span>
     
-    <span class="k">def</span> <span class="nf">cond_f</span><span class="p">(</span><span class="n">loopData</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cond_f</span><span class="p">(</span><span class="n">loopData</span><span class="p">):</span>
         <span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">error</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">loopData</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">k</span> <span class="o">&lt;</span> <span class="n">maxIters</span><span class="p">,</span> <span class="n">error</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
     
-    <span class="k">def</span> <span class="nf">body_f</span><span class="p">(</span><span class="n">loopData</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">body_f</span><span class="p">(</span><span class="n">loopData</span><span class="p">):</span>
         <span class="n">X</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">diff</span> <span class="o">=</span> <span class="n">loopData</span>
         <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diff</span> <span class="o">&gt;=</span> <span class="n">scaleTol</span><span class="p">,</span>
                      <span class="n">scaling</span><span class="p">(</span><span class="n">M</span><span class="p">),</span>
@@ -161,7 +161,7 @@
 
 
 <span class="nd">@jax</span><span class="o">.</span><span class="n">custom_jvp</span>
-<span class="k">def</span> <span class="nf">logm_iss</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">logm_iss</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
     <span class="n">X</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">m</span> <span class="o">=</span> <span class="n">_logm_iss</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">k</span><span class="p">)</span> <span class="o">*</span> <span class="n">log_pade_pf</span><span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">m</span><span class="p">)</span>
 
@@ -169,7 +169,7 @@
 <div class="viewcode-block" id="logm_jvp">
 <a class="viewcode-back" href="../../optimism.html#optimism.LinAlg.logm_jvp">[docs]</a>
 <span class="nd">@logm_iss</span><span class="o">.</span><span class="n">defjvp</span>
-<span class="k">def</span> <span class="nf">logm_jvp</span><span class="p">(</span><span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">logm_jvp</span><span class="p">(</span><span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
     <span class="n">A</span><span class="p">,</span> <span class="o">=</span> <span class="n">primals</span>
     <span class="n">H</span><span class="p">,</span> <span class="o">=</span> <span class="n">tangents</span>
     <span class="n">logA</span> <span class="o">=</span> <span class="n">logm_iss</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
@@ -182,7 +182,7 @@
 
 <div class="viewcode-block" id="_logm_iss">
 <a class="viewcode-back" href="../../optimism.html#optimism.LinAlg._logm_iss">[docs]</a>
-<span class="k">def</span> <span class="nf">_logm_iss</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_logm_iss</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Logarithmic map by inverse scaling and squaring and Padé approximants</span>
 <span class="sd">    </span>
 <span class="sd">    Translated from the Matrix Function Toolbox</span>
@@ -193,12 +193,12 @@
     <span class="n">dim</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">c15</span> <span class="o">=</span> <span class="n">log_pade_coefficients</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">cond_f</span><span class="p">(</span><span class="n">loopData</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cond_f</span><span class="p">(</span><span class="n">loopData</span><span class="p">):</span>
         <span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">converged</span> <span class="o">=</span> <span class="n">loopData</span>
         <span class="n">conditions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">~</span><span class="n">converged</span><span class="p">,</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="mi">16</span><span class="p">],</span> <span class="n">dtype</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">conditions</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">compute_pade_degree</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">itk</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_pade_degree</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">itk</span><span class="p">):</span>
         <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="c1"># Manually force the return type of searchsorted to be 64-bit int, because it</span>
         <span class="c1"># returns 32-bit ints, ignoring the global `jax_enable_x64` flag. This looks</span>
@@ -212,7 +212,7 @@
                                      <span class="p">(</span><span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="kc">True</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="kc">False</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">m</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">converged</span>
 
-    <span class="k">def</span> <span class="nf">body_f</span><span class="p">(</span><span class="n">loopData</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">body_f</span><span class="p">(</span><span class="n">loopData</span><span class="p">):</span>
         <span class="n">X</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">itk</span><span class="p">,</span><span class="n">converged</span> <span class="o">=</span> <span class="n">loopData</span>
         <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">dim</span><span class="p">),</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">m</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">converged</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">diff</span> <span class="o">&lt;</span> <span class="n">c15</span><span class="p">,</span>
@@ -235,7 +235,7 @@
 
 <div class="viewcode-block" id="log_pade_pf">
 <a class="viewcode-back" href="../../optimism.html#optimism.LinAlg.log_pade_pf">[docs]</a>
-<span class="k">def</span> <span class="nf">log_pade_pf</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">log_pade_pf</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Logarithmic map by Padé approximant and partial fractions</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -243,7 +243,7 @@
     <span class="n">quadPrec</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span>
     <span class="n">xs</span><span class="p">,</span><span class="n">ws</span> <span class="o">=</span> <span class="n">create_padded_quadrature_rule_1D</span><span class="p">(</span><span class="n">quadPrec</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_log_inc</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_log_inc</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
         <span class="n">B</span> <span class="o">=</span> <span class="n">I</span> <span class="o">+</span> <span class="n">x</span><span class="o">*</span><span class="n">A</span>
         <span class="n">dXT</span> <span class="o">=</span> <span class="n">w</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">dXT</span>

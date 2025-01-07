@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.phasefield.test.plotPhaseFieldThresholdModel &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../../_static/copybutton.js?v=f281be69"></script>
@@ -73,13 +73,13 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.phasefield.test.plotPhaseFieldThresholdModel</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-<span class="kn">import</span> <span class="nn">unittest</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">unittest</span>
 
-<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">optimism.phasefield</span> <span class="kn">import</span> <span class="n">PhaseFieldThreshold</span> <span class="k">as</span> <span class="n">Model</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">TensorMath</span>
-<span class="kn">from</span> <span class="nn">optimism.phasefield.MaterialPointSimulator</span> <span class="kn">import</span> <span class="n">MaterialPointSimulator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.phasefield</span><span class="w"> </span><span class="kn">import</span> <span class="n">PhaseFieldThreshold</span> <span class="k">as</span> <span class="n">Model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorMath</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.phasefield.MaterialPointSimulator</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaterialPointSimulator</span>
 
 <span class="n">plotting</span><span class="o">=</span><span class="kc">True</span>
 
@@ -101,10 +101,10 @@
 
 <div class="viewcode-block" id="PhaseFieldThresholdUniaxialFixture">
 <a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.plotPhaseFieldThresholdModel.PhaseFieldThresholdUniaxialFixture">[docs]</a>
-<span class="k">class</span> <span class="nc">PhaseFieldThresholdUniaxialFixture</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PhaseFieldThresholdUniaxialFixture</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
 <div class="viewcode-block" id="PhaseFieldThresholdUniaxialFixture.setUp">
 <a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.plotPhaseFieldThresholdModel.PhaseFieldThresholdUniaxialFixture.setUp">[docs]</a>
-    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">materialModel</span> <span class="o">=</span> <span class="n">Model</span><span class="o">.</span><span class="n">create_material_model_functions</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span> <span class="o">=</span> <span class="n">MaterialPointSimulator</span><span class="p">(</span><span class="n">materialModel</span><span class="p">,</span> <span class="n">maxStrain</span><span class="p">,</span> <span class="n">strainRate</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span></div>
 
@@ -112,7 +112,7 @@
         
 <div class="viewcode-block" id="PhaseFieldThresholdUniaxialFixture.testUniaxial">
 <a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.plotPhaseFieldThresholdModel.PhaseFieldThresholdUniaxialFixture.testUniaxial">[docs]</a>
-    <span class="k">def</span> <span class="nf">testUniaxial</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">testUniaxial</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulator</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">plotting</span><span class="p">:</span>

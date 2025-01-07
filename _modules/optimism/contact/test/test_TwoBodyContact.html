@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.contact.test.test_TwoBodyContact &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../../_static/copybutton.js?v=f281be69"></script>
@@ -73,23 +73,23 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.contact.test.test_TwoBodyContact</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">unittest</span>
-<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mesh</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">QuadratureRule</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Surface</span>
-<span class="kn">from</span> <span class="nn">optimism.contact</span> <span class="kn">import</span> <span class="n">EdgeIntersection</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">FunctionSpace</span>
-<span class="kn">from</span> <span class="nn">optimism.test.MeshFixture</span> <span class="kn">import</span> <span class="n">MeshFixture</span>
-<span class="kn">from</span> <span class="nn">optimism.contact</span> <span class="kn">import</span> <span class="n">Contact</span>
-<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">unittest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuadratureRule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Surface</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.contact</span><span class="w"> </span><span class="kn">import</span> <span class="n">EdgeIntersection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionSpace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.test.MeshFixture</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshFixture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.contact</span><span class="w"> </span><span class="kn">import</span> <span class="n">Contact</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 
 
 <div class="viewcode-block" id="get_side_set_segments">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_TwoBodyContact.get_side_set_segments">[docs]</a>
-<span class="k">def</span> <span class="nf">get_side_set_segments</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">sideset</span><span class="p">,</span> <span class="n">disp</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_side_set_segments</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">sideset</span><span class="p">,</span> <span class="n">disp</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">get_current_edge_segments</span><span class="p">(</span><span class="n">edge</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_current_edge_segments</span><span class="p">(</span><span class="n">edge</span><span class="p">):</span>
         <span class="n">XOnEdge</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">get_edge_coords</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">edge</span><span class="p">)</span>
         <span class="n">uOnEdge</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">get_edge_field</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">disp</span><span class="p">)</span>
         <span class="n">xOnEdge</span> <span class="o">=</span> <span class="n">XOnEdge</span> <span class="o">+</span> <span class="n">uOnEdge</span>
@@ -102,7 +102,7 @@
 
 <div class="viewcode-block" id="get_best_overlap_vector">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_TwoBodyContact.get_best_overlap_vector">[docs]</a>
-<span class="k">def</span> <span class="nf">get_best_overlap_vector</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">listOfEdges</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_best_overlap_vector</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">listOfEdges</span><span class="p">):</span>
     <span class="n">edgeCoords</span> <span class="o">=</span> <span class="n">Surface</span><span class="o">.</span><span class="n">get_coords</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">edge</span><span class="p">)</span>
     <span class="n">normal</span> <span class="o">=</span> <span class="n">Surface</span><span class="o">.</span><span class="n">compute_normal</span><span class="p">(</span><span class="n">edgeCoords</span><span class="p">)</span>
     <span class="n">edgeCenter</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">edgeCoords</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -122,11 +122,11 @@
 
 <div class="viewcode-block" id="TwoBodyContactFixture">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture">[docs]</a>
-<span class="k">class</span> <span class="nc">TwoBodyContactFixture</span><span class="p">(</span><span class="n">MeshFixture</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TwoBodyContactFixture</span><span class="p">(</span><span class="n">MeshFixture</span><span class="p">):</span>
 
 <div class="viewcode-block" id="TwoBodyContactFixture.setUp">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.setUp">[docs]</a>
-    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tol</span> <span class="o">=</span> <span class="mf">1e-7</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">targetDispGrad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">],[</span><span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">]])</span>
         
@@ -158,7 +158,7 @@
 <div class="viewcode-block" id="TwoBodyContactFixture.test_combining_nodesets">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.test_combining_nodesets">[docs]</a>
     <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">test_combining_nodesets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_combining_nodesets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayEqual</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodeSets</span><span class="p">[</span><span class="s1">&#39;top1&#39;</span><span class="p">],</span> <span class="p">[</span><span class="mi">12</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">14</span><span class="p">]</span> <span class="p">)</span>
         <span class="n">numNodesMesh1</span> <span class="o">=</span> <span class="mi">15</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayEqual</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodeSets</span><span class="p">[</span><span class="s1">&#39;top2&#39;</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">])</span><span class="o">+</span><span class="n">numNodesMesh1</span> <span class="p">)</span></div>
@@ -167,7 +167,7 @@
 <div class="viewcode-block" id="TwoBodyContactFixture.test_combining_sidesets">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.test_combining_sidesets">[docs]</a>
     <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">test_combining_sidesets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_combining_sidesets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayEqual</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">sideSets</span><span class="p">[</span><span class="s1">&#39;top1&#39;</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">7</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">15</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span> <span class="p">)</span>
         <span class="n">numElemsMesh1</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="mi">8</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayEqual</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">sideSets</span><span class="p">[</span><span class="s1">&#39;top2&#39;</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">5</span><span class="o">+</span><span class="n">numElemsMesh1</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span> <span class="p">)</span></div>
@@ -176,8 +176,8 @@
         
 <div class="viewcode-block" id="TwoBodyContactFixture.plot_solution">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.plot_solution">[docs]</a>
-    <span class="k">def</span> <span class="nf">plot_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotName</span><span class="p">):</span>
-        <span class="kn">import</span> <span class="nn">VTKWriter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot_solution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotName</span><span class="p">):</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">VTKWriter</span>
 
         <span class="n">writer</span> <span class="o">=</span> <span class="n">VTKWriter</span><span class="o">.</span><span class="n">VTKWriter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="n">baseFileName</span><span class="o">=</span><span class="n">plotName</span><span class="p">)</span>
         <span class="n">writer</span><span class="o">.</span><span class="n">add_nodal_field</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;displacement&#39;</span><span class="p">,</span>
@@ -196,7 +196,7 @@
 <div class="viewcode-block" id="TwoBodyContactFixture.test_contact_search">
 <a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.test_contact_search">[docs]</a>
     <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">test_contact_search</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_contact_search</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">disp</span> <span class="o">=</span> <span class="mf">0.0</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">disp</span>
         
         <span class="n">sideA</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">sideSets</span><span class="p">[</span><span class="s1">&#39;right1&#39;</span><span class="p">]</span>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.contact.MortarContact &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -73,18 +73,18 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.contact.MortarContact</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">jax</span>
-<span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">jnp</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">QuadratureRule</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mesh</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jax</span><span class="w"> </span><span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">jnp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuadratureRule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 
 <span class="c1"># some normal utilities</span>
 
 <div class="viewcode-block" id="compute_normal">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.MortarContact.compute_normal">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_normal</span><span class="p">(</span><span class="n">edgeCoords</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_normal</span><span class="p">(</span><span class="n">edgeCoords</span><span class="p">):</span>
     <span class="n">tangent</span> <span class="o">=</span> <span class="n">edgeCoords</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">edgeCoords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">normal</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">tangent</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="n">tangent</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
     <span class="k">return</span> <span class="n">normal</span> <span class="o">/</span> <span class="n">jnp</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">normal</span><span class="p">)</span></div>
@@ -93,7 +93,7 @@
 
 <div class="viewcode-block" id="compute_average_normal">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.MortarContact.compute_average_normal">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_average_normal</span><span class="p">(</span><span class="n">edgeA</span> <span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">edgeB</span> <span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_average_normal</span><span class="p">(</span><span class="n">edgeA</span> <span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">edgeB</span> <span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
     <span class="n">nA</span> <span class="o">=</span> <span class="n">compute_normal</span><span class="p">(</span><span class="n">edgeA</span><span class="p">)</span>
     <span class="n">nB</span> <span class="o">=</span> <span class="n">compute_normal</span><span class="p">(</span><span class="n">edgeB</span><span class="p">)</span>
     <span class="n">normal</span> <span class="o">=</span> <span class="n">nA</span> <span class="o">-</span> <span class="n">nB</span>
@@ -103,7 +103,7 @@
 
 <div class="viewcode-block" id="compute_normal_from_a">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.MortarContact.compute_normal_from_a">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_normal_from_a</span><span class="p">(</span><span class="n">edgeA</span> <span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">edgeB</span> <span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_normal_from_a</span><span class="p">(</span><span class="n">edgeA</span> <span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">edgeB</span> <span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">compute_normal</span><span class="p">(</span><span class="n">edgeA</span><span class="p">)</span></div>
 
 
@@ -111,14 +111,14 @@
 
 <div class="viewcode-block" id="eval_linear_field_on_edge">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.MortarContact.eval_linear_field_on_edge">[docs]</a>
-<span class="k">def</span> <span class="nf">eval_linear_field_on_edge</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">xi</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">eval_linear_field_on_edge</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">xi</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">field</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">xi</span><span class="p">)</span> <span class="o">+</span> <span class="n">field</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">xi</span></div>
 
 
 
 <div class="viewcode-block" id="smooth_linear">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.MortarContact.smooth_linear">[docs]</a>
-<span class="k">def</span> <span class="nf">smooth_linear</span><span class="p">(</span><span class="n">xi</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>                
+<span class="k">def</span><span class="w"> </span><span class="nf">smooth_linear</span><span class="p">(</span><span class="n">xi</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>                
     <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span> <span class="n">xi</span> <span class="o">&lt;</span> <span class="n">l</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">xi</span><span class="o">*</span><span class="n">xi</span><span class="o">/</span><span class="n">l</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">xi</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="o">-</span><span class="n">l</span><span class="p">,</span> <span class="mf">1.0</span><span class="o">-</span><span class="n">l</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="mf">1.0</span><span class="o">-</span><span class="n">xi</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">1.0</span><span class="o">-</span><span class="n">xi</span><span class="p">)</span><span class="o">/</span><span class="n">l</span><span class="p">,</span> <span class="n">xi</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">l</span><span class="p">)</span> <span class="p">)</span></div>
 
 
@@ -127,9 +127,9 @@
 
 <div class="viewcode-block" id="compute_intersection">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.MortarContact.compute_intersection">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_intersection</span><span class="p">(</span><span class="n">edgeA</span><span class="p">,</span> <span class="n">edgeB</span><span class="p">,</span> <span class="n">f_common_normal</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_intersection</span><span class="p">(</span><span class="n">edgeA</span><span class="p">,</span> <span class="n">edgeB</span><span class="p">,</span> <span class="n">f_common_normal</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">compute_xi</span><span class="p">(</span><span class="n">xa</span><span class="p">,</span> <span class="n">edgeB</span><span class="p">,</span> <span class="n">normal</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_xi</span><span class="p">(</span><span class="n">xa</span><span class="p">,</span> <span class="n">edgeB</span><span class="p">,</span> <span class="n">normal</span><span class="p">):</span>
         <span class="c1"># solve xa - xb(xi) + g * normal = 0</span>
         <span class="c1"># xb = edgeB[0] * (1-xi) + edgeB[1] * xi</span>
         <span class="n">M</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">edgeB</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">edgeB</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">normal</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
@@ -154,7 +154,7 @@
 
 <div class="viewcode-block" id="integrate_with_active_mortar">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.MortarContact.integrate_with_active_mortar">[docs]</a>
-<span class="k">def</span> <span class="nf">integrate_with_active_mortar</span><span class="p">(</span><span class="n">xiA</span><span class="p">,</span> <span class="n">xiB</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">lengthA</span><span class="p">,</span> <span class="n">lengthB</span><span class="p">,</span> <span class="n">func_of_xiA_xiB_g</span><span class="p">,</span> <span class="n">relativeSmoothingSize</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">integrate_with_active_mortar</span><span class="p">(</span><span class="n">xiA</span><span class="p">,</span> <span class="n">xiB</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">lengthA</span><span class="p">,</span> <span class="n">lengthB</span><span class="p">,</span> <span class="n">func_of_xiA_xiB_g</span><span class="p">,</span> <span class="n">relativeSmoothingSize</span><span class="p">):</span>
     <span class="n">edgeQuad</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">create_quadrature_rule_1D</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">xiGauss</span> <span class="o">=</span> <span class="n">edgeQuad</span><span class="o">.</span><span class="n">xigauss</span>
 
@@ -176,7 +176,7 @@
 
 <div class="viewcode-block" id="integrate_with_mortar">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.MortarContact.integrate_with_mortar">[docs]</a>
-<span class="k">def</span> <span class="nf">integrate_with_mortar</span><span class="p">(</span><span class="n">edgeA</span> <span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">integrate_with_mortar</span><span class="p">(</span><span class="n">edgeA</span> <span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">,</span>
                           <span class="n">edgeB</span> <span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> 
                           <span class="n">f_common_normal</span> <span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">,</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">],</span><span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">],</span>
                           <span class="n">func_of_xiA_xiB_g</span> <span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">,</span><span class="nb">float</span><span class="p">,</span><span class="nb">float</span><span class="p">],</span><span class="nb">float</span><span class="p">],</span>
@@ -195,13 +195,13 @@
 
 <div class="viewcode-block" id="assembly_mortar_integral">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.MortarContact.assembly_mortar_integral">[docs]</a>
-<span class="k">def</span> <span class="nf">assembly_mortar_integral</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">segmentConnsA</span><span class="p">,</span> <span class="n">segmentConnsB</span><span class="p">,</span> <span class="n">neighborList</span><span class="p">,</span> 
+<span class="k">def</span><span class="w"> </span><span class="nf">assembly_mortar_integral</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">segmentConnsA</span><span class="p">,</span> <span class="n">segmentConnsB</span><span class="p">,</span> <span class="n">neighborList</span><span class="p">,</span> 
                              <span class="n">f_average_normal</span> <span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
                              <span class="n">f_integrand</span> <span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">compute_nodal_gap_area</span><span class="p">(</span><span class="n">segB</span><span class="p">,</span> <span class="n">neighborSegsA</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_nodal_gap_area</span><span class="p">(</span><span class="n">segB</span><span class="p">,</span> <span class="n">neighborSegsA</span><span class="p">):</span>
         <span class="n">nodeLeft</span> <span class="o">=</span> <span class="n">segB</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">nodeRight</span> <span class="o">=</span> <span class="n">segB</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">def</span> <span class="nf">compute_quantities_for_segment_pair</span><span class="p">(</span><span class="n">segB</span><span class="p">,</span> <span class="n">indexA</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">compute_quantities_for_segment_pair</span><span class="p">(</span><span class="n">segB</span><span class="p">,</span> <span class="n">indexA</span><span class="p">):</span>
             <span class="n">segA</span> <span class="o">=</span> <span class="n">segmentConnsA</span><span class="p">[</span><span class="n">indexA</span><span class="p">]</span>
             <span class="n">coordsSegB</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="n">segB</span><span class="p">]</span> <span class="o">+</span> <span class="n">disp</span><span class="p">[</span><span class="n">segB</span><span class="p">]</span>
             <span class="n">coordsSegA</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="n">segA</span><span class="p">]</span> <span class="o">+</span> <span class="n">disp</span><span class="p">[</span><span class="n">segA</span><span class="p">]</span>
@@ -225,14 +225,14 @@
 
 <div class="viewcode-block" id="assemble_area_weighted_gaps">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.MortarContact.assemble_area_weighted_gaps">[docs]</a>
-<span class="k">def</span> <span class="nf">assemble_area_weighted_gaps</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">segmentConnsA</span><span class="p">,</span> <span class="n">segmentConnsB</span><span class="p">,</span> <span class="n">neighborList</span><span class="p">,</span> <span class="n">f_average_normal</span> <span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">assemble_area_weighted_gaps</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">segmentConnsA</span><span class="p">,</span> <span class="n">segmentConnsB</span><span class="p">,</span> <span class="n">neighborList</span><span class="p">,</span> <span class="n">f_average_normal</span> <span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">assembly_mortar_integral</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">segmentConnsA</span><span class="p">,</span> <span class="n">segmentConnsB</span><span class="p">,</span> <span class="n">neighborList</span><span class="p">,</span> <span class="n">f_average_normal</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">gap</span> <span class="p">:</span> <span class="n">gap</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="assemble_nodal_areas">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.MortarContact.assemble_nodal_areas">[docs]</a>
-<span class="k">def</span> <span class="nf">assemble_nodal_areas</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">segmentConnsA</span><span class="p">,</span> <span class="n">segmentConnsB</span><span class="p">,</span> <span class="n">neighborList</span><span class="p">,</span> <span class="n">f_average_normal</span> <span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">assemble_nodal_areas</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">segmentConnsA</span><span class="p">,</span> <span class="n">segmentConnsB</span><span class="p">,</span> <span class="n">neighborList</span><span class="p">,</span> <span class="n">f_average_normal</span> <span class="p">:</span> <span class="n">Callable</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">assembly_mortar_integral</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">segmentConnsA</span><span class="p">,</span> <span class="n">segmentConnsB</span><span class="p">,</span> <span class="n">neighborList</span><span class="p">,</span> <span class="n">f_average_normal</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">gap</span> <span class="p">:</span> <span class="mf">1.0</span><span class="p">)</span></div>
 
 
@@ -241,18 +241,18 @@
 <div class="viewcode-block" id="get_closest_neighbors">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.MortarContact.get_closest_neighbors">[docs]</a>
 <span class="nd">@partial</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">,</span> <span class="n">static_argnums</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,))</span>
-<span class="k">def</span> <span class="nf">get_closest_neighbors</span><span class="p">(</span><span class="n">edgeSetA</span> <span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_closest_neighbors</span><span class="p">(</span><span class="n">edgeSetA</span> <span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">,</span>
                           <span class="n">edgeSetB</span> <span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">,</span>
                           <span class="n">mesh</span> <span class="p">:</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">Mesh</span><span class="p">,</span>
                           <span class="n">disp</span> <span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">,</span>
                           <span class="n">maxNeighbors</span> <span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">min_dist_squared</span><span class="p">(</span><span class="n">edge1</span><span class="p">,</span> <span class="n">edge2</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">disp</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">min_dist_squared</span><span class="p">(</span><span class="n">edge1</span><span class="p">,</span> <span class="n">edge2</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">disp</span><span class="p">):</span>
         <span class="n">xs1</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="n">edge1</span><span class="p">]</span> <span class="o">+</span> <span class="n">disp</span><span class="p">[</span><span class="n">edge1</span><span class="p">]</span>
         <span class="n">xs2</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="n">edge2</span><span class="p">]</span> <span class="o">+</span> <span class="n">disp</span><span class="p">[</span><span class="n">edge2</span><span class="p">]</span>
         <span class="n">dists</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">y</span><span class="p">)</span><span class="o">@</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">y</span><span class="p">)</span> <span class="p">)(</span><span class="n">xs1</span><span class="p">)</span> <span class="p">)</span> <span class="p">(</span><span class="n">xs2</span><span class="p">)</span>    
         <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dists</span><span class="p">)</span>
     
-    <span class="k">def</span> <span class="nf">get_close_edge_indices</span><span class="p">(</span><span class="n">surfaceA</span><span class="p">,</span> <span class="n">edgeB</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_close_edge_indices</span><span class="p">(</span><span class="n">surfaceA</span><span class="p">,</span> <span class="n">edgeB</span><span class="p">):</span>
         <span class="n">minDistsToA</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">min_dist_squared</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">))(</span><span class="n">surfaceA</span><span class="p">,</span> <span class="n">edgeB</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">disp</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">jnp</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">minDistsToA</span><span class="p">)[:</span><span class="n">maxNeighbors</span><span class="p">]</span>
     
@@ -263,8 +263,8 @@
 <div class="viewcode-block" id="get_facet_connectivities">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.MortarContact.get_facet_connectivities">[docs]</a>
 <span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
-<span class="k">def</span> <span class="nf">get_facet_connectivities</span><span class="p">(</span><span class="n">mesh</span> <span class="p">:</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">Mesh</span><span class="p">,</span> <span class="n">sideset</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">get_sub_segments</span><span class="p">(</span><span class="n">side</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_facet_connectivities</span><span class="p">(</span><span class="n">mesh</span> <span class="p">:</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">Mesh</span><span class="p">,</span> <span class="n">sideset</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_sub_segments</span><span class="p">(</span><span class="n">side</span><span class="p">):</span>
         <span class="n">indices</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">get_edge_node_indices</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">side</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">jnp</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">]))(</span><span class="n">indices</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">indices</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
 

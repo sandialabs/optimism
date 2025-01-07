@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.phasefield.PhaseFieldLorentzPlastic &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -73,11 +73,11 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.phasefield.PhaseFieldLorentzPlastic</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">optimism.phasefield.PhaseFieldMaterialModel</span> <span class="kn">import</span> <span class="n">MaterialModel</span>
-<span class="kn">from</span> <span class="nn">optimism.material.J2Plastic</span> <span class="kn">import</span> <span class="n">compute_flow_direction</span>
-<span class="kn">from</span> <span class="nn">optimism.material</span> <span class="kn">import</span> <span class="n">Hardening</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">TensorMath</span> 
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.phasefield.PhaseFieldMaterialModel</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaterialModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.material.J2Plastic</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_flow_direction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.material</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hardening</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorMath</span> 
 
 
 <span class="c1"># index enumerations</span>
@@ -102,7 +102,7 @@
 
 <div class="viewcode-block" id="create_material_model_functions">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic.create_material_model_functions">[docs]</a>
-<span class="k">def</span> <span class="nf">create_material_model_functions</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_material_model_functions</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    properties:</span>
 <span class="sd">      &#39;elastic modulus&#39;</span>
@@ -137,19 +137,19 @@
 
     <span class="n">hardeningModel</span> <span class="o">=</span> <span class="n">Hardening</span><span class="o">.</span><span class="n">create_hardening_model</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
     
-    <span class="k">def</span> <span class="nf">compute_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="n">elasticTrialStrain</span> <span class="o">=</span> <span class="n">compute_elastic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">energy_density_generic</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">,</span> <span class="n">doUpdate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">compute_output_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_output_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="n">elasticStrain</span> <span class="o">=</span> <span class="n">compute_elastic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">energy_density_generic</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">,</span> <span class="n">doUpdate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">compute_strain_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_strain_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="n">elasticStrain</span> <span class="o">=</span> <span class="n">compute_elastic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">strain_energy_density</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">compute_phase_potential_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_phase_potential_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">phase_potential_density</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
     
     <span class="k">if</span> <span class="n">finiteDeformations</span><span class="p">:</span>
@@ -159,10 +159,10 @@
         <span class="n">compute_initial_state_func</span> <span class="o">=</span> <span class="n">make_initial_state_small_deformations</span>
         <span class="n">compute_state_new_func</span> <span class="o">=</span> <span class="n">compute_state_new_small_deformations</span>
 
-    <span class="k">def</span> <span class="nf">compute_initial_state</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,)):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_initial_state</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,)):</span>
         <span class="k">return</span> <span class="n">compute_initial_state_func</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
         
-    <span class="k">def</span> <span class="nf">compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">compute_state_new_func</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">)</span>
     
     <span class="k">return</span> <span class="n">MaterialModel</span><span class="p">(</span><span class="n">compute_energy_density</span><span class="p">,</span>
@@ -176,7 +176,7 @@
 
 <div class="viewcode-block" id="make_properties">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic.make_properties">[docs]</a>
-<span class="k">def</span> <span class="nf">make_properties</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">nu</span><span class="p">,</span> <span class="n">Gc</span><span class="p">,</span> <span class="n">psiC</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">Y0</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_properties</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">nu</span><span class="p">,</span> <span class="n">Gc</span><span class="p">,</span> <span class="n">psiC</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">Y0</span><span class="p">):</span>
     <span class="n">mu</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">E</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">nu</span><span class="p">)</span>
     <span class="n">kappa</span> <span class="o">=</span> <span class="n">E</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">nu</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">E</span><span class="p">,</span> <span class="n">nu</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">Gc</span><span class="p">,</span> <span class="n">psiC</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">Y0</span></div>
@@ -185,7 +185,7 @@
 
 <div class="viewcode-block" id="make_initial_state_finite_deformations">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic.make_initial_state_finite_deformations">[docs]</a>
-<span class="k">def</span> <span class="nf">make_initial_state_finite_deformations</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,)):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_initial_state_finite_deformations</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,)):</span>
     <span class="n">eqps</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="n">Fp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="n">pointState</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">eqps</span><span class="p">,</span> <span class="n">Fp</span><span class="o">.</span><span class="n">ravel</span><span class="p">()))</span>
@@ -195,7 +195,7 @@
 
 <div class="viewcode-block" id="make_initial_state_small_deformations">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic.make_initial_state_small_deformations">[docs]</a>
-<span class="k">def</span> <span class="nf">make_initial_state_small_deformations</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,)):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_initial_state_small_deformations</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,)):</span>
     <span class="n">eqps</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="n">plasticStrain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
     <span class="n">pointState</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">eqps</span><span class="p">,</span> <span class="n">plasticStrain</span><span class="o">.</span><span class="n">ravel</span><span class="p">()))</span>
@@ -205,7 +205,7 @@
 
 <div class="viewcode-block" id="compute_state_new_small_deformations">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic.compute_state_new_small_deformations">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_state_new_small_deformations</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_state_new_small_deformations</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">):</span>
     <span class="n">strain</span> <span class="o">=</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">)</span>
     <span class="n">plasticStrainOld</span> <span class="o">=</span> <span class="n">stateOld</span><span class="p">[</span><span class="n">STATE_PLASTIC_STRAIN</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
     <span class="n">elasticTrialStrain</span> <span class="o">=</span> <span class="n">strain</span> <span class="o">-</span> <span class="n">plasticStrainOld</span>
@@ -219,7 +219,7 @@
 
 <div class="viewcode-block" id="compute_state_new_finite_deformations">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic.compute_state_new_finite_deformations">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_state_new_finite_deformations</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_state_new_finite_deformations</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">):</span>
     <span class="n">FpOld</span> <span class="o">=</span> <span class="n">stateOld</span><span class="p">[</span><span class="n">STATE_PLASTIC_DISTORTION</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
     <span class="n">elasticTrialStrain</span> <span class="o">=</span> <span class="n">compute_elastic_logarithmic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">FpOld</span><span class="p">)</span>
     <span class="n">stateInc</span> <span class="o">=</span> <span class="n">compute_state_increment</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">)</span>
@@ -233,7 +233,7 @@
 
 <div class="viewcode-block" id="energy_density_generic">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic.energy_density_generic">[docs]</a>
-<span class="k">def</span> <span class="nf">energy_density_generic</span><span class="p">(</span><span class="n">elStrain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">,</span> <span class="n">doUpdate</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">energy_density_generic</span><span class="p">(</span><span class="n">elStrain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">,</span> <span class="n">doUpdate</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">doUpdate</span><span class="p">:</span>
         <span class="n">eqps</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="n">STATE_EQPS</span><span class="p">]</span>
         <span class="n">N</span> <span class="o">=</span> <span class="n">compute_flow_direction</span><span class="p">(</span><span class="n">elStrain</span><span class="p">)</span>
@@ -266,7 +266,7 @@
 
 <div class="viewcode-block" id="compute_state_increment">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic.compute_state_increment">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_state_increment</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_state_increment</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">):</span>
     <span class="n">eqpsOld</span> <span class="o">=</span> <span class="n">stateOld</span><span class="p">[</span><span class="n">STATE_EQPS</span><span class="p">]</span>
     <span class="n">N</span> <span class="o">=</span> <span class="n">compute_flow_direction</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">)</span>
     <span class="n">trialStress</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">degradation</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span><span class="n">props</span><span class="p">)</span><span class="o">*</span><span class="n">props</span><span class="p">[</span><span class="n">PROPS_MU</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">TensorMath</span><span class="o">.</span><span class="n">dev</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">),</span> <span class="n">N</span><span class="p">)</span>
@@ -288,21 +288,21 @@
 
 <div class="viewcode-block" id="degradation">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic.degradation">[docs]</a>
-<span class="k">def</span> <span class="nf">degradation</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">degradation</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
     <span class="n">gamma</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_GC</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="mf">16.</span> <span class="o">*</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_L</span><span class="p">]</span> <span class="o">*</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_PSIC</span><span class="p">])</span> <span class="o">-</span> <span class="mf">1.</span>
     <span class="k">return</span> <span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">phase</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">phase</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">phase</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span></div>
 
 
 <div class="viewcode-block" id="elastic_deviatoric_free_energy">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic.elastic_deviatoric_free_energy">[docs]</a>
-<span class="k">def</span> <span class="nf">elastic_deviatoric_free_energy</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">elastic_deviatoric_free_energy</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">degradation</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span><span class="n">props</span><span class="p">)</span><span class="o">*</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_MU</span><span class="p">]</span> <span class="o">*</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">norm_of_deviator_squared</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="elastic_volumetric_free_energy">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic.elastic_volumetric_free_energy">[docs]</a>
-<span class="k">def</span> <span class="nf">elastic_volumetric_free_energy</span><span class="p">(</span><span class="n">strain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">elastic_volumetric_free_energy</span><span class="p">(</span><span class="n">strain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
     <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">strain</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">degradation</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span><span class="n">props</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">g</span><span class="o">*</span><span class="mf">0.5</span><span class="o">*</span><span class="n">props</span><span class="p">[</span><span class="n">PROPS_KAPPA</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">strain</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span></div>
 
@@ -310,7 +310,7 @@
 
 <div class="viewcode-block" id="strain_energy_density">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic.strain_energy_density">[docs]</a>
-<span class="k">def</span> <span class="nf">strain_energy_density</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">strain_energy_density</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
     <span class="n">Wdev</span> <span class="o">=</span> <span class="n">elastic_deviatoric_free_energy</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
     <span class="n">Wvol</span> <span class="o">=</span> <span class="n">elastic_volumetric_free_energy</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">Wdev</span> <span class="o">+</span> <span class="n">Wvol</span></div>
@@ -319,7 +319,7 @@
 
 <div class="viewcode-block" id="phase_potential_density">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic.phase_potential_density">[docs]</a>
-<span class="k">def</span> <span class="nf">phase_potential_density</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="n">gradPhase</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">phase_potential_density</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="n">gradPhase</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
     <span class="n">gradPhaseNormSquared</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">gradPhase</span><span class="p">,</span> <span class="n">gradPhase</span><span class="p">)</span>
     <span class="k">return</span> <span class="mf">3.0</span><span class="o">*</span><span class="n">props</span><span class="p">[</span><span class="n">PROPS_GC</span><span class="p">]</span><span class="o">/</span><span class="mf">8.0</span><span class="o">*</span><span class="p">(</span><span class="n">phase</span><span class="o">/</span><span class="n">props</span><span class="p">[</span><span class="n">PROPS_L</span><span class="p">]</span> <span class="o">+</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_L</span><span class="p">]</span><span class="o">*</span><span class="n">gradPhaseNormSquared</span><span class="p">)</span></div>
 
@@ -327,7 +327,7 @@
 
 <div class="viewcode-block" id="compute_free_energy_density">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic.compute_free_energy_density">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_free_energy_density</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">eqps</span><span class="p">,</span> <span class="n">eqpsOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_free_energy_density</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">eqps</span><span class="p">,</span> <span class="n">eqpsOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">strain_energy_density</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
             <span class="o">+</span> <span class="n">hardeningModel</span><span class="o">.</span><span class="n">compute_hardening_energy_density</span><span class="p">(</span><span class="n">eqps</span><span class="p">,</span> <span class="n">eqpsOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
             <span class="o">+</span> <span class="n">phase_potential_density</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">props</span><span class="p">))</span></div>
@@ -336,7 +336,7 @@
 
 <div class="viewcode-block" id="incremental_potential">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic.incremental_potential">[docs]</a>
-<span class="k">def</span> <span class="nf">incremental_potential</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">,</span> <span class="n">eqps</span><span class="p">,</span> <span class="n">eqpsOld</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">incremental_potential</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">,</span> <span class="n">eqps</span><span class="p">,</span> <span class="n">eqpsOld</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">):</span>
     <span class="n">N</span> <span class="o">=</span> <span class="n">compute_flow_direction</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">)</span>
     <span class="n">elasticStrain</span> <span class="o">=</span> <span class="n">elasticTrialStrain</span> <span class="o">-</span> <span class="p">(</span><span class="n">eqps</span><span class="o">-</span><span class="n">eqpsOld</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span>
     <span class="k">return</span> <span class="n">elastic_deviatoric_free_energy</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span> <span class="o">+</span> \
@@ -351,17 +351,17 @@
 
 <div class="viewcode-block" id="update_state">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic.update_state">[docs]</a>
-<span class="k">def</span> <span class="nf">update_state</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">stateNewGuess</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_state</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">stateNewGuess</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">):</span>
     <span class="n">tol</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="o">*</span><span class="n">props</span><span class="p">[</span><span class="n">PROPS_Y0</span><span class="p">]</span>
     <span class="nd">@custom_jvp</span>
-    <span class="k">def</span> <span class="nf">radial_return</span><span class="p">(</span><span class="n">eqpsGuess</span><span class="p">,</span> <span class="n">etStrain</span><span class="p">,</span> <span class="n">eqpsOld</span><span class="p">,</span> <span class="n">phase</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">radial_return</span><span class="p">(</span><span class="n">eqpsGuess</span><span class="p">,</span> <span class="n">etStrain</span><span class="p">,</span> <span class="n">eqpsOld</span><span class="p">,</span> <span class="n">phase</span><span class="p">):</span>
         
         <span class="n">maxIterations</span><span class="o">=</span><span class="mi">25</span>
-        <span class="k">def</span> <span class="nf">cond_func</span><span class="p">(</span><span class="n">eqpsAndIter</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">cond_func</span><span class="p">(</span><span class="n">eqpsAndIter</span><span class="p">):</span>
             <span class="n">eqps</span><span class="p">,</span><span class="n">i</span> <span class="o">=</span> <span class="n">eqpsAndIter</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">r</span><span class="p">(</span><span class="n">etStrain</span><span class="p">,</span> <span class="n">eqps</span><span class="p">,</span> <span class="n">eqpsOld</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="n">maxIterations</span><span class="p">)</span>
         
-        <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">eqpsAndIter</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">eqpsAndIter</span><span class="p">):</span>
             <span class="n">eqps</span><span class="p">,</span><span class="n">i</span> <span class="o">=</span> <span class="n">eqpsAndIter</span>
             <span class="n">R</span><span class="p">,</span> <span class="n">dR_dEqps</span> <span class="o">=</span> <span class="n">r_and_deqps</span><span class="p">(</span><span class="n">etStrain</span><span class="p">,</span> <span class="n">eqps</span><span class="p">,</span> <span class="n">eqpsOld</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">eqps</span> <span class="o">-</span> <span class="n">R</span> <span class="o">/</span> <span class="n">dR_dEqps</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
@@ -374,7 +374,7 @@
     
     
     <span class="nd">@radial_return</span><span class="o">.</span><span class="n">defjvp</span>
-    <span class="k">def</span> <span class="nf">radial_return_jvp</span><span class="p">(</span><span class="n">primals</span><span class="p">,</span> <span class="n">vt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">radial_return_jvp</span><span class="p">(</span><span class="n">primals</span><span class="p">,</span> <span class="n">vt</span><span class="p">):</span>
         <span class="n">eqpsGuess</span><span class="p">,</span> <span class="n">estrain</span><span class="p">,</span> <span class="n">eqpsOld</span><span class="p">,</span> <span class="n">phase</span> <span class="o">=</span> <span class="n">primals</span>
         <span class="n">vEqpsGuess</span><span class="p">,</span> <span class="n">vStrain</span><span class="p">,</span> <span class="n">vEqpsOld</span><span class="p">,</span> <span class="n">vPhase</span> <span class="o">=</span> <span class="n">vt</span>
         <span class="n">eqpsNew</span> <span class="o">=</span> <span class="n">radial_return</span><span class="p">(</span><span class="n">eqpsGuess</span><span class="p">,</span> <span class="n">estrain</span><span class="p">,</span> <span class="n">eqpsOld</span><span class="p">,</span> <span class="n">phase</span><span class="p">)</span>
@@ -393,7 +393,7 @@
 
 <div class="viewcode-block" id="compute_elastic_linear_strain">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic.compute_elastic_linear_strain">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_elastic_linear_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">plasticStrain</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_elastic_linear_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">plasticStrain</span><span class="p">):</span>
     <span class="n">strain</span> <span class="o">=</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">strain</span> <span class="o">-</span> <span class="n">plasticStrain</span></div>
 
@@ -401,7 +401,7 @@
 
 <div class="viewcode-block" id="compute_elastic_logarithmic_strain">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic.compute_elastic_logarithmic_strain">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_elastic_logarithmic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">Fp</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_elastic_logarithmic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">Fp</span><span class="p">):</span>
     <span class="c1"># Compute the deviatoric and spherical parts separately</span>
     <span class="c1"># to preserve the sign of J. Want to let solver sense and</span>
     <span class="c1"># deal with inverted elements.</span>
@@ -417,7 +417,7 @@
 
 <div class="viewcode-block" id="_compute_elastic_logarithmic_strain">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic._compute_elastic_logarithmic_strain">[docs]</a>
-<span class="k">def</span> <span class="nf">_compute_elastic_logarithmic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_elastic_logarithmic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
     <span class="n">Fp</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="n">STATE_PLASTIC_DISTORTION</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">compute_elastic_logarithmic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">Fp</span><span class="p">)</span></div>
 
@@ -425,7 +425,7 @@
 
 <div class="viewcode-block" id="_compute_elastic_linear_strain">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic._compute_elastic_linear_strain">[docs]</a>
-<span class="k">def</span> <span class="nf">_compute_elastic_linear_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_elastic_linear_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
     <span class="n">plasticStrain</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="n">STATE_PLASTIC_STRAIN</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">compute_elastic_linear_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">plasticStrain</span><span class="p">)</span></div>
 

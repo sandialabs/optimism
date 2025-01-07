@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.EquationSolverSubspace &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -73,19 +73,19 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.EquationSolverSubspace</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">optimism.treigen</span> <span class="kn">import</span> <span class="n">treigen</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.treigen</span><span class="w"> </span><span class="kn">import</span> <span class="n">treigen</span>
 
 
 
-<span class="kn">from</span> <span class="nn">optimism.EquationSolver</span> <span class="kn">import</span> <span class="n">Settings</span><span class="p">,</span> <span class="n">get_settings</span><span class="p">,</span> <span class="n">settings_with_new_tol</span><span class="p">,</span> <span class="n">negCurveString</span><span class="p">,</span> <span class="n">boundaryString</span><span class="p">,</span> <span class="n">interiorString</span><span class="p">,</span> <span class="n">is_converged</span><span class="p">,</span> <span class="n">is_on_boundary</span><span class="p">,</span> <span class="n">print_min_banner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.EquationSolver</span><span class="w"> </span><span class="kn">import</span> <span class="n">Settings</span><span class="p">,</span> <span class="n">get_settings</span><span class="p">,</span> <span class="n">settings_with_new_tol</span><span class="p">,</span> <span class="n">negCurveString</span><span class="p">,</span> <span class="n">boundaryString</span><span class="p">,</span> <span class="n">interiorString</span><span class="p">,</span> <span class="n">is_converged</span><span class="p">,</span> <span class="n">is_on_boundary</span><span class="p">,</span> <span class="n">print_min_banner</span>
 
 
 <div class="viewcode-block" id="ModelProblem">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolverSubspace.ModelProblem">[docs]</a>
-<span class="k">class</span> <span class="nc">ModelProblem</span><span class="p">():</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelProblem</span><span class="p">():</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">g</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Kv</span> <span class="o">=</span> <span class="p">[]</span>
@@ -94,14 +94,14 @@
 
 <div class="viewcode-block" id="ModelProblem.is_initialized">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolverSubspace.ModelProblem.is_initialized">[docs]</a>
-    <span class="k">def</span> <span class="nf">is_initialized</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_initialized</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">isInitialized</span></div>
 
 
     
 <div class="viewcode-block" id="ModelProblem.add_vector">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolverSubspace.ModelProblem.add_vector">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_vector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">Kv</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_vector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">Kv</span><span class="p">):</span>
         <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
             <span class="n">alpha</span> <span class="o">=</span> <span class="n">v</span><span class="nd">@self</span><span class="o">.</span><span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -116,7 +116,7 @@
 
 <div class="viewcode-block" id="ModelProblem.setup_system">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolverSubspace.ModelProblem.setup_system">[docs]</a>
-    <span class="k">def</span> <span class="nf">setup_system</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_system</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">isInitialized</span><span class="o">=</span><span class="kc">True</span>
         <span class="c1"># for the reduced system</span>
         <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
@@ -139,7 +139,7 @@
         
 <div class="viewcode-block" id="ModelProblem.solve">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolverSubspace.ModelProblem.solve">[docs]</a>
-    <span class="k">def</span> <span class="nf">solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Delta</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Delta</span><span class="p">):</span>
         <span class="c1"># s below is alpha, the coefficeints for the vectors</span>
         <span class="c1"># min 1/2 alpha^T H alpha + alpha dot self.g, st. norm(alpha) &lt;= Delta</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">treigen</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="n">Delta</span><span class="p">)</span>
@@ -156,7 +156,7 @@
 
 <div class="viewcode-block" id="project_to_boundary_with_coefs">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolverSubspace.project_to_boundary_with_coefs">[docs]</a>
-<span class="k">def</span> <span class="nf">project_to_boundary_with_coefs</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">zz</span><span class="p">,</span> <span class="n">zd</span><span class="p">,</span> <span class="n">dd</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">project_to_boundary_with_coefs</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">zz</span><span class="p">,</span> <span class="n">zd</span><span class="p">,</span> <span class="n">dd</span><span class="p">):</span>
     <span class="c1"># find tau s.t. (z + tau*d)^2 = trSize^2</span>
     <span class="n">tau</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="p">(</span><span class="n">trSize</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="n">zz</span><span class="p">)</span><span class="o">*</span><span class="n">dd</span> <span class="o">+</span> <span class="n">zd</span><span class="o">**</span><span class="mi">2</span> <span class="p">)</span> <span class="o">-</span> <span class="n">zd</span><span class="p">)</span><span class="o">/</span><span class="n">dd</span>
     <span class="k">return</span> <span class="n">z</span> <span class="o">+</span> <span class="n">tau</span><span class="o">*</span><span class="n">d</span></div>
@@ -165,7 +165,7 @@
 
 <div class="viewcode-block" id="trust_region_cg">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolverSubspace.trust_region_cg">[docs]</a>
-<span class="k">def</span> <span class="nf">trust_region_cg</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">Pr</span><span class="p">,</span> <span class="n">HPr</span><span class="p">,</span> <span class="n">hess_vec_func</span><span class="p">,</span> <span class="n">precond</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">trust_region_cg</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">Pr</span><span class="p">,</span> <span class="n">HPr</span><span class="p">,</span> <span class="n">hess_vec_func</span><span class="p">,</span> <span class="n">precond</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
     <span class="c1"># minimize r@z + 0.5*z@J@z</span>
     <span class="n">z</span> <span class="o">=</span> <span class="mf">0.</span><span class="o">*</span><span class="n">x</span>
 
@@ -222,7 +222,7 @@
 
 <div class="viewcode-block" id="spectral_gradient_minimize">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolverSubspace.spectral_gradient_minimize">[docs]</a>
-<span class="k">def</span> <span class="nf">spectral_gradient_minimize</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">hess_vec_func</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">spectral_gradient_minimize</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">hess_vec_func</span><span class="p">,</span> <span class="n">trSize</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
 
     <span class="n">Hx</span> <span class="o">=</span> <span class="n">hess_vec_func</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">d</span> <span class="o">=</span> <span class="n">g</span> <span class="o">+</span> <span class="n">Hx</span>
@@ -261,7 +261,7 @@
 
 <div class="viewcode-block" id="trust_region_subspace_minimize">
 <a class="viewcode-back" href="../../optimism.html#optimism.EquationSolverSubspace.trust_region_subspace_minimize">[docs]</a>
-<span class="k">def</span> <span class="nf">trust_region_subspace_minimize</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">trust_region_subspace_minimize</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">settings</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     
     <span class="n">trSize</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">tr_size</span>
     

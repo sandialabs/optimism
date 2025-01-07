@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.contact.Contact &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -73,35 +73,35 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.contact.Contact</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Surface</span>
-<span class="kn">from</span> <span class="nn">optimism.contact</span> <span class="kn">import</span> <span class="n">EdgeCpp</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">QuadratureRule</span>
-<span class="kn">from</span> <span class="nn">optimism.contact</span> <span class="kn">import</span> <span class="n">Friction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Surface</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.contact</span><span class="w"> </span><span class="kn">import</span> <span class="n">EdgeCpp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuadratureRule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.contact</span><span class="w"> </span><span class="kn">import</span> <span class="n">Friction</span>
 
 <span class="c1"># surfaceI means integration side/surface/face (subordinate)</span>
 <span class="c1"># surfaceM means main side/surface/face (geometrically controlling)</span>
 
 <div class="viewcode-block" id="compute_closest_distance_to_each_side">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.Contact.compute_closest_distance_to_each_side">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_closest_distance_to_each_side</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">interactionList</span><span class="p">,</span> <span class="n">surfaceI</span><span class="p">,</span> <span class="n">smoothingTol</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_closest_distance_to_each_side</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">interactionList</span><span class="p">,</span> <span class="n">surfaceI</span><span class="p">,</span> <span class="n">smoothingTol</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">vmap</span><span class="p">(</span><span class="n">compute_projection_dists</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">interactionList</span><span class="p">,</span> <span class="n">surfaceI</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="compute_closest_distance_to_each_side_smooth">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.Contact.compute_closest_distance_to_each_side_smooth">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_closest_distance_to_each_side_smooth</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">interactionList</span><span class="p">,</span> <span class="n">surfaceI</span><span class="p">,</span> <span class="n">smoothingTol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_closest_distance_to_each_side_smooth</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">interactionList</span><span class="p">,</span> <span class="n">surfaceI</span><span class="p">,</span> <span class="n">smoothingTol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">vmap</span><span class="p">(</span><span class="n">compute_projection_dists_smooth</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="kc">None</span><span class="p">))(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">interactionList</span><span class="p">,</span> <span class="n">surfaceI</span><span class="p">,</span> <span class="n">smoothingTol</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="get_potential_interaction_list">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.Contact.get_potential_interaction_list">[docs]</a>
-<span class="k">def</span> <span class="nf">get_potential_interaction_list</span><span class="p">(</span><span class="n">surfaceM</span><span class="p">,</span> <span class="n">surfaceI</span><span class="p">,</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">maxNeighbors</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_potential_interaction_list</span><span class="p">(</span><span class="n">surfaceM</span><span class="p">,</span> <span class="n">surfaceI</span><span class="p">,</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">maxNeighbors</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">get_close_edge_indices</span><span class="p">(</span><span class="n">surfaceM</span><span class="p">,</span> <span class="n">edgeI</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_close_edge_indices</span><span class="p">(</span><span class="n">surfaceM</span><span class="p">,</span> <span class="n">edgeI</span><span class="p">):</span>
         <span class="n">minDistsToA</span> <span class="o">=</span> <span class="n">vmap</span><span class="p">(</span><span class="n">min_dist_squared</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">))(</span><span class="n">surfaceM</span><span class="p">,</span> <span class="n">edgeI</span><span class="p">,</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">disp</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">surfaceM</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">minDistsToA</span><span class="p">)[:</span><span class="n">maxNeighbors</span><span class="p">]]</span>
     
@@ -111,16 +111,16 @@
 
 <div class="viewcode-block" id="compute_closest_edges_and_field_weights">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.Contact.compute_closest_edges_and_field_weights">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_closest_edges_and_field_weights</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">interactionList</span><span class="p">,</span> <span class="n">surfaceI</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_closest_edges_and_field_weights</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">interactionList</span><span class="p">,</span> <span class="n">surfaceI</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">get_closest_edge</span><span class="p">(</span><span class="n">coordsM</span><span class="p">,</span> <span class="n">edgesM</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_closest_edge</span><span class="p">(</span><span class="n">coordsM</span><span class="p">,</span> <span class="n">edgesM</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
         <span class="n">cppDists</span> <span class="o">=</span> <span class="n">vmap</span><span class="p">(</span><span class="n">EdgeCpp</span><span class="o">.</span><span class="n">cpp_distance</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="kc">None</span><span class="p">))(</span><span class="n">coordsM</span><span class="p">,</span> <span class="n">point</span><span class="p">)</span>
         <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">cppDists</span><span class="p">)</span> <span class="p">)</span>
         <span class="k">return</span> <span class="n">edgesM</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
 
     <span class="c1"># edgesM here is maxNeighbors per integration edge</span>
-    <span class="k">def</span> <span class="nf">get_closest_edges</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dispField</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">edgesM</span><span class="p">,</span> <span class="n">edgeI</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_closest_edges</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dispField</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">edgesM</span><span class="p">,</span> <span class="n">edgeI</span><span class="p">):</span>
         <span class="n">coordsI</span> <span class="o">=</span> <span class="n">get_side_coordinates</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dispField</span><span class="p">,</span> <span class="n">edgeI</span><span class="p">)</span>
         <span class="n">coordsQ</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">eval_at_iso_points</span><span class="p">(</span><span class="n">quadRule</span><span class="o">.</span><span class="n">xigauss</span><span class="p">,</span> <span class="n">coordsI</span><span class="p">)</span>
         <span class="n">coordsM</span> <span class="o">=</span> <span class="n">vmap</span><span class="p">(</span><span class="n">get_side_coordinates</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="mi">0</span><span class="p">))(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dispField</span><span class="p">,</span> <span class="n">edgesM</span><span class="p">)</span>
@@ -128,7 +128,7 @@
 
 
     <span class="c1"># edgesM here is 1 per quadrature point</span>
-    <span class="k">def</span> <span class="nf">get_edge_weights</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dispField</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">edgesM</span><span class="p">,</span> <span class="n">edgeI</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_edge_weights</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dispField</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">edgesM</span><span class="p">,</span> <span class="n">edgeI</span><span class="p">):</span>
         <span class="n">coordsI</span> <span class="o">=</span> <span class="n">get_side_coordinates</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dispField</span><span class="p">,</span> <span class="n">edgeI</span><span class="p">)</span>
         <span class="n">coordsM</span> <span class="o">=</span> <span class="n">vmap</span><span class="p">(</span><span class="n">get_side_coordinates</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="mi">0</span><span class="p">))(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dispField</span><span class="p">,</span> <span class="n">edgesM</span><span class="p">)</span>
         <span class="n">coordsQ</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">eval_at_iso_points</span><span class="p">(</span><span class="n">quadRule</span><span class="o">.</span><span class="n">xigauss</span><span class="p">,</span> <span class="n">coordsI</span><span class="p">)</span>
@@ -143,13 +143,13 @@
 
 <div class="viewcode-block" id="compute_q_coordinates_from_field_weights">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.Contact.compute_q_coordinates_from_field_weights">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_q_coordinates_from_field_weights</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">closestEdges</span><span class="p">,</span> <span class="n">edgeWeights</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_q_coordinates_from_field_weights</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">closestEdges</span><span class="p">,</span> <span class="n">edgeWeights</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">compute_coordinate</span><span class="p">(</span><span class="n">edgeM</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_coordinate</span><span class="p">(</span><span class="n">edgeM</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
         <span class="n">coordM</span> <span class="o">=</span> <span class="n">get_side_coordinates</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">edgeM</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">coordM</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">-</span><span class="n">weight</span><span class="p">)</span> <span class="o">+</span> <span class="n">coordM</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">weight</span>
     
-    <span class="k">def</span> <span class="nf">compute_coordinates</span><span class="p">(</span><span class="n">closestEdgesQ</span><span class="p">,</span> <span class="n">edgeWeightsQ</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_coordinates</span><span class="p">(</span><span class="n">closestEdgesQ</span><span class="p">,</span> <span class="n">edgeWeightsQ</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">vmap</span><span class="p">(</span><span class="n">compute_coordinate</span><span class="p">)(</span><span class="n">closestEdgesQ</span><span class="p">,</span> <span class="n">edgeWeightsQ</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">vmap</span><span class="p">(</span><span class="n">compute_coordinates</span><span class="p">)(</span><span class="n">closestEdges</span><span class="p">,</span> <span class="n">edgeWeights</span><span class="p">)</span></div>
@@ -158,9 +158,9 @@
 
 <div class="viewcode-block" id="compute_q_coordinates">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.Contact.compute_q_coordinates">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_q_coordinates</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">surfaceI</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_q_coordinates</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">surfaceI</span><span class="p">):</span>
     
-    <span class="k">def</span> <span class="nf">compute_coordinates</span><span class="p">(</span><span class="n">edge</span><span class="p">):</span> 
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_coordinates</span><span class="p">(</span><span class="n">edge</span><span class="p">):</span> 
         <span class="n">edgeCoords</span> <span class="o">=</span> <span class="n">get_side_coordinates</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">edge</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">eval_at_iso_points</span><span class="p">(</span><span class="n">quadRule</span><span class="o">.</span><span class="n">xigauss</span><span class="p">,</span> <span class="n">edgeCoords</span><span class="p">)</span>
 
@@ -170,14 +170,14 @@
 
 <div class="viewcode-block" id="compute_friction_potential">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.Contact.compute_friction_potential">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_friction_potential</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">lam</span><span class="p">,</span> <span class="n">frictionParams</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_friction_potential</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">lam</span><span class="p">,</span> <span class="n">frictionParams</span><span class="p">,</span>
                                <span class="n">quadRule</span><span class="p">,</span> <span class="n">surfI</span><span class="p">,</span> <span class="n">closestSides</span><span class="p">,</span> <span class="n">sideWeights</span><span class="p">):</span>
 
     <span class="c1"># the relative motion is assuming that the weights applied to the closest sides at the</span>
     <span class="c1"># previous timestep were exactly co-located with the location of the quadrature points</span>
     <span class="c1"># at the previous timestep</span>
     
-    <span class="k">def</span> <span class="nf">compute_friction_potential_on_edge</span><span class="p">(</span><span class="n">relativeMotionOnEdge</span><span class="p">,</span> <span class="n">lamI</span><span class="p">,</span> <span class="n">edgeI</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_friction_potential_on_edge</span><span class="p">(</span><span class="n">relativeMotionOnEdge</span><span class="p">,</span> <span class="n">lamI</span><span class="p">,</span> <span class="n">edgeI</span><span class="p">):</span>
         <span class="n">coordI</span> <span class="o">=</span> <span class="n">get_side_coordinates</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">disp</span><span class="p">,</span> <span class="n">edgeI</span><span class="p">)</span>
         <span class="n">normal</span> <span class="o">=</span> <span class="n">Surface</span><span class="o">.</span><span class="n">compute_normal</span><span class="p">(</span><span class="n">coordI</span><span class="p">)</span>
         <span class="n">projection</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="n">normal</span><span class="p">)</span>    
@@ -200,7 +200,7 @@
 
 <div class="viewcode-block" id="min_dist_squared">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.Contact.min_dist_squared">[docs]</a>
-<span class="k">def</span> <span class="nf">min_dist_squared</span><span class="p">(</span><span class="n">edge1</span><span class="p">,</span> <span class="n">edge2</span><span class="p">,</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">disp</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">min_dist_squared</span><span class="p">(</span><span class="n">edge1</span><span class="p">,</span> <span class="n">edge2</span><span class="p">,</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">disp</span><span class="p">):</span>
     <span class="n">index1</span> <span class="o">=</span> <span class="n">Surface</span><span class="o">.</span><span class="n">get_field_index</span><span class="p">(</span><span class="n">edge1</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">)</span>
     <span class="n">index2</span> <span class="o">=</span> <span class="n">Surface</span><span class="o">.</span><span class="n">get_field_index</span><span class="p">(</span><span class="n">edge2</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">)</span>
 
@@ -214,7 +214,7 @@
 
 <div class="viewcode-block" id="get_side_coordinates">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.Contact.get_side_coordinates">[docs]</a>
-<span class="k">def</span> <span class="nf">get_side_coordinates</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dispField</span><span class="p">,</span> <span class="n">edge</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_side_coordinates</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dispField</span><span class="p">,</span> <span class="n">edge</span><span class="p">):</span>
     <span class="n">fieldIndex</span> <span class="o">=</span> <span class="n">Surface</span><span class="o">.</span><span class="n">get_field_index</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">Surface</span><span class="o">.</span><span class="n">eval_field</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">fieldIndex</span><span class="p">)</span> <span class="o">+</span> <span class="n">Surface</span><span class="o">.</span><span class="n">eval_field</span><span class="p">(</span><span class="n">dispField</span><span class="p">,</span> <span class="n">fieldIndex</span><span class="p">)</span></div>
 
@@ -222,7 +222,7 @@
 
 <div class="viewcode-block" id="get_closest_distance">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.Contact.get_closest_distance">[docs]</a>
-<span class="k">def</span> <span class="nf">get_closest_distance</span><span class="p">(</span><span class="n">coordsM</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_closest_distance</span><span class="p">(</span><span class="n">coordsM</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
     <span class="n">cppDists</span> <span class="o">=</span> <span class="n">vmap</span><span class="p">(</span><span class="n">EdgeCpp</span><span class="o">.</span><span class="n">cpp_distance</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="kc">None</span><span class="p">))(</span><span class="n">coordsM</span><span class="p">,</span> <span class="n">point</span><span class="p">)</span>
     <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">cppDists</span><span class="p">)</span> <span class="p">)</span>
     <span class="k">return</span> <span class="n">cppDists</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></div>
@@ -231,7 +231,7 @@
 
 <div class="viewcode-block" id="compute_projection_dists">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.Contact.compute_projection_dists">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_projection_dists</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dispField</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">edgesM</span><span class="p">,</span> <span class="n">edgeI</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_projection_dists</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dispField</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">edgesM</span><span class="p">,</span> <span class="n">edgeI</span><span class="p">):</span>
     <span class="n">coordsI</span> <span class="o">=</span> <span class="n">get_side_coordinates</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dispField</span><span class="p">,</span> <span class="n">edgeI</span><span class="p">)</span>
     <span class="n">coordsQ</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">eval_at_iso_points</span><span class="p">(</span><span class="n">quadRule</span><span class="o">.</span><span class="n">xigauss</span><span class="p">,</span> <span class="n">coordsI</span><span class="p">)</span>
     <span class="n">coordsM</span> <span class="o">=</span> <span class="n">vmap</span><span class="p">(</span><span class="n">get_side_coordinates</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="mi">0</span><span class="p">))(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dispField</span><span class="p">,</span> <span class="n">edgesM</span><span class="p">)</span>
@@ -241,7 +241,7 @@
 
 <div class="viewcode-block" id="get_closest_two_edges">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.Contact.get_closest_two_edges">[docs]</a>
-<span class="k">def</span> <span class="nf">get_closest_two_edges</span><span class="p">(</span><span class="n">coordsM</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>        
+<span class="k">def</span><span class="w"> </span><span class="nf">get_closest_two_edges</span><span class="p">(</span><span class="n">coordsM</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>        
     <span class="n">cppDists</span> <span class="o">=</span> <span class="n">vmap</span><span class="p">(</span><span class="n">EdgeCpp</span><span class="o">.</span><span class="n">cpp_distance</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="kc">None</span><span class="p">))(</span><span class="n">coordsM</span><span class="p">,</span> <span class="n">point</span><span class="p">)</span>
     <span class="n">sortedIndices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">cppDists</span><span class="p">)</span> <span class="p">)</span>
     <span class="k">return</span> <span class="n">coordsM</span><span class="p">[</span><span class="n">sortedIndices</span><span class="p">[:</span><span class="mi">2</span><span class="p">]]</span></div>
@@ -250,7 +250,7 @@
 
 <div class="viewcode-block" id="get_closest_distance_smooth">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.Contact.get_closest_distance_smooth">[docs]</a>
-<span class="k">def</span> <span class="nf">get_closest_distance_smooth</span><span class="p">(</span><span class="n">coordsM</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="n">smoothingTol</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_closest_distance_smooth</span><span class="p">(</span><span class="n">coordsM</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="n">smoothingTol</span><span class="p">):</span>
     <span class="n">twoClosestEdges</span> <span class="o">=</span> <span class="n">get_closest_two_edges</span><span class="p">(</span><span class="n">coordsM</span><span class="p">,</span> <span class="n">point</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">EdgeCpp</span><span class="o">.</span><span class="n">smooth_distance</span><span class="p">(</span><span class="n">twoClosestEdges</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="n">smoothingTol</span><span class="p">)</span></div>
 
@@ -258,7 +258,7 @@
 
 <div class="viewcode-block" id="compute_projection_dists_smooth">
 <a class="viewcode-back" href="../../../optimism.contact.html#optimism.contact.Contact.compute_projection_dists_smooth">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_projection_dists_smooth</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dispField</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">edgesM</span><span class="p">,</span> <span class="n">edgeI</span><span class="p">,</span> <span class="n">smoothingTol</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_projection_dists_smooth</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dispField</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">edgesM</span><span class="p">,</span> <span class="n">edgeI</span><span class="p">,</span> <span class="n">smoothingTol</span><span class="p">):</span>
     <span class="n">coordsI</span> <span class="o">=</span> <span class="n">get_side_coordinates</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dispField</span><span class="p">,</span> <span class="n">edgeI</span><span class="p">)</span>
     <span class="n">coordsQ</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">eval_at_iso_points</span><span class="p">(</span><span class="n">quadRule</span><span class="o">.</span><span class="n">xigauss</span><span class="p">,</span> <span class="n">coordsI</span><span class="p">)</span>    
     <span class="n">coordsM</span> <span class="o">=</span> <span class="n">vmap</span><span class="p">(</span><span class="n">get_side_coordinates</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="mi">0</span><span class="p">))(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">dispField</span><span class="p">,</span> <span class="n">edgesM</span><span class="p">)</span>

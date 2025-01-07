@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.test.test_AxisymmPatchTest &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -73,13 +73,13 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.test.test_AxisymmPatchTest</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">FunctionSpace</span>
-<span class="kn">from</span> <span class="nn">optimism.material</span> <span class="kn">import</span> <span class="n">LinearElastic</span> <span class="k">as</span> <span class="n">MatModel</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mechanics</span>
-<span class="kn">from</span> <span class="nn">optimism.EquationSolver</span> <span class="kn">import</span> <span class="n">newton_solve</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">QuadratureRule</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">MeshFixture</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionSpace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.material</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearElastic</span> <span class="k">as</span> <span class="n">MatModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mechanics</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.EquationSolver</span><span class="w"> </span><span class="kn">import</span> <span class="n">newton_solve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuadratureRule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshFixture</span>
 
 
 <span class="n">E</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -91,11 +91,11 @@
 
 <div class="viewcode-block" id="AxisymmPatchTest">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_AxisymmPatchTest.AxisymmPatchTest">[docs]</a>
-<span class="k">class</span> <span class="nc">AxisymmPatchTest</span><span class="p">(</span><span class="n">MeshFixture</span><span class="o">.</span><span class="n">MeshFixture</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AxisymmPatchTest</span><span class="p">(</span><span class="n">MeshFixture</span><span class="o">.</span><span class="n">MeshFixture</span><span class="p">):</span>
     
 <div class="viewcode-block" id="AxisymmPatchTest.setUp">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_AxisymmPatchTest.AxisymmPatchTest.setUp">[docs]</a>
-    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Nx</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ny</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">R</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -124,7 +124,7 @@
 
 <div class="viewcode-block" id="AxisymmPatchTest.test_axisymmetric_gradient">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_AxisymmPatchTest.AxisymmPatchTest.test_axisymmetric_gradient">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_axisymmetric_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_axisymmetric_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">elem0DispGrads</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span>\
             <span class="n">compute_element_field_gradient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">shapes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                                            <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">shapeGrads</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">vols</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
@@ -139,7 +139,7 @@
         
 <div class="viewcode-block" id="AxisymmPatchTest.test_dirichlet_patch_test">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_AxisymmPatchTest.AxisymmPatchTest.test_dirichlet_patch_test">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_dirichlet_patch_test</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_dirichlet_patch_test</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">ebc</span> <span class="o">=</span> <span class="p">[</span><span class="n">FunctionSpace</span><span class="o">.</span><span class="n">EssentialBC</span><span class="p">(</span><span class="n">nodeSet</span><span class="o">=</span><span class="s1">&#39;bottom&#39;</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
                <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">EssentialBC</span><span class="p">(</span><span class="n">nodeSet</span><span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
         <span class="n">dofManager</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">DofManager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">EssentialBCs</span><span class="o">=</span><span class="n">ebc</span><span class="p">)</span>
@@ -149,7 +149,7 @@
         <span class="n">Ubc</span> <span class="o">=</span> <span class="n">dofManager</span><span class="o">.</span><span class="n">get_bc_values</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
         
         <span class="nd">@jit</span>
-        <span class="k">def</span> <span class="nf">objective</span><span class="p">(</span><span class="n">Uu</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">Uu</span><span class="p">):</span>
             <span class="n">U</span> <span class="o">=</span> <span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">)</span>
         

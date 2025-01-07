@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.FunctionSpace &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -73,21 +73,21 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.FunctionSpace</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">jax.scipy.linalg</span> <span class="kn">import</span> <span class="n">solve</span>
-<span class="kn">from</span> <span class="nn">jaxtyping</span> <span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Float</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Interpolants</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mesh</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">QuadratureRule</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
-<span class="kn">import</span> <span class="nn">equinox</span> <span class="k">as</span> <span class="nn">eqx</span>
-<span class="kn">import</span> <span class="nn">jax</span>
-<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">jax.scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">solve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jaxtyping</span><span class="w"> </span><span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Float</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Interpolants</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuadratureRule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">equinox</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">eqx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">onp</span>
 
 
 <div class="viewcode-block" id="EssentialBC">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.EssentialBC">[docs]</a>
-<span class="k">class</span> <span class="nc">EssentialBC</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EssentialBC</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="n">nodeSet</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">component</span><span class="p">:</span> <span class="nb">int</span></div>
 
@@ -95,7 +95,7 @@
 
 <div class="viewcode-block" id="FunctionSpace">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.FunctionSpace">[docs]</a>
-<span class="k">class</span> <span class="nc">FunctionSpace</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FunctionSpace</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Data needed for calculus on functions in the discrete function space.</span>
 
 <span class="sd">    In describing the shape of the attributes, ``ne`` is the number of</span>
@@ -128,7 +128,7 @@
 
 <div class="viewcode-block" id="construct_function_space">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.construct_function_space">[docs]</a>
-<span class="k">def</span> <span class="nf">construct_function_space</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">quadratureRule</span><span class="p">,</span> <span class="n">mode2D</span><span class="o">=</span><span class="s1">&#39;cartesian&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">construct_function_space</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">quadratureRule</span><span class="p">,</span> <span class="n">mode2D</span><span class="o">=</span><span class="s1">&#39;cartesian&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct a discrete function space.</span>
 
 <span class="sd">    Parameters</span>
@@ -153,7 +153,7 @@
 
 <div class="viewcode-block" id="construct_function_space_from_parent_element">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.construct_function_space_from_parent_element">[docs]</a>
-<span class="k">def</span> <span class="nf">construct_function_space_from_parent_element</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">shapeOnRef</span><span class="p">,</span> <span class="n">quadratureRule</span><span class="p">,</span> <span class="n">mode2D</span><span class="o">=</span><span class="s1">&#39;cartesian&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">construct_function_space_from_parent_element</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">shapeOnRef</span><span class="p">,</span> <span class="n">quadratureRule</span><span class="p">,</span> <span class="n">mode2D</span><span class="o">=</span><span class="s1">&#39;cartesian&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct a function space with precomputed shape function data on the parent element.</span>
 
 <span class="sd">    This version of the function space constructor is Jax-transformable,</span>
@@ -204,7 +204,7 @@
 
 <div class="viewcode-block" id="map_element_shape_grads">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.map_element_shape_grads">[docs]</a>
-<span class="k">def</span> <span class="nf">map_element_shape_grads</span><span class="p">(</span><span class="n">coordField</span><span class="p">,</span> <span class="n">nodeOrdinals</span><span class="p">,</span> <span class="n">parentElement</span><span class="p">,</span> <span class="n">shapeGradients</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">map_element_shape_grads</span><span class="p">(</span><span class="n">coordField</span><span class="p">,</span> <span class="n">nodeOrdinals</span><span class="p">,</span> <span class="n">parentElement</span><span class="p">,</span> <span class="n">shapeGradients</span><span class="p">):</span>
     <span class="n">Xn</span> <span class="o">=</span> <span class="n">coordField</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">nodeOrdinals</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">v</span> <span class="o">=</span> <span class="n">Xn</span><span class="p">[</span><span class="n">parentElement</span><span class="o">.</span><span class="n">vertexNodes</span><span class="p">]</span>
     <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
@@ -214,7 +214,7 @@
 
 <div class="viewcode-block" id="compute_element_volumes">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.compute_element_volumes">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_element_volumes</span><span class="p">(</span><span class="n">coordField</span><span class="p">,</span> <span class="n">nodeOrdinals</span><span class="p">,</span> <span class="n">parentElement</span><span class="p">,</span> <span class="n">shapes</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_element_volumes</span><span class="p">(</span><span class="n">coordField</span><span class="p">,</span> <span class="n">nodeOrdinals</span><span class="p">,</span> <span class="n">parentElement</span><span class="p">,</span> <span class="n">shapes</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
     <span class="n">Xn</span> <span class="o">=</span> <span class="n">coordField</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">nodeOrdinals</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">v</span> <span class="o">=</span> <span class="n">Xn</span><span class="p">[</span><span class="n">parentElement</span><span class="o">.</span><span class="n">vertexNodes</span><span class="p">]</span>
     <span class="n">jac</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -224,7 +224,7 @@
 
 <div class="viewcode-block" id="compute_element_volumes_axisymmetric">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.compute_element_volumes_axisymmetric">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_element_volumes_axisymmetric</span><span class="p">(</span><span class="n">coordField</span><span class="p">,</span> <span class="n">nodeOrdinals</span><span class="p">,</span> <span class="n">parentElement</span><span class="p">,</span> <span class="n">shapes</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_element_volumes_axisymmetric</span><span class="p">(</span><span class="n">coordField</span><span class="p">,</span> <span class="n">nodeOrdinals</span><span class="p">,</span> <span class="n">parentElement</span><span class="p">,</span> <span class="n">shapes</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
     <span class="n">vols</span> <span class="o">=</span> <span class="n">compute_element_volumes</span><span class="p">(</span><span class="n">coordField</span><span class="p">,</span> <span class="n">nodeOrdinals</span><span class="p">,</span> <span class="n">parentElement</span><span class="p">,</span> <span class="n">shapes</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
     <span class="n">Xn</span> <span class="o">=</span> <span class="n">coordField</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">nodeOrdinals</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">Rs</span> <span class="o">=</span> <span class="n">shapes</span><span class="nd">@Xn</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
@@ -239,13 +239,13 @@
 <span class="c1"># only supports cartesian and linear shape functions on tris, single integration point per element</span>
 <div class="viewcode-block" id="construct_weighted_function_space">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.construct_weighted_function_space">[docs]</a>
-<span class="k">def</span> <span class="nf">construct_weighted_function_space</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">quadratureRule</span><span class="p">,</span> <span class="n">quadratureWeights</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">construct_weighted_function_space</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">quadratureRule</span><span class="p">,</span> <span class="n">quadratureWeights</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
     
-    <span class="k">def</span> <span class="nf">normal_vector</span><span class="p">(</span><span class="n">edge</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">normal_vector</span><span class="p">(</span><span class="n">edge</span><span class="p">):</span>
         <span class="n">ba</span> <span class="o">=</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ba</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="n">ba</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
     
-    <span class="k">def</span> <span class="nf">compute_volume</span><span class="p">(</span><span class="n">coords</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_volume</span><span class="p">(</span><span class="n">coords</span><span class="p">):</span>
         <span class="n">vol</span> <span class="o">=</span> <span class="mf">0.</span>
         <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
             <span class="n">edge</span> <span class="o">=</span> <span class="p">[</span><span class="n">coords</span><span class="p">[</span><span class="n">e</span><span class="p">],</span> <span class="n">coords</span><span class="p">[(</span><span class="n">e</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">%</span><span class="mi">3</span><span class="p">]]</span>
@@ -253,10 +253,10 @@
             <span class="n">vol</span> <span class="o">+=</span> <span class="n">normal</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">vol</span>
 
-    <span class="k">def</span> <span class="nf">compute_elem_volume</span><span class="p">(</span><span class="n">coordField</span><span class="p">,</span> <span class="n">elem</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_elem_volume</span><span class="p">(</span><span class="n">coordField</span><span class="p">,</span> <span class="n">elem</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">compute_volume</span><span class="p">(</span><span class="n">coordField</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">compute_elem_linear_shape_gradient</span><span class="p">(</span><span class="n">coordField</span><span class="p">,</span> <span class="n">vol</span><span class="p">,</span> <span class="n">elem</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_elem_linear_shape_gradient</span><span class="p">(</span><span class="n">coordField</span><span class="p">,</span> <span class="n">vol</span><span class="p">,</span> <span class="n">elem</span><span class="p">):</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="n">coordField</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">shape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
         <span class="n">halfVol</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">/</span><span class="n">vol</span>
@@ -282,28 +282,28 @@
 
 <div class="viewcode-block" id="default_modify_element_gradient">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.default_modify_element_gradient">[docs]</a>
-<span class="k">def</span> <span class="nf">default_modify_element_gradient</span><span class="p">(</span><span class="n">elemGrads</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">elemNodalDisps</span><span class="p">,</span> <span class="n">elemNodalCoords</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">default_modify_element_gradient</span><span class="p">(</span><span class="n">elemGrads</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">elemNodalDisps</span><span class="p">,</span> <span class="n">elemNodalCoords</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">elemGrads</span></div>
 
 
 
 <div class="viewcode-block" id="compute_field_gradient">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.compute_field_gradient">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_field_gradient</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">nodalField</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">default_modify_element_gradient</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_field_gradient</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">nodalField</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">default_modify_element_gradient</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">compute_element_field_gradient</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="kc">None</span><span class="p">))(</span><span class="n">nodalField</span><span class="p">,</span> <span class="n">functionSpace</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">functionSpace</span><span class="o">.</span><span class="n">shapes</span><span class="p">,</span> <span class="n">functionSpace</span><span class="o">.</span><span class="n">shapeGrads</span><span class="p">,</span> <span class="n">functionSpace</span><span class="o">.</span><span class="n">vols</span><span class="p">,</span> <span class="n">functionSpace</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="interpolate_to_points">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.interpolate_to_points">[docs]</a>
-<span class="k">def</span> <span class="nf">interpolate_to_points</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">nodalField</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">interpolate_to_points</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">nodalField</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">interpolate_to_element_points</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))(</span><span class="n">nodalField</span><span class="p">,</span> <span class="n">functionSpace</span><span class="o">.</span><span class="n">shapes</span><span class="p">,</span> <span class="n">functionSpace</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="integrate_over_block">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.integrate_over_block">[docs]</a>
-<span class="k">def</span> <span class="nf">integrate_over_block</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">stateVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">integrate_over_block</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">stateVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span>
                          <span class="o">*</span><span class="n">params</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">default_modify_element_gradient</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Integrates a density function over a block of the mesh.</span>
 
@@ -336,7 +336,7 @@
 
 <div class="viewcode-block" id="evaluate_on_block">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.evaluate_on_block">[docs]</a>
-<span class="k">def</span> <span class="nf">evaluate_on_block</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">stateVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">evaluate_on_block</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">stateVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span>
                       <span class="o">*</span><span class="n">params</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">default_modify_element_gradient</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Evaluates a density function at every quadrature point in a block of the mesh.</span>
 
@@ -373,7 +373,7 @@
 
 <div class="viewcode-block" id="integrate_element_from_local_field">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.integrate_element_from_local_field">[docs]</a>
-<span class="k">def</span> <span class="nf">integrate_element_from_local_field</span><span class="p">(</span><span class="n">elemNodalField</span><span class="p">,</span> <span class="n">elemNodalCoords</span><span class="p">,</span> <span class="n">elemStates</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemShapeGrads</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">default_modify_element_gradient</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">integrate_element_from_local_field</span><span class="p">(</span><span class="n">elemNodalField</span><span class="p">,</span> <span class="n">elemNodalCoords</span><span class="p">,</span> <span class="n">elemStates</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemShapeGrads</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">default_modify_element_gradient</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Integrate over element with element nodal field as input.</span>
 <span class="sd">    This allows element residuals and element stiffness matrices to computed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -388,7 +388,7 @@
 
 <div class="viewcode-block" id="compute_element_field_gradient">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.compute_element_field_gradient">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_element_field_gradient</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemShapeGrads</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">elemConnectivity</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_element_field_gradient</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemShapeGrads</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">elemConnectivity</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">):</span>
     <span class="n">elemNodalDisps</span> <span class="o">=</span> <span class="n">U</span><span class="p">[</span><span class="n">elemConnectivity</span><span class="p">]</span>
     <span class="n">elemGrads</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">compute_quadrature_point_field_gradient</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">))(</span><span class="n">elemNodalDisps</span><span class="p">,</span> <span class="n">elemShapeGrads</span><span class="p">)</span>
     <span class="n">elemNodalCoords</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[</span><span class="n">elemConnectivity</span><span class="p">]</span>
@@ -399,7 +399,7 @@
 
 <div class="viewcode-block" id="compute_quadrature_point_field_gradient">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.compute_quadrature_point_field_gradient">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_quadrature_point_field_gradient</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">shapeGrad</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_quadrature_point_field_gradient</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">shapeGrad</span><span class="p">):</span>
     <span class="n">dg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">shapeGrad</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">dg</span></div>
 
@@ -407,14 +407,14 @@
 
 <div class="viewcode-block" id="interpolate_to_point">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.interpolate_to_point">[docs]</a>
-<span class="k">def</span> <span class="nf">interpolate_to_point</span><span class="p">(</span><span class="n">elementNodalValues</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">interpolate_to_point</span><span class="p">(</span><span class="n">elementNodalValues</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">elementNodalValues</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="interpolate_to_element_points">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.interpolate_to_element_points">[docs]</a>
-<span class="k">def</span> <span class="nf">interpolate_to_element_points</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemConnectivity</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">interpolate_to_element_points</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemConnectivity</span><span class="p">):</span>
     <span class="n">elemU</span> <span class="o">=</span> <span class="n">U</span><span class="p">[</span><span class="n">elemConnectivity</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">interpolate_to_point</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">))(</span><span class="n">elemU</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">)</span></div>
 
@@ -422,7 +422,7 @@
 
 <div class="viewcode-block" id="integrate_element">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.integrate_element">[docs]</a>
-<span class="k">def</span> <span class="nf">integrate_element</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">elemStates</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemShapeGrads</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">elemConn</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">integrate_element</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">elemStates</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemShapeGrads</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">elemConn</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">):</span>
     <span class="n">elemVals</span> <span class="o">=</span> <span class="n">interpolate_to_element_points</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemConn</span><span class="p">)</span>
     <span class="n">elemGrads</span> <span class="o">=</span> <span class="n">compute_element_field_gradient</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemShapeGrads</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">elemConn</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span>
     <span class="n">elemXs</span> <span class="o">=</span> <span class="n">interpolate_to_element_points</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemConn</span><span class="p">)</span>
@@ -433,7 +433,7 @@
 
 <div class="viewcode-block" id="evaluate_on_element">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.evaluate_on_element">[docs]</a>
-<span class="k">def</span> <span class="nf">evaluate_on_element</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">elemStates</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemShapeGrads</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">elemConn</span><span class="p">,</span> <span class="n">kernelFunc</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">evaluate_on_element</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">elemStates</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemShapeGrads</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">elemConn</span><span class="p">,</span> <span class="n">kernelFunc</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">):</span>
     <span class="n">elemVals</span> <span class="o">=</span> <span class="n">interpolate_to_element_points</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemConn</span><span class="p">)</span>
     <span class="n">elemGrads</span> <span class="o">=</span> <span class="n">compute_element_field_gradient</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemShapeGrads</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">elemConn</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span>
     <span class="n">elemXs</span> <span class="o">=</span> <span class="n">interpolate_to_element_points</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemConn</span><span class="p">)</span>
@@ -445,14 +445,14 @@
 
 <div class="viewcode-block" id="project_quadrature_field_to_element_field">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.project_quadrature_field_to_element_field">[docs]</a>
-<span class="k">def</span> <span class="nf">project_quadrature_field_to_element_field</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">quadField</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">project_quadrature_field_to_element_field</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">quadField</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">average_quadrature_field_over_element</span><span class="p">)(</span><span class="n">quadField</span><span class="p">,</span> <span class="n">functionSpace</span><span class="o">.</span><span class="n">vols</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="average_quadrature_field_over_element">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.average_quadrature_field_over_element">[docs]</a>
-<span class="k">def</span> <span class="nf">average_quadrature_field_over_element</span><span class="p">(</span><span class="n">elemQPData</span><span class="p">,</span> <span class="n">vols</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">average_quadrature_field_over_element</span><span class="p">(</span><span class="n">elemQPData</span><span class="p">,</span> <span class="n">vols</span><span class="p">):</span>
     <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">vols</span><span class="p">,</span> <span class="n">elemQPData</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">elVol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">vols</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">S</span><span class="o">/</span><span class="n">elVol</span></div>
@@ -461,7 +461,7 @@
 
 <div class="viewcode-block" id="get_nodal_values_on_edge">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.get_nodal_values_on_edge">[docs]</a>
-<span class="k">def</span> <span class="nf">get_nodal_values_on_edge</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">nodalField</span><span class="p">,</span> <span class="n">edge</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_nodal_values_on_edge</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">nodalField</span><span class="p">,</span> <span class="n">edge</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get nodal values of a field on an element edge.</span>
 
 <span class="sd">    Arguments:</span>
@@ -479,7 +479,7 @@
 
 <div class="viewcode-block" id="interpolate_nodal_field_on_edge">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.interpolate_nodal_field_on_edge">[docs]</a>
-<span class="k">def</span> <span class="nf">interpolate_nodal_field_on_edge</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">interpolationPoints</span><span class="p">,</span> <span class="n">edge</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">interpolate_nodal_field_on_edge</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">interpolationPoints</span><span class="p">,</span> <span class="n">edge</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Interpolate a nodal field to specified points on an element edge.</span>
 
 <span class="sd">    Arguments:</span>
@@ -498,7 +498,7 @@
 
 <div class="viewcode-block" id="integrate_function_on_edge">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.integrate_function_on_edge">[docs]</a>
-<span class="k">def</span> <span class="nf">integrate_function_on_edge</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">edge</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">integrate_function_on_edge</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">edge</span><span class="p">):</span>
     <span class="n">uq</span> <span class="o">=</span> <span class="n">interpolate_nodal_field_on_edge</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">quadRule</span><span class="o">.</span><span class="n">xigauss</span><span class="p">,</span> <span class="n">edge</span><span class="p">)</span>
     <span class="n">Xq</span> <span class="o">=</span> <span class="n">interpolate_nodal_field_on_edge</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">functionSpace</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">quadRule</span><span class="o">.</span><span class="n">xigauss</span><span class="p">,</span> <span class="n">edge</span><span class="p">)</span>
     <span class="n">edgeCoords</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">get_edge_coords</span><span class="p">(</span><span class="n">functionSpace</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="n">edge</span><span class="p">)</span>
@@ -510,7 +510,7 @@
 
 <div class="viewcode-block" id="integrate_function_on_edges">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.integrate_function_on_edges">[docs]</a>
-<span class="k">def</span> <span class="nf">integrate_function_on_edges</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">edges</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">integrate_function_on_edges</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">edges</span><span class="p">):</span>
     <span class="n">integrate_on_edges</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">integrate_function_on_edge</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">integrate_on_edges</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">edges</span><span class="p">))</span></div>
 
@@ -518,7 +518,7 @@
 
 <div class="viewcode-block" id="DofManager">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.DofManager">[docs]</a>
-<span class="k">class</span> <span class="nc">DofManager</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DofManager</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="c1"># TODO get type hints below correct</span>
     <span class="c1"># TODO this one could be moved to jax types if we move towards</span>
     <span class="c1"># TODO jit safe preconditioners/solvers</span>
@@ -533,7 +533,7 @@
     <span class="n">HessColCoords</span><span class="p">:</span> <span class="nb">any</span>
     <span class="n">hessian_bc_mask</span><span class="p">:</span> <span class="nb">any</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">functionSpace</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">EssentialBCs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">functionSpace</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">EssentialBCs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fieldShape</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">(</span><span class="n">functionSpace</span><span class="o">.</span><span class="n">mesh</span><span class="p">),</span> <span class="n">dim</span>
         <span class="n">isBc</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fieldShape</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">ebc</span> <span class="ow">in</span> <span class="n">EssentialBCs</span><span class="p">:</span>
@@ -558,21 +558,21 @@
 
 <div class="viewcode-block" id="DofManager.get_bc_size">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.DofManager.get_bc_size">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_bc_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_bc_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">isBc</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="c1"># item() method casts to Python int</span></div>
 
 
 
 <div class="viewcode-block" id="DofManager.get_unknown_size">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.DofManager.get_unknown_size">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_unknown_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_unknown_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">isUnknown</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="c1"># item() method casts to Python int</span></div>
 
 
 
 <div class="viewcode-block" id="DofManager.create_field">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.DofManager.create_field">[docs]</a>
-    <span class="k">def</span> <span class="nf">create_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">isBc</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">isBc</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">Ubc</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">U</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">isUnknown</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">Uu</span><span class="p">)</span></div>
 
@@ -580,21 +580,21 @@
 
 <div class="viewcode-block" id="DofManager.get_bc_values">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.DofManager.get_bc_values">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_bc_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">U</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_bc_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">U</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">U</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">isBc</span><span class="p">]</span></div>
 
 
 
 <div class="viewcode-block" id="DofManager.get_unknown_values">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.DofManager.get_unknown_values">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_unknown_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">U</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_unknown_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">U</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">U</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">isUnknown</span><span class="p">]</span></div>
 
 
 
 <div class="viewcode-block" id="DofManager.slice_unknowns_with_dof_indices">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.DofManager.slice_unknowns_with_dof_indices">[docs]</a>
-    <span class="k">def</span> <span class="nf">slice_unknowns_with_dof_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">dofIndexSlice</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">slice_unknowns_with_dof_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Uu</span><span class="p">,</span> <span class="n">dofIndexSlice</span><span class="p">):</span>
         <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">isUnknown</span><span class="p">[</span><span class="n">dofIndexSlice</span><span class="p">]</span>
         <span class="n">j</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofToUnknown</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fieldShape</span><span class="p">)[</span><span class="n">dofIndexSlice</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">Uu</span><span class="p">[</span><span class="n">j</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span></div>
@@ -603,7 +603,7 @@
 
 <div class="viewcode-block" id="DofManager._make_hessian_coordinates">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.DofManager._make_hessian_coordinates">[docs]</a>
-    <span class="k">def</span> <span class="nf">_make_hessian_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conns</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_hessian_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conns</span><span class="p">):</span>
         <span class="n">nElUnknowns</span> <span class="o">=</span> <span class="n">onp</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">conns</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
         <span class="n">nHessianEntries</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">e</span><span class="p">,</span> <span class="n">eNodes</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">conns</span><span class="p">):</span>
@@ -632,7 +632,7 @@
 
 <div class="viewcode-block" id="DofManager._make_hessian_bc_mask">
 <a class="viewcode-back" href="../../optimism.html#optimism.FunctionSpace.DofManager._make_hessian_bc_mask">[docs]</a>
-    <span class="k">def</span> <span class="nf">_make_hessian_bc_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conns</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_hessian_bc_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conns</span><span class="p">):</span>
         <span class="n">nElements</span><span class="p">,</span> <span class="n">nNodesPerElement</span> <span class="o">=</span> <span class="n">conns</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">nFields</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">nDofPerElement</span> <span class="o">=</span> <span class="n">nNodesPerElement</span><span class="o">*</span><span class="n">nFields</span>

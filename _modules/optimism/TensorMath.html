@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.TensorMath &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -75,42 +75,42 @@
   <h1>Source code for optimism.TensorMath</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Provide differentiable operations on 3x3 tensors.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">jax</span>
-<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="n">if_then_else</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="n">if_then_else</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Math</span>
 
 <div class="viewcode-block" id="trace">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.trace">[docs]</a>
-<span class="k">def</span> <span class="nf">trace</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">trace</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="I2">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.I2">[docs]</a>
-<span class="k">def</span> <span class="nf">I2</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">I2</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
     <span class="n">trA</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
     <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">trA</span><span class="o">*</span><span class="n">trA</span> <span class="o">-</span> <span class="n">A</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="nd">@A</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="det">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.det">[docs]</a>
-<span class="k">def</span> <span class="nf">det</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">det</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> \
         <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="detpIm1">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.detpIm1">[docs]</a>
-<span class="k">def</span> <span class="nf">detpIm1</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">detpIm1</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute det(A + I) - 1 while preserving precision when A is small compared to the identity.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">trace</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">+</span> <span class="n">I2</span><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="o">+</span> <span class="n">det</span><span class="p">(</span><span class="n">A</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="inv">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.inv">[docs]</a>
-<span class="k">def</span> <span class="nf">inv</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">inv</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
     <span class="n">invA00</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
     <span class="n">invA01</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
     <span class="n">invA02</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
@@ -128,56 +128,56 @@
 
 <div class="viewcode-block" id="deviator">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.deviator">[docs]</a>
-<span class="k">def</span> <span class="nf">deviator</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">deviator</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
     <span class="n">dil</span> <span class="o">=</span> <span class="n">trace</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">A</span> <span class="o">-</span> <span class="p">(</span><span class="n">dil</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="dev">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.dev">[docs]</a>
-<span class="k">def</span> <span class="nf">dev</span><span class="p">(</span><span class="n">strain</span><span class="p">):</span> <span class="k">return</span> <span class="n">deviator</span><span class="p">(</span><span class="n">strain</span><span class="p">)</span></div>
+<span class="k">def</span><span class="w"> </span><span class="nf">dev</span><span class="p">(</span><span class="n">strain</span><span class="p">):</span> <span class="k">return</span> <span class="n">deviator</span><span class="p">(</span><span class="n">strain</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="sym">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.sym">[docs]</a>
-<span class="k">def</span> <span class="nf">sym</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sym</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
     <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">A</span> <span class="o">+</span> <span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="skw">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.skw">[docs]</a>
-<span class="k">def</span> <span class="nf">skw</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">skw</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
     <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">A</span> <span class="o">-</span> <span class="n">A</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="norm">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.norm">[docs]</a>
-<span class="k">def</span> <span class="nf">norm</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">norm</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">Math</span><span class="o">.</span><span class="n">safe_sqrt</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="o">@</span> <span class="n">A</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="norm_of_deviator_squared">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.norm_of_deviator_squared">[docs]</a>
-<span class="k">def</span> <span class="nf">norm_of_deviator_squared</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">norm_of_deviator_squared</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
     <span class="n">dev</span> <span class="o">=</span> <span class="n">deviator</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span><span class="n">dev</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="norm_of_deviator">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.norm_of_deviator">[docs]</a>
-<span class="k">def</span> <span class="nf">norm_of_deviator</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">norm_of_deviator</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">norm</span><span class="p">(</span> <span class="n">deviator</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span> <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="mises_invariant">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.mises_invariant">[docs]</a>
-<span class="k">def</span> <span class="nf">mises_invariant</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mises_invariant</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span><span class="o">*</span><span class="n">norm_of_deviator</span><span class="p">(</span><span class="n">S</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="triaxiality">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.triaxiality">[docs]</a>
-<span class="k">def</span> <span class="nf">triaxiality</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">triaxiality</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
     <span class="n">mean_normal</span> <span class="o">=</span> <span class="n">trace</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">/</span><span class="mf">3.0</span>
     <span class="n">mises_norm</span> <span class="o">=</span> <span class="n">mises_invariant</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
     <span class="c1"># avoid division by zero in case of spherical tensor</span>
@@ -187,7 +187,7 @@
 
 <div class="viewcode-block" id="right_polar_decomposition">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.right_polar_decomposition">[docs]</a>
-<span class="k">def</span> <span class="nf">right_polar_decomposition</span><span class="p">(</span><span class="n">F</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">right_polar_decomposition</span><span class="p">(</span><span class="n">F</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the right polar decomposition of a tensor.</span>
 
 <span class="sd">    Computes the factors R and U such that R@U = F, where R is an</span>
@@ -207,13 +207,13 @@
 
 <div class="viewcode-block" id="tensor_2D_to_3D">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.tensor_2D_to_3D">[docs]</a>
-<span class="k">def</span> <span class="nf">tensor_2D_to_3D</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">tensor_2D_to_3D</span><span class="p">(</span><span class="n">H</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">at</span><span class="p">[</span> <span class="mi">0</span><span class="p">:</span><span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">:</span><span class="n">H</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">H</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="gradient_2D_to_axisymmetric">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.gradient_2D_to_axisymmetric">[docs]</a>
-<span class="k">def</span> <span class="nf">gradient_2D_to_axisymmetric</span><span class="p">(</span><span class="n">dudX_2D</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">gradient_2D_to_axisymmetric</span><span class="p">(</span><span class="n">dudX_2D</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
     <span class="n">dudX</span> <span class="o">=</span> <span class="n">tensor_2D_to_3D</span><span class="p">(</span><span class="n">dudX_2D</span><span class="p">)</span>
     <span class="n">dudX</span> <span class="o">=</span> <span class="n">dudX</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">dudX</span></div>
@@ -221,7 +221,7 @@
 
 <div class="viewcode-block" id="eigen_sym33_non_unit">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.eigen_sym33_non_unit">[docs]</a>
-<span class="k">def</span> <span class="nf">eigen_sym33_non_unit</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">eigen_sym33_non_unit</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute eigen values and vectors of a symmetric 3x3 tensor.</span>
 
 <span class="sd">    Note, returned eigen vectors may not be unit length</span>
@@ -410,7 +410,7 @@
 
 <div class="viewcode-block" id="eigen_sym33_unit">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.eigen_sym33_unit">[docs]</a>
-<span class="k">def</span> <span class="nf">eigen_sym33_unit</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">eigen_sym33_unit</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
     <span class="n">cmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
     <span class="n">cmaxInv</span> <span class="o">=</span> <span class="n">if_then_else</span><span class="p">(</span><span class="n">cmax</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">cmax</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
     <span class="n">scaledTensor</span> <span class="o">=</span> <span class="n">cmaxInv</span> <span class="o">*</span> <span class="n">tensor</span>
@@ -438,7 +438,7 @@
 <span class="c1"># 6 and 5 indicate the polynomial order in the numerator and denominator.</span>
 <div class="viewcode-block" id="cos_of_acos_divided_by_3">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.cos_of_acos_divided_by_3">[docs]</a>
-<span class="k">def</span> <span class="nf">cos_of_acos_divided_by_3</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cos_of_acos_divided_by_3</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     
     <span class="n">x2</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
     <span class="n">x4</span> <span class="o">=</span> <span class="n">x2</span><span class="o">*</span><span class="n">x2</span>
@@ -460,7 +460,7 @@
 
 <div class="viewcode-block" id="_relative_log_difference_taylor">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._relative_log_difference_taylor">[docs]</a>
-<span class="k">def</span> <span class="nf">_relative_log_difference_taylor</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_relative_log_difference_taylor</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">):</span>
     <span class="c1"># Compute a more accurate (mtk::log(lam1) - log(lam2)) / (lam1-lam2) as lam1 -&gt; lam2</span>
     <span class="n">third2</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">3.0</span>
     <span class="n">fifth2</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">5.0</span>
@@ -478,14 +478,14 @@
 
 <div class="viewcode-block" id="_relative_log_difference_no_tolerance_check">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._relative_log_difference_no_tolerance_check">[docs]</a>
-<span class="k">def</span> <span class="nf">_relative_log_difference_no_tolerance_check</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_relative_log_difference_no_tolerance_check</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">):</span>
   <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">lam1</span> <span class="o">/</span> <span class="n">lam2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">lam1</span> <span class="o">-</span> <span class="n">lam2</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="_relative_log_difference">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._relative_log_difference">[docs]</a>
-<span class="k">def</span> <span class="nf">_relative_log_difference</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_relative_log_difference</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">):</span>
     <span class="n">haveLargeDiff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lam1</span> <span class="o">-</span> <span class="n">lam2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.05</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">)</span>
     <span class="n">lamFake</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">haveLargeDiff</span><span class="p">,</span> <span class="n">lam2</span><span class="p">,</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">lam2</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">haveLargeDiff</span><span class="p">,</span>
@@ -496,7 +496,7 @@
 
 <div class="viewcode-block" id="symmetric_matrix_function">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.symmetric_matrix_function">[docs]</a>
-<span class="k">def</span> <span class="nf">symmetric_matrix_function</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">symmetric_matrix_function</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a function on symmetric matrices from a scalar function.&quot;&quot;&quot;</span>
     <span class="n">lam</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">eigen_sym33_unit</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">V</span><span class="nd">@np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="n">lam</span><span class="p">))</span><span class="nd">@V</span><span class="o">.</span><span class="n">T</span></div>
@@ -510,7 +510,7 @@
 <span class="c1"># error as lam1 -&gt; lam2.</span>
 <div class="viewcode-block" id="_symmetric_matrix_function_jvp_helper">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._symmetric_matrix_function_jvp_helper">[docs]</a>
-<span class="k">def</span> <span class="nf">_symmetric_matrix_function_jvp_helper</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">relative_difference</span><span class="p">,</span> <span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_symmetric_matrix_function_jvp_helper</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">relative_difference</span><span class="p">,</span> <span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
     <span class="n">C</span><span class="p">,</span> <span class="o">=</span> <span class="n">primals</span>
     <span class="n">Cdot</span><span class="p">,</span> <span class="o">=</span> <span class="n">tangents</span>
 
@@ -523,7 +523,7 @@
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jacfwd</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
     <span class="n">h_diag</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">df</span><span class="p">)(</span><span class="n">lam</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">rd</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rd</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">):</span>
         <span class="n">x2_safe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x2</span> <span class="o">==</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">x2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x2</span> <span class="o">==</span> <span class="n">x1</span><span class="p">,</span> <span class="n">df</span><span class="p">(</span><span class="n">x1</span><span class="p">),</span> <span class="n">relative_difference</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2_safe</span><span class="p">))</span>
     <span class="n">h12</span> <span class="o">=</span> <span class="n">rd</span><span class="p">(</span><span class="n">lam</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lam</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -550,33 +550,33 @@
 
 
 <span class="nd">@jax</span><span class="o">.</span><span class="n">custom_jvp</span>
-<span class="k">def</span> <span class="nf">sqrt_symm</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sqrt_symm</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Square root of a symmetric positive semi-definite tensor.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">symmetric_matrix_function</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">Math</span><span class="o">.</span><span class="n">safe_sqrt</span><span class="p">)</span>
 
 <div class="viewcode-block" id="_sqrt_relative_difference">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._sqrt_relative_difference">[docs]</a>
-<span class="k">def</span> <span class="nf">_sqrt_relative_difference</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_sqrt_relative_difference</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">):</span>
     <span class="k">return</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">lam1</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">lam2</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="_sqrt_symm_jvp">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._sqrt_symm_jvp">[docs]</a>
 <span class="nd">@sqrt_symm</span><span class="o">.</span><span class="n">defjvp</span>
-<span class="k">def</span> <span class="nf">_sqrt_symm_jvp</span><span class="p">(</span><span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_sqrt_symm_jvp</span><span class="p">(</span><span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
     <span class="n">primal_out</span> <span class="o">=</span> <span class="n">sqrt_symm</span><span class="p">(</span><span class="o">*</span><span class="n">primals</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">primal_out</span><span class="p">,</span> <span class="n">_symmetric_matrix_function_jvp_helper</span><span class="p">(</span><span class="n">Math</span><span class="o">.</span><span class="n">safe_sqrt</span><span class="p">,</span> <span class="n">_sqrt_relative_difference</span><span class="p">,</span> <span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">)</span></div>
 
 
 
 <span class="nd">@jax</span><span class="o">.</span><span class="n">custom_jvp</span>
-<span class="k">def</span> <span class="nf">exp_symm</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">exp_symm</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the matrix exponential of a symmetric matrix.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">symmetric_matrix_function</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">)</span>
 
 <div class="viewcode-block" id="_exp_relative_difference">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._exp_relative_difference">[docs]</a>
-<span class="k">def</span> <span class="nf">_exp_relative_difference</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_exp_relative_difference</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">):</span>
     <span class="n">arg</span> <span class="o">=</span> <span class="n">lam1</span> <span class="o">-</span> <span class="n">lam2</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">lam2</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">expm1</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span><span class="o">/</span><span class="n">arg</span></div>
 
@@ -584,20 +584,20 @@
 <div class="viewcode-block" id="_exp_symm_jvp">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._exp_symm_jvp">[docs]</a>
 <span class="nd">@exp_symm</span><span class="o">.</span><span class="n">defjvp</span>
-<span class="k">def</span> <span class="nf">_exp_symm_jvp</span><span class="p">(</span><span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_exp_symm_jvp</span><span class="p">(</span><span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
     <span class="n">primal_out</span> <span class="o">=</span> <span class="n">exp_symm</span><span class="p">(</span><span class="o">*</span><span class="n">primals</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">primal_out</span><span class="p">,</span> <span class="n">_symmetric_matrix_function_jvp_helper</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">,</span> <span class="n">_exp_relative_difference</span><span class="p">,</span> <span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">)</span></div>
 
 
 
 <span class="nd">@jax</span><span class="o">.</span><span class="n">custom_jvp</span>
-<span class="k">def</span> <span class="nf">log_symm</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">log_symm</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the matrix logarithm of a symmetric positive definite matrix.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">symmetric_matrix_function</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
 
 <div class="viewcode-block" id="_log_relative_difference">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._log_relative_difference">[docs]</a>
-<span class="k">def</span> <span class="nf">_log_relative_difference</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_log_relative_difference</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">):</span>
     <span class="n">lams</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">])</span>
     <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lams</span><span class="p">))</span>
     <span class="n">arg</span> <span class="o">=</span> <span class="n">lams</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">/</span><span class="n">lams</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">-</span> <span class="mi">1</span>
@@ -607,7 +607,7 @@
 <div class="viewcode-block" id="_log_symm_jvp">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._log_symm_jvp">[docs]</a>
 <span class="nd">@log_symm</span><span class="o">.</span><span class="n">defjvp</span>
-<span class="k">def</span> <span class="nf">_log_symm_jvp</span><span class="p">(</span><span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_log_symm_jvp</span><span class="p">(</span><span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
     <span class="n">primal_out</span> <span class="o">=</span> <span class="n">log_symm</span><span class="p">(</span><span class="o">*</span><span class="n">primals</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">primal_out</span><span class="p">,</span> <span class="n">_symmetric_matrix_function_jvp_helper</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="n">_log_relative_difference</span><span class="p">,</span> <span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">)</span></div>
 
@@ -615,14 +615,14 @@
 
 <div class="viewcode-block" id="log_sqrt_symm">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath.log_sqrt_symm">[docs]</a>
-<span class="k">def</span> <span class="nf">log_sqrt_symm</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">log_sqrt_symm</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute matrix logarithm of the square root of a symmetric positive definite matrix.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">log_symm</span><span class="p">(</span><span class="n">A</span><span class="p">)</span></div>
 
 
 
 <span class="nd">@jax</span><span class="o">.</span><span class="n">custom_jvp</span>
-<span class="k">def</span> <span class="nf">pow_symm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pow_symm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raise a symmetric matrix to a power.</span>
 <span class="sd">    </span>
 <span class="sd">    Compute m-fold iterated matrix multiplication of A. Works correctly with</span>
@@ -646,7 +646,7 @@
 <span class="c1"># Please replace with a numerically stable implmentation if you know how!</span>
 <div class="viewcode-block" id="_pow_relative_difference">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._pow_relative_difference">[docs]</a>
-<span class="k">def</span> <span class="nf">_pow_relative_difference</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_pow_relative_difference</span><span class="p">(</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
     <span class="n">lams</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">lam1</span><span class="p">,</span> <span class="n">lam2</span><span class="p">])</span>
     <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lams</span><span class="p">))</span>
     <span class="n">lam_small</span><span class="p">,</span> <span class="n">lam_big</span> <span class="o">=</span> <span class="n">lams</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -657,7 +657,7 @@
 <div class="viewcode-block" id="_pow_symm_jvp">
 <a class="viewcode-back" href="../../optimism.html#optimism.TensorMath._pow_symm_jvp">[docs]</a>
 <span class="nd">@pow_symm</span><span class="o">.</span><span class="n">defjvp</span>
-<span class="k">def</span> <span class="nf">_pow_symm_jvp</span><span class="p">(</span><span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_pow_symm_jvp</span><span class="p">(</span><span class="n">primals</span><span class="p">,</span> <span class="n">tangents</span><span class="p">):</span>
     <span class="n">A</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">primals</span>
     <span class="n">dA</span><span class="p">,</span> <span class="n">dm</span> <span class="o">=</span> <span class="n">tangents</span>
     <span class="k">return</span> <span class="n">pow_symm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="n">_symmetric_matrix_function_jvp_helper</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="p">:</span> <span class="n">_pow_relative_difference</span><span class="p">(</span><span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="p">(</span><span class="n">A</span><span class="p">,),</span> <span class="p">(</span><span class="n">dA</span><span class="p">,))</span></div>

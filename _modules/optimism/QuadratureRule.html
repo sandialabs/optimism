@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.QuadratureRule &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -73,18 +73,18 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.QuadratureRule</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">jax.lax</span> <span class="kn">import</span> <span class="n">switch</span>
-<span class="kn">from</span> <span class="nn">jaxtyping</span> <span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Float</span>
-<span class="kn">import</span> <span class="nn">equinox</span> <span class="k">as</span> <span class="nn">eqx</span>
-<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
-<span class="kn">import</span> <span class="nn">scipy.special</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">jax.lax</span><span class="w"> </span><span class="kn">import</span> <span class="n">switch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jaxtyping</span><span class="w"> </span><span class="kn">import</span> <span class="n">Array</span><span class="p">,</span> <span class="n">Float</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">equinox</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">eqx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">onp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.special</span>
 
 
 <div class="viewcode-block" id="QuadratureRule">
 <a class="viewcode-back" href="../../optimism.html#optimism.QuadratureRule.QuadratureRule">[docs]</a>
-<span class="k">class</span> <span class="nc">QuadratureRule</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">QuadratureRule</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Quadrature rule points and weights.</span>
 <span class="sd">    An ``equinox`` ``Module`` containing ``xigauss``, a ``jax.numpy`` array of the</span>
@@ -94,18 +94,18 @@
     <span class="n">xigauss</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;nq 2&quot;</span><span class="p">]</span>
     <span class="n">wgauss</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s2">&quot;nq&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">xigauss</span>
         <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">wgauss</span>
 
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">xigauss</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
 
 <div class="viewcode-block" id="create_quadrature_rule_1D">
 <a class="viewcode-back" href="../../optimism.html#optimism.QuadratureRule.create_quadrature_rule_1D">[docs]</a>
-<span class="k">def</span> <span class="nf">create_quadrature_rule_1D</span><span class="p">(</span><span class="n">degree</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_quadrature_rule_1D</span><span class="p">(</span><span class="n">degree</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a Gauss-Legendre quadrature on the unit interval.</span>
 
 <span class="sd">    The rule can exactly integrate polynomials of degree up to </span>
@@ -129,7 +129,7 @@
 
 <div class="viewcode-block" id="eval_at_iso_points">
 <a class="viewcode-back" href="../../optimism.html#optimism.QuadratureRule.eval_at_iso_points">[docs]</a>
-<span class="k">def</span> <span class="nf">eval_at_iso_points</span><span class="p">(</span><span class="n">xigauss</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">eval_at_iso_points</span><span class="p">(</span><span class="n">xigauss</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
     <span class="n">fields</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">field</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span> <span class="o">+</span> <span class="p">(</span><span class="n">field</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span><span class="o">-</span><span class="n">field</span><span class="p">[</span><span class="mi">0</span><span class="p">,:])</span> <span class="o">*</span> <span class="n">xi</span> <span class="k">for</span> <span class="n">xi</span> <span class="ow">in</span> <span class="n">xigauss</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">fields</span></div>
 
@@ -137,7 +137,7 @@
 
 <div class="viewcode-block" id="create_quadrature_rule_on_triangle">
 <a class="viewcode-back" href="../../optimism.html#optimism.QuadratureRule.create_quadrature_rule_on_triangle">[docs]</a>
-<span class="k">def</span> <span class="nf">create_quadrature_rule_on_triangle</span><span class="p">(</span><span class="n">degree</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_quadrature_rule_on_triangle</span><span class="p">(</span><span class="n">degree</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a Gauss-Legendre quadrature on the unit triangle.</span>
 
 <span class="sd">    The rule can exactly integrate 2D polynomials up to the value of </span>
@@ -284,7 +284,7 @@
 
 <div class="viewcode-block" id="create_padded_quadrature_rule_1D">
 <a class="viewcode-back" href="../../optimism.html#optimism.QuadratureRule.create_padded_quadrature_rule_1D">[docs]</a>
-<span class="k">def</span> <span class="nf">create_padded_quadrature_rule_1D</span><span class="p">(</span><span class="n">degree</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_padded_quadrature_rule_1D</span><span class="p">(</span><span class="n">degree</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates 1D Gauss quadrature rule data that are padded to maintain a </span>
 <span class="sd">    uniform size, which makes this function jit-able. </span>
 
@@ -308,7 +308,7 @@
 
 <div class="viewcode-block" id="_gauss_quad_1D_1pt">
 <a class="viewcode-back" href="../../optimism.html#optimism.QuadratureRule._gauss_quad_1D_1pt">[docs]</a>
-<span class="k">def</span> <span class="nf">_gauss_quad_1D_1pt</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_gauss_quad_1D_1pt</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
     <span class="n">xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>
     <span class="n">w</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">xi</span><span class="p">,</span><span class="n">w</span></div>
@@ -317,7 +317,7 @@
 
 <div class="viewcode-block" id="_gauss_quad_1D_2pt">
 <a class="viewcode-back" href="../../optimism.html#optimism.QuadratureRule._gauss_quad_1D_2pt">[docs]</a>
-<span class="k">def</span> <span class="nf">_gauss_quad_1D_2pt</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_gauss_quad_1D_2pt</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
     <span class="n">xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.5773502691896257</span><span class="p">,</span>  <span class="mf">0.5773502691896257</span><span class="p">,</span>   <span class="mf">0.</span><span class="p">,</span>
                     <span class="mf">0.</span><span class="p">,</span>                  <span class="mf">0.</span><span class="p">])</span>
     <span class="n">w</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="mf">1.</span><span class="p">,</span>                  <span class="mf">1.</span>                <span class="p">,</span>   <span class="mf">0.</span><span class="p">,</span>
@@ -328,7 +328,7 @@
 
 <div class="viewcode-block" id="_gauss_quad_1D_3pt">
 <a class="viewcode-back" href="../../optimism.html#optimism.QuadratureRule._gauss_quad_1D_3pt">[docs]</a>
-<span class="k">def</span> <span class="nf">_gauss_quad_1D_3pt</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_gauss_quad_1D_3pt</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
     <span class="n">xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.7745966692414834</span><span class="p">,</span>  <span class="mf">0.</span>                <span class="p">,</span>  <span class="mf">0.7745966692414834</span><span class="p">,</span>
                     <span class="mf">0.</span><span class="p">,</span>                  <span class="mf">0.</span><span class="p">])</span>
     <span class="n">w</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="mf">0.5555555555555557</span><span class="p">,</span>  <span class="mf">0.8888888888888888</span><span class="p">,</span>  <span class="mf">0.5555555555555557</span><span class="p">,</span>
@@ -339,7 +339,7 @@
 
 <div class="viewcode-block" id="_gauss_quad_1D_4pt">
 <a class="viewcode-back" href="../../optimism.html#optimism.QuadratureRule._gauss_quad_1D_4pt">[docs]</a>
-<span class="k">def</span> <span class="nf">_gauss_quad_1D_4pt</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_gauss_quad_1D_4pt</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
     <span class="n">xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.8611363115940526</span> <span class="p">,</span> <span class="o">-</span><span class="mf">0.33998104358485626</span><span class="p">,</span>  <span class="mf">0.33998104358485626</span><span class="p">,</span>
                     <span class="mf">0.8611363115940526</span> <span class="p">,</span>  <span class="mf">0.</span><span class="p">])</span>
     <span class="n">w</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="mf">0.3478548451374537</span> <span class="p">,</span>  <span class="mf">0.6521451548625462</span> <span class="p">,</span>  <span class="mf">0.6521451548625462</span> <span class="p">,</span>
@@ -350,7 +350,7 @@
 
 <div class="viewcode-block" id="_gauss_quad_1D_5pt">
 <a class="viewcode-back" href="../../optimism.html#optimism.QuadratureRule._gauss_quad_1D_5pt">[docs]</a>
-<span class="k">def</span> <span class="nf">_gauss_quad_1D_5pt</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_gauss_quad_1D_5pt</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
     <span class="n">xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.906179845938664</span>  <span class="p">,</span>  <span class="o">-</span><span class="mf">0.5384693101056831</span><span class="p">,</span>  <span class="mf">0.</span>                <span class="p">,</span>  <span class="mf">0.5384693101056831</span><span class="p">,</span>  <span class="mf">0.906179845938664</span>  <span class="p">])</span>
     <span class="n">w</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="mf">0.23692688505618942</span><span class="p">,</span>   <span class="mf">0.4786286704993662</span><span class="p">,</span>  <span class="mf">0.568888888888889</span> <span class="p">,</span>  <span class="mf">0.4786286704993662</span><span class="p">,</span>  <span class="mf">0.23692688505618942</span><span class="p">])</span>
 

@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.phasefield.PhaseField &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -73,13 +73,13 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.phasefield.PhaseField</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">onp</span>
 
-<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">FunctionSpace</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mesh</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">QuadratureRule</span>
-<span class="kn">from</span> <span class="nn">optimism.TensorMath</span> <span class="kn">import</span> <span class="n">tensor_2D_to_3D</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionSpace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuadratureRule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.TensorMath</span><span class="w"> </span><span class="kn">import</span> <span class="n">tensor_2D_to_3D</span>
 
 
 <span class="n">PhaseFieldFunctions</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;PhaseFieldFunctions&#39;</span><span class="p">,</span>
@@ -98,7 +98,7 @@
 
 <div class="viewcode-block" id="compute_element_stiffness_from_global_fields">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseField.compute_element_stiffness_from_global_fields">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_element_stiffness_from_global_fields</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">elemInternals</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">elemConns</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_element_stiffness_from_global_fields</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">elemInternals</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">elemConns</span><span class="p">,</span>
                                                  <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemShapeGrads</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span>
                                                  <span class="n">lagrangian_density</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">):</span>
     <span class="n">elemU</span> <span class="o">=</span> <span class="n">U</span><span class="p">[</span><span class="n">elemConns</span><span class="p">,:]</span>
@@ -110,7 +110,7 @@
 
 <div class="viewcode-block" id="_compute_element_stiffnesses">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseField._compute_element_stiffnesses">[docs]</a>
-<span class="k">def</span> <span class="nf">_compute_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">functionSpace</span><span class="p">,</span> <span class="n">lagrangian_density</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">functionSpace</span><span class="p">,</span> <span class="n">lagrangian_density</span><span class="p">,</span>
                                  <span class="n">modify_element_gradient</span><span class="p">):</span>
     <span class="n">f</span> <span class="o">=</span> <span class="n">vmap</span><span class="p">(</span><span class="n">compute_element_stiffness_from_global_fields</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
     <span class="n">fs</span> <span class="o">=</span> <span class="n">functionSpace</span>
@@ -121,12 +121,12 @@
 
 <div class="viewcode-block" id="_compute_block_diagonal_element_stiffnesses">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseField._compute_block_diagonal_element_stiffnesses">[docs]</a>
-<span class="k">def</span> <span class="nf">_compute_block_diagonal_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">functionSpace</span><span class="p">,</span> <span class="n">lagrangian_density</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_block_diagonal_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">functionSpace</span><span class="p">,</span> <span class="n">lagrangian_density</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">):</span>
     <span class="n">elementKMats</span> <span class="o">=</span> <span class="n">_compute_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">functionSpace</span><span class="p">,</span> <span class="n">lagrangian_density</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;zeroing cross terms&#39;</span><span class="p">)</span>
     
-    <span class="k">def</span> <span class="nf">zero_out_cross_terms</span><span class="p">(</span><span class="n">eStiff</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zero_out_cross_terms</span><span class="p">(</span><span class="n">eStiff</span><span class="p">):</span>
         <span class="n">eStiff</span> <span class="o">=</span> <span class="n">eStiff</span><span class="o">.</span><span class="n">at</span><span class="p">[:,:</span><span class="mi">2</span><span class="p">,:,</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">eStiff</span><span class="o">.</span><span class="n">at</span><span class="p">[:,</span><span class="mi">2</span><span class="p">,:,:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
 
@@ -136,7 +136,7 @@
 
 <div class="viewcode-block" id="compute_phase_field_constraint_hessian">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseField.compute_phase_field_constraint_hessian">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_phase_field_constraint_hessian</span><span class="p">(</span><span class="n">Lambda</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">constraint</span><span class="p">,</span> <span class="n">dofManager</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_phase_field_constraint_hessian</span><span class="p">(</span><span class="n">Lambda</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">constraint</span><span class="p">,</span> <span class="n">dofManager</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Augmented Lagrange Hessian terms for lower bound constrained phase field models.</span>
 
 <span class="sd">    Because this is a simple bound constraint, the Hessian terms are diagonal.</span>
@@ -170,7 +170,7 @@
 
 <div class="viewcode-block" id="unpack_fields_2D">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseField.unpack_fields_2D">[docs]</a>
-<span class="k">def</span> <span class="nf">unpack_fields_2D</span><span class="p">(</span><span class="n">U</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">unpack_fields_2D</span><span class="p">(</span><span class="n">U</span><span class="p">):</span>
     <span class="n">disp</span> <span class="o">=</span> <span class="n">U</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
     <span class="n">phase</span> <span class="o">=</span> <span class="n">U</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">disp</span><span class="p">,</span> <span class="n">phase</span></div>
@@ -179,7 +179,7 @@
 
 <div class="viewcode-block" id="unpack_gradients_2D">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseField.unpack_gradients_2D">[docs]</a>
-<span class="k">def</span> <span class="nf">unpack_gradients_2D</span><span class="p">(</span><span class="n">gradU</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">unpack_gradients_2D</span><span class="p">(</span><span class="n">gradU</span><span class="p">):</span>
     <span class="n">dispGrad</span> <span class="o">=</span> <span class="n">gradU</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
     <span class="n">phaseGrad</span> <span class="o">=</span> <span class="n">gradU</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">dispGrad</span><span class="p">,</span> <span class="n">phaseGrad</span></div>
@@ -188,8 +188,8 @@
 
 <div class="viewcode-block" id="energy_density_to_lagrangian_density">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseField.energy_density_to_lagrangian_density">[docs]</a>
-<span class="k">def</span> <span class="nf">energy_density_to_lagrangian_density</span><span class="p">(</span><span class="n">energy_density</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">L</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">gradU</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">energy_density_to_lagrangian_density</span><span class="p">(</span><span class="n">energy_density</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">L</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">gradU</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="n">disp</span><span class="p">,</span> <span class="n">phase</span> <span class="o">=</span> <span class="n">unpack_fields_2D</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
         <span class="n">dispGrad</span> <span class="o">=</span> <span class="n">gradU</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
         <span class="n">phaseGrad</span> <span class="o">=</span> <span class="n">gradU</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
@@ -200,7 +200,7 @@
 
 <div class="viewcode-block" id="plane_strain_gradient">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseField.plane_strain_gradient">[docs]</a>
-<span class="k">def</span> <span class="nf">plane_strain_gradient</span><span class="p">(</span><span class="n">gradU</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plane_strain_gradient</span><span class="p">(</span><span class="n">gradU</span><span class="p">):</span>
     <span class="n">dispGrad2D</span><span class="p">,</span> <span class="n">phaseGrad2D</span> <span class="o">=</span> <span class="n">unpack_gradients_2D</span><span class="p">(</span><span class="n">gradU</span><span class="p">)</span>
     <span class="n">dispGrad</span> <span class="o">=</span> <span class="n">tensor_2D_to_3D</span><span class="p">(</span><span class="n">dispGrad2D</span><span class="p">)</span>
     <span class="n">phaseGrad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">phaseGrad2D</span><span class="p">,</span><span class="mf">0.0</span><span class="p">))</span>
@@ -210,14 +210,14 @@
 
 <div class="viewcode-block" id="plane_strain_element_gradient_transformation">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseField.plane_strain_element_gradient_transformation">[docs]</a>
-<span class="k">def</span> <span class="nf">plane_strain_element_gradient_transformation</span><span class="p">(</span><span class="n">elemGrads</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">elemNodalDofs</span><span class="p">,</span> <span class="n">elemNodalCoords</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plane_strain_element_gradient_transformation</span><span class="p">(</span><span class="n">elemGrads</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">elemNodalDofs</span><span class="p">,</span> <span class="n">elemNodalCoords</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">vmap</span><span class="p">(</span><span class="n">plane_strain_gradient</span><span class="p">)(</span><span class="n">elemGrads</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="axisymmetric_gradient">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseField.axisymmetric_gradient">[docs]</a>
-<span class="k">def</span> <span class="nf">axisymmetric_gradient</span><span class="p">(</span><span class="n">gradU</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">coord</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">axisymmetric_gradient</span><span class="p">(</span><span class="n">gradU</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">coord</span><span class="p">):</span>
     <span class="n">dispGrad2D</span><span class="p">,</span> <span class="n">phaseGrad2D</span> <span class="o">=</span> <span class="n">unpack_gradients_2D</span><span class="p">(</span><span class="n">gradU</span><span class="p">)</span>
     <span class="n">disp</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">unpack_fields_2D</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
     <span class="n">dispGrad</span> <span class="o">=</span> <span class="n">tensor_2D_to_3D</span><span class="p">(</span><span class="n">dispGrad2D</span><span class="p">)</span>
@@ -229,7 +229,7 @@
 
 <div class="viewcode-block" id="axisymmetric_element_gradient_transformation">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseField.axisymmetric_element_gradient_transformation">[docs]</a>
-<span class="k">def</span> <span class="nf">axisymmetric_element_gradient_transformation</span><span class="p">(</span><span class="n">elemGrads</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">elemNodalDofs</span><span class="p">,</span> <span class="n">elemNodalCoords</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">axisymmetric_element_gradient_transformation</span><span class="p">(</span><span class="n">elemGrads</span><span class="p">,</span> <span class="n">elemShapes</span><span class="p">,</span> <span class="n">elemVols</span><span class="p">,</span> <span class="n">elemNodalDofs</span><span class="p">,</span> <span class="n">elemNodalCoords</span><span class="p">):</span>
     <span class="n">elemPointDofs</span> <span class="o">=</span> <span class="n">elemShapes</span><span class="nd">@elemNodalDofs</span>
     <span class="n">elemPointCoords</span> <span class="o">=</span> <span class="n">elemShapes</span><span class="nd">@elemNodalCoords</span>
     <span class="k">return</span> <span class="n">vmap</span><span class="p">(</span><span class="n">axisymmetric_gradient</span><span class="p">)(</span><span class="n">elemGrads</span><span class="p">,</span> <span class="n">elemPointDofs</span><span class="p">,</span> <span class="n">elemPointCoords</span><span class="p">)</span></div>
@@ -238,7 +238,7 @@
 
 <div class="viewcode-block" id="create_phasefield_functions">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseField.create_phasefield_functions">[docs]</a>
-<span class="k">def</span> <span class="nf">create_phasefield_functions</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">mode2D</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_phasefield_functions</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">mode2D</span><span class="p">,</span>
                                 <span class="n">materialModel</span><span class="p">,</span> <span class="n">pressureProjectionDegree</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">fs</span> <span class="o">=</span> <span class="n">functionSpace</span>
 
@@ -251,38 +251,38 @@
 
     <span class="n">L</span> <span class="o">=</span> <span class="n">energy_density_to_lagrangian_density</span><span class="p">(</span><span class="n">materialModel</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">)</span>
     
-    <span class="k">def</span> <span class="nf">compute_internal_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_internal_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">modify_element_gradient</span><span class="p">)</span>
 
     <span class="n">L_output</span> <span class="o">=</span> <span class="n">energy_density_to_lagrangian_density</span><span class="p">(</span><span class="n">materialModel</span><span class="o">.</span><span class="n">compute_output_energy_density</span><span class="p">)</span>
     <span class="n">L_and_fluxes</span> <span class="o">=</span> <span class="n">value_and_grad</span><span class="p">(</span><span class="n">L_output</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">compute_output_energy_densities_and_stresses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_output_energy_densities_and_stresses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">evaluate_on_block</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">L_and_fluxes</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">modify_element_gradient</span><span class="p">)</span>
 
     <span class="n">L_strain</span> <span class="o">=</span> <span class="n">energy_density_to_lagrangian_density</span><span class="p">(</span><span class="n">materialModel</span><span class="o">.</span><span class="n">compute_strain_energy_density</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">compute_strain_energy_density</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_strain_energy_density</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">evaluate_on_block</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">L_strain</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">modify_element_gradient</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">compute_initial_state</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_initial_state</span><span class="p">():</span>
         <span class="k">return</span> <span class="n">materialModel</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">((</span><span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
 
     <span class="n">L_compute_state_new</span> <span class="o">=</span> <span class="n">energy_density_to_lagrangian_density</span><span class="p">(</span><span class="n">materialModel</span><span class="o">.</span><span class="n">compute_state_new</span><span class="p">)</span>
     
-    <span class="k">def</span> <span class="nf">compute_updated_internal_variables</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_updated_internal_variables</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">FunctionSpace</span><span class="o">.</span>\
             <span class="n">evaluate_on_block</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">L_compute_state_new</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">modify_element_gradient</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">compute_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_compute_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span>
 
     
-    <span class="k">def</span> <span class="nf">compute_block_diagonal_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_block_diagonal_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_compute_block_diagonal_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span>
 
     <span class="n">Lphase</span> <span class="o">=</span> <span class="n">energy_density_to_lagrangian_density</span><span class="p">(</span><span class="n">materialModel</span><span class="o">.</span><span class="n">compute_phase_potential_density</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">compute_phase_potential_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_phase_potential_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">Lphase</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">modify_element_gradient</span><span class="p">)</span>
     
     <span class="k">return</span> <span class="n">PhaseFieldFunctions</span><span class="p">(</span><span class="n">compute_internal_energy</span><span class="p">,</span>

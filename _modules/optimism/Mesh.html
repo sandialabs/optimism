@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.Mesh &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -73,9 +73,9 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.Mesh</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
-<span class="kn">from</span> <span class="nn">optimism.JaxConfig</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Interpolants</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">onp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Interpolants</span>
 
 
 <span class="n">Mesh</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Mesh&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;coords&#39;</span><span class="p">,</span><span class="s1">&#39;conns&#39;</span><span class="p">,</span><span class="s1">&#39;simplexNodesOrdinals&#39;</span><span class="p">,</span>
@@ -107,7 +107,7 @@
 
 <div class="viewcode-block" id="create_structured_mesh_data">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.create_structured_mesh_data">[docs]</a>
-<span class="k">def</span> <span class="nf">create_structured_mesh_data</span><span class="p">(</span><span class="n">Nx</span><span class="p">,</span> <span class="n">Ny</span><span class="p">,</span> <span class="n">xExtent</span><span class="p">,</span> <span class="n">yExtent</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_structured_mesh_data</span><span class="p">(</span><span class="n">Nx</span><span class="p">,</span> <span class="n">Ny</span><span class="p">,</span> <span class="n">xExtent</span><span class="p">,</span> <span class="n">yExtent</span><span class="p">):</span>
     <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">xExtent</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xExtent</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">Nx</span><span class="p">)</span>
     <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">yExtent</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">yExtent</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">Ny</span><span class="p">)</span>
 
@@ -130,7 +130,7 @@
 
 <div class="viewcode-block" id="construct_mesh_from_basic_data">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.construct_mesh_from_basic_data">[docs]</a>
-<span class="k">def</span> <span class="nf">construct_mesh_from_basic_data</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">conns</span><span class="p">,</span> <span class="n">blocks</span><span class="p">,</span> <span class="n">nodeSets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sideSets</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">construct_mesh_from_basic_data</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">conns</span><span class="p">,</span> <span class="n">blocks</span><span class="p">,</span> <span class="n">nodeSets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sideSets</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">element</span><span class="p">,</span> <span class="n">element1d</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">make_parent_elements</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">vertexNodes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">Mesh</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">conns</span><span class="p">,</span> <span class="n">vertexNodes</span><span class="p">,</span>
@@ -140,7 +140,7 @@
 
 <div class="viewcode-block" id="construct_structured_mesh">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.construct_structured_mesh">[docs]</a>
-<span class="k">def</span> <span class="nf">construct_structured_mesh</span><span class="p">(</span><span class="n">Nx</span><span class="p">,</span> <span class="n">Ny</span><span class="p">,</span> <span class="n">xExtent</span><span class="p">,</span> <span class="n">yExtent</span><span class="p">,</span> <span class="n">elementOrder</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">useBubbleElement</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">construct_structured_mesh</span><span class="p">(</span><span class="n">Nx</span><span class="p">,</span> <span class="n">Ny</span><span class="p">,</span> <span class="n">xExtent</span><span class="p">,</span> <span class="n">yExtent</span><span class="p">,</span> <span class="n">elementOrder</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">useBubbleElement</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">coords</span><span class="p">,</span> <span class="n">conns</span> <span class="o">=</span> <span class="n">create_structured_mesh_data</span><span class="p">(</span><span class="n">Nx</span><span class="p">,</span> <span class="n">Ny</span><span class="p">,</span> <span class="n">xExtent</span><span class="p">,</span> <span class="n">yExtent</span><span class="p">)</span>
     <span class="n">blocks</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;block_0&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">conns</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])}</span>
     <span class="n">mesh</span> <span class="o">=</span> <span class="n">construct_mesh_from_basic_data</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">conns</span><span class="p">,</span> <span class="n">blocks</span><span class="p">)</span>
@@ -152,14 +152,14 @@
 
 <div class="viewcode-block" id="get_blocks">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.get_blocks">[docs]</a>
-<span class="k">def</span> <span class="nf">get_blocks</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">blockNames</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_blocks</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">blockNames</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">blockNames</span><span class="p">)</span></div>
 
 
     
 <div class="viewcode-block" id="combine_nodesets">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.combine_nodesets">[docs]</a>
-<span class="k">def</span> <span class="nf">combine_nodesets</span><span class="p">(</span><span class="n">set1</span><span class="p">,</span> <span class="n">set2</span><span class="p">,</span> <span class="n">nodeOffset</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">combine_nodesets</span><span class="p">(</span><span class="n">set1</span><span class="p">,</span> <span class="n">set2</span><span class="p">,</span> <span class="n">nodeOffset</span><span class="p">):</span>
     <span class="n">newSet</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">set1</span><span class="o">!=</span><span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">set1</span><span class="p">:</span>
@@ -173,7 +173,7 @@
 
 <div class="viewcode-block" id="combine_sidesets">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.combine_sidesets">[docs]</a>
-<span class="k">def</span> <span class="nf">combine_sidesets</span><span class="p">(</span><span class="n">set1</span><span class="p">,</span> <span class="n">set2</span><span class="p">,</span> <span class="n">elemOffset</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">combine_sidesets</span><span class="p">(</span><span class="n">set1</span><span class="p">,</span> <span class="n">set2</span><span class="p">,</span> <span class="n">elemOffset</span><span class="p">):</span>
     <span class="n">newSet</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">set1</span><span class="o">!=</span><span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">set1</span><span class="p">:</span>
@@ -189,7 +189,7 @@
 
 <div class="viewcode-block" id="combine_blocks">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.combine_blocks">[docs]</a>
-<span class="k">def</span> <span class="nf">combine_blocks</span><span class="p">(</span><span class="n">set1</span><span class="p">,</span> <span class="n">set2</span><span class="p">,</span> <span class="n">elemOffset</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">combine_blocks</span><span class="p">(</span><span class="n">set1</span><span class="p">,</span> <span class="n">set2</span><span class="p">,</span> <span class="n">elemOffset</span><span class="p">):</span>
     <span class="c1"># meshes are required to have at least one block</span>
     <span class="n">newSet</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -206,7 +206,7 @@
 
 <div class="viewcode-block" id="combine_mesh">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.combine_mesh">[docs]</a>
-<span class="k">def</span> <span class="nf">combine_mesh</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">combine_mesh</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="p">):</span>
     <span class="c1"># need to implement block combining</span>
     
     <span class="n">mesh1</span><span class="p">,</span><span class="n">disp1</span> <span class="o">=</span> <span class="n">m1</span>
@@ -243,7 +243,7 @@
 
 <div class="viewcode-block" id="mesh_with_coords">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.mesh_with_coords">[docs]</a>
-<span class="k">def</span> <span class="nf">mesh_with_coords</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">coords</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mesh_with_coords</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">coords</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">Mesh</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">,</span><span class="n">mesh</span><span class="o">.</span><span class="n">simplexNodesOrdinals</span><span class="p">,</span>
                 <span class="n">mesh</span><span class="o">.</span><span class="n">parentElement</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">parentElement1d</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">nodeSets</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">sideSets</span><span class="p">)</span></div>
 
@@ -251,7 +251,7 @@
 
 <div class="viewcode-block" id="mesh_with_nodesets">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.mesh_with_nodesets">[docs]</a>
-<span class="k">def</span> <span class="nf">mesh_with_nodesets</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">nodeSets</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mesh_with_nodesets</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">nodeSets</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">Mesh</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">,</span>
                 <span class="n">mesh</span><span class="o">.</span><span class="n">simplexNodesOrdinals</span><span class="p">,</span>
                 <span class="n">mesh</span><span class="o">.</span><span class="n">parentElement</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">parentElement1d</span><span class="p">,</span>
@@ -261,7 +261,7 @@
 
 <div class="viewcode-block" id="mesh_with_blocks">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.mesh_with_blocks">[docs]</a>
-<span class="k">def</span> <span class="nf">mesh_with_blocks</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">blocks</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mesh_with_blocks</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">blocks</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">Mesh</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">,</span>
                 <span class="n">mesh</span><span class="o">.</span><span class="n">simplexNodesOrdinals</span><span class="p">,</span>
                 <span class="n">mesh</span><span class="o">.</span><span class="n">parentElement</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">parentElement1d</span><span class="p">,</span>
@@ -271,7 +271,7 @@
 
 <div class="viewcode-block" id="create_edges">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.create_edges">[docs]</a>
-<span class="k">def</span> <span class="nf">create_edges</span><span class="p">(</span><span class="n">conns</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_edges</span><span class="p">(</span><span class="n">conns</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate topological information about edges in a triangulation.</span>
 
 <span class="sd">    Parameters</span>
@@ -322,7 +322,7 @@
 
 <div class="viewcode-block" id="create_higher_order_mesh_from_simplex_mesh">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.create_higher_order_mesh_from_simplex_mesh">[docs]</a>
-<span class="k">def</span> <span class="nf">create_higher_order_mesh_from_simplex_mesh</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">useBubbleElement</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">copyNodeSets</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">createNodeSetsFromSideSets</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_higher_order_mesh_from_simplex_mesh</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">useBubbleElement</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">copyNodeSets</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">createNodeSetsFromSideSets</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">order</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span> <span class="k">return</span> <span class="n">mesh</span>
 
     <span class="n">parentElement1d</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">make_parent_element_1d</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
@@ -373,7 +373,7 @@
         <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">N0</span><span class="p">,</span><span class="n">N1</span><span class="p">,</span><span class="n">N2</span><span class="p">))</span>
         <span class="n">interiorCoords</span> <span class="o">=</span> <span class="n">vmap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">triConn</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="n">triConn</span><span class="p">]))(</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">add_element_interior_nodes</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">newNodeOrdinals</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">add_element_interior_nodes</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">newNodeOrdinals</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">conn</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">basis</span><span class="o">.</span><span class="n">interiorNodes</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">newNodeOrdinals</span><span class="p">)</span>
 
         <span class="n">nTri</span> <span class="o">=</span> <span class="n">conns</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -401,10 +401,10 @@
 
 <div class="viewcode-block" id="create_nodesets_from_sidesets">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.create_nodesets_from_sidesets">[docs]</a>
-<span class="k">def</span> <span class="nf">create_nodesets_from_sidesets</span><span class="p">(</span><span class="n">mesh</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_nodesets_from_sidesets</span><span class="p">(</span><span class="n">mesh</span><span class="p">):</span>
     <span class="n">nodeSets</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="nf">get_nodes_from_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_nodes_from_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">):</span>
         <span class="n">elemOrdinal</span> <span class="o">=</span> <span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">sideOrdinal</span> <span class="o">=</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="n">elemOrdinal</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">parentElement</span><span class="o">.</span><span class="n">faceNodes</span><span class="p">[</span><span class="n">sideOrdinal</span><span class="p">,:]]</span>
@@ -419,21 +419,21 @@
 
 <div class="viewcode-block" id="num_elements">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.num_elements">[docs]</a>
-<span class="k">def</span> <span class="nf">num_elements</span><span class="p">(</span><span class="n">mesh</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">num_elements</span><span class="p">(</span><span class="n">mesh</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
 
 <div class="viewcode-block" id="num_nodes">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.num_nodes">[docs]</a>
-<span class="k">def</span> <span class="nf">num_nodes</span><span class="p">(</span><span class="n">mesh</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">num_nodes</span><span class="p">(</span><span class="n">mesh</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
 
 <div class="viewcode-block" id="get_edge_node_indices">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.get_edge_node_indices">[docs]</a>
-<span class="k">def</span> <span class="nf">get_edge_node_indices</span><span class="p">(</span><span class="n">mesh</span> <span class="p">:</span> <span class="n">Mesh</span><span class="p">,</span> <span class="n">edge</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_edge_node_indices</span><span class="p">(</span><span class="n">mesh</span> <span class="p">:</span> <span class="n">Mesh</span><span class="p">,</span> <span class="n">edge</span><span class="p">):</span>
     <span class="n">edgeNodes</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">parentElement</span><span class="o">.</span><span class="n">faceNodes</span><span class="p">[</span><span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">:]</span>
     <span class="k">return</span> <span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">[</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edgeNodes</span><span class="p">]</span></div>
 
@@ -441,7 +441,7 @@
 
 <div class="viewcode-block" id="get_edge_field">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.get_edge_field">[docs]</a>
-<span class="k">def</span> <span class="nf">get_edge_field</span><span class="p">(</span><span class="n">mesh</span> <span class="p">:</span> <span class="n">Mesh</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_edge_field</span><span class="p">(</span><span class="n">mesh</span> <span class="p">:</span> <span class="n">Mesh</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Evaluate field on nodes of an element edge.</span>
 <span class="sd">    Arguments:</span>
 
@@ -455,14 +455,14 @@
 
 <div class="viewcode-block" id="get_edge_coords">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.get_edge_coords">[docs]</a>
-<span class="k">def</span> <span class="nf">get_edge_coords</span><span class="p">(</span><span class="n">mesh</span> <span class="p">:</span> <span class="n">Mesh</span><span class="p">,</span> <span class="n">edge</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_edge_coords</span><span class="p">(</span><span class="n">mesh</span> <span class="p">:</span> <span class="n">Mesh</span><span class="p">,</span> <span class="n">edge</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">get_edge_field</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="compute_edge_vectors">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.compute_edge_vectors">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_edge_vectors</span><span class="p">(</span><span class="n">mesh</span> <span class="p">:</span> <span class="n">Mesh</span><span class="p">,</span> <span class="n">edgeCoords</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_edge_vectors</span><span class="p">(</span><span class="n">mesh</span> <span class="p">:</span> <span class="n">Mesh</span><span class="p">,</span> <span class="n">edgeCoords</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get geometric vectors for an element edge.</span>
 <span class="sd">    </span>
 <span class="sd">    Assumes that the edgs has a constant shape jacobian, that is, the</span>

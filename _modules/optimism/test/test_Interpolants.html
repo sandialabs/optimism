@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.test.test_Interpolants &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -73,23 +73,23 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.test.test_Interpolants</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
-<span class="kn">import</span> <span class="nn">unittest</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">onp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">unittest</span>
 
-<span class="kn">import</span> <span class="nn">jax</span>
-<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Interpolants</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">QuadratureRule</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">TestFixture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Interpolants</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuadratureRule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestFixture</span>
 
     
 <span class="n">tol</span> <span class="o">=</span> <span class="mf">1e-14</span>
 
 <div class="viewcode-block" id="generate_random_points_in_triangle">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Interpolants.generate_random_points_in_triangle">[docs]</a>
-<span class="k">def</span> <span class="nf">generate_random_points_in_triangle</span><span class="p">(</span><span class="n">npts</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_random_points_in_triangle</span><span class="p">(</span><span class="n">npts</span><span class="p">):</span>
     <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">npts</span><span class="p">,))</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">npts</span><span class="p">)</span>
@@ -103,11 +103,11 @@
 
 <div class="viewcode-block" id="TestInterpolants">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Interpolants.TestInterpolants">[docs]</a>
-<span class="k">class</span> <span class="nc">TestInterpolants</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestInterpolants</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
     
 <div class="viewcode-block" id="TestInterpolants.setUp">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.setUp">[docs]</a>
-    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">maxDegree</span> <span class="o">=</span> <span class="mi">5</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">elements1d</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">=</span> <span class="p">[]</span>
@@ -123,7 +123,7 @@
 
 <div class="viewcode-block" id="TestInterpolants.test_1D_interpolant_points_in_element">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.test_1D_interpolant_points_in_element">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_1D_interpolant_points_in_element</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_1D_interpolant_points_in_element</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements1d</span><span class="p">:</span>
             <span class="n">p</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">coordinates</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">p</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">onp</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">p</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">))</span></div>
@@ -132,7 +132,7 @@
 
 <div class="viewcode-block" id="TestInterpolants.test_1D_element_element_topological_nodesets">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.test_1D_element_element_topological_nodesets">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_1D_element_element_topological_nodesets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_1D_element_element_topological_nodesets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements1d</span><span class="p">:</span>
             <span class="n">p</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">coordinates</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assertNear</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="n">element</span><span class="o">.</span><span class="n">vertexNodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span>
@@ -146,7 +146,7 @@
             
 <div class="viewcode-block" id="TestInterpolants.test_tri_interpolant_points_in_element">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.test_tri_interpolant_points_in_element">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_tri_interpolant_points_in_element</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_tri_interpolant_points_in_element</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
             <span class="n">p</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">coordinates</span>
             <span class="c1"># x conditions</span>
@@ -160,7 +160,7 @@
 
 <div class="viewcode-block" id="TestInterpolants.test_tri_element_element_topological_nodesets">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.test_tri_element_element_topological_nodesets">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_tri_element_element_topological_nodesets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_tri_element_element_topological_nodesets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
             <span class="n">p</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">coordinates</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="n">element</span><span class="o">.</span><span class="n">vertexNodes</span><span class="p">[</span><span class="mi">0</span><span class="p">],:],</span>
@@ -182,7 +182,7 @@
 
 <div class="viewcode-block" id="TestInterpolants.test_tri_face_nodes_match_1D_lobatto_nodes">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.test_tri_face_nodes_match_1D_lobatto_nodes">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_tri_face_nodes_match_1D_lobatto_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_tri_face_nodes_match_1D_lobatto_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">element1d</span><span class="p">,</span> <span class="n">elementTri</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elements1d</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">faceNodeIds</span> <span class="ow">in</span> <span class="n">elementTri</span><span class="o">.</span><span class="n">faceNodes</span><span class="p">:</span>
                 <span class="c1"># get the triangle face node points directly</span>
@@ -197,7 +197,7 @@
 
 <div class="viewcode-block" id="TestInterpolants.test_tri_shape_partition_of_unity">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.test_tri_shape_partition_of_unity">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_tri_shape_partition_of_unity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_tri_shape_partition_of_unity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
             <span class="n">shapes</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">shape2d</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">degree</span><span class="p">,</span> <span class="n">element</span><span class="o">.</span><span class="n">coordinates</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qr</span><span class="o">.</span><span class="n">xigauss</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">shapes</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nQPts</span><span class="p">),</span> <span class="mi">14</span><span class="p">)</span></div>
@@ -206,7 +206,7 @@
 
 <div class="viewcode-block" id="TestInterpolants.test_tri_shapeGrads_partition_of_unity">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.test_tri_shapeGrads_partition_of_unity">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_tri_shapeGrads_partition_of_unity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_tri_shapeGrads_partition_of_unity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">shapeGradients</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">shape2d</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">degree</span><span class="p">,</span> <span class="n">element</span><span class="o">.</span><span class="n">coordinates</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">qr</span><span class="o">.</span><span class="n">xigauss</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assertArrayNear</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">shapeGradients</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nQPts</span><span class="p">,</span> <span class="mi">2</span><span class="p">)),</span> <span class="mi">14</span><span class="p">)</span></div>
@@ -215,7 +215,7 @@
             
 <div class="viewcode-block" id="TestInterpolants.test_shape_kronecker_delta_property">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.test_shape_kronecker_delta_property">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_shape_kronecker_delta_property</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_shape_kronecker_delta_property</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
             <span class="n">shapeAtNodes</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">shape2d</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">degree</span><span class="p">,</span> <span class="n">element</span><span class="o">.</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">element</span><span class="o">.</span><span class="n">coordinates</span><span class="p">)</span>
             <span class="n">nNodes</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -225,7 +225,7 @@
 
 <div class="viewcode-block" id="TestInterpolants.test_interpolation">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.test_interpolation">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_interpolation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_interpolation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">generate_random_points_in_triangle</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
             <span class="n">degree</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">degree</span>
@@ -243,7 +243,7 @@
 
 <div class="viewcode-block" id="TestInterpolants.test_grad_interpolation">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.test_grad_interpolation">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_grad_interpolation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_grad_interpolation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">generate_random_points_in_triangle</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
             <span class="n">degree</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">degree</span>
@@ -271,7 +271,7 @@
 
 <div class="viewcode-block" id="TestInterpolants.no_test_plot_high_order_nodes">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.no_test_plot_high_order_nodes">[docs]</a>
-    <span class="k">def</span> <span class="nf">no_test_plot_high_order_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">no_test_plot_high_order_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">degree</span> <span class="o">=</span> <span class="mi">10</span>
         <span class="n">nodeScheme</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">make_parent_element_2d</span><span class="p">(</span><span class="n">degree</span><span class="p">)</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">nodeScheme</span><span class="o">.</span><span class="n">coordinates</span>
@@ -285,10 +285,10 @@
 
 <div class="viewcode-block" id="TestBubbleInterpolants">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Interpolants.TestBubbleInterpolants">[docs]</a>
-<span class="k">class</span> <span class="nc">TestBubbleInterpolants</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestBubbleInterpolants</span><span class="p">(</span><span class="n">TestFixture</span><span class="o">.</span><span class="n">TestFixture</span><span class="p">):</span>
 <div class="viewcode-block" id="TestBubbleInterpolants.setUp">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Interpolants.TestBubbleInterpolants.setUp">[docs]</a>
-    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">maxDegree</span> <span class="o">=</span> <span class="mi">5</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">qr</span> <span class="o">=</span> <span class="n">QuadratureRule</span><span class="o">.</span><span class="n">create_quadrature_rule_on_triangle</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="n">maxDegree</span><span class="p">)</span>
@@ -299,7 +299,7 @@
 
 <div class="viewcode-block" id="TestBubbleInterpolants.test_bubble_interpolation">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Interpolants.TestBubbleInterpolants.test_bubble_interpolation">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_bubble_interpolation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_bubble_interpolation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">generate_random_points_in_triangle</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">subTest</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="n">element</span><span class="o">.</span><span class="n">degree</span><span class="p">):</span>
@@ -317,7 +317,7 @@
 
 <div class="viewcode-block" id="TestBubbleInterpolants.test_bubble_grad_interpolation">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Interpolants.TestBubbleInterpolants.test_bubble_grad_interpolation">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_bubble_grad_interpolation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_bubble_grad_interpolation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">generate_random_points_in_triangle</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
             <span class="n">degree</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">degree</span>
@@ -345,7 +345,7 @@
 
 <div class="viewcode-block" id="TestBubbleInterpolants.no_test_plot_shape_functions">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_Interpolants.TestBubbleInterpolants.no_test_plot_shape_functions">[docs]</a>
-    <span class="k">def</span> <span class="nf">no_test_plot_shape_functions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">no_test_plot_shape_functions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;degree=&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">degree</span><span class="p">)</span>
 

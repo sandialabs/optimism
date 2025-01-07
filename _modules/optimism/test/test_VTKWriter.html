@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>optimism.test.test_VTKWriter &mdash; optimism 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
 
@@ -14,7 +14,7 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -73,25 +73,25 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.test.test_VTKWriter</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">unittest</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">unittest</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
-<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">optimism.VTKWriter</span> <span class="kn">import</span> <span class="n">VTKWriter</span><span class="p">,</span> <span class="n">VTKFieldType</span><span class="p">,</span> <span class="n">VTKDataType</span>
-<span class="kn">from</span> <span class="nn">optimism</span> <span class="kn">import</span> <span class="n">Mesh</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">MeshFixture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.VTKWriter</span><span class="w"> </span><span class="kn">import</span> <span class="n">VTKWriter</span><span class="p">,</span> <span class="n">VTKFieldType</span><span class="p">,</span> <span class="n">VTKDataType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshFixture</span>
 
 
 <div class="viewcode-block" id="TestVTKWriter">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_VTKWriter.TestVTKWriter">[docs]</a>
-<span class="k">class</span> <span class="nc">TestVTKWriter</span><span class="p">(</span><span class="n">MeshFixture</span><span class="o">.</span><span class="n">MeshFixture</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestVTKWriter</span><span class="p">(</span><span class="n">MeshFixture</span><span class="o">.</span><span class="n">MeshFixture</span><span class="p">):</span>
     <span class="n">baseFileName</span> <span class="o">=</span> <span class="s1">&#39;output&#39;</span>
 
 <div class="viewcode-block" id="TestVTKWriter.setUp">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_VTKWriter.TestVTKWriter.setUp">[docs]</a>
-    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Nx</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ny</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="n">xRange</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]</span>
@@ -117,7 +117,7 @@
         
 <div class="viewcode-block" id="TestVTKWriter.tearDown">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_VTKWriter.TestVTKWriter.tearDown">[docs]</a>
-    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">baseFileName</span> <span class="o">+</span> <span class="s1">&#39;.vtk&#39;</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">baseFileName</span> <span class="o">+</span> <span class="s1">&#39;.vtk&#39;</span><span class="p">)</span></div>
 
@@ -125,7 +125,7 @@
 
 <div class="viewcode-block" id="TestVTKWriter.test_vtk_write">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_VTKWriter.TestVTKWriter.test_vtk_write">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_vtk_write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_vtk_write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">baseFileName</span> <span class="o">+</span> <span class="s1">&#39;.vtk&#39;</span><span class="p">))</span></div>
 
@@ -133,7 +133,7 @@
 
 <div class="viewcode-block" id="TestVTKWriter.test_vtk_no_warning_for_inconsistent_sizes">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_VTKWriter.TestVTKWriter.test_vtk_no_warning_for_inconsistent_sizes">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_vtk_no_warning_for_inconsistent_sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_vtk_no_warning_for_inconsistent_sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">()</span></div>
@@ -144,12 +144,12 @@
 
 <div class="viewcode-block" id="TestVTKWriterHigherOrder">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_VTKWriter.TestVTKWriterHigherOrder">[docs]</a>
-<span class="k">class</span> <span class="nc">TestVTKWriterHigherOrder</span><span class="p">(</span><span class="n">MeshFixture</span><span class="o">.</span><span class="n">MeshFixture</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestVTKWriterHigherOrder</span><span class="p">(</span><span class="n">MeshFixture</span><span class="o">.</span><span class="n">MeshFixture</span><span class="p">):</span>
     <span class="n">baseFileName</span> <span class="o">=</span> <span class="s1">&#39;output&#39;</span>
 
 <div class="viewcode-block" id="TestVTKWriterHigherOrder.setUp">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_VTKWriter.TestVTKWriterHigherOrder.setUp">[docs]</a>
-    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Nx</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Ny</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="n">xRange</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]</span>
@@ -163,7 +163,7 @@
         
 <div class="viewcode-block" id="TestVTKWriterHigherOrder.tearDown">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_VTKWriter.TestVTKWriterHigherOrder.tearDown">[docs]</a>
-    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">baseFileName</span> <span class="o">+</span> <span class="s1">&#39;.vtk&#39;</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">baseFileName</span> <span class="o">+</span> <span class="s1">&#39;.vtk&#39;</span><span class="p">)</span></div>
 
@@ -171,7 +171,7 @@
             
 <div class="viewcode-block" id="TestVTKWriterHigherOrder.make_high_order_writer_with_fields">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_VTKWriter.TestVTKWriterHigherOrder.make_high_order_writer_with_fields">[docs]</a>
-    <span class="k">def</span> <span class="nf">make_high_order_writer_with_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mesh</span><span class="p">):</span>     
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_high_order_writer_with_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mesh</span><span class="p">):</span>     
         <span class="bp">self</span><span class="o">.</span><span class="n">writer</span> <span class="o">=</span> <span class="n">VTKWriter</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">baseFileName</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">baseFileName</span><span class="p">)</span>
         
         <span class="n">scalarField</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">coords</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
@@ -189,7 +189,7 @@
         
 <div class="viewcode-block" id="TestVTKWriterHigherOrder.test_vtk_writer_on_quadratic_elements">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_VTKWriter.TestVTKWriterHigherOrder.test_vtk_writer_on_quadratic_elements">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_vtk_writer_on_quadratic_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_vtk_writer_on_quadratic_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">mesh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">create_higher_order_mesh_from_simplex_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simplexMesh</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">make_high_order_writer_with_fields</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
@@ -199,7 +199,7 @@
         
 <div class="viewcode-block" id="TestVTKWriterHigherOrder.test_vtk_writer_no_inconsistent_sizes_with_quadratic_elements">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_VTKWriter.TestVTKWriterHigherOrder.test_vtk_writer_no_inconsistent_sizes_with_quadratic_elements">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_vtk_writer_no_inconsistent_sizes_with_quadratic_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_vtk_writer_no_inconsistent_sizes_with_quadratic_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">mesh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">create_higher_order_mesh_from_simplex_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simplexMesh</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">make_high_order_writer_with_fields</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
@@ -210,7 +210,7 @@
 
 <div class="viewcode-block" id="TestVTKWriterHigherOrder.test_vtk_writer_on_cubic_elements">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_VTKWriter.TestVTKWriterHigherOrder.test_vtk_writer_on_cubic_elements">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_vtk_writer_on_cubic_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_vtk_writer_on_cubic_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">mesh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">create_higher_order_mesh_from_simplex_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simplexMesh</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">make_high_order_writer_with_fields</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
@@ -220,7 +220,7 @@
         
 <div class="viewcode-block" id="TestVTKWriterHigherOrder.test_vtk_writer_no_inconsistent_sizes_with_cubic_elements">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_VTKWriter.TestVTKWriterHigherOrder.test_vtk_writer_no_inconsistent_sizes_with_cubic_elements">[docs]</a>
-    <span class="k">def</span> <span class="nf">test_vtk_writer_no_inconsistent_sizes_with_cubic_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_vtk_writer_no_inconsistent_sizes_with_cubic_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">mesh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">create_higher_order_mesh_from_simplex_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simplexMesh</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">make_high_order_writer_with_fields</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
