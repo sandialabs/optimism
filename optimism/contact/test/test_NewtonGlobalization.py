@@ -171,7 +171,7 @@ class TestGMRESSolver(TestFixture):
         randRhs = np.array(rand(self.x.size))
         randRhs *= 0.25 / np.linalg.norm(randRhs)
 
-        penalty0 = unconstrainedObjective.hessian_vec(self.x, randRhs) @ randRhs
+        penalty0 = unconstrainedObjective.hessian_vec(self.x, np.array(randRhs, dtype=np.float64)) @ randRhs
         
         alObjective = ConstrainedObjective(lambda x,p: objective(x),
                                            lambda x,p: constraint(x),
