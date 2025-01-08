@@ -133,7 +133,7 @@ class TestGMRESSolver(TestFixture):
         xl = np.hstack( (self.x, self.lam) )
         r0 = np.linalg.norm( residual(xl) )
         
-        xl += newton_step(residual, lambda v: linear_op(xl,v), xl)[0]
+        xl += newton_step(residual, lambda v: linear_op(xl, np.array(v, dtype=np.float64)), xl)[0]
         r1 = np.linalg.norm( residual(xl) )
 
         self.assertTrue( r1 < 10*r0 )
@@ -144,7 +144,7 @@ class TestGMRESSolver(TestFixture):
         linear_op = create_linear_op(residual)
         x = np.array([0.1])
         r0 = np.linalg.norm( residual(x) )
-        x += globalized_newton_step(residual, lambda v: linear_op(x,v), x, self.etak, self.t)
+        x += globalized_newton_step(residual, lambda v: linear_op(x, np.array(v, dtype=np.float64)), x, self.etak, self.t)
         r1 = np.linalg.norm( residual(x) )
 
         self.assertTrue( r1 < r0 )
@@ -154,7 +154,7 @@ class TestGMRESSolver(TestFixture):
         xl = np.hstack( (self.x, self.lam) )
         r0 = np.linalg.norm( residual(xl) )
         
-        xl += globalized_newton_step(residual, lambda v: linear_op(xl,v), xl, self.etak, self.t)
+        xl += globalized_newton_step(residual, lambda v: linear_op(xl, np.array(v, dtype=np.float64)), xl, self.etak, self.t)
         r1 = np.linalg.norm( residual(xl) )
 
         self.assertTrue( r1 < r0 )
@@ -171,7 +171,7 @@ class TestGMRESSolver(TestFixture):
         randRhs = np.array(rand(self.x.size))
         randRhs *= 0.25 / np.linalg.norm(randRhs)
 
-        penalty0 = unconstrainedObjective.hessian_vec(self.x, randRhs) @ randRhs
+        penalty0 = unconstrainedObjective.hessian_vec(self.x, np.array(randRhs, dtype=np.float64)) @ randRhs
         
         alObjective = ConstrainedObjective(lambda x,p: objective(x),
                                            lambda x,p: constraint(x),
