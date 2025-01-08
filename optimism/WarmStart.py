@@ -1,8 +1,7 @@
-from scipy.sparse.linalg import cg, LinearOperator
-
 from optimism.JaxConfig import *
-import optimism.Objective as Objective
+from scipy.sparse.linalg import cg, LinearOperator
     
+
 def warm_start_increment(objective, x, pNew, index=0):
     dp = objective.p[index] - pNew[index]
 
