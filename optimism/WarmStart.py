@@ -1,7 +1,6 @@
+from optimism.JaxConfig import *
 from scipy.sparse.linalg import cg, LinearOperator
 
-from optimism.JaxConfig import *
-import optimism.Objective as Objective
     
 def warm_start_increment(objective, x, pNew, index=0):
     dp = objective.p[index] - pNew[index]
@@ -14,7 +13,7 @@ def warm_start_increment(objective, x, pNew, index=0):
         raise('invalid warm start parameter gradient direction')
         
     sz = b.size
-    op = lambda v: objective.hessian_vec(x, v)
+    op = lambda v: objective.hessian_vec(x, np.array(v, dtype=np.float64))
     
     Lop = LinearOperator((sz,sz),
                          matvec = op)
