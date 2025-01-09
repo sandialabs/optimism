@@ -77,6 +77,9 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">onp</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">unittest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshFixture</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionSpace</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">optimism.material</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearElastic</span> <span class="k">as</span> <span class="n">MatModel</span>
 <span class="c1">#from optimism.material import Neohookean as MatModel</span>
@@ -84,9 +87,13 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mechanics</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">optimism.EquationSolver</span><span class="w"> </span><span class="kn">import</span> <span class="n">newton_solve</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuadratureRule</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeshFixture</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">optimism.TensorMath</span><span class="w"> </span><span class="kn">import</span> <span class="n">tensor_2D_to_3D</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">metis</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="n">haveMetis</span> <span class="o">=</span> <span class="s1">&#39;metis&#39;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span>
+<span class="n">skipMessage</span> <span class="o">=</span> <span class="s1">&#39;metis not installed, PatchTestQuadraticElements disabled&#39;</span>
+<span class="k">if</span><span class="p">(</span><span class="n">haveMetis</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">metis</span>
 
 <span class="n">E</span> <span class="o">=</span> <span class="mf">1.0</span>
 <span class="n">nu</span> <span class="o">=</span> <span class="mf">0.3</span>
@@ -277,6 +284,7 @@
 
 <div class="viewcode-block" id="PatchTestQuadraticElements.test_dirichlet_patch_test_with_quadratic_elements">
 <a class="viewcode-back" href="../../../optimism.test.html#optimism.test.test_PatchTestPou.PatchTestQuadraticElements.test_dirichlet_patch_test_with_quadratic_elements">[docs]</a>
+    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">haveMetis</span><span class="p">,</span> <span class="n">skipMessage</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">test_dirichlet_patch_test_with_quadratic_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">ebcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">FunctionSpace</span><span class="o">.</span><span class="n">EssentialBC</span><span class="p">(</span><span class="n">nodeSet</span><span class="o">=</span><span class="s1">&#39;all_boundary&#39;</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
                 <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">EssentialBC</span><span class="p">(</span><span class="n">nodeSet</span><span class="o">=</span><span class="s1">&#39;all_boundary&#39;</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
@@ -345,7 +353,6 @@
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">unittest</span>
     <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
 </pre></div>
 
