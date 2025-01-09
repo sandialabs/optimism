@@ -1,4 +1,5 @@
 import pathlib # to reach sample mesh file
+import pytest
 import sys
 import unittest
 
@@ -19,8 +20,7 @@ from optimism import Mechanics
 haveNetCDF = 'netCDF4' in sys.modules
 skipMessage = 'netCDF4 not installed, exodus reader disabled'
 
-
-TEST_FILE = pathlib.Path(__file__).parent.joinpath('patch_2_blocks.g')
+TEST_FILE = pathlib.Path(__file__).parent.joinpath('patch_2_blocks.exo')
 
 
 class TestMeshReadData(TestFixture.TestFixture):
@@ -90,6 +90,27 @@ class TestMeshReadData(TestFixture.TestFixture):
         self.assertEqual(self.mesh.sideSets["right"].shape[0], 2)
         self.assertEqual(self.mesh.sideSets["top"].shape[0], 4)
 
+    @TestFixture.unittest.skipIf(not haveNetCDF, skipMessage)
+    def test_block_maps_no_map(self):
+        mesh = ReadExodusMesh.read_exodus_mesh(pathlib.Path(__file__).parent.joinpath('square_mesh_no_map.exo'))
+        block1Map = mesh.block_maps['Block1']
+        self.assertEqual(block1Map.size, 10)
+        self.assertArrayEqual(block1Map, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+    @TestFixture.unittest.skipIf(not haveNetCDF, skipMessage)
+    def test_block_maps(self):
+        # ncdump output (see patch_2_blocks.txt)
+        #   elem_num_map = 100, 2, 103, 4, 101, 6, 102, 8, 9, 10, 11, 12, 13, 14, 15, 104;
+        goldBlock1Map = [100, 2, 103, 4, 101, 6, 102, 8]
+        block1Map = self.mesh.block_maps['left_half']
+        self.assertEqual(block1Map.size, 8)
+        self.assertArrayEqual(block1Map, goldBlock1Map)
+
+        goldBlock2Map = [9, 10, 11, 12, 13, 14, 15, 104]
+        block2Map = self.mesh.block_maps['right_half']
+        self.assertEqual(block2Map.size, 8)
+        self.assertArrayEqual(block2Map, goldBlock2Map)
+
 
 
 class TestMeshReadPatchTest(TestFixture.TestFixture):
@@ -112,7 +133,7 @@ class TestMeshReadPatchTest(TestFixture.TestFixture):
         self.internalVariables = mechBvp.compute_initial_state()
 
         
-    @TestFixture.unittest.skipIf(not haveNetCDF, skipMessage)        
+    @TestFixture.unittest.skipIf(not haveNetCDF, skipMessage)
     def test_dirichlet_patch_test(self):
         ebcs = [FunctionSpace.EssentialBC(nodeSet='left', component=0),
                 FunctionSpace.EssentialBC(nodeSet='left', component=1),
