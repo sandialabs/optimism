@@ -6,10 +6,11 @@ setuptools.setup(
     author="Michael Tupek and Brandon Talamini",
     author_email='talamini1@llnl.gov', # todo: make an email list
     install_requires=['equinox',
+                      'numpy<2.2.0',
                       'jax[cpu]==0.4.28',
                       'jaxtyping',
                       'matplotlib', # this is not strictly necessary
-                      'metis<1.12.2',
+                      'metis',
                       'netcdf4',
                       'scipy<1.15.0'],
     #tests_require=[], # could put chex and pytest here
