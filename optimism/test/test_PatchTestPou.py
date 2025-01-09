@@ -11,7 +11,12 @@ from optimism.EquationSolver import newton_solve
 from optimism import QuadratureRule
 from . import MeshFixture
 from optimism.TensorMath import tensor_2D_to_3D
-import metis
+
+import sys
+haveMetis = 'metis' in sys.modules
+skipMessage = 'metis not installed, PatchTestQuadraticElements disabled'
+if(haveMetis):
+    import metis
 
 E = 1.0
 nu = 0.3
@@ -177,6 +182,7 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
         writer.write()
     
 
+    @TestFixture.unittest.skipIf(not haveMetis, skipMessage)
     def test_dirichlet_patch_test_with_quadratic_elements(self):
         ebcs = [FunctionSpace.EssentialBC(nodeSet='all_boundary', component=0),
                 FunctionSpace.EssentialBC(nodeSet='all_boundary', component=1)]
