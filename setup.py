@@ -9,7 +9,7 @@ setuptools.setup(
                       'jax[cpu]==0.4.28',
                       'jaxtyping',
                       'matplotlib', # this is not strictly necessary
-                      'metis',
+                      'metis<1.12.2',
                       'netcdf4',
                       'scipy<1.15.0'],
     #tests_require=[], # could put chex and pytest here
