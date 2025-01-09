@@ -2,6 +2,9 @@ import jax
 import jax.numpy as np
 import numpy as onp
 
+import unittest
+from . import MeshFixture
+
 from optimism import FunctionSpace
 from optimism.material import LinearElastic as MatModel
 #from optimism.material import Neohookean as MatModel
@@ -9,7 +12,6 @@ from optimism import Mesh
 from optimism import Mechanics
 from optimism.EquationSolver import newton_solve
 from optimism import QuadratureRule
-from . import MeshFixture
 from optimism.TensorMath import tensor_2D_to_3D
 
 import sys
@@ -182,7 +184,7 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
         writer.write()
     
 
-    @TestFixture.unittest.skipIf(not haveMetis, skipMessage)
+    @unittest.skipIf(not haveMetis, skipMessage)
     def test_dirichlet_patch_test_with_quadratic_elements(self):
         ebcs = [FunctionSpace.EssentialBC(nodeSet='all_boundary', component=0),
                 FunctionSpace.EssentialBC(nodeSet='all_boundary', component=1)]
@@ -249,5 +251,4 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
 
 
 if __name__ == '__main__':
-    import unittest
     unittest.main()
