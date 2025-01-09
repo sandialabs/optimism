@@ -144,21 +144,21 @@ def combine_mesh(m1, m2):
 
 def mesh_with_coords(mesh, coords):
     return Mesh(coords, mesh.conns,mesh.simplexNodesOrdinals,
-                mesh.parentElement, mesh.parentElement1d, mesh.blocks, mesh.nodeSets, mesh.sideSets)
+                mesh.parentElement, mesh.parentElement1d, mesh.blocks, mesh.nodeSets, mesh.sideSets, mesh.block_maps)
 
 
 def mesh_with_nodesets(mesh, nodeSets):
     return Mesh(mesh.coords, mesh.conns,
                 mesh.simplexNodesOrdinals,
                 mesh.parentElement, mesh.parentElement1d,
-                mesh.blocks, nodeSets, mesh.sideSets)
+                mesh.blocks, nodeSets, mesh.sideSets, mesh.block_maps)
 
 
 def mesh_with_blocks(mesh, blocks):
     return Mesh(mesh.coords, mesh.conns,
                 mesh.simplexNodesOrdinals,
                 mesh.parentElement, mesh.parentElement1d,
-                blocks, mesh.nodeSets, mesh.sideSets)
+                blocks, mesh.nodeSets, mesh.sideSets, mesh.block_maps)
 
 
 def create_edges(conns):
@@ -276,7 +276,7 @@ def create_higher_order_mesh_from_simplex_mesh(mesh, order, useBubbleElement=Fal
     nodeSets = mesh.nodeSets if copyNodeSets else None
 
     newMesh = Mesh(coords, conns, simplexNodesOrdinals, basis,
-                   parentElement1d, mesh.blocks, nodeSets, mesh.sideSets)
+                   parentElement1d, mesh.blocks, nodeSets, mesh.sideSets, mesh.block_maps)
     
     if createNodeSetsFromSideSets:
         nodeSets = create_nodesets_from_sidesets(newMesh)

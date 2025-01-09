@@ -91,6 +91,13 @@ class TestMeshReadData(TestFixture.TestFixture):
         self.assertEqual(self.mesh.sideSets["top"].shape[0], 4)
 
     @TestFixture.unittest.skipIf(not haveNetCDF, skipMessage)
+    def test_block_maps_no_map(self):
+        mesh = ReadExodusMesh.read_exodus_mesh(pathlib.Path(__file__).parent.joinpath('square_mesh_no_map.exo'))
+        block1Map = mesh.block_maps['Block1']
+        self.assertEqual(block1Map.size, 10)
+        self.assertArrayEqual(block1Map, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+    @TestFixture.unittest.skipIf(not haveNetCDF, skipMessage)
     def test_block_maps(self):
         # ncdump output (see patch_2_blocks.txt)
         #   elem_num_map = 100, 2, 103, 4, 101, 6, 102, 8, 9, 10, 11, 12, 13, 14, 15, 104;
