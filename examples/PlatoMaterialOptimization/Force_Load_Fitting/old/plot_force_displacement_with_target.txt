@@ -1,0 +1,29 @@
+from matplotlib import pyplot as plt
+import numpy as np
+ 
+norm_x = 1.0
+norm_y = 1.0
+ 
+loadDisp = np.load('disp_control_response_optimized.npz')
+F = norm_y*np.abs(loadDisp['force'])
+U = norm_x*np.abs(loadDisp['displacement'])
+plt.plot(U, F, marker='o')
+
+F2 = norm_y*np.abs(loadDisp['targetForces'])
+U2 = norm_x*np.abs(loadDisp['targetDisplacements'])
+plt.scatter(U2, F2, marker='x', c='r', s=80)
+
+compareOptimized = True
+if compareOptimized:
+    loadDisp = np.load('disp_control_response_initial.npz')
+    F = norm_y*np.abs(loadDisp['force'])
+    U = norm_x*np.abs(loadDisp['displacement'])
+    plt.plot(U, F, marker='x')
+    plt.legend(["Initial", "Target", "Optimized"], loc=0, frameon=True)
+else:
+    plt.legend(["Initial", "Target"], loc=0, frameon=True)
+
+plt.xlabel('Displacement (mm)')
+plt.ylabel('Force (N)')
+ 
+plt.savefig('force_displacement.png')
