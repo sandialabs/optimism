@@ -255,12 +255,37 @@ def create_multi_block_mechanics_functions(functionSpace, mode2D, materialModels
             stresses = stresses.at[elemIds].set(blockStresses)
         return energy_densities, stresses
 
-
     def compute_initial_state():
         return _compute_initial_state_multi_block(fs, materialModels)
 
-    
-    return MechanicsFunctions(compute_strain_energy, jit(compute_updated_internal_variables), jit(compute_element_stiffnesses), jit(compute_output_energy_densities_and_stresses), compute_initial_state, None, None)
+    def qoi_to_lagrangian_qoi(compute_material_qoi):
+        def L(U, gradU, Q, X, dt):
+            return compute_material_qoi(gradU, Q, dt)
+        return L
+
+    def integrated_material_qoi(U, stateVariables, dt=0.0):
+        material_qoi = np.zeros((Mesh.num_elements(fs.mesh), len(fs.quadratureRule)))
+        for blockKey in materialModels:
+            elemIds = fs.mesh.blocks[blockKey]
+            block_qoi = FunctionSpace.integrate_over_block(fs, U, stateVariables, dt, 
+                                                  qoi_to_lagrangian_qoi(materialModels[blockKey].compute_material_qoi),
+                                                  elemIds,
+                                                  modify_element_gradient=modify_element_gradient)
+            material_qoi = material_qoi.at[elemIds].set(block_qoi)
+        return material_qoi
+
+    def compute_output_material_qoi(U, stateVariables, dt=0.0):
+        material_qoi = np.zeros((Mesh.num_elements(fs.mesh), len(fs.quadratureRule)))
+        for blockKey in materialModels:
+            elemIds = fs.mesh.blocks[blockKey]
+            block_qoi = FunctionSpace.evaluate_on_block(fs, U, stateVariables, dt, 
+                                                        qoi_to_lagrangian_qoi(materialModels[blockKey].compute_material_qoi), 
+                                                        elemIds, 
+                                                        modify_element_gradient=modify_element_gradient)
+            material_qoi = material_qoi.at[elemIds].set(block_qoi)
+        return material_qoi
+
+    return MechanicsFunctions(compute_strain_energy, jit(compute_updated_internal_variables), jit(compute_element_stiffnesses), jit(compute_output_energy_densities_and_stresses), compute_initial_state, integrated_material_qoi, jit(compute_output_material_qoi))
 
 
 ######
