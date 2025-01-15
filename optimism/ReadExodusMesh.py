@@ -92,11 +92,18 @@ def _read_blocks(exodusDataset):
 
 def _read_block_maps(exodusDataset, blocks):
     block_maps = {}
-    elementMap = exodusDataset.variables['elem_num_map']
+    if 'elem_num_map' in exodusDataset.variables:
+        elementMap = exodusDataset.variables['elem_num_map']
+    else:
+        nEle = 1
+        for blockName, blockElems in blocks.items():
+            nEle = nEle + len(blockElems) 
+        elementMap = onp.arange(1, nEle)
+
     firstElemInBlock = 0
     for blockName, blockElems in blocks.items():
         nElemsInBlock = len(blockElems)
-        block_maps[blockName] = elementMap[firstElemInBlock:firstElemInBlock+nElemsInBlock]
+        block_maps[blockName] = onp.array(elementMap[firstElemInBlock:firstElemInBlock + nElemsInBlock])
         firstElemInBlock += nElemsInBlock
 
     return block_maps
