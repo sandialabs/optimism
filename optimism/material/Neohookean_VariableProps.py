@@ -63,6 +63,9 @@ constProps = [
 # and convert to an array on construction
 def create_material_model_functions(const_props, version = 'adagio'):
     # TODO convert const_props from dict to list/np.array here
+    
+    for n in range(20):
+        print('right here....')
 
     if version == 'adagio':
         energy_density = _adagio_neohookean
@@ -90,7 +93,16 @@ def create_material_model_functions(const_props, version = 'adagio'):
 
 
 def _make_properties(props, const_props):
-    p = 1 - np.exp(-constProps[CONST_PROPS_K]*props[0])
+    dens = props[0]
+
+    # THIS IS NOT RIGHT
+    a = 580. * (1 - dens)
+    light_dose = 600. - a
+    # THIS IS NOT RIGHT
+
+    # p = 1 - np.exp(-constProps[CONST_PROPS_K]*props[0])
+    p = 1 - np.exp(-constProps[CONST_PROPS_K]*light_dose)
+
     E = (constProps[CONST_PROPS_EC] * np.exp(constProps[CONST_PROPS_B] * (p - constProps[CONST_PROPS_PGEL]))) + constProps[CONST_PROPS_ED]
     # we also want Poisson's ratio to be a "constant prop"
     # otherwise that's additional "dead" properties Ryan has to deal with

@@ -1,5 +1,6 @@
 from jax import grad
 from jax import jit
+from jax import vmap
 from optimism import EquationSolver
 from optimism import VTKWriter
 from optimism import FunctionSpace
@@ -108,6 +109,7 @@ class MaterialPropertiesOptimization:
         
         self.elementMap = onp.argsort(self.mesh.block_maps['block_1'])
 
+        print(self.elementMap)
         # print(materialProperties)        
 
         # TODO: convert properties from 0-1 to 0-255 (for now just do a linear map)
@@ -132,21 +134,32 @@ class MaterialPropertiesOptimization:
             # return dosage
 
         # quick and dirty conversion from given density (materialProperties) to actual material properties (light_dose)
-        def densityToProps(dens):
+        # def densityToProps(dens):
             
-            a = [580*(1-ONE) for ONE in dens]
-            b = [600 - TWO for TWO in a]
+        #     # a = [580*(1-ONE) for ONE in dens]
+        #     # b = [600 - TWO for TWO in a]
+        #     a = 580. * (1 - dens)
+        #     b = 600. - a
+        #     return b
 
-            return b
+        # matPropConv = densityToProps(materialProperties)
+        materialProperties = np.array(materialProperties)
+        # matPropConv = vmap(densityToProps)(materialProperties)
+        matPropConv = materialProperties
 
-        matPropConv = densityToProps(materialProperties)
+        # self.dprops_ddensity = vmap(grad(densityToProps))(materialProperties)
+        # self.dprops_ddensity = self.dprops_ddensity.at[self.elementMap].get()
+        # self.dprops_ddensity = self.dprops_ddensity.reshape((self.dprops_ddensity.shape[0], 1))
 
-        props = onp.zeros(len(matPropConv))
-        props[self.elementMap] = matPropConv
-        # props = onp.zeros(len(materialProperties))
-        # props[self.elementMap] = materialProperties
+        # props = onp.zeros(len(matPropConv))
+        # props[self.elementMap] = matPropConv
+        # # props = onp.zeros(len(materialProperties))
+        # # props[self.elementMap] = materialProperties
+        # props = props.reshape((props.shape[0], 1))
+        props = matPropConv.at[self.elementMap].get()
         props = props.reshape((props.shape[0], 1))
-        self.elementProperties = np.array(props)
+        # self.elementProperties = np.array(props)
+        self.elementProperties = props
 
         self.stateNotStored = True
         self.state = []
@@ -315,6 +328,10 @@ class MaterialPropertiesOptimization:
  
         return onp.array(self.scaleObjective * gradient[self.elementMap], copy=False).flatten().tolist()
 
+        # print(type(gradient))
+        # print(gradient.shape)
+
+        # return onp.array(self.scaleObjective * gradient, self.dprops_ddensity, copy=False).flatten()[self.elementMap].tolist()
 
 if __name__ == '__main__':
     mpo = MaterialPropertiesOptimization()
