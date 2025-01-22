@@ -269,8 +269,8 @@ class ScaledObjective(Objective):
 class ObjectiveMPC(Objective):
     def __init__(self, f, x, p, dofManagerMPC, precondStrategy=None):
         """
-        Initialize the Objective class for MPC with the condensation method.
-        
+        Initialize the Objective class for MPC with full DOFs and master-slave constraints.
+
         Parameters:
         - f: Objective function.
         - x: Initial guess for the primal DOF vector.
@@ -283,67 +283,58 @@ class ObjectiveMPC(Objective):
         self.master_dofs = dofManagerMPC.master_array[:, 1:]
         self.slave_dofs = dofManagerMPC.slave_array[:, 1:]
         self.slave_to_master_map = self.create_slave_to_master_map()
-        print("self.master_dofs:", self.master_dofs)
-        print("master_dof_indices.size:", self.master_dofs.size)
 
     def create_slave_to_master_map(self):
-        """Create the mapping to express slave DOFs in terms of master DOFs."""
-        # Placeholder for the actual implementation.
-        # This should create a relationship of the form:
-        # slave_dofs = C @ master_dofs + d
-        # where C is the constraint matrix and d is a constant vector.
-        pass
+        """
+        Create the mapping to express slave DOFs in terms of master DOFs.
+        Returns:
+        - C: Constraint matrix (2D array).
+        - d: Constant vector (1D array).
+        """
+        num_slaves = len(self.slave_dofs)
+        num_masters = len(self.master_dofs)
+        
+        # Initialize the constraint matrix with the correct dimensions
+        C = np.zeros((num_slaves, num_masters))  # Replace with actual mapping logic
+        
+        # Initialize the constant vector
+        d = np.zeros(num_slaves)  # Replace with actual constant values if needed
+        
+        return C, d
 
-    def value(self, x_master):
-        """Evaluate the objective function with reduced DOFs."""
-        x_full = self.expand_master_to_full_dofs(x_master)
-        print("x_master shape:", x_master.shape)
-        print("fieldShape:", self.dofManagerMPC.fieldShape)
-        assert x_master.shape[0] == self.master_dofs.size, "Mismatch in master DOF sizes!"
 
+    def value(self, x_full):
+        # Ensure the constraints are satisfied
+        x_full = self.enforce_constraints(x_full)
         return super().value(x_full)
 
-    def gradient(self, x_master):
-        """Compute the gradient w.r.t. master DOFs."""
-        x_full = self.expand_master_to_full_dofs(x_master)
+    def gradient(self, x_full):
+        x_full = self.enforce_constraints(x_full)
         grad_full = super().gradient(x_full)
-        return self.reduce_gradient_to_master(grad_full)
+        return grad_full
 
-    def hessian_vec(self, x_master, vx_master):
-        """Compute the Hessian-vector product w.r.t. master DOFs."""
-        x_full = self.expand_master_to_full_dofs(x_master)
-        vx_full = self.expand_master_to_full_dofs(vx_master)
+    def hessian_vec(self, x_full, vx_full):
+        x_full = self.enforce_constraints(x_full)
         hess_vec_full = super().hessian_vec(x_full, vx_full)
-        return self.reduce_gradient_to_master(hess_vec_full)
+        return hess_vec_full
 
-    def expand_master_to_full_dofs(self, x_master):
-        """Expand master DOFs to the full DOF vector."""
-        # Initialize the full DOF array
-        x_full = np.zeros(self.dofManagerMPC.fieldShape)
-        
-        # Ensure `self.master_dofs` is a 1D array of indices
-        master_dof_indices = self.master_dofs.ravel()
-
-        # Validate shape consistency
-        assert x_master.shape[0] == master_dof_indices.size, (
-            f"Mismatch: x_master has shape {x_master.shape}, "
-            f"but master DOFs have size {master_dof_indices.size}"
-        )
-
-        # Assign master DOFs
-        x_full = x_full.at[master_dof_indices].set(x_master)
-
-        # Add slave DOFs
+    def enforce_constraints(self, x_full):
+        """
+        Enforce the master-slave relationship in the full DOF vector.
+        """
         if self.slave_to_master_map is not None:
-            slave_values = self.slave_to_master_map @ x_master  # Ensure compatibility
-            slave_dof_indices = self.slave_dofs.ravel()
-            x_full = x_full.at[slave_dof_indices].set(slave_values)
-
+            C, d = self.slave_to_master_map
+            
+            # # Debug shapes
+            # print("Shape of C:", C.shape)
+            # print("Shape of x_full[self.master_dofs]:", x_full[self.master_dofs].shape)
+            # print("Shape of d:", d.shape)
+            
+            # Ensure broadcasting compatibility
+            slave_values = C @ x_full[self.master_dofs] + d[:, None]
+            # print("Shape of slave_values:", slave_values.shape)
+            
+            x_full = x_full.at[self.slave_dofs].set(slave_values)
         return x_full
 
-
-    def reduce_gradient_to_master(self, grad_full):
-        """Reduce the full gradient to master DOFs."""
-        # Extract the gradient corresponding to the master DOFs.
-        return grad_full[self.master_dofs]
 

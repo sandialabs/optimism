@@ -95,7 +95,7 @@ class ShearTest(MeshFixture):
         def write_output(Uu, p, step):
             from optimism import VTKWriter
             U = create_field(Uu, p.bc_data)
-            plotName = "../Results/Disp_based_Shear_Test/"+'output-'+str(step).zfill(3)
+            plotName = "../test_results/disp_based_shear_test/"+'output-'+str(step).zfill(3)
             writer = VTKWriter.VTKWriter(self.mesh, baseFileName=plotName)
 
             writer.add_nodal_field(name='displ', nodalData=U, fieldType=VTKWriter.VTKFieldType.VECTORS)
