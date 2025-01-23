@@ -3,6 +3,7 @@ from optimism.SparseCholesky import SparseCholesky
 import numpy as onp
 from scipy.sparse import diags as sparse_diags
 from scipy.sparse import csc_matrix
+import jax.random as rand
 
 # static vs dynamics
 # differentiable vs undifferentiable
@@ -294,8 +295,9 @@ class ObjectiveMPC(Objective):
         num_slaves = len(self.slave_dofs)
         num_masters = len(self.master_dofs)
         
+        key = rand.PRNGKey(0)
         # Initialize the constraint matrix with the correct dimensions
-        C = np.zeros((num_slaves, num_masters))  # Replace with actual mapping logic
+        C = rand.uniform(key, (num_slaves, num_masters))  # Replace with actual mapping logic
         
         # Initialize the constant vector
         d = np.zeros(num_slaves)  # Replace with actual constant values if needed
@@ -319,22 +321,13 @@ class ObjectiveMPC(Objective):
         return hess_vec_full
 
     def enforce_constraints(self, x_full):
-        """
-        Enforce the master-slave relationship in the full DOF vector.
-        """
         if self.slave_to_master_map is not None:
             C, d = self.slave_to_master_map
-            
-            # # Debug shapes
-            # print("Shape of C:", C.shape)
-            # print("Shape of x_full[self.master_dofs]:", x_full[self.master_dofs].shape)
-            # print("Shape of d:", d.shape)
-            
-            # Ensure broadcasting compatibility
             slave_values = C @ x_full[self.master_dofs] + d[:, None]
-            # print("Shape of slave_values:", slave_values.shape)
-            
+            print("Slave values before assignment:", slave_values)
             x_full = x_full.at[self.slave_dofs].set(slave_values)
+            print("x_full after enforcing constraints:", x_full)
         return x_full
+
 
 

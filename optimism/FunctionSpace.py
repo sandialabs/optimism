@@ -1,16 +1,21 @@
-from collections import namedtuple
-import numpy as onp
-
-import jax
-import jax.numpy as np
 from jax.scipy.linalg import solve
-
+from jaxtyping import Array, Float
 from optimism import Interpolants
 from optimism import Mesh
+from optimism import QuadratureRule
+from typing import Tuple
+import equinox as eqx
+import jax
+import jax.numpy as np
+import numpy as onp
 
 
-FunctionSpace = namedtuple('FunctionSpace', ['shapes', 'vols', 'shapeGrads', 'mesh', 'quadratureRule', 'isAxisymmetric'])
-FunctionSpace.__doc__ = \
+class EssentialBC(eqx.Module):
+    nodeSet: str
+    component: int
+
+
+class FunctionSpace(eqx.Module):
     """Data needed for calculus on functions in the discrete function space.
 
     In describing the shape of the attributes, ``ne`` is the number of
@@ -32,8 +37,12 @@ FunctionSpace.__doc__ = \
         isAxisymmetric: boolean indicating if the function space data are
             axisymmetric.
     """
-
-EssentialBC = namedtuple('EssentialBC', ['nodeSet', 'component'])
+    shapes: Float[Array, "ne nqpe nn"]
+    vols: Float[Array, "ne nqpe"]
+    shapeGrads: Float[Array, "ne nqpe nn nd"]
+    mesh: Mesh.Mesh
+    quadratureRule: QuadratureRule.QuadratureRule
+    isAxisymmetric: bool
 
 
 def construct_function_space(mesh, quadratureRule, mode2D='cartesian'):
@@ -353,7 +362,6 @@ def integrate_function_on_edges(functionSpace, func, U, quadRule, edges):
     integrate_on_edges = jax.vmap(integrate_function_on_edge, (None, None, None, None, 0))
     return np.sum(integrate_on_edges(functionSpace, func, U, quadRule, edges))
 
-
 def create_nodeset_layers(mesh):
     coords = mesh.coords
     tol = 1e-8
@@ -378,25 +386,43 @@ def create_nodeset_layers(mesh):
     # print("Layers in y-direction: ", y_layers)
     return y_layers
 
-class DofManager:
+
+class DofManager(eqx.Module):
+    # TODO get type hints below correct
+    # TODO this one could be moved to jax types if we move towards
+    # TODO jit safe preconditioners/solvers
+    fieldShape: Tuple[int, int]
+    isBc: any
+    isUnknown: any
+    ids: any
+    unknownIndices: any
+    bcIndices: any
+    dofToUnknown: any
+    HessRowCoords: any
+    HessColCoords: any
+    hessian_bc_mask: any
+
     def __init__(self, functionSpace, dim, EssentialBCs):
         self.fieldShape = Mesh.num_nodes(functionSpace.mesh), dim
-        self.isBc = onp.full(self.fieldShape, False, dtype=bool)
+        isBc = onp.full(self.fieldShape, False, dtype=bool)
         for ebc in EssentialBCs:
-            self.isBc[functionSpace.mesh.nodeSets[ebc.nodeSet], ebc.component] = True
+            isBc[functionSpace.mesh.nodeSets[ebc.nodeSet], ebc.component] = True
+        self.isBc = isBc
         self.isUnknown = ~self.isBc
 
-        self.ids = np.arange(self.isBc.size).reshape(self.fieldShape)
+        self.ids = onp.arange(self.isBc.size).reshape(self.fieldShape)
 
         self.unknownIndices = self.ids[self.isUnknown]
         self.bcIndices = self.ids[self.isBc]
 
-        ones = np.ones(self.isBc.size, dtype=int) * -1
-        self.dofToUnknown = ones.at[self.unknownIndices].set(np.arange(self.unknownIndices.size)) 
+        ones = onp.ones(self.isBc.size, dtype=int) * -1
+        dofToUnknown = ones
+        dofToUnknown[self.unknownIndices] = onp.arange(self.unknownIndices.size)
+        self.dofToUnknown = dofToUnknown
 
         self.HessRowCoords, self.HessColCoords = self._make_hessian_coordinates(functionSpace.mesh.conns)
 
-        self.hessian_bc_mask = self._make_hessian_bc_mask(functionSpace.mesh.conns)
+        self.hessian_bc_mask = self._make_hessian_bc_mask(onp.array(functionSpace.mesh.conns))
 
 
     def get_bc_size(self):
@@ -448,7 +474,7 @@ class DofManager:
             rowCoords[rangeBegin:rangeEnd] = elHessCoords.ravel()
             colCoords[rangeBegin:rangeEnd] = elHessCoords.T.ravel()
 
-            rangeBegin += np.square(nElUnknowns[e])
+            rangeBegin += onp.square(nElUnknowns[e])
         return rowCoords, colCoords
 
 
@@ -465,16 +491,40 @@ class DofManager:
             hessian_bc_mask[e,:,eFlag] = False
         return hessian_bc_mask
 
+
 # Different class for Multi-Point Constrained Problem
-class DofManagerMPC:
+from optimism import Mesh
+import equinox as eqx
+import jax.numpy as np
+import numpy as onp
+from typing import List, Tuple
+
+
+class DofManagerMPC(eqx.Module):
+    fieldShape: Tuple[int, int]
+    isBc: np.ndarray
+    isUnknown: np.ndarray
+    ids: np.ndarray
+    unknownIndices: np.ndarray
+    bcIndices: np.ndarray
+    dofToUnknown: np.ndarray
+    HessRowCoords: np.ndarray
+    HessColCoords: np.ndarray
+    hessian_bc_mask: np.ndarray
+    master_layer: int = eqx.static_field()
+    slave_layer: int = eqx.static_field()
+    master_array: np.ndarray
+    slave_array: np.ndarray
+    layers: List[List[int]] = eqx.static_field()
+
     def __init__(self, functionSpace, dim, EssentialBCs, mesh):
-        self.fieldShape = Mesh.num_nodes(functionSpace.mesh), dim
+        self.fieldShape = (Mesh.num_nodes(functionSpace.mesh), dim)
         self.isBc = onp.full(self.fieldShape, False, dtype=bool)
         for ebc in EssentialBCs:
             self.isBc[functionSpace.mesh.nodeSets[ebc.nodeSet], ebc.component] = True
         self.isUnknown = ~self.isBc
 
-        self.ids = np.arange(self.isBc.size).reshape(self.fieldShape)
+        self.ids = onp.arange(self.isBc.size).reshape(self.fieldShape)
 
         # Create layers and assign master and slave rows
         self.layers = create_nodeset_layers(mesh)
@@ -526,7 +576,7 @@ class DofManagerMPC:
         for node in layer_nodes:
             node_dofs = self.ids[node]
             layer_array.append([node, *node_dofs])
-        return onp.array(layer_array, dtype=int)
+        return np.array(layer_array, dtype=int)
 
     def _make_hessian_coordinates(self, conns):
         """Creates row and column coordinates for the Hessian, considering master and slave nodes."""
@@ -538,8 +588,8 @@ class DofManagerMPC:
 
             # Include master and slave nodes in the size calculation
             eNodes_list = onp.asarray(eNodes).tolist()
-            elMasterNodes = set(eNodes_list).intersection(set(self.master_array[:, 0]))
-            elSlaveNodes = set(eNodes_list).intersection(set(self.slave_array[:, 0]))
+            elMasterNodes = set(eNodes_list).intersection(set(onp.array(self.master_array[:, 0])))
+            elSlaveNodes = set(eNodes_list).intersection(set(onp.array(self.slave_array[:, 0])))
 
             nElMasters = sum(len(self.master_array[onp.where(self.master_array[:, 0] == node)[0], 1:].ravel()) for node in elMasterNodes)
             nElSlaves = sum(len(self.slave_array[onp.where(self.slave_array[:, 0] == node)[0], 1:].ravel()) for node in elSlaveNodes)
@@ -559,8 +609,8 @@ class DofManagerMPC:
             elUnknowns = self.dofToUnknown[elDofs[elUnknownFlags]]
 
             # Identify master and slave DOFs for the element
-            elMasterNodes = set(eNodes_list).intersection(set(self.master_array[:, 0]))
-            elSlaveNodes = set(eNodes_list).intersection(set(self.slave_array[:, 0]))
+            elMasterNodes = set(eNodes_list).intersection(set(onp.array(self.master_array[:, 0])))
+            elSlaveNodes = set(eNodes_list).intersection(set(onp.array(self.slave_array[:, 0])))
 
             elMasterDofs = []
             for node in elMasterNodes:
@@ -586,7 +636,6 @@ class DofManagerMPC:
             rangeBegin += nElHessianEntries
 
         return rowCoords, colCoords
-
 
     def _make_hessian_bc_mask(self, conns):
         """Creates a mask for BCs in the Hessian, considering master and slave nodes."""
@@ -616,5 +665,6 @@ class DofManagerMPC:
             hessian_bc_mask[e, :, combinedFlag] = False
 
         return hessian_bc_mask
+
 
 
