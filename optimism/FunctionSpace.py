@@ -3,7 +3,7 @@ from jaxtyping import Array, Float
 from optimism import Interpolants
 from optimism import Mesh
 from optimism import QuadratureRule
-from typing import Tuple
+from typing import Tuple, List
 import equinox as eqx
 import jax
 import jax.numpy as np
@@ -492,13 +492,7 @@ class DofManager(eqx.Module):
         return hessian_bc_mask
 
 
-# Different class for Multi-Point Constrained Problem
-from optimism import Mesh
-import equinox as eqx
-import jax.numpy as np
-import numpy as onp
-from typing import List, Tuple
-
+# DofManager for Multi-Point Constrained Problem
 
 class DofManagerMPC(eqx.Module):
     fieldShape: Tuple[int, int]
