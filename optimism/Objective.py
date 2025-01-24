@@ -3,6 +3,7 @@ from optimism.SparseCholesky import SparseCholesky
 import numpy as onp
 from scipy.sparse import diags as sparse_diags
 from scipy.sparse import csc_matrix
+import jax.random as rand
 
 # static vs dynamics
 # differentiable vs undifferentiable
@@ -265,4 +266,68 @@ class ScaledObjective(Objective):
     def get_residual(self, x):
         return self.gradient(self.scaling * x)
 
-    
+
+class ObjectiveMPC(Objective):
+    def __init__(self, f, x, p, dofManagerMPC, precondStrategy=None):
+        """
+        Initialize the Objective class for MPC with full DOFs and master-slave constraints.
+
+        Parameters:
+        - f: Objective function.
+        - x: Initial guess for the primal DOF vector.
+        - p: Parameters for the objective function.
+        - dofManagerMPC: Instance of DofManagerMPC with master-slave relationships.
+        - precondStrategy: Preconditioning strategy (optional).
+        """
+        super().__init__(f, x, p, precondStrategy)
+        self.dofManagerMPC = dofManagerMPC
+        self.master_dofs = dofManagerMPC.master_array[:, 1:]
+        self.slave_dofs = dofManagerMPC.slave_array[:, 1:]
+        self.slave_to_master_map = self.create_slave_to_master_map()
+
+    def create_slave_to_master_map(self):
+        """
+        Create the mapping to express slave DOFs in terms of master DOFs.
+        Returns:
+        - C: Constraint matrix (2D array).
+        - d: Constant vector (1D array).
+        """
+        num_slaves = len(self.slave_dofs)
+        num_masters = len(self.master_dofs)
+        
+        key = rand.PRNGKey(0)
+        # Initialize the constraint matrix with the correct dimensions
+        C = rand.uniform(key, (num_slaves, num_masters))  # Replace with actual mapping logic
+        
+        # Initialize the constant vector
+        d = np.zeros(num_slaves)  # Replace with actual constant values if needed
+        
+        return C, d
+
+
+    def value(self, x_full):
+        # Ensure the constraints are satisfied
+        x_full = self.enforce_constraints(x_full)
+        return super().value(x_full)
+
+    def gradient(self, x_full):
+        x_full = self.enforce_constraints(x_full)
+        grad_full = super().gradient(x_full)
+        return grad_full
+
+    def hessian_vec(self, x_full, vx_full):
+        x_full = self.enforce_constraints(x_full)
+        hess_vec_full = super().hessian_vec(x_full, vx_full)
+        return hess_vec_full
+
+    def enforce_constraints(self, x_full):
+        if self.slave_to_master_map is not None:
+            C, d = self.slave_to_master_map
+            slave_values = C @ x_full[self.master_dofs] + d[:, None]
+            print("Slave values before assignment:", slave_values)
+            x_full = x_full.at[self.slave_dofs].set(slave_values)
+            print("x_full after enforcing constraints:", x_full)
+        return x_full
+
+
+
