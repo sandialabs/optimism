@@ -44,9 +44,9 @@ class ShapeFunctions(eqx.Module):
             is the number of nodes in the element (which is equal to the
             number of shape functions).
         gradients: Values of the parametric gradients of the shape functions.
-            Shape is ``(nPts, nDim, nNodes)``, where ``nDim`` is the number
+            Shape is ``(nPts, nNodes, nDim)``, where ``nDim`` is the number
             of spatial dimensions. Line elements are an exception, which
-            have shape ``(nPts, nNdodes)``.
+            have shape ``(nNodes, nPts)``.
     """
     values: Float[Array, "nq nn"]
     gradients: Float[Array, "nq nn nd"]
@@ -59,6 +59,8 @@ class ShapeFunctions(eqx.Module):
 LINE_ELEMENT = 0
 TRIANGLE_ELEMENT = 1
 TRIANGLE_ELEMENT_WITH_BUBBLE = 2
+LAGRANGE_LINE_ELEMENT = 3
+LAGRANGE_TRIANGLE_ELEMENT = 4
 
 
 def make_parent_elements(degree):
@@ -86,6 +88,33 @@ def get_lobatto_nodes_1d(degree):
     return xn
 
 
+def make_lagrange_parent_element_1d(degree):
+    """Lagrange Interpolation points on the unit interval [0, 1].
+    Only implemented for second degree
+    """
+    if degree != 2:
+        raise NotImplementedError
+    
+    xn = np.array([0.0, 0.5, 1.0])
+    vertexPoints = np.array([0, 2], dtype=np.int32)
+    interiorPoints = np.array([1], dtype=np.int32)
+    return ParentElement(LAGRANGE_LINE_ELEMENT, int(degree), xn, vertexPoints, None, interiorPoints)
+
+
+def vander1d(x, degree):
+    x = onp.asarray(x)
+    A = onp.zeros((x.shape[0], degree + 1))
+    dA = onp.zeros((x.shape[0], degree + 1))
+    domain = [0.0, 1.0]
+    for i in range(degree + 1):
+        p = onp.polynomial.Legendre.basis(i, domain=domain) 
+        p *= onp.sqrt(2.0*i + 1.0) # keep polynomial orthonormal
+        A[:, i] = p(x)
+        dp = p.deriv()
+        dA[:, i] = dp(x)
+    return A, dA
+
+
 def shape1d(degree, nodalPoints, evaluationPoints):
     """Evaluate shape functions and derivatives at points in the master element.
 
@@ -108,18 +137,34 @@ def shape1d(degree, nodalPoints, evaluationPoints):
     return ShapeFunctions(shape, dshape) 
 
 
-def vander1d(x, degree):
-    x = onp.asarray(x)
-    A = onp.zeros((x.shape[0], degree + 1))
-    dA = onp.zeros((x.shape[0], degree + 1))
-    domain = [0.0, 1.0]
-    for i in range(degree + 1):
-        p = onp.polynomial.Legendre.basis(i, domain=domain) 
-        p *= onp.sqrt(2.0*i + 1.0) # keep polynomial orthonormal
-        A[:, i] = p(x)
-        dp = p.deriv()
-        dA[:, i] = dp(x)
-    return A, dA
+def shape1d_lagrange(degree, nodalPoints, evaluationPoints):
+    """Evaluate Lagrange shape functions and derivatives at points in the parent element.
+    Only implemented for second degree
+
+    Returns:
+      Shape function values and shape function derivatives at ``evaluationPoints``,
+      in a tuple (``shape``, ``dshape``).
+      shapes: [nNodes, nEvalPoints]
+      dshapes: [nNodes, nEvalPoints]
+    """
+    if degree != 2:
+        raise NotImplementedError
+
+    denom1 = (nodalPoints[0] - nodalPoints[1]) * (nodalPoints[0] - nodalPoints[2])
+    denom2 = (nodalPoints[1] - nodalPoints[0]) * (nodalPoints[1] - nodalPoints[2])
+    denom3 = (nodalPoints[2] - nodalPoints[0]) * (nodalPoints[2] - nodalPoints[1])
+
+    shape1 = (evaluationPoints - nodalPoints[1])*(evaluationPoints - nodalPoints[2]) / denom1
+    shape2 = (evaluationPoints - nodalPoints[0])*(evaluationPoints - nodalPoints[2]) / denom2
+    shape3 = (evaluationPoints - nodalPoints[0])*(evaluationPoints - nodalPoints[1]) / denom3
+    shape = np.stack((shape1, shape2, shape3))
+
+    dshape1 = (2.0*evaluationPoints - nodalPoints[2] - nodalPoints[1]) / denom1
+    dshape2 = (2.0*evaluationPoints - nodalPoints[2] - nodalPoints[0]) / denom2
+    dshape3 = (2.0*evaluationPoints - nodalPoints[1] - nodalPoints[0]) / denom3
+    dshape = np.stack((dshape1, dshape2, dshape3))
+
+    return ShapeFunctions(shape, dshape) 
 
 
 def make_parent_element_2d(degree):
@@ -169,6 +214,27 @@ def make_parent_element_2d(degree):
     
     return ParentElement(TRIANGLE_ELEMENT, int(degree), points, vertexPoints, facePoints, interiorPoints)
 
+def make_lagrange_parent_element_2d(degree):
+    """Lagrange interpolation points on the triangle
+    Only implemented for second degree triangles.
+
+    Convention for numbering:
+    
+       2
+       o
+       | \
+     4 o  o 1  
+       |    \  
+       o--o--o
+       5  3   0 
+    """
+    if degree != 2:
+        raise NotImplementedError
+
+    xn = np.array([[1.0, 0.0], [0.5, 0.5], [0.0, 1.0], [0.5, 0.0], [0.0, 0.5], [0.0, 0.0]])
+    vertexPoints = np.array([0, 2, 5], dtype=np.int32)
+    facePoints = np.array([[0, 1, 2], [2, 4, 5], [5, 3, 0]], dtype=np.int32)
+    return ParentElement(LAGRANGE_TRIANGLE_ELEMENT, int(degree), xn, vertexPoints, facePoints, None)
 
 def pascal_triangle_monomials(degree):
     p = []
@@ -261,6 +327,49 @@ def shape2d(degree, nodalPoints, evaluationPoints):
     return ShapeFunctions(np.asarray(shapes), np.asarray(dshapes))
 
 
+def shape2d_lagrange(degree, nodalPoints, evaluationPoints):
+    """Evaluate Lagrange shape functions and derivatives at points in the parent element.
+    Only implemented for second degree
+
+    Reference:
+    T. Hughes. "The Finite Element Method"
+    Appendix 3.I
+    """
+    if degree != 2:
+        raise NotImplementedError
+
+    numEvalPoints = evaluationPoints.shape[0]
+    r = evaluationPoints[:,0]
+    s = evaluationPoints[:,1]
+    # t = 1.0 - r - s
+
+    shape0 = 2.0*r*r - r                                   # r * (2.0 * r - 1.0)
+    shape1 = 4.0 * r * s                                   # 4.0 * r * s
+    shape2 = 2.0*s*s - s                                   # s * (2.0 * s - 1.0)
+    shape3 = 4.0*(r - r*s - r*r)                           # 4.0 * r * t
+    shape4 = 4.0*(s - r*s - s*s)                           # 4.0 * s * t
+    shape5 = 1.0 - 3.0*(r + s) + 4.0*r*s + 2.0*(r*r + s*s) # t * (2.0 * t - 1.0)
+    shape = np.stack((shape0, shape1, shape2, shape3, shape4, shape5)).T
+
+    dshape0_dr = 4.0*r - 1.0
+    dshape0_ds = np.zeros(numEvalPoints)
+    dshape1_dr = 4.0*s
+    dshape1_ds = 4.0*r
+    dshape2_dr = np.zeros(numEvalPoints)
+    dshape2_ds = 4.0*s - 1.0
+    dshape3_dr = 4.0*(1.0 - s - 2.0*r)
+    dshape3_ds = -4.0*r
+    dshape4_dr = -4.0*s
+    dshape4_ds = 4.0*(1.0 - r - 2.0*s)
+    dshape5_dr = 4.0*(r + s) - 3.0
+    dshape5_ds = 4.0*(r + s) - 3.0
+    dshape_dr = np.stack((dshape0_dr, dshape1_dr, dshape2_dr, dshape3_dr, dshape4_dr, dshape5_dr)).T
+    dshape_ds = np.stack((dshape0_ds, dshape1_ds, dshape2_ds, dshape3_ds, dshape4_ds, dshape5_ds)).T
+    dshape = np.stack((dshape_dr, dshape_ds), axis=2)
+
+    return ShapeFunctions(shape, dshape) 
+
+
 def compute_shapes(parentElement, evaluationPoints):
     if parentElement.elementType == LINE_ELEMENT:
         return shape1d(parentElement.degree, parentElement.coordinates, evaluationPoints)
@@ -268,6 +377,10 @@ def compute_shapes(parentElement, evaluationPoints):
         return shape2d(parentElement.degree, parentElement.coordinates, evaluationPoints)
     elif parentElement.elementType == TRIANGLE_ELEMENT_WITH_BUBBLE:
         return shape2dBubble(parentElement, evaluationPoints)
+    elif parentElement.elementType == LAGRANGE_LINE_ELEMENT:
+        return shape1d_lagrange(parentElement.degree, parentElement.coordinates, evaluationPoints)
+    elif parentElement.elementType == LAGRANGE_TRIANGLE_ELEMENT:
+        return shape2d_lagrange(parentElement.degree, parentElement.coordinates, evaluationPoints)
     else:
         raise ValueError('Unknown element type.')
 
