@@ -109,9 +109,15 @@
 
     <span class="n">density</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;density&#39;</span><span class="p">)</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_material_qoi</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="k">del</span> <span class="n">internalVars</span>
+        <span class="k">del</span> <span class="n">dt</span>
+        <span class="k">return</span> <span class="n">_compute_volumetric_jacobian</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">MaterialModel</span><span class="p">(</span><span class="n">compute_energy_density</span> <span class="o">=</span> <span class="n">strain_energy</span><span class="p">,</span>
                          <span class="n">compute_initial_state</span> <span class="o">=</span> <span class="n">make_initial_state</span><span class="p">,</span>
                          <span class="n">compute_state_new</span> <span class="o">=</span> <span class="n">compute_state_new</span><span class="p">,</span>
+                         <span class="n">compute_material_qoi</span> <span class="o">=</span> <span class="n">compute_material_qoi</span><span class="p">,</span>
                          <span class="n">density</span> <span class="o">=</span> <span class="n">density</span><span class="p">)</span></div>
 
 
@@ -170,6 +176,13 @@
     <span class="k">del</span> <span class="n">dispGrad</span>
     <span class="k">del</span> <span class="n">props</span>
     <span class="k">return</span> <span class="n">internalVars</span></div>
+
+
+<div class="viewcode-block" id="_compute_volumetric_jacobian">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.Neohookean._compute_volumetric_jacobian">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_volumetric_jacobian</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">):</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="n">dispGrad</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">F</span><span class="p">)</span></div>
 
 </pre></div>
 

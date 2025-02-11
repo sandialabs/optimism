@@ -110,6 +110,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-optimism.material.MaterialUniaxialSimulator">optimism.material.MaterialUniaxialSimulator module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-optimism.material.MultiBranchHyperViscoelastic">optimism.material.MultiBranchHyperViscoelastic module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-optimism.material.Neohookean">optimism.material.Neohookean module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-optimism.material.ThirdMediumNeoHookean">optimism.material.ThirdMediumNeoHookean module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-optimism.material">Module contents</a></li>
 </ul>
 </li>
@@ -295,6 +296,20 @@
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_RateSensitivity.RateSentivityInsideJ2.test_kinetic_potential_works_inside_J2"><code class="docutils literal notranslate"><span class="pre">RateSentivityInsideJ2.test_kinetic_potential_works_inside_J2()</span></code></a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.material.test.html#module-optimism.material.test.test_ThirdMedium">optimism.material.test.test_ThirdMedium module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_ThirdMedium.ThirdMediumModelFixture"><code class="docutils literal notranslate"><span class="pre">ThirdMediumModelFixture</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_ThirdMedium.ThirdMediumModelFixture.setUp"><code class="docutils literal notranslate"><span class="pre">ThirdMediumModelFixture.setUp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_ThirdMedium.ThirdMediumModelFixture.test_energy_consistency"><code class="docutils literal notranslate"><span class="pre">ThirdMediumModelFixture.test_energy_consistency()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_ThirdMedium.ThirdMediumModelFixture.test_plot_biaxial_response"><code class="docutils literal notranslate"><span class="pre">ThirdMediumModelFixture.test_plot_biaxial_response()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_ThirdMedium.energy_neo_hookean_adagio"><code class="docutils literal notranslate"><span class="pre">energy_neo_hookean_adagio()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_ThirdMedium.energy_neo_hookean_rokos_isochoric"><code class="docutils literal notranslate"><span class="pre">energy_neo_hookean_rokos_isochoric()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_ThirdMedium.energy_neo_hookean_rokos_volumetric"><code class="docutils literal notranslate"><span class="pre">energy_neo_hookean_rokos_volumetric()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_ThirdMedium.energy_stable_arruda_boyce"><code class="docutils literal notranslate"><span class="pre">energy_stable_arruda_boyce()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.material.test.html#optimism.material.test.test_ThirdMedium.energy_stable_neo_hookean"><code class="docutils literal notranslate"><span class="pre">energy_stable_neo_hookean()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="optimism.material.test.html#module-optimism.material.test">Module contents</a></li>
@@ -994,6 +1009,11 @@
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="optimism.material.Neohookean._compute_volumetric_jacobian">
+<span class="sig-prename descclassname"><span class="pre">optimism.material.Neohookean.</span></span><span class="sig-name descname"><span class="pre">_compute_volumetric_jacobian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/Neohookean.html#_compute_volumetric_jacobian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.Neohookean._compute_volumetric_jacobian" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="optimism.material.Neohookean._make_properties">
 <span class="sig-prename descclassname"><span class="pre">optimism.material.Neohookean.</span></span><span class="sig-name descname"><span class="pre">_make_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/Neohookean.html#_make_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.Neohookean._make_properties" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -1011,6 +1031,39 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="optimism.material.Neohookean.make_initial_state">
 <span class="sig-prename descclassname"><span class="pre">optimism.material.Neohookean.</span></span><span class="sig-name descname"><span class="pre">make_initial_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/Neohookean.html#make_initial_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.Neohookean.make_initial_state" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-optimism.material.ThirdMediumNeoHookean">
+<span id="optimism-material-thirdmediumneohookean-module"></span><h2>optimism.material.ThirdMediumNeoHookean module<a class="headerlink" href="#module-optimism.material.ThirdMediumNeoHookean" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.material.ThirdMediumNeoHookean._compute_volumetric_jacobian">
+<span class="sig-prename descclassname"><span class="pre">optimism.material.ThirdMediumNeoHookean.</span></span><span class="sig-name descname"><span class="pre">_compute_volumetric_jacobian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/ThirdMediumNeoHookean.html#_compute_volumetric_jacobian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.ThirdMediumNeoHookean._compute_volumetric_jacobian" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.material.ThirdMediumNeoHookean._make_properties">
+<span class="sig-prename descclassname"><span class="pre">optimism.material.ThirdMediumNeoHookean.</span></span><span class="sig-name descname"><span class="pre">_make_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kappa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/ThirdMediumNeoHookean.html#_make_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.ThirdMediumNeoHookean._make_properties" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.material.ThirdMediumNeoHookean.create_material_model_functions">
+<span class="sig-prename descclassname"><span class="pre">optimism.material.ThirdMediumNeoHookean.</span></span><span class="sig-name descname"><span class="pre">create_material_model_functions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/ThirdMediumNeoHookean.html#create_material_model_functions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.ThirdMediumNeoHookean.create_material_model_functions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.material.ThirdMediumNeoHookean.make_initial_state">
+<span class="sig-prename descclassname"><span class="pre">optimism.material.ThirdMediumNeoHookean.</span></span><span class="sig-name descname"><span class="pre">make_initial_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/ThirdMediumNeoHookean.html#make_initial_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.ThirdMediumNeoHookean.make_initial_state" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.material.ThirdMediumNeoHookean.neo_hookean_energy_density">
+<span class="sig-prename descclassname"><span class="pre">optimism.material.ThirdMediumNeoHookean.</span></span><span class="sig-name descname"><span class="pre">neo_hookean_energy_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/ThirdMediumNeoHookean.html#neo_hookean_energy_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.ThirdMediumNeoHookean.neo_hookean_energy_density" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.material.ThirdMediumNeoHookean.stabilized_neo_hookean_energy_density">
+<span class="sig-prename descclassname"><span class="pre">optimism.material.ThirdMediumNeoHookean.</span></span><span class="sig-name descname"><span class="pre">stabilized_neo_hookean_energy_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dispGrad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">props</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/material/ThirdMediumNeoHookean.html#stabilized_neo_hookean_energy_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.material.ThirdMediumNeoHookean.stabilized_neo_hookean_energy_density" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>

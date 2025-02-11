@@ -233,6 +233,12 @@
 </li>
       <li><a href="optimism.html#optimism.Mechanics._compute_updated_internal_variables_multi_block">_compute_updated_internal_variables_multi_block() (in module optimism.Mechanics)</a>
 </li>
+      <li><a href="optimism.material.html#optimism.material.Neohookean._compute_volumetric_jacobian">_compute_volumetric_jacobian() (in module optimism.material.Neohookean)</a>
+
+      <ul>
+        <li><a href="optimism.material.html#optimism.material.ThirdMediumNeoHookean._compute_volumetric_jacobian">(in module optimism.material.ThirdMediumNeoHookean)</a>
+</li>
+      </ul></li>
       <li><a href="optimism.material.html#optimism.material.HyperViscoelastic._dissipation_potential">_dissipation_potential() (in module optimism.material.HyperViscoelastic)</a>
 
       <ul>
@@ -424,6 +430,8 @@
 </li>
         <li><a href="optimism.material.html#optimism.material.Neohookean._make_properties">(in module optimism.material.Neohookean)</a>
 </li>
+        <li><a href="optimism.material.html#optimism.material.ThirdMediumNeoHookean._make_properties">(in module optimism.material.ThirdMediumNeoHookean)</a>
+</li>
       </ul></li>
       <li><a href="optimism.material.html#optimism.material.Neohookean._neohookean_3D_energy_density">_neohookean_3D_energy_density() (in module optimism.material.Neohookean)</a>
 </li>
@@ -569,12 +577,12 @@
 </li>
       <li><a href="optimism.contact.html#optimism.contact.MortarContact.assemble_area_weighted_gaps">assemble_area_weighted_gaps() (in module optimism.contact.MortarContact)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="optimism.contact.html#optimism.contact.MortarContact.assemble_nodal_areas">assemble_nodal_areas() (in module optimism.contact.MortarContact)</a>
 </li>
       <li><a href="optimism.html#optimism.SparseMatrixAssembler.assemble_sparse_stiffness_matrix">assemble_sparse_stiffness_matrix() (in module optimism.SparseMatrixAssembler)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="optimism.contact.html#optimism.contact.MortarContact.assembly_mortar_integral">assembly_mortar_integral() (in module optimism.contact.MortarContact)</a>
 </li>
       <li><a href="optimism.test.html#optimism.test.TestFixture.TestFixture.assertArrayEqual">assertArrayEqual() (optimism.test.TestFixture.TestFixture method)</a>
@@ -583,7 +591,15 @@
 </li>
       <li><a href="optimism.test.html#optimism.test.TestFixture.TestFixture.assertArrayNotEqual">assertArrayNotEqual() (optimism.test.TestFixture.TestFixture method)</a>
 </li>
+      <li><a href="optimism.test.html#optimism.test.test_Interpolants.ElementFixture.assertCorrectGradInterpolationOn2DElement">assertCorrectGradInterpolationOn2DElement() (optimism.test.test_Interpolants.ElementFixture method)</a>
+</li>
+      <li><a href="optimism.test.html#optimism.test.test_Interpolants.ElementFixture.assertCorrectInterpolationOn2DElement">assertCorrectInterpolationOn2DElement() (optimism.test.test_Interpolants.ElementFixture method)</a>
+</li>
+      <li><a href="optimism.test.html#optimism.test.test_PatchTest.PatchTestFixture.assertLinearPatchTestPasses">assertLinearPatchTestPasses() (optimism.test.test_PatchTest.PatchTestFixture method)</a>
+</li>
       <li><a href="optimism.test.html#optimism.test.TestFixture.TestFixture.assertNear">assertNear() (optimism.test.TestFixture.TestFixture method)</a>
+</li>
+      <li><a href="optimism.test.html#optimism.test.test_PatchTest.PatchTestFixture.assertQuadraticPatchTestPasses">assertQuadraticPatchTestPasses() (optimism.test.test_PatchTest.PatchTestFixture method)</a>
 </li>
       <li><a href="optimism.html#optimism.AlSolver.augmented_lagrange_solve">augmented_lagrange_solve() (in module optimism.AlSolver)</a>
 </li>
@@ -1044,6 +1060,8 @@
 </li>
         <li><a href="optimism.material.html#optimism.material.Neohookean.create_material_model_functions">(in module optimism.material.Neohookean)</a>
 </li>
+        <li><a href="optimism.material.html#optimism.material.ThirdMediumNeoHookean.create_material_model_functions">(in module optimism.material.ThirdMediumNeoHookean)</a>
+</li>
         <li><a href="optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic.create_material_model_functions">(in module optimism.phasefield.PhaseFieldLorentzPlastic)</a>
 </li>
         <li><a href="optimism.phasefield.html#optimism.phasefield.PhaseFieldThreshold.create_material_model_functions">(in module optimism.phasefield.PhaseFieldThreshold)</a>
@@ -1219,6 +1237,8 @@
         <li><a href="optimism.phasefield.html#optimism.phasefield.PhaseFieldThresholdPlastic.elastic_volumetric_free_energy">(in module optimism.phasefield.PhaseFieldThresholdPlastic)</a>
 </li>
       </ul></li>
+      <li><a href="optimism.test.html#optimism.test.test_Interpolants.ElementFixture">ElementFixture (class in optimism.test.test_Interpolants)</a>
+</li>
       <li><a href="optimism.html#id8">elementType (optimism.Interpolants.ParentElement attribute)</a>, <a href="optimism.html#optimism.Interpolants.ParentElement.elementType">[1]</a>
 </li>
       <li><a href="optimism.test.html#optimism.test.test_QuadratureRule.TestQuadratureRules.endpoints">endpoints (optimism.test.test_QuadratureRule.TestQuadratureRules attribute)</a>
@@ -1250,6 +1270,16 @@
 </li>
       </ul></li>
       <li><a href="optimism.phasefield.html#optimism.phasefield.PhaseField.energy_density_to_lagrangian_density">energy_density_to_lagrangian_density() (in module optimism.phasefield.PhaseField)</a>
+</li>
+      <li><a href="optimism.material.test.html#optimism.material.test.test_ThirdMedium.energy_neo_hookean_adagio">energy_neo_hookean_adagio() (in module optimism.material.test.test_ThirdMedium)</a>
+</li>
+      <li><a href="optimism.material.test.html#optimism.material.test.test_ThirdMedium.energy_neo_hookean_rokos_isochoric">energy_neo_hookean_rokos_isochoric() (in module optimism.material.test.test_ThirdMedium)</a>
+</li>
+      <li><a href="optimism.material.test.html#optimism.material.test.test_ThirdMedium.energy_neo_hookean_rokos_volumetric">energy_neo_hookean_rokos_volumetric() (in module optimism.material.test.test_ThirdMedium)</a>
+</li>
+      <li><a href="optimism.material.test.html#optimism.material.test.test_ThirdMedium.energy_stable_arruda_boyce">energy_stable_arruda_boyce() (in module optimism.material.test.test_ThirdMedium)</a>
+</li>
+      <li><a href="optimism.material.test.html#optimism.material.test.test_ThirdMedium.energy_stable_neo_hookean">energy_stable_neo_hookean() (in module optimism.material.test.test_ThirdMedium)</a>
 </li>
       <li><a href="optimism.material.html#id0">energyHistory (optimism.material.MaterialUniaxialSimulator.UniaxialOutput attribute)</a>, <a href="optimism.material.html#optimism.material.MaterialUniaxialSimulator.UniaxialOutput.energyHistory">[1]</a>
 
@@ -1571,6 +1601,10 @@
         <li><a href="optimism.html#optimism.Objective.TwoTryPrecondStrategy.initialize">(optimism.Objective.TwoTryPrecondStrategy method)</a>
 </li>
       </ul></li>
+      <li><a href="optimism.test.html#optimism.test.test_PatchTest.PatchTestFixture.initializeLinearPatchTestFromMesh">initializeLinearPatchTestFromMesh() (optimism.test.test_PatchTest.PatchTestFixture method)</a>
+</li>
+      <li><a href="optimism.test.html#optimism.test.test_PatchTest.PatchTestFixture.initializeQuadraticPatchTestFromMesh">initializeQuadraticPatchTestFromMesh() (optimism.test.test_PatchTest.PatchTestFixture method)</a>
+</li>
       <li><a href="optimism.test.html#optimism.test.test_PatchTestPou.insort">insort() (in module optimism.test.test_PatchTestPou)</a>
 </li>
       <li><a href="optimism.html#optimism.VTKWriter.VTKDataType.INT">INT (optimism.VTKWriter.VTKDataType attribute)</a>
@@ -1630,6 +1664,8 @@
       <li><a href="optimism.html#optimism.FunctionSpace.interpolate_to_point">interpolate_to_point() (in module optimism.FunctionSpace)</a>
 </li>
       <li><a href="optimism.html#optimism.FunctionSpace.interpolate_to_points">interpolate_to_points() (in module optimism.FunctionSpace)</a>
+</li>
+      <li><a href="optimism.html#optimism.Interpolants.InterpolationType">InterpolationType (class in optimism.Interpolants)</a>
 </li>
       <li><a href="optimism.html#optimism.TensorMath.inv">inv() (in module optimism.TensorMath)</a>
 </li>
@@ -1719,6 +1755,8 @@
         <li><a href="optimism.phasefield.html#optimism.phasefield.PhaseFieldThresholdPlastic.Properties.l">(optimism.phasefield.PhaseFieldThresholdPlastic.Properties attribute)</a>
 </li>
       </ul></li>
+      <li><a href="optimism.html#optimism.Interpolants.InterpolationType.LAGRANGE">LAGRANGE (optimism.Interpolants.InterpolationType attribute)</a>
+</li>
       <li><a href="optimism.html#optimism.MinimizeScalar.line_search_backtrack">line_search_backtrack() (in module optimism.MinimizeScalar)</a>
 </li>
       <li><a href="optimism.html#optimism.MinimizeScalar.line_search_bidirectional">line_search_bidirectional() (in module optimism.MinimizeScalar)</a>
@@ -1738,6 +1776,10 @@
       <li><a href="optimism.test.html#optimism.test.test_PatchTest.LinearPatchTestLinearElements">LinearPatchTestLinearElements (class in optimism.test.test_PatchTest)</a>
 </li>
       <li><a href="optimism.test.html#optimism.test.test_PatchTest.LinearPatchTestQuadraticElements">LinearPatchTestQuadraticElements (class in optimism.test.test_PatchTest)</a>
+</li>
+      <li><a href="optimism.test.html#optimism.test.test_PatchTest.LinearPatchTestQuadraticLagrangeElements">LinearPatchTestQuadraticLagrangeElements (class in optimism.test.test_PatchTest)</a>
+</li>
+      <li><a href="optimism.html#optimism.Interpolants.InterpolationType.LOBATTO">LOBATTO (optimism.Interpolants.InterpolationType attribute)</a>
 </li>
       <li><a href="optimism.html#optimism.LinAlg.log_pade_pf">log_pade_pf() (in module optimism.LinAlg)</a>
 </li>
@@ -1772,6 +1814,8 @@
 </li>
         <li><a href="optimism.material.html#optimism.material.Neohookean.make_initial_state">(in module optimism.material.Neohookean)</a>
 </li>
+        <li><a href="optimism.material.html#optimism.material.ThirdMediumNeoHookean.make_initial_state">(in module optimism.material.ThirdMediumNeoHookean)</a>
+</li>
         <li><a href="optimism.phasefield.html#optimism.phasefield.PhaseFieldThresholdPlastic.make_initial_state">(in module optimism.phasefield.PhaseFieldThresholdPlastic)</a>
 </li>
       </ul></li>
@@ -1787,6 +1831,10 @@
         <li><a href="optimism.phasefield.html#optimism.phasefield.PhaseFieldLorentzPlastic.make_initial_state_small_deformations">(in module optimism.phasefield.PhaseFieldLorentzPlastic)</a>
 </li>
       </ul></li>
+      <li><a href="optimism.html#optimism.Interpolants.make_lagrange_parent_element_1d">make_lagrange_parent_element_1d() (in module optimism.Interpolants)</a>
+</li>
+      <li><a href="optimism.html#optimism.Interpolants.make_lagrange_parent_element_2d">make_lagrange_parent_element_2d() (in module optimism.Interpolants)</a>
+</li>
       <li><a href="optimism.html#optimism.Interpolants.make_parent_element_1d">make_parent_element_1d() (in module optimism.Interpolants)</a>
 </li>
       <li><a href="optimism.html#optimism.Interpolants.make_parent_element_2d">make_parent_element_2d() (in module optimism.Interpolants)</a>
@@ -2013,6 +2061,10 @@
 </li>
         <li><a href="optimism.material.test.html#module-optimism.material.test.test_RateSensitivity">optimism.material.test.test_RateSensitivity</a>
 </li>
+        <li><a href="optimism.material.test.html#module-optimism.material.test.test_ThirdMedium">optimism.material.test.test_ThirdMedium</a>
+</li>
+        <li><a href="optimism.material.html#module-optimism.material.ThirdMediumNeoHookean">optimism.material.ThirdMediumNeoHookean</a>
+</li>
         <li><a href="optimism.html#module-optimism.Math">optimism.Math</a>
 </li>
         <li><a href="optimism.html#module-optimism.Mechanics">optimism.Mechanics</a>
@@ -2180,6 +2232,8 @@
 </li>
       <li><a href="optimism.html#optimism.ConstrainedObjective.ConstrainedObjective.ncp_hessian">ncp_hessian() (optimism.ConstrainedObjective.ConstrainedObjective method)</a>
 </li>
+      <li><a href="optimism.material.html#optimism.material.ThirdMediumNeoHookean.neo_hookean_energy_density">neo_hookean_energy_density() (in module optimism.material.ThirdMediumNeoHookean)</a>
+</li>
       <li><a href="optimism.html#optimism.Mechanics.NewmarkParameters">NewmarkParameters (class in optimism.Mechanics)</a>
 </li>
       <li><a href="optimism.html#optimism.EquationSolver.newton">newton() (in module optimism.EquationSolver)</a>
@@ -2210,10 +2264,10 @@
 </li>
       <li><a href="optimism.html#optimism.FunctionSpace.EssentialBC.nodeSet">nodeSet (optimism.FunctionSpace.EssentialBC attribute)</a>
 </li>
-      <li><a href="optimism.html#id18">nodeSets (optimism.Mesh.Mesh attribute)</a>, <a href="optimism.html#optimism.Mesh.Mesh.nodeSets">[1]</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="optimism.html#id18">nodeSets (optimism.Mesh.Mesh attribute)</a>, <a href="optimism.html#optimism.Mesh.Mesh.nodeSets">[1]</a>
+</li>
       <li><a href="optimism.html#optimism.EquationSolver.nonlinear_equation_solve">nonlinear_equation_solve() (in module optimism.EquationSolver)</a>
 </li>
       <li><a href="optimism.html#optimism.TrustRegionSPG.nonmonotone_line_search">nonmonotone_line_search() (in module optimism.TrustRegionSPG)</a>
@@ -2627,6 +2681,20 @@
 </li>
       </ul></li>
       <li>
+    optimism.material.test.test_ThirdMedium
+
+      <ul>
+        <li><a href="optimism.material.test.html#module-optimism.material.test.test_ThirdMedium">module</a>
+</li>
+      </ul></li>
+      <li>
+    optimism.material.ThirdMediumNeoHookean
+
+      <ul>
+        <li><a href="optimism.material.html#module-optimism.material.ThirdMediumNeoHookean">module</a>
+</li>
+      </ul></li>
+      <li>
     optimism.Math
 
       <ul>
@@ -2675,6 +2743,8 @@
         <li><a href="optimism.html#module-optimism.Objective">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     optimism.phasefield
 
@@ -2682,8 +2752,6 @@
         <li><a href="optimism.phasefield.html#module-optimism.phasefield">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     optimism.phasefield.MaterialPointSimulator
 
@@ -3131,6 +3199,8 @@
 </li>
       <li><a href="optimism.html#optimism.Interpolants.pascal_triangle_monomials">pascal_triangle_monomials() (in module optimism.Interpolants)</a>
 </li>
+      <li><a href="optimism.test.html#optimism.test.test_PatchTest.PatchTestFixture">PatchTestFixture (class in optimism.test.test_PatchTest)</a>
+</li>
       <li><a href="optimism.test.html#optimism.test.test_PatchTestPou.PatchTestQuadraticElements">PatchTestQuadraticElements (class in optimism.test.test_PatchTestPou)</a>
 </li>
       <li><a href="optimism.html#optimism.AlSolver.Settings.penalty_scaling">penalty_scaling (optimism.AlSolver.Settings attribute)</a>
@@ -3167,10 +3237,10 @@
 </li>
       <li><a href="optimism.html#optimism.MeshPlot.plot_mesh">plot_mesh() (in module optimism.MeshPlot)</a>
 </li>
-      <li><a href="optimism.html#optimism.MeshPlot.plot_mesh_with_field">plot_mesh_with_field() (in module optimism.MeshPlot)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="optimism.html#optimism.MeshPlot.plot_mesh_with_field">plot_mesh_with_field() (in module optimism.MeshPlot)</a>
+</li>
       <li><a href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.plot_solution">plot_solution() (optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture method)</a>
 
       <ul>
@@ -3249,6 +3319,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="optimism.test.html#optimism.test.test_PatchTest.QuadraticPatchTestQuadraticLagrangeElements">QuadraticPatchTestQuadraticLagrangeElements (class in optimism.test.test_PatchTest)</a>
+</li>
       <li><a href="optimism.html#optimism.QuadratureRule.QuadratureRule">QuadratureRule (class in optimism.QuadratureRule)</a>
 </li>
       <li><a href="optimism.html#id2">quadratureRule (optimism.FunctionSpace.FunctionSpace attribute)</a>, <a href="optimism.html#optimism.FunctionSpace.FunctionSpace.quadratureRule">[1]</a>
@@ -3398,6 +3470,8 @@
 </li>
         <li><a href="optimism.material.test.html#optimism.material.test.test_MultiBranchHyperVisco.HyperViscoModelFixture.setUp">(optimism.material.test.test_MultiBranchHyperVisco.HyperViscoModelFixture method)</a>
 </li>
+        <li><a href="optimism.material.test.html#optimism.material.test.test_ThirdMedium.ThirdMediumModelFixture.setUp">(optimism.material.test.test_ThirdMedium.ThirdMediumModelFixture method)</a>
+</li>
         <li><a href="optimism.phasefield.test.html#optimism.phasefield.test.plotPhaseFieldThresholdModel.PhaseFieldThresholdUniaxialFixture.setUp">(optimism.phasefield.test.plotPhaseFieldThresholdModel.PhaseFieldThresholdUniaxialFixture method)</a>
 </li>
         <li><a href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.setUp">(optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture method)</a>
@@ -3428,6 +3502,8 @@
 </li>
         <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.setUp">(optimism.test.test_Interpolants.TestInterpolants method)</a>
 </li>
+        <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.setUp">(optimism.test.test_Interpolants.TestLagrangeInterpolants method)</a>
+</li>
         <li><a href="optimism.test.html#optimism.test.test_LinAlg.TestLinAlg.setUp">(optimism.test.test_LinAlg.TestLinAlg method)</a>
 </li>
         <li><a href="optimism.test.html#optimism.test.test_Math.TestMathInnerProduct.setUp">(optimism.test.test_Math.TestMathInnerProduct method)</a>
@@ -3448,7 +3524,11 @@
 </li>
         <li><a href="optimism.test.html#optimism.test.test_PatchTest.LinearPatchTestQuadraticElements.setUp">(optimism.test.test_PatchTest.LinearPatchTestQuadraticElements method)</a>
 </li>
+        <li><a href="optimism.test.html#optimism.test.test_PatchTest.LinearPatchTestQuadraticLagrangeElements.setUp">(optimism.test.test_PatchTest.LinearPatchTestQuadraticLagrangeElements method)</a>
+</li>
         <li><a href="optimism.test.html#optimism.test.test_PatchTest.QuadraticPatchTestQuadraticElements.setUp">(optimism.test.test_PatchTest.QuadraticPatchTestQuadraticElements method)</a>
+</li>
+        <li><a href="optimism.test.html#optimism.test.test_PatchTest.QuadraticPatchTestQuadraticLagrangeElements.setUp">(optimism.test.test_PatchTest.QuadraticPatchTestQuadraticLagrangeElements method)</a>
 </li>
         <li><a href="optimism.test.html#optimism.test.test_PatchTestPou.PatchTestQuadraticElements.setUp">(optimism.test.test_PatchTestPou.PatchTestQuadraticElements method)</a>
 </li>
@@ -3497,7 +3577,11 @@
 </li>
       <li><a href="optimism.html#optimism.Interpolants.shape1d">shape1d() (in module optimism.Interpolants)</a>
 </li>
+      <li><a href="optimism.html#optimism.Interpolants.shape1d_lagrange">shape1d_lagrange() (in module optimism.Interpolants)</a>
+</li>
       <li><a href="optimism.html#optimism.Interpolants.shape2d">shape2d() (in module optimism.Interpolants)</a>
+</li>
+      <li><a href="optimism.html#optimism.Interpolants.shape2d_lagrange">shape2d_lagrange() (in module optimism.Interpolants)</a>
 </li>
       <li><a href="optimism.html#optimism.Interpolants.shape2dBubble">shape2dBubble() (in module optimism.Interpolants)</a>
 </li>
@@ -3566,6 +3650,8 @@
       <li><a href="optimism.contact.test.html#optimism.contact.test.test_MortarGeom.spline_ramp">spline_ramp() (in module optimism.contact.test.test_MortarGeom)</a>
 </li>
       <li><a href="optimism.html#optimism.LinAlg.sqrtm_dbp">sqrtm_dbp() (in module optimism.LinAlg)</a>
+</li>
+      <li><a href="optimism.material.html#optimism.material.ThirdMediumNeoHookean.stabilized_neo_hookean_energy_density">stabilized_neo_hookean_energy_density() (in module optimism.material.ThirdMediumNeoHookean)</a>
 </li>
       <li><a href="optimism.html#optimism.Timer.Timer.start">start() (optimism.Timer.Timer method)</a>
 </li>
@@ -3638,6 +3724,8 @@
       <li><a href="optimism.html#optimism.VTKWriter.VTKFieldType.TENSORS">TENSORS (optimism.VTKWriter.VTKFieldType attribute)</a>
 </li>
       <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.test_1D_element_element_topological_nodesets">test_1D_element_element_topological_nodesets() (optimism.test.test_Interpolants.TestInterpolants method)</a>
+</li>
+      <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_1D_interpolant_points">test_1D_interpolant_points() (optimism.test.test_Interpolants.TestLagrangeInterpolants method)</a>
 </li>
       <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.test_1D_interpolant_points_in_element">test_1D_interpolant_points_in_element() (optimism.test.test_Interpolants.TestInterpolants method)</a>
 </li>
@@ -3723,6 +3811,8 @@
 </li>
       <li><a href="optimism.test.html#optimism.test.test_JaxConfig.TestJaxConfiguration.test_debug_nans_is_off">test_debug_nans_is_off() (optimism.test.test_JaxConfig.TestJaxConfiguration method)</a>
 </li>
+      <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_degree_other_than_two_throws">test_degree_other_than_two_throws() (optimism.test.test_Interpolants.TestLagrangeInterpolants method)</a>
+</li>
       <li><a href="optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_determinant">test_determinant() (optimism.test.test_TensorMath.TensorMathFixture method)</a>
 </li>
       <li><a href="optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_determinant_precision">test_determinant_precision() (optimism.test.test_TensorMath.TensorMathFixture method)</a>
@@ -3744,7 +3834,11 @@
       <li><a href="optimism.test.html#optimism.test.test_PatchTest.LinearPatchTestQuadraticElements.test_dirichlet_patch_test_with_quadratic_elements">test_dirichlet_patch_test_with_quadratic_elements() (optimism.test.test_PatchTest.LinearPatchTestQuadraticElements method)</a>
 
       <ul>
+        <li><a href="optimism.test.html#optimism.test.test_PatchTest.LinearPatchTestQuadraticLagrangeElements.test_dirichlet_patch_test_with_quadratic_elements">(optimism.test.test_PatchTest.LinearPatchTestQuadraticLagrangeElements method)</a>
+</li>
         <li><a href="optimism.test.html#optimism.test.test_PatchTest.QuadraticPatchTestQuadraticElements.test_dirichlet_patch_test_with_quadratic_elements">(optimism.test.test_PatchTest.QuadraticPatchTestQuadraticElements method)</a>
+</li>
+        <li><a href="optimism.test.html#optimism.test.test_PatchTest.QuadraticPatchTestQuadraticLagrangeElements.test_dirichlet_patch_test_with_quadratic_elements">(optimism.test.test_PatchTest.QuadraticPatchTestQuadraticLagrangeElements method)</a>
 </li>
         <li><a href="optimism.test.html#optimism.test.test_PatchTestPou.PatchTestQuadraticElements.test_dirichlet_patch_test_with_quadratic_elements">(optimism.test.test_PatchTestPou.PatchTestQuadraticElements method)</a>
 </li>
@@ -3758,6 +3852,16 @@
       <li><a href="optimism.test.html#optimism.test.test_JaxConfig.TestJaxConfiguration.test_double_precision_mode_is_on">test_double_precision_mode_is_on() (optimism.test.test_JaxConfig.TestJaxConfiguration method)</a>
 </li>
       <li><a href="optimism.test.html#optimism.test.test_Mesh.TestSingleMeshFixture.test_edge_connectivities">test_edge_connectivities() (optimism.test.test_Mesh.TestSingleMeshFixture method)</a>
+</li>
+      <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_edge_grad_interpolation">test_edge_grad_interpolation() (optimism.test.test_Interpolants.TestLagrangeInterpolants method)</a>
+</li>
+      <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_edge_interpolation">test_edge_interpolation() (optimism.test.test_Interpolants.TestLagrangeInterpolants method)</a>
+</li>
+      <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_edge_shape_kronecker_delta_property">test_edge_shape_kronecker_delta_property() (optimism.test.test_Interpolants.TestLagrangeInterpolants method)</a>
+</li>
+      <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_edge_shape_partition_of_unity">test_edge_shape_partition_of_unity() (optimism.test.test_Interpolants.TestLagrangeInterpolants method)</a>
+</li>
+      <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_edge_shapeGrads_partition_of_unity">test_edge_shapeGrads_partition_of_unity() (optimism.test.test_Interpolants.TestLagrangeInterpolants method)</a>
 </li>
       <li><a href="optimism.test.html#optimism.test.test_Mesh.TestSingleMeshFixture.test_edge_to_neighbor_cells_data">test_edge_to_neighbor_cells_data() (optimism.test.test_Mesh.TestSingleMeshFixture method)</a>
 </li>
@@ -3778,6 +3882,8 @@
       <li><a href="optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceMultiQuadPointFixture.test_element_volume_multi_point_quadrature">test_element_volume_multi_point_quadrature() (optimism.test.test_FunctionSpace.TestFunctionSpaceMultiQuadPointFixture method)</a>
 </li>
       <li><a href="optimism.test.html#optimism.test.test_FunctionSpace.TestFunctionSpaceSingleQuadPointFixture.test_element_volume_single_point_quadrature">test_element_volume_single_point_quadrature() (optimism.test.test_FunctionSpace.TestFunctionSpaceSingleQuadPointFixture method)</a>
+</li>
+      <li><a href="optimism.material.test.html#optimism.material.test.test_ThirdMedium.ThirdMediumModelFixture.test_energy_consistency">test_energy_consistency() (optimism.material.test.test_ThirdMedium.ThirdMediumModelFixture method)</a>
 </li>
       <li><a href="optimism.test.html#optimism.test.test_ReadExodusMesh.TestMeshReadData.test_entity_counts">test_entity_counts() (optimism.test.test_ReadExodusMesh.TestMeshReadData method)</a>
 
@@ -4001,6 +4107,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="optimism.material.test.html#optimism.material.test.test_ThirdMedium.ThirdMediumModelFixture.test_plot_biaxial_response">test_plot_biaxial_response() (optimism.material.test.test_ThirdMedium.ThirdMediumModelFixture method)</a>
+</li>
       <li><a href="optimism.contact.test.html#optimism.contact.test.test_Cpp.TestEdgeIntersection.test_plot_smooth_min">test_plot_smooth_min() (optimism.contact.test.test_Cpp.TestEdgeIntersection method)</a>
 </li>
       <li><a href="optimism.contact.test.html#optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.test_positive_curvature">test_positive_curvature() (optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver method)</a>
@@ -4151,12 +4259,28 @@
 </li>
       <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.test_tri_face_nodes_match_1D_lobatto_nodes">test_tri_face_nodes_match_1D_lobatto_nodes() (optimism.test.test_Interpolants.TestInterpolants method)</a>
 </li>
+      <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_grad_interpolation">test_tri_grad_interpolation() (optimism.test.test_Interpolants.TestLagrangeInterpolants method)</a>
+</li>
+      <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_interpolant_points">test_tri_interpolant_points() (optimism.test.test_Interpolants.TestLagrangeInterpolants method)</a>
+</li>
       <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.test_tri_interpolant_points_in_element">test_tri_interpolant_points_in_element() (optimism.test.test_Interpolants.TestInterpolants method)</a>
 </li>
+      <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_interpolation">test_tri_interpolation() (optimism.test.test_Interpolants.TestLagrangeInterpolants method)</a>
+</li>
+      <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_shape_kronecker_delta_property">test_tri_shape_kronecker_delta_property() (optimism.test.test_Interpolants.TestLagrangeInterpolants method)</a>
+</li>
       <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.test_tri_shape_partition_of_unity">test_tri_shape_partition_of_unity() (optimism.test.test_Interpolants.TestInterpolants method)</a>
+
+      <ul>
+        <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_shape_partition_of_unity">(optimism.test.test_Interpolants.TestLagrangeInterpolants method)</a>
 </li>
+      </ul></li>
       <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.test_tri_shapeGrads_partition_of_unity">test_tri_shapeGrads_partition_of_unity() (optimism.test.test_Interpolants.TestInterpolants method)</a>
+
+      <ul>
+        <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_shapeGrads_partition_of_unity">(optimism.test.test_Interpolants.TestLagrangeInterpolants method)</a>
 </li>
+      </ul></li>
       <li><a href="optimism.test.html#optimism.test.test_QuadratureRule.TestQuadratureRules.test_triangle_quadrature_exactness">test_triangle_quadrature_exactness() (optimism.test.test_QuadratureRule.TestQuadratureRules method)</a>
 </li>
       <li><a href="optimism.test.html#optimism.test.test_QuadratureRule.TestQuadratureRules.test_triangle_quadrature_points_in_domain">test_triangle_quadrature_points_in_domain() (optimism.test.test_QuadratureRule.TestQuadratureRules method)</a>
@@ -4255,6 +4379,8 @@
 </li>
       <li><a href="optimism.test.html#optimism.test.test_JaxConfig.TestJaxConfiguration">TestJaxConfiguration (class in optimism.test.test_JaxConfig)</a>
 </li>
+      <li><a href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants">TestLagrangeInterpolants (class in optimism.test.test_Interpolants)</a>
+</li>
       <li><a href="optimism.contact.test.html#optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint">TestLevelsetContactConstraint (class in optimism.contact.test.test_LevelsetConstraint)</a>
 </li>
       <li><a href="optimism.test.html#optimism.test.test_LinAlg.TestLinAlg">TestLinAlg (class in optimism.test.test_LinAlg)</a>
@@ -4328,6 +4454,8 @@
       <li><a href="optimism.test.html#optimism.test.test_VTKWriter.TestVTKWriterHigherOrder">TestVTKWriterHigherOrder (class in optimism.test.test_VTKWriter)</a>
 </li>
       <li><a href="optimism.html#optimism.Timer.Timer.text">text (optimism.Timer.Timer attribute)</a>
+</li>
+      <li><a href="optimism.material.test.html#optimism.material.test.test_ThirdMedium.ThirdMediumModelFixture">ThirdMediumModelFixture (class in optimism.material.test.test_ThirdMedium)</a>
 </li>
       <li><a href="optimism.material.html#id4">time (optimism.material.MaterialUniaxialSimulator.UniaxialOutput attribute)</a>, <a href="optimism.material.html#optimism.material.MaterialUniaxialSimulator.UniaxialOutput.time">[1]</a>
 

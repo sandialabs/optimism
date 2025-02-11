@@ -111,6 +111,7 @@
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.MaterialUniaxialSimulator">optimism.material.MaterialUniaxialSimulator module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.MultiBranchHyperViscoelastic">optimism.material.MultiBranchHyperViscoelastic module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.Neohookean">optimism.material.Neohookean module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.ThirdMediumNeoHookean">optimism.material.ThirdMediumNeoHookean module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material">Module contents</a></li>
 </ul>
 </li>
@@ -382,6 +383,11 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="optimism.html#optimism-incompletecholesky-module">optimism.IncompleteCholesky module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="optimism.html#module-optimism.Interpolants">optimism.Interpolants module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.InterpolationType"><code class="docutils literal notranslate"><span class="pre">InterpolationType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Interpolants.InterpolationType.LAGRANGE"><code class="docutils literal notranslate"><span class="pre">InterpolationType.LAGRANGE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Interpolants.InterpolationType.LOBATTO"><code class="docutils literal notranslate"><span class="pre">InterpolationType.LOBATTO</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.ParentElement"><code class="docutils literal notranslate"><span class="pre">ParentElement</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Interpolants.ParentElement.elementType"><code class="docutils literal notranslate"><span class="pre">ParentElement.elementType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Interpolants.ParentElement.degree"><code class="docutils literal notranslate"><span class="pre">ParentElement.degree</span></code></a></li>
@@ -409,14 +415,18 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.compute_shapes"><code class="docutils literal notranslate"><span class="pre">compute_shapes()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.get_lobatto_nodes_1d"><code class="docutils literal notranslate"><span class="pre">get_lobatto_nodes_1d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.make_lagrange_parent_element_1d"><code class="docutils literal notranslate"><span class="pre">make_lagrange_parent_element_1d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.make_lagrange_parent_element_2d"><code class="docutils literal notranslate"><span class="pre">make_lagrange_parent_element_2d()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.make_parent_element_1d"><code class="docutils literal notranslate"><span class="pre">make_parent_element_1d()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.make_parent_element_2d"><code class="docutils literal notranslate"><span class="pre">make_parent_element_2d()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.make_parent_element_2d_with_bubble"><code class="docutils literal notranslate"><span class="pre">make_parent_element_2d_with_bubble()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.make_parent_elements"><code class="docutils literal notranslate"><span class="pre">make_parent_elements()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.pascal_triangle_monomials"><code class="docutils literal notranslate"><span class="pre">pascal_triangle_monomials()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.shape1d"><code class="docutils literal notranslate"><span class="pre">shape1d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.shape1d_lagrange"><code class="docutils literal notranslate"><span class="pre">shape1d_lagrange()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.shape2d"><code class="docutils literal notranslate"><span class="pre">shape2d()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.shape2dBubble"><code class="docutils literal notranslate"><span class="pre">shape2dBubble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.shape2d_lagrange"><code class="docutils literal notranslate"><span class="pre">shape2d_lagrange()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.vander1d"><code class="docutils literal notranslate"><span class="pre">vander1d()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Interpolants.vander2d"><code class="docutils literal notranslate"><span class="pre">vander2d()</span></code></a></li>
 </ul>

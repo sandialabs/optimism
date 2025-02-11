@@ -322,15 +322,20 @@
 
 <div class="viewcode-block" id="create_higher_order_mesh_from_simplex_mesh">
 <a class="viewcode-back" href="../../optimism.html#optimism.Mesh.create_higher_order_mesh_from_simplex_mesh">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">create_higher_order_mesh_from_simplex_mesh</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">useBubbleElement</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">copyNodeSets</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">createNodeSetsFromSideSets</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_higher_order_mesh_from_simplex_mesh</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">interpolationType</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">InterpolationType</span><span class="o">.</span><span class="n">LOBATTO</span><span class="p">,</span> <span class="n">useBubbleElement</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">copyNodeSets</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">createNodeSetsFromSideSets</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">order</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span> <span class="k">return</span> <span class="n">mesh</span>
 
-    <span class="n">parentElement1d</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">make_parent_element_1d</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
-    
-    <span class="k">if</span> <span class="n">useBubbleElement</span><span class="p">:</span>
-        <span class="n">basis</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">make_parent_element_2d_with_bubble</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">interpolationType</span> <span class="o">==</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">InterpolationType</span><span class="o">.</span><span class="n">LAGRANGE</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">useBubbleElement</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="n">parentElement1d</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">make_lagrange_parent_element_1d</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
+        <span class="n">basis</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">make_lagrange_parent_element_2d</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">basis</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">make_parent_element_2d</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
+        <span class="n">parentElement1d</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">make_parent_element_1d</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">useBubbleElement</span><span class="p">:</span>
+            <span class="n">basis</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">make_parent_element_2d_with_bubble</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">basis</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">make_parent_element_2d</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
 
     <span class="n">conns</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_elements</span><span class="p">(</span><span class="n">mesh</span><span class="p">),</span> <span class="n">basis</span><span class="o">.</span><span class="n">coordinates</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int_</span><span class="p">)</span>
 

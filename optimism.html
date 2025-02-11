@@ -147,18 +147,23 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#optimism-incompletecholesky-module">optimism.IncompleteCholesky module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-optimism.Interpolants">optimism.Interpolants module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.InterpolationType"><code class="docutils literal notranslate"><span class="pre">InterpolationType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.ParentElement"><code class="docutils literal notranslate"><span class="pre">ParentElement</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.ShapeFunctions"><code class="docutils literal notranslate"><span class="pre">ShapeFunctions</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.compute_shapes"><code class="docutils literal notranslate"><span class="pre">compute_shapes()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.get_lobatto_nodes_1d"><code class="docutils literal notranslate"><span class="pre">get_lobatto_nodes_1d()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.make_lagrange_parent_element_1d"><code class="docutils literal notranslate"><span class="pre">make_lagrange_parent_element_1d()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.make_lagrange_parent_element_2d"><code class="docutils literal notranslate"><span class="pre">make_lagrange_parent_element_2d()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.make_parent_element_1d"><code class="docutils literal notranslate"><span class="pre">make_parent_element_1d()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.make_parent_element_2d"><code class="docutils literal notranslate"><span class="pre">make_parent_element_2d()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.make_parent_element_2d_with_bubble"><code class="docutils literal notranslate"><span class="pre">make_parent_element_2d_with_bubble()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.make_parent_elements"><code class="docutils literal notranslate"><span class="pre">make_parent_elements()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.pascal_triangle_monomials"><code class="docutils literal notranslate"><span class="pre">pascal_triangle_monomials()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.shape1d"><code class="docutils literal notranslate"><span class="pre">shape1d()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.shape1d_lagrange"><code class="docutils literal notranslate"><span class="pre">shape1d_lagrange()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.shape2d"><code class="docutils literal notranslate"><span class="pre">shape2d()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.shape2dBubble"><code class="docutils literal notranslate"><span class="pre">shape2dBubble()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.shape2d_lagrange"><code class="docutils literal notranslate"><span class="pre">shape2d_lagrange()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.vander1d"><code class="docutils literal notranslate"><span class="pre">vander1d()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.vander2d"><code class="docutils literal notranslate"><span class="pre">vander2d()</span></code></a></li>
 </ul>
@@ -673,6 +678,11 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#optimism-incompletecholesky-module">optimism.IncompleteCholesky module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-optimism.Interpolants">optimism.Interpolants module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#optimism.Interpolants.InterpolationType"><code class="docutils literal notranslate"><span class="pre">InterpolationType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.InterpolationType.LAGRANGE"><code class="docutils literal notranslate"><span class="pre">InterpolationType.LAGRANGE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.InterpolationType.LOBATTO"><code class="docutils literal notranslate"><span class="pre">InterpolationType.LOBATTO</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#optimism.Interpolants.ParentElement"><code class="docutils literal notranslate"><span class="pre">ParentElement</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.ParentElement.elementType"><code class="docutils literal notranslate"><span class="pre">ParentElement.elementType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Interpolants.ParentElement.degree"><code class="docutils literal notranslate"><span class="pre">ParentElement.degree</span></code></a></li>
@@ -700,14 +710,18 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#optimism.Interpolants.compute_shapes"><code class="docutils literal notranslate"><span class="pre">compute_shapes()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#optimism.Interpolants.get_lobatto_nodes_1d"><code class="docutils literal notranslate"><span class="pre">get_lobatto_nodes_1d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#optimism.Interpolants.make_lagrange_parent_element_1d"><code class="docutils literal notranslate"><span class="pre">make_lagrange_parent_element_1d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#optimism.Interpolants.make_lagrange_parent_element_2d"><code class="docutils literal notranslate"><span class="pre">make_lagrange_parent_element_2d()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#optimism.Interpolants.make_parent_element_1d"><code class="docutils literal notranslate"><span class="pre">make_parent_element_1d()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#optimism.Interpolants.make_parent_element_2d"><code class="docutils literal notranslate"><span class="pre">make_parent_element_2d()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#optimism.Interpolants.make_parent_element_2d_with_bubble"><code class="docutils literal notranslate"><span class="pre">make_parent_element_2d_with_bubble()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#optimism.Interpolants.make_parent_elements"><code class="docutils literal notranslate"><span class="pre">make_parent_elements()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#optimism.Interpolants.pascal_triangle_monomials"><code class="docutils literal notranslate"><span class="pre">pascal_triangle_monomials()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#optimism.Interpolants.shape1d"><code class="docutils literal notranslate"><span class="pre">shape1d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#optimism.Interpolants.shape1d_lagrange"><code class="docutils literal notranslate"><span class="pre">shape1d_lagrange()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#optimism.Interpolants.shape2d"><code class="docutils literal notranslate"><span class="pre">shape2d()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#optimism.Interpolants.shape2dBubble"><code class="docutils literal notranslate"><span class="pre">shape2dBubble()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#optimism.Interpolants.shape2d_lagrange"><code class="docutils literal notranslate"><span class="pre">shape2d_lagrange()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#optimism.Interpolants.vander1d"><code class="docutils literal notranslate"><span class="pre">vander1d()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#optimism.Interpolants.vander2d"><code class="docutils literal notranslate"><span class="pre">vander2d()</span></code></a></li>
 </ul>
@@ -1392,6 +1406,7 @@
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.test.html#module-optimism.material.test.test_MaterialUniaxialSimulator">optimism.material.test.test_MaterialUniaxialSimulator module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.test.html#module-optimism.material.test.test_MultiBranchHyperVisco">optimism.material.test.test_MultiBranchHyperVisco module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.test.html#module-optimism.material.test.test_RateSensitivity">optimism.material.test.test_RateSensitivity module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.test.html#module-optimism.material.test.test_ThirdMedium">optimism.material.test.test_ThirdMedium module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.test.html#module-optimism.material.test">Module contents</a></li>
 </ul>
 </li>
@@ -1548,10 +1563,20 @@
 <li class="toctree-l2"><a class="reference internal" href="optimism.material.html#module-optimism.material.Neohookean">optimism.material.Neohookean module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="optimism.material.html#optimism.material.Neohookean._adagio_neohookean"><code class="docutils literal notranslate"><span class="pre">_adagio_neohookean()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.material.html#optimism.material.Neohookean._compute_state_new"><code class="docutils literal notranslate"><span class="pre">_compute_state_new()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.material.html#optimism.material.Neohookean._compute_volumetric_jacobian"><code class="docutils literal notranslate"><span class="pre">_compute_volumetric_jacobian()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.material.html#optimism.material.Neohookean._make_properties"><code class="docutils literal notranslate"><span class="pre">_make_properties()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.material.html#optimism.material.Neohookean._neohookean_3D_energy_density"><code class="docutils literal notranslate"><span class="pre">_neohookean_3D_energy_density()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.material.html#optimism.material.Neohookean.create_material_model_functions"><code class="docutils literal notranslate"><span class="pre">create_material_model_functions()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.material.html#optimism.material.Neohookean.make_initial_state"><code class="docutils literal notranslate"><span class="pre">make_initial_state()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.material.html#module-optimism.material.ThirdMediumNeoHookean">optimism.material.ThirdMediumNeoHookean module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.material.html#optimism.material.ThirdMediumNeoHookean._compute_volumetric_jacobian"><code class="docutils literal notranslate"><span class="pre">_compute_volumetric_jacobian()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.material.html#optimism.material.ThirdMediumNeoHookean._make_properties"><code class="docutils literal notranslate"><span class="pre">_make_properties()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.material.html#optimism.material.ThirdMediumNeoHookean.create_material_model_functions"><code class="docutils literal notranslate"><span class="pre">create_material_model_functions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.material.html#optimism.material.ThirdMediumNeoHookean.make_initial_state"><code class="docutils literal notranslate"><span class="pre">make_initial_state()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.material.html#optimism.material.ThirdMediumNeoHookean.neo_hookean_energy_density"><code class="docutils literal notranslate"><span class="pre">neo_hookean_energy_density()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.material.html#optimism.material.ThirdMediumNeoHookean.stabilized_neo_hookean_energy_density"><code class="docutils literal notranslate"><span class="pre">stabilized_neo_hookean_energy_density()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="optimism.material.html#module-optimism.material">Module contents</a></li>
@@ -1843,6 +1868,11 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_Interpolants">optimism.test.test_Interpolants module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.ElementFixture"><code class="docutils literal notranslate"><span class="pre">ElementFixture</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.ElementFixture.assertCorrectGradInterpolationOn2DElement"><code class="docutils literal notranslate"><span class="pre">ElementFixture.assertCorrectGradInterpolationOn2DElement()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.ElementFixture.assertCorrectInterpolationOn2DElement"><code class="docutils literal notranslate"><span class="pre">ElementFixture.assertCorrectInterpolationOn2DElement()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestBubbleInterpolants"><code class="docutils literal notranslate"><span class="pre">TestBubbleInterpolants</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestBubbleInterpolants.no_test_plot_shape_functions"><code class="docutils literal notranslate"><span class="pre">TestBubbleInterpolants.no_test_plot_shape_functions()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestBubbleInterpolants.setUp"><code class="docutils literal notranslate"><span class="pre">TestBubbleInterpolants.setUp()</span></code></a></li>
@@ -1863,6 +1893,23 @@
 <li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.test_tri_interpolant_points_in_element"><code class="docutils literal notranslate"><span class="pre">TestInterpolants.test_tri_interpolant_points_in_element()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.test_tri_shapeGrads_partition_of_unity"><code class="docutils literal notranslate"><span class="pre">TestInterpolants.test_tri_shapeGrads_partition_of_unity()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestInterpolants.test_tri_shape_partition_of_unity"><code class="docutils literal notranslate"><span class="pre">TestInterpolants.test_tri_shape_partition_of_unity()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants"><code class="docutils literal notranslate"><span class="pre">TestLagrangeInterpolants</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.setUp"><code class="docutils literal notranslate"><span class="pre">TestLagrangeInterpolants.setUp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_1D_interpolant_points"><code class="docutils literal notranslate"><span class="pre">TestLagrangeInterpolants.test_1D_interpolant_points()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_degree_other_than_two_throws"><code class="docutils literal notranslate"><span class="pre">TestLagrangeInterpolants.test_degree_other_than_two_throws()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_edge_grad_interpolation"><code class="docutils literal notranslate"><span class="pre">TestLagrangeInterpolants.test_edge_grad_interpolation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_edge_interpolation"><code class="docutils literal notranslate"><span class="pre">TestLagrangeInterpolants.test_edge_interpolation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_edge_shapeGrads_partition_of_unity"><code class="docutils literal notranslate"><span class="pre">TestLagrangeInterpolants.test_edge_shapeGrads_partition_of_unity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_edge_shape_kronecker_delta_property"><code class="docutils literal notranslate"><span class="pre">TestLagrangeInterpolants.test_edge_shape_kronecker_delta_property()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_edge_shape_partition_of_unity"><code class="docutils literal notranslate"><span class="pre">TestLagrangeInterpolants.test_edge_shape_partition_of_unity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_grad_interpolation"><code class="docutils literal notranslate"><span class="pre">TestLagrangeInterpolants.test_tri_grad_interpolation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_interpolant_points"><code class="docutils literal notranslate"><span class="pre">TestLagrangeInterpolants.test_tri_interpolant_points()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_interpolation"><code class="docutils literal notranslate"><span class="pre">TestLagrangeInterpolants.test_tri_interpolation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_shapeGrads_partition_of_unity"><code class="docutils literal notranslate"><span class="pre">TestLagrangeInterpolants.test_tri_shapeGrads_partition_of_unity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_shape_kronecker_delta_property"><code class="docutils literal notranslate"><span class="pre">TestLagrangeInterpolants.test_tri_shape_kronecker_delta_property()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_shape_partition_of_unity"><code class="docutils literal notranslate"><span class="pre">TestLagrangeInterpolants.test_tri_shape_partition_of_unity()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.test.html#optimism.test.test_Interpolants.generate_random_points_in_triangle"><code class="docutils literal notranslate"><span class="pre">generate_random_points_in_triangle()</span></code></a></li>
@@ -2005,9 +2052,26 @@
 <li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_PatchTest.LinearPatchTestQuadraticElements.test_dirichlet_patch_test_with_quadratic_elements_and_constant_jac_projection"><code class="docutils literal notranslate"><span class="pre">LinearPatchTestQuadraticElements.test_dirichlet_patch_test_with_quadratic_elements_and_constant_jac_projection()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.test.html#optimism.test.test_PatchTest.LinearPatchTestQuadraticLagrangeElements"><code class="docutils literal notranslate"><span class="pre">LinearPatchTestQuadraticLagrangeElements</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_PatchTest.LinearPatchTestQuadraticLagrangeElements.setUp"><code class="docutils literal notranslate"><span class="pre">LinearPatchTestQuadraticLagrangeElements.setUp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_PatchTest.LinearPatchTestQuadraticLagrangeElements.test_dirichlet_patch_test_with_quadratic_elements"><code class="docutils literal notranslate"><span class="pre">LinearPatchTestQuadraticLagrangeElements.test_dirichlet_patch_test_with_quadratic_elements()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.test.html#optimism.test.test_PatchTest.PatchTestFixture"><code class="docutils literal notranslate"><span class="pre">PatchTestFixture</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_PatchTest.PatchTestFixture.assertLinearPatchTestPasses"><code class="docutils literal notranslate"><span class="pre">PatchTestFixture.assertLinearPatchTestPasses()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_PatchTest.PatchTestFixture.assertQuadraticPatchTestPasses"><code class="docutils literal notranslate"><span class="pre">PatchTestFixture.assertQuadraticPatchTestPasses()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_PatchTest.PatchTestFixture.initializeLinearPatchTestFromMesh"><code class="docutils literal notranslate"><span class="pre">PatchTestFixture.initializeLinearPatchTestFromMesh()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_PatchTest.PatchTestFixture.initializeQuadraticPatchTestFromMesh"><code class="docutils literal notranslate"><span class="pre">PatchTestFixture.initializeQuadraticPatchTestFromMesh()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.test.html#optimism.test.test_PatchTest.QuadraticPatchTestQuadraticElements"><code class="docutils literal notranslate"><span class="pre">QuadraticPatchTestQuadraticElements</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_PatchTest.QuadraticPatchTestQuadraticElements.setUp"><code class="docutils literal notranslate"><span class="pre">QuadraticPatchTestQuadraticElements.setUp()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_PatchTest.QuadraticPatchTestQuadraticElements.test_dirichlet_patch_test_with_quadratic_elements"><code class="docutils literal notranslate"><span class="pre">QuadraticPatchTestQuadraticElements.test_dirichlet_patch_test_with_quadratic_elements()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.test.html#optimism.test.test_PatchTest.QuadraticPatchTestQuadraticLagrangeElements"><code class="docutils literal notranslate"><span class="pre">QuadraticPatchTestQuadraticLagrangeElements</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_PatchTest.QuadraticPatchTestQuadraticLagrangeElements.setUp"><code class="docutils literal notranslate"><span class="pre">QuadraticPatchTestQuadraticLagrangeElements.setUp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#optimism.test.test_PatchTest.QuadraticPatchTestQuadraticLagrangeElements.test_dirichlet_patch_test_with_quadratic_elements"><code class="docutils literal notranslate"><span class="pre">QuadraticPatchTestQuadraticLagrangeElements.test_dirichlet_patch_test_with_quadratic_elements()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -3376,6 +3440,23 @@ interpolationPoints: coordinates of points (in the 1D parametric space) to</p>
 <section id="module-optimism.Interpolants">
 <span id="optimism-interpolants-module"></span><h2>optimism.Interpolants module<a class="headerlink" href="#module-optimism.Interpolants" title="Link to this heading"></a></h2>
 <dl class="py class">
+<dt class="sig sig-object py" id="optimism.Interpolants.InterpolationType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.Interpolants.</span></span><span class="sig-name descname"><span class="pre">InterpolationType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/Interpolants.html#InterpolationType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.Interpolants.InterpolationType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.Interpolants.InterpolationType.LAGRANGE">
+<span class="sig-name descname"><span class="pre">LAGRANGE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#optimism.Interpolants.InterpolationType.LAGRANGE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.Interpolants.InterpolationType.LOBATTO">
+<span class="sig-name descname"><span class="pre">LOBATTO</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#optimism.Interpolants.InterpolationType.LOBATTO" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="optimism.Interpolants.ParentElement">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.Interpolants.</span></span><span class="sig-name descname"><span class="pre">ParentElement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elementType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coordinates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'nn</span> <span class="pre">nd'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertexNodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Int</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'nn'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">faceNodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Int</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'nf</span> <span class="pre">nnpf'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interiorNodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Int</span><span class="p"><span class="pre">[</span></span><span class="pre">Array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'ni'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/Interpolants.html#ParentElement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.Interpolants.ParentElement" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
@@ -3519,9 +3600,9 @@ number of shape functions).</p>
 <dt class="sig sig-object py" id="optimism.Interpolants.ShapeFunctions.gradients">
 <span class="sig-name descname"><span class="pre">gradients</span></span><a class="headerlink" href="#optimism.Interpolants.ShapeFunctions.gradients" title="Link to this definition"></a></dt>
 <dd><p>Values of the parametric gradients of the shape functions.
-Shape is <code class="docutils literal notranslate"><span class="pre">(nPts,</span> <span class="pre">nDim,</span> <span class="pre">nNodes)</span></code>, where <code class="docutils literal notranslate"><span class="pre">nDim</span></code> is the number
+Shape is <code class="docutils literal notranslate"><span class="pre">(nPts,</span> <span class="pre">nNodes,</span> <span class="pre">nDim)</span></code>, where <code class="docutils literal notranslate"><span class="pre">nDim</span></code> is the number
 of spatial dimensions. Line elements are an exception, which
-have shape <code class="docutils literal notranslate"><span class="pre">(nPts,</span> <span class="pre">nNdodes)</span></code>.</p>
+have shape <code class="docutils literal notranslate"><span class="pre">(nNodes,</span> <span class="pre">nPts)</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>jaxtyping.Float[Array, ‘nq nn nd’]</p>
@@ -3555,6 +3636,28 @@ have shape <code class="docutils literal notranslate"><span class="pre">(nPts,</
 <dt class="sig sig-object py" id="optimism.Interpolants.get_lobatto_nodes_1d">
 <span class="sig-prename descclassname"><span class="pre">optimism.Interpolants.</span></span><span class="sig-name descname"><span class="pre">get_lobatto_nodes_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/Interpolants.html#get_lobatto_nodes_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.Interpolants.get_lobatto_nodes_1d" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.Interpolants.make_lagrange_parent_element_1d">
+<span class="sig-prename descclassname"><span class="pre">optimism.Interpolants.</span></span><span class="sig-name descname"><span class="pre">make_lagrange_parent_element_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/Interpolants.html#make_lagrange_parent_element_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.Interpolants.make_lagrange_parent_element_1d" title="Link to this definition"></a></dt>
+<dd><p>Lagrange Interpolation points on the unit interval [0, 1].
+Only implemented for second degree</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.Interpolants.make_lagrange_parent_element_2d">
+<span class="sig-prename descclassname"><span class="pre">optimism.Interpolants.</span></span><span class="sig-name descname"><span class="pre">make_lagrange_parent_element_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/Interpolants.html#make_lagrange_parent_element_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.Interpolants.make_lagrange_parent_element_2d" title="Link to this definition"></a></dt>
+<dd><p>Lagrange interpolation points on the triangle
+Only implemented for second degree triangles.</p>
+<p>Convention for numbering:</p>
+<blockquote>
+<div><p>2
+o
+|      4 o  o 1
+|    o–o–o
+5  3   0</p>
+</div></blockquote>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="optimism.Interpolants.make_parent_element_1d">
@@ -3621,6 +3724,21 @@ dshapes: [nNodes, nEvalPoints]</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="optimism.Interpolants.shape1d_lagrange">
+<span class="sig-prename descclassname"><span class="pre">optimism.Interpolants.</span></span><span class="sig-name descname"><span class="pre">shape1d_lagrange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodalPoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluationPoints</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/Interpolants.html#shape1d_lagrange"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.Interpolants.shape1d_lagrange" title="Link to this definition"></a></dt>
+<dd><p>Evaluate Lagrange shape functions and derivatives at points in the parent element.
+Only implemented for second degree</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Shape function values and shape function derivatives at <code class="docutils literal notranslate"><span class="pre">evaluationPoints</span></code>,
+in a tuple (<code class="docutils literal notranslate"><span class="pre">shape</span></code>, <code class="docutils literal notranslate"><span class="pre">dshape</span></code>).
+shapes: [nNodes, nEvalPoints]
+dshapes: [nNodes, nEvalPoints]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="optimism.Interpolants.shape2d">
 <span class="sig-prename descclassname"><span class="pre">optimism.Interpolants.</span></span><span class="sig-name descname"><span class="pre">shape2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodalPoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluationPoints</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/Interpolants.html#shape2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.Interpolants.shape2d" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -3629,6 +3747,16 @@ dshapes: [nNodes, nEvalPoints]</p>
 <dt class="sig sig-object py" id="optimism.Interpolants.shape2dBubble">
 <span class="sig-prename descclassname"><span class="pre">optimism.Interpolants.</span></span><span class="sig-name descname"><span class="pre">shape2dBubble</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">refElement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluationPoints</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/Interpolants.html#shape2dBubble"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.Interpolants.shape2dBubble" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.Interpolants.shape2d_lagrange">
+<span class="sig-prename descclassname"><span class="pre">optimism.Interpolants.</span></span><span class="sig-name descname"><span class="pre">shape2d_lagrange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodalPoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluationPoints</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/Interpolants.html#shape2d_lagrange"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.Interpolants.shape2d_lagrange" title="Link to this definition"></a></dt>
+<dd><p>Evaluate Lagrange shape functions and derivatives at points in the parent element.
+Only implemented for second degree</p>
+<p>Reference:
+T. Hughes. “The Finite Element Method”
+Appendix 3.I</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="optimism.Interpolants.vander1d">
@@ -4405,7 +4533,7 @@ values of rightT and rightP are -1.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="optimism.Mesh.create_higher_order_mesh_from_simplex_mesh">
-<span class="sig-prename descclassname"><span class="pre">optimism.Mesh.</span></span><span class="sig-name descname"><span class="pre">create_higher_order_mesh_from_simplex_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useBubbleElement</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copyNodeSets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">createNodeSetsFromSideSets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/Mesh.html#create_higher_order_mesh_from_simplex_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.Mesh.create_higher_order_mesh_from_simplex_mesh" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">optimism.Mesh.</span></span><span class="sig-name descname"><span class="pre">create_higher_order_mesh_from_simplex_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolationType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">InterpolationType.LOBATTO</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useBubbleElement</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copyNodeSets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">createNodeSetsFromSideSets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/Mesh.html#create_higher_order_mesh_from_simplex_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.Mesh.create_higher_order_mesh_from_simplex_mesh" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -5036,7 +5164,7 @@ positive weights.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="optimism.ReadExodusMesh.read_exodus_mesh">
-<span class="sig-prename descclassname"><span class="pre">optimism.ReadExodusMesh.</span></span><span class="sig-name descname"><span class="pre">read_exodus_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/ReadExodusMesh.html#read_exodus_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.ReadExodusMesh.read_exodus_mesh" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">optimism.ReadExodusMesh.</span></span><span class="sig-name descname"><span class="pre">read_exodus_mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolationType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">InterpolationType.LOBATTO</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/ReadExodusMesh.html#read_exodus_mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.ReadExodusMesh.read_exodus_mesh" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">

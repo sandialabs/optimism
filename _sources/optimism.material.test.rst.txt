@@ -85,6 +85,15 @@ optimism.material.test.test\_RateSensitivity module
    :show-inheritance:
    :private-members:
 
+optimism.material.test.test\_ThirdMedium module
+-----------------------------------------------
+
+.. automodule:: optimism.material.test.test_ThirdMedium
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
 Module contents
 ---------------
 

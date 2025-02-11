@@ -507,6 +507,22 @@
 <section id="module-optimism.test.test_Interpolants">
 <span id="optimism-test-test-interpolants-module"></span><h2>optimism.test.test_Interpolants module<a class="headerlink" href="#module-optimism.test.test_Interpolants" title="Link to this heading"></a></h2>
 <dl class="py class">
+<dt class="sig sig-object py" id="optimism.test.test_Interpolants.ElementFixture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.test.test_Interpolants.</span></span><span class="sig-name descname"><span class="pre">ElementFixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#ElementFixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.ElementFixture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_Interpolants.ElementFixture.assertCorrectGradInterpolationOn2DElement">
+<span class="sig-name descname"><span class="pre">assertCorrectGradInterpolationOn2DElement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numRandomEvalPoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape2dFun</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#ElementFixture.assertCorrectGradInterpolationOn2DElement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.ElementFixture.assertCorrectGradInterpolationOn2DElement" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_Interpolants.ElementFixture.assertCorrectInterpolationOn2DElement">
+<span class="sig-name descname"><span class="pre">assertCorrectInterpolationOn2DElement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numRandomEvalPoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape2dFun</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#ElementFixture.assertCorrectInterpolationOn2DElement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.ElementFixture.assertCorrectInterpolationOn2DElement" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="optimism.test.test_Interpolants.TestBubbleInterpolants">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.test.test_Interpolants.</span></span><span class="sig-name descname"><span class="pre">TestBubbleInterpolants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#TestBubbleInterpolants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.TestBubbleInterpolants" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
@@ -536,7 +552,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="optimism.test.test_Interpolants.TestInterpolants">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.test.test_Interpolants.</span></span><span class="sig-name descname"><span class="pre">TestInterpolants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#TestInterpolants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.TestInterpolants" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#optimism.test.TestFixture.TestFixture" title="optimism.test.TestFixture.TestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestFixture</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#optimism.test.test_Interpolants.ElementFixture" title="optimism.test.test_Interpolants.ElementFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">ElementFixture</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="optimism.test.test_Interpolants.TestInterpolants.no_test_plot_high_order_nodes">
 <span class="sig-name descname"><span class="pre">no_test_plot_high_order_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#TestInterpolants.no_test_plot_high_order_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.TestInterpolants.no_test_plot_high_order_nodes" title="Link to this definition"></a></dt>
@@ -596,6 +612,83 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="optimism.test.test_Interpolants.TestInterpolants.test_tri_shape_partition_of_unity">
 <span class="sig-name descname"><span class="pre">test_tri_shape_partition_of_unity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#TestInterpolants.test_tri_shape_partition_of_unity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.TestInterpolants.test_tri_shape_partition_of_unity" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.test.test_Interpolants.TestLagrangeInterpolants">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.test.test_Interpolants.</span></span><span class="sig-name descname"><span class="pre">TestLagrangeInterpolants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#TestLagrangeInterpolants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.TestLagrangeInterpolants" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#optimism.test.test_Interpolants.ElementFixture" title="optimism.test.test_Interpolants.ElementFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">ElementFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_Interpolants.TestLagrangeInterpolants.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#TestLagrangeInterpolants.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.TestLagrangeInterpolants.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_Interpolants.TestLagrangeInterpolants.test_1D_interpolant_points">
+<span class="sig-name descname"><span class="pre">test_1D_interpolant_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#TestLagrangeInterpolants.test_1D_interpolant_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_1D_interpolant_points" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_Interpolants.TestLagrangeInterpolants.test_degree_other_than_two_throws">
+<span class="sig-name descname"><span class="pre">test_degree_other_than_two_throws</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#TestLagrangeInterpolants.test_degree_other_than_two_throws"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_degree_other_than_two_throws" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_Interpolants.TestLagrangeInterpolants.test_edge_grad_interpolation">
+<span class="sig-name descname"><span class="pre">test_edge_grad_interpolation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#TestLagrangeInterpolants.test_edge_grad_interpolation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_edge_grad_interpolation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_Interpolants.TestLagrangeInterpolants.test_edge_interpolation">
+<span class="sig-name descname"><span class="pre">test_edge_interpolation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#TestLagrangeInterpolants.test_edge_interpolation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_edge_interpolation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_Interpolants.TestLagrangeInterpolants.test_edge_shapeGrads_partition_of_unity">
+<span class="sig-name descname"><span class="pre">test_edge_shapeGrads_partition_of_unity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#TestLagrangeInterpolants.test_edge_shapeGrads_partition_of_unity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_edge_shapeGrads_partition_of_unity" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_Interpolants.TestLagrangeInterpolants.test_edge_shape_kronecker_delta_property">
+<span class="sig-name descname"><span class="pre">test_edge_shape_kronecker_delta_property</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#TestLagrangeInterpolants.test_edge_shape_kronecker_delta_property"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_edge_shape_kronecker_delta_property" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_Interpolants.TestLagrangeInterpolants.test_edge_shape_partition_of_unity">
+<span class="sig-name descname"><span class="pre">test_edge_shape_partition_of_unity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#TestLagrangeInterpolants.test_edge_shape_partition_of_unity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_edge_shape_partition_of_unity" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_grad_interpolation">
+<span class="sig-name descname"><span class="pre">test_tri_grad_interpolation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#TestLagrangeInterpolants.test_tri_grad_interpolation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_grad_interpolation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_interpolant_points">
+<span class="sig-name descname"><span class="pre">test_tri_interpolant_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#TestLagrangeInterpolants.test_tri_interpolant_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_interpolant_points" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_interpolation">
+<span class="sig-name descname"><span class="pre">test_tri_interpolation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#TestLagrangeInterpolants.test_tri_interpolation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_interpolation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_shapeGrads_partition_of_unity">
+<span class="sig-name descname"><span class="pre">test_tri_shapeGrads_partition_of_unity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#TestLagrangeInterpolants.test_tri_shapeGrads_partition_of_unity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_shapeGrads_partition_of_unity" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_shape_kronecker_delta_property">
+<span class="sig-name descname"><span class="pre">test_tri_shape_kronecker_delta_property</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#TestLagrangeInterpolants.test_tri_shape_kronecker_delta_property"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_shape_kronecker_delta_property" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_shape_partition_of_unity">
+<span class="sig-name descname"><span class="pre">test_tri_shape_partition_of_unity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_Interpolants.html#TestLagrangeInterpolants.test_tri_shape_partition_of_unity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_Interpolants.TestLagrangeInterpolants.test_tri_shape_partition_of_unity" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1054,7 +1147,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="optimism.test.test_PatchTest.LinearPatchTestLinearElements">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.test.test_PatchTest.</span></span><span class="sig-name descname"><span class="pre">LinearPatchTestLinearElements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_PatchTest.html#LinearPatchTestLinearElements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_PatchTest.LinearPatchTestLinearElements" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#optimism.test.MeshFixture.MeshFixture" title="optimism.test.MeshFixture.MeshFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeshFixture</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#optimism.test.test_PatchTest.PatchTestFixture" title="optimism.test.test_PatchTest.PatchTestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">PatchTestFixture</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="optimism.test.test_PatchTest.LinearPatchTestLinearElements.setUp">
 <span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_PatchTest.html#LinearPatchTestLinearElements.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_PatchTest.LinearPatchTestLinearElements.setUp" title="Link to this definition"></a></dt>
@@ -1076,7 +1169,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="optimism.test.test_PatchTest.LinearPatchTestQuadraticElements">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.test.test_PatchTest.</span></span><span class="sig-name descname"><span class="pre">LinearPatchTestQuadraticElements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_PatchTest.html#LinearPatchTestQuadraticElements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_PatchTest.LinearPatchTestQuadraticElements" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#optimism.test.MeshFixture.MeshFixture" title="optimism.test.MeshFixture.MeshFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeshFixture</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#optimism.test.test_PatchTest.PatchTestFixture" title="optimism.test.test_PatchTest.PatchTestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">PatchTestFixture</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="optimism.test.test_PatchTest.LinearPatchTestQuadraticElements.setUp">
 <span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_PatchTest.html#LinearPatchTestQuadraticElements.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_PatchTest.LinearPatchTestQuadraticElements.setUp" title="Link to this definition"></a></dt>
@@ -1096,9 +1189,52 @@
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="optimism.test.test_PatchTest.LinearPatchTestQuadraticLagrangeElements">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.test.test_PatchTest.</span></span><span class="sig-name descname"><span class="pre">LinearPatchTestQuadraticLagrangeElements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_PatchTest.html#LinearPatchTestQuadraticLagrangeElements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_PatchTest.LinearPatchTestQuadraticLagrangeElements" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#optimism.test.test_PatchTest.PatchTestFixture" title="optimism.test.test_PatchTest.PatchTestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">PatchTestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_PatchTest.LinearPatchTestQuadraticLagrangeElements.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_PatchTest.html#LinearPatchTestQuadraticLagrangeElements.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_PatchTest.LinearPatchTestQuadraticLagrangeElements.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_PatchTest.LinearPatchTestQuadraticLagrangeElements.test_dirichlet_patch_test_with_quadratic_elements">
+<span class="sig-name descname"><span class="pre">test_dirichlet_patch_test_with_quadratic_elements</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_PatchTest.html#LinearPatchTestQuadraticLagrangeElements.test_dirichlet_patch_test_with_quadratic_elements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_PatchTest.LinearPatchTestQuadraticLagrangeElements.test_dirichlet_patch_test_with_quadratic_elements" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.test.test_PatchTest.PatchTestFixture">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.test.test_PatchTest.</span></span><span class="sig-name descname"><span class="pre">PatchTestFixture</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_PatchTest.html#PatchTestFixture"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_PatchTest.PatchTestFixture" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#optimism.test.MeshFixture.MeshFixture" title="optimism.test.MeshFixture.MeshFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeshFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_PatchTest.PatchTestFixture.assertLinearPatchTestPasses">
+<span class="sig-name descname"><span class="pre">assertLinearPatchTestPasses</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_PatchTest.html#PatchTestFixture.assertLinearPatchTestPasses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_PatchTest.PatchTestFixture.assertLinearPatchTestPasses" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_PatchTest.PatchTestFixture.assertQuadraticPatchTestPasses">
+<span class="sig-name descname"><span class="pre">assertQuadraticPatchTestPasses</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_PatchTest.html#PatchTestFixture.assertQuadraticPatchTestPasses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_PatchTest.PatchTestFixture.assertQuadraticPatchTestPasses" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_PatchTest.PatchTestFixture.initializeLinearPatchTestFromMesh">
+<span class="sig-name descname"><span class="pre">initializeLinearPatchTestFromMesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quadratureDegree</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_PatchTest.html#PatchTestFixture.initializeLinearPatchTestFromMesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_PatchTest.PatchTestFixture.initializeLinearPatchTestFromMesh" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_PatchTest.PatchTestFixture.initializeQuadraticPatchTestFromMesh">
+<span class="sig-name descname"><span class="pre">initializeQuadraticPatchTestFromMesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_PatchTest.html#PatchTestFixture.initializeQuadraticPatchTestFromMesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_PatchTest.PatchTestFixture.initializeQuadraticPatchTestFromMesh" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="optimism.test.test_PatchTest.QuadraticPatchTestQuadraticElements">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.test.test_PatchTest.</span></span><span class="sig-name descname"><span class="pre">QuadraticPatchTestQuadraticElements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_PatchTest.html#QuadraticPatchTestQuadraticElements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_PatchTest.QuadraticPatchTestQuadraticElements" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#optimism.test.MeshFixture.MeshFixture" title="optimism.test.MeshFixture.MeshFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeshFixture</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#optimism.test.test_PatchTest.PatchTestFixture" title="optimism.test.test_PatchTest.PatchTestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">PatchTestFixture</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="optimism.test.test_PatchTest.QuadraticPatchTestQuadraticElements.setUp">
 <span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_PatchTest.html#QuadraticPatchTestQuadraticElements.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_PatchTest.QuadraticPatchTestQuadraticElements.setUp" title="Link to this definition"></a></dt>
@@ -1108,6 +1244,23 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="optimism.test.test_PatchTest.QuadraticPatchTestQuadraticElements.test_dirichlet_patch_test_with_quadratic_elements">
 <span class="sig-name descname"><span class="pre">test_dirichlet_patch_test_with_quadratic_elements</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_PatchTest.html#QuadraticPatchTestQuadraticElements.test_dirichlet_patch_test_with_quadratic_elements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_PatchTest.QuadraticPatchTestQuadraticElements.test_dirichlet_patch_test_with_quadratic_elements" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="optimism.test.test_PatchTest.QuadraticPatchTestQuadraticLagrangeElements">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.test.test_PatchTest.</span></span><span class="sig-name descname"><span class="pre">QuadraticPatchTestQuadraticLagrangeElements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_PatchTest.html#QuadraticPatchTestQuadraticLagrangeElements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_PatchTest.QuadraticPatchTestQuadraticLagrangeElements" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#optimism.test.test_PatchTest.PatchTestFixture" title="optimism.test.test_PatchTest.PatchTestFixture"><code class="xref py py-class docutils literal notranslate"><span class="pre">PatchTestFixture</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_PatchTest.QuadraticPatchTestQuadraticLagrangeElements.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_PatchTest.html#QuadraticPatchTestQuadraticLagrangeElements.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_PatchTest.QuadraticPatchTestQuadraticLagrangeElements.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.test.test_PatchTest.QuadraticPatchTestQuadraticLagrangeElements.test_dirichlet_patch_test_with_quadratic_elements">
+<span class="sig-name descname"><span class="pre">test_dirichlet_patch_test_with_quadratic_elements</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/test/test_PatchTest.html#QuadraticPatchTestQuadraticLagrangeElements.test_dirichlet_patch_test_with_quadratic_elements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.test.test_PatchTest.QuadraticPatchTestQuadraticLagrangeElements.test_dirichlet_patch_test_with_quadratic_elements" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
