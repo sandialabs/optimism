@@ -286,7 +286,7 @@ class TestLagrangeInterpolants(ElementFixture):
         self.assertArrayNear(p[k[1,:],:], onp.array([[0.0, 1.0], [0.0, 0.5], [0.0, 0.0]]), 16)
         self.assertArrayNear(p[k[2,:],:], onp.array([[0.0, 0.0], [0.5, 0.0], [1.0, 0.0]]), 16)
         # interior node conditions
-        self.assertTrue(element.interiorNodes.shape == 0)
+        self.assertTrue(element.interiorNodes.shape == (0,))
 
     def test_edge_shape_kronecker_delta_property(self):
         element = Interpolants.make_lagrange_parent_element_1d(self.degree)
