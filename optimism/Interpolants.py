@@ -1,9 +1,13 @@
 from jaxtyping import Array, Float, Int
 from scipy import special
+from enum import Enum, auto
 import numpy as onp
 import equinox as eqx
 import jax.numpy as np
 
+class InterpolationType(Enum):
+    LOBATTO = auto()
+    LAGRANGE = auto()
 
 class ParentElement(eqx.Module):
     """Finite element on reference domain.
@@ -234,7 +238,7 @@ def make_lagrange_parent_element_2d(degree):
     xn = np.array([[1.0, 0.0], [0.5, 0.5], [0.0, 1.0], [0.5, 0.0], [0.0, 0.5], [0.0, 0.0]])
     vertexPoints = np.array([0, 2, 5], dtype=np.int32)
     facePoints = np.array([[0, 1, 2], [2, 4, 5], [5, 3, 0]], dtype=np.int32)
-    return ParentElement(LAGRANGE_TRIANGLE_ELEMENT, int(degree), xn, vertexPoints, facePoints, None)
+    return ParentElement(LAGRANGE_TRIANGLE_ELEMENT, int(degree), xn, vertexPoints, facePoints, np.array([], dtype=np.int32))
 
 def pascal_triangle_monomials(degree):
     p = []

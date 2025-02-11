@@ -3,15 +3,10 @@ from optimism import Mesh
 from optimism import Interpolants
 import netCDF4
 import numpy as onp
-from enum import Enum, auto
-
-class InterpolationType(Enum):
-    LOBATTO = auto()
-    LAGRANGE = auto()
 
 exodusToNativeTri6NodeOrder = np.array([0, 3, 1, 5, 4, 2])
 
-def read_exodus_mesh(fileName, interpolationType = InterpolationType.LOBATTO):
+def read_exodus_mesh(fileName, interpolationType = Interpolants.InterpolationType.LOBATTO):
     with netCDF4.Dataset(fileName) as exData:
         coords = _read_coordinates(exData)
         conns, blocks = _read_blocks(exData)
@@ -30,7 +25,7 @@ def read_exodus_mesh(fileName, interpolationType = InterpolationType.LOBATTO):
         else:
             raise
 
-        if interpolationType == InterpolationType.LAGRANGE:
+        if interpolationType == Interpolants.InterpolationType.LAGRANGE:
             basis1d = Interpolants.make_lagrange_parent_element_1d(degree)
             basis = Interpolants.make_lagrange_parent_element_2d(degree)
         else:
