@@ -7,7 +7,7 @@ import jax.numpy as np
 
 from optimism import Interpolants
 from optimism import QuadratureRule
-import TestFixture
+from . import TestFixture
 
     
 tol = 1e-14
