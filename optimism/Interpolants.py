@@ -374,6 +374,67 @@ def shape2d_lagrange(degree, nodalPoints, evaluationPoints):
     return ShapeFunctions(shape, dshape) 
 
 
+def shape2d_lagrange_second_derivatives(degree, nodalPoints, evaluationPoints):
+    """Evaluate second derivatives of Lagrange shape functions at points in the parent element.
+    Only implemented for second degree
+
+    Shape of returned second derivatives is ``(nPts, nNodes, nTerms)``, where ``nTerms``
+    is the number of derivative terms (3). These terms are organized as
+    [ (d^2 N)/(dr^2), (d^2 N)/(ds^2), (d^2 N)/(dr ds) ]
+    where r and s are the local triangle coordinates.
+
+    Following shape2d_lagrange above, the shape functions are
+
+    N0 = r * (2.0 * r - 1.0) = 2.0*r*r - r                                   
+    N1 = 4.0 * r * s         = 4.0 * r * s                                   
+    N2 = s * (2.0 * s - 1.0) = 2.0*s*s - s                                   
+    N3 = 4.0 * r * t         = 4.0*(r - r*s - r*r)                           
+    N4 = 4.0 * s * t         = 4.0*(s - r*s - s*s)                           
+    N5 = t * (2.0 * t - 1.0) = 1.0 - 3.0*(r + s) + 4.0*r*s + 2.0*(r*r + s*s) 
+
+    Reference:
+    T. Hughes. "The Finite Element Method"
+    Appendix 3.I
+    """
+    if degree != 2:
+        raise NotImplementedError
+
+    numEvalPoints = evaluationPoints.shape[0]
+    r = evaluationPoints[:,0]
+    s = evaluationPoints[:,1]
+    # t = 1.0 - r - s
+
+    d2shape0_dr2  = 4.0 * np.ones(numEvalPoints)
+    d2shape0_ds2  = np.zeros(numEvalPoints)
+    d2shape0_drds = np.zeros(numEvalPoints)
+
+    d2shape1_dr2  = np.zeros(numEvalPoints)
+    d2shape1_ds2  = np.zeros(numEvalPoints)
+    d2shape1_drds = 4.0 * np.ones(numEvalPoints)
+
+    d2shape2_dr2  = np.zeros(numEvalPoints)
+    d2shape2_ds2  = 4.0 * np.ones(numEvalPoints)
+    d2shape2_drds = np.zeros(numEvalPoints)
+
+    d2shape3_dr2  = -8.0 * np.ones(numEvalPoints)
+    d2shape3_ds2  = np.zeros(numEvalPoints)
+    d2shape3_drds = -4.0 * np.ones(numEvalPoints)
+
+    d2shape4_dr2  = np.zeros(numEvalPoints)
+    d2shape4_ds2  = -8.0 * np.ones(numEvalPoints)
+    d2shape4_drds = -4.0 * np.ones(numEvalPoints)
+
+    d2shape5_dr2  = 4.0 * np.ones(numEvalPoints)
+    d2shape5_ds2  = 4.0 * np.ones(numEvalPoints)
+    d2shape5_drds = 4.0 * np.ones(numEvalPoints)
+
+    d2shape_dr2 = np.stack((d2shape0_dr2, d2shape1_dr2, d2shape2_dr2, d2shape3_dr2, d2shape4_dr2, d2shape5_dr2)).T
+    d2shape_ds2 = np.stack((d2shape0_ds2, d2shape1_ds2, d2shape2_ds2, d2shape3_ds2, d2shape4_ds2, d2shape5_ds2)).T
+    d2shape_drds = np.stack((d2shape0_drds, d2shape1_drds, d2shape2_drds, d2shape3_drds, d2shape4_drds, d2shape5_drds)).T
+
+    return np.stack((d2shape_dr2, d2shape_ds2, d2shape_drds), axis=2)
+
+
 def compute_shapes(parentElement, evaluationPoints):
     if parentElement.elementType == LINE_ELEMENT:
         return shape1d(parentElement.degree, parentElement.coordinates, evaluationPoints)

@@ -256,6 +256,7 @@ class TestLagrangeInterpolants(ElementFixture):
             self.assertRaises(NotImplementedError, Interpolants.make_lagrange_parent_element_2d, degree)
             self.assertRaises(NotImplementedError, Interpolants.shape1d_lagrange, degree, dummyCoords, self.qr1d)
             self.assertRaises(NotImplementedError, Interpolants.shape2d_lagrange, degree, dummyCoords, self.qr)
+            self.assertRaises(NotImplementedError, Interpolants.shape2d_lagrange_second_derivatives, degree, dummyCoords, self.qr)
 
     def test_1D_interpolant_points(self):
         element = Interpolants.make_lagrange_parent_element_1d(self.degree)
@@ -358,6 +359,44 @@ class TestLagrangeInterpolants(ElementFixture):
         numRandomEvalPoints = 5
         element = Interpolants.make_lagrange_parent_element_2d(self.degree)
         self.assertCorrectGradInterpolationOn2DElement(element, numRandomEvalPoints, Interpolants.shape2d_lagrange)
+    
+    def test_tri_second_grad_partition_of_unity(self):
+        element = Interpolants.make_lagrange_parent_element_2d(self.degree)
+        shapeSecondGrad = Interpolants.shape2d_lagrange_second_derivatives(element.degree, element.coordinates, self.qr.xigauss)
+        self.assertArrayNear(np.sum(shapeSecondGrad, axis=1), np.zeros((self.nQPts, 3)), 14)
+
+    def test_tri_second_grad_interpolation(self):
+        numRandomEvalPoints = 5
+        element = Interpolants.make_lagrange_parent_element_2d(self.degree)
+
+        degree = element.degree
+        x = generate_random_points_in_triangle(numRandomEvalPoints)
+
+        poly = onp.array([[1, 1, 2], [1, 1, 0], [1, 0, 0]])
+
+        shapeSecondGrad = Interpolants.shape2d_lagrange_second_derivatives(degree, element.coordinates, x)
+        fn = onp.polynomial.polynomial.polyval2d(element.coordinates[:,0],
+                                                 element.coordinates[:,1],
+                                                 poly)
+        d2fInterpolated = onp.einsum('qai,a->qi', shapeSecondGrad, fn)
+
+        # 00 derivative
+        DPoly  = onp.polynomial.polynomial.polyder(poly,  1, scl=1, axis=0)
+        D2Poly = onp.polynomial.polynomial.polyder(DPoly, 1, scl=1, axis=0)
+        expected00 = onp.polynomial.polynomial.polyval2d(x[:,0], x[:,1], D2Poly)
+        self.assertArrayNear(expected00, d2fInterpolated[:,0], 14)
+
+        # 11 derivative
+        DPoly  = onp.polynomial.polynomial.polyder(poly,  1, scl=1, axis=1)
+        D2Poly = onp.polynomial.polynomial.polyder(DPoly, 1, scl=1, axis=1)
+        expected11 = onp.polynomial.polynomial.polyval2d(x[:,0], x[:,1], D2Poly)
+        self.assertArrayNear(expected11, d2fInterpolated[:,1], 14)
+
+        # 01 derivative
+        DPoly  = onp.polynomial.polynomial.polyder(poly,  1, scl=1, axis=0)
+        D2Poly = onp.polynomial.polynomial.polyder(DPoly, 1, scl=1, axis=1)
+        expected01 = onp.polynomial.polynomial.polyval2d(x[:,0], x[:,1], D2Poly)
+        self.assertArrayNear(expected01, d2fInterpolated[:,2], 14)
 
 
 
