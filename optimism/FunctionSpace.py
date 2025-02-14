@@ -22,6 +22,7 @@ class FunctionSpace(eqx.Module):
     elements in the mesh, ``nqpe`` is the number of quadrature points per
     element, ``npe`` is the number of nodes per element, and ``nd`` is the
     spatial dimension of the domain.
+    For shape Hessians, nh is the number of hessian entries, set to 3
 
     Attributes:
         shapes: Shape function values on each element, shape (ne, nqpe, npe)
@@ -31,6 +32,9 @@ class FunctionSpace(eqx.Module):
             element in the domain. Shape (ne, nqpe).
         shapeGrads: Derivatives of the shape functions with respect to the
             spatial coordinates of the domain. Shape (ne, nqpe, npe, nd).
+        shapeHessians: Second derivatives of the shape functions with respect to the
+            spatial coordinates of the domain. Shape (ne, nqpe, npe, nh).
+            These are only implemented for quadratic Lagrange elements.
         mesh: The ``Mesh`` object of the domain.
         quadratureRule: The ``QuadratureRule`` on which to sample the shape
             functions.
@@ -40,6 +44,7 @@ class FunctionSpace(eqx.Module):
     shapes: Float[Array, "ne nqpe nn"]
     vols: Float[Array, "ne nqpe"]
     shapeGrads: Float[Array, "ne nqpe nn nd"]
+    shapeHessians: Float[Array, "ne nqpe nn nh"]
     mesh: Mesh.Mesh
     quadratureRule: QuadratureRule.QuadratureRule
     isAxisymmetric: bool
@@ -112,14 +117,38 @@ def construct_function_space_from_parent_element(mesh, shapeOnRef, quadratureRul
         isAxisymmetric = True
     vols = jax.vmap(el_vols, (None, 0, None, 0, None))(mesh.coords, mesh.conns, mesh.parentElement, shapes, quadratureRule.wgauss)
 
-    return FunctionSpace(shapes, vols, shapeGrads, mesh, quadratureRule, isAxisymmetric)
+    if mesh.parentElement.elementType == Interpolants.LAGRANGE_TRIANGLE_ELEMENT:
+        shapeOnRefHessians = Interpolants.shape2d_lagrange_second_derivatives(mesh.parentElement.degree, mesh.parentElement.coordinates, quadratureRule.xigauss)
+        shapeHessians = jax.vmap(map_element_shape_hessians, (None, 0, None, None, None))(mesh.coords, mesh.conns, mesh.parentElement, shapeOnRef.gradients, shapeOnRefHessians)
+        return FunctionSpace(shapes, vols, shapeGrads, shapeHessians, mesh, quadratureRule, isAxisymmetric)
+    else:
+        return FunctionSpace(shapes, vols, shapeGrads, None, mesh, quadratureRule, isAxisymmetric)
 
 
 def map_element_shape_grads(coordField, nodeOrdinals, parentElement, shapeGradients):
     Xn = coordField.take(nodeOrdinals,0)
     v = Xn[parentElement.vertexNodes]
-    J = np.column_stack((v[0] - v[2], v[1] - v[2]))
+    J = np.column_stack((v[0] - v[2], v[1] - v[2])) # assumes simplex element
     return jax.vmap(lambda dN: solve(J.T, dN.T).T)(shapeGradients)
+
+
+def map_element_shape_hessians(coordField, nodeOrdinals, parentElement, shapeGradients, shapeHessians):
+    Xn = coordField.take(nodeOrdinals,0)
+
+    dNdX = map_element_shape_grads(coordField, nodeOrdinals, parentElement, shapeGradients)
+
+    def quad_point_shape_hessian(shapeGrads, dNdX, shapeHessians):
+        dXdXi = np.tensordot(Xn, shapeGrads, axes=[0,0])
+        J = np.array([[dXdXi[0,0]**2, dXdXi[1,0]**2, 2.0*dXdXi[1,0]*dXdXi[0,0]],
+                      [dXdXi[0,1]**2, dXdXi[1,1]**2, 2.0*dXdXi[1,1]*dXdXi[0,1]],
+                      [dXdXi[0,0]*dXdXi[0,1], dXdXi[1,0]*dXdXi[1,1], dXdXi[1,0]*dXdXi[0,1] + dXdXi[0,0]*dXdXi[1,1]]])
+        
+        d2X_dXi2 = np.tensordot(Xn, shapeHessians, axes=[0,0])
+        b = np.array([shapeHessians[:,0].T - dNdX[:,0].T * d2X_dXi2[0,0] - dNdX[:,1].T * d2X_dXi2[1,0],
+                      shapeHessians[:,1].T - dNdX[:,0].T * d2X_dXi2[0,1] - dNdX[:,1].T * d2X_dXi2[1,1],
+                      shapeHessians[:,2].T - dNdX[:,0].T * d2X_dXi2[0,2] - dNdX[:,1].T * d2X_dXi2[1,2]])
+        return solve(J, b).T
+    return jax.vmap(quad_point_shape_hessian, (0, 0, 0))(shapeGradients, dNdX, shapeHessians) # vmap over nqpe
 
 
 def compute_element_volumes(coordField, nodeOrdinals, parentElement, shapes, weights):
@@ -187,6 +216,12 @@ def default_modify_element_gradient(elemGrads, elemShapes, elemVols, elemNodalDi
 
 def compute_field_gradient(functionSpace, nodalField, modify_element_gradient=default_modify_element_gradient):
     return jax.vmap(compute_element_field_gradient, (None,None,0,0,0,0,None))(nodalField, functionSpace.mesh.coords, functionSpace.shapes, functionSpace.shapeGrads, functionSpace.vols, functionSpace.mesh.conns, modify_element_gradient)
+
+
+def compute_field_hessian(functionSpace, nodalField):
+    if functionSpace.shapeHessians == None:
+        raise NotImplementedError
+    return jax.vmap(compute_element_field_hessian, (None,0,0))(nodalField, functionSpace.shapeHessians, functionSpace.mesh.conns)
 
 
 def interpolate_to_points(functionSpace, nodalField):
@@ -280,6 +315,15 @@ def compute_element_field_gradient(U, coords, elemShapes, elemShapeGrads, elemVo
 def compute_quadrature_point_field_gradient(u, shapeGrad):
     dg = np.tensordot(u, shapeGrad, axes=[0,0])
     return dg
+
+
+def compute_element_field_hessian(U, elemShapeHessians, elemConnectivity):
+    elemNodalDisps = U[elemConnectivity]
+    return jax.vmap(compute_quadrature_point_field_hessian, (None, 0))(elemNodalDisps, elemShapeHessians)
+
+
+def compute_quadrature_point_field_hessian(u, shapeHess):
+    return np.tensordot(u, shapeHess, axes=[0,0])
 
 
 def interpolate_to_point(elementNodalValues, shape):
