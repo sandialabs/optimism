@@ -14,7 +14,7 @@
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../../_static/copybutton.js?v=f281be69"></script>
@@ -78,6 +78,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">optimism.material</span><span class="w"> </span><span class="kn">import</span> <span class="n">Neohookean</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.material</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThirdMediumNeoHookean</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 
@@ -141,6 +142,14 @@
     <span class="k">return</span> <span class="n">Wiso</span> <span class="o">+</span> <span class="n">Wvol</span></div>
 
 
+<div class="viewcode-block" id="energy_teran_invertible">
+<a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_ThirdMedium.energy_teran_invertible">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">energy_teran_invertible</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">mu</span><span class="p">):</span>
+    <span class="n">lamda</span> <span class="o">=</span> <span class="n">kappa</span> <span class="o">-</span> <span class="p">(</span><span class="mf">2.0</span><span class="o">/</span><span class="mf">3.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">mu</span>
+    <span class="n">props</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mu</span><span class="p">,</span> <span class="n">kappa</span><span class="p">,</span> <span class="n">lamda</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">ThirdMediumNeoHookean</span><span class="o">.</span><span class="n">teran_invertible_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="ThirdMediumModelFixture">
 <a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_ThirdMedium.ThirdMediumModelFixture">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ThirdMediumModelFixture</span><span class="p">(</span><span class="n">TestFixture</span><span class="p">):</span>
@@ -191,7 +200,7 @@
             <span class="n">energies</span> <span class="o">=</span> <span class="n">energies</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">energy_neo_hookean_rokos_volumetric</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kappa</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">))</span>
             <span class="n">energies</span> <span class="o">=</span> <span class="n">energies</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">energy_neo_hookean_rokos_isochoric</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kappa</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">))</span>
             <span class="n">energies</span> <span class="o">=</span> <span class="n">energies</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">energy_stable_neo_hookean</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kappa</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">))</span>
-            <span class="n">energies</span> <span class="o">=</span> <span class="n">energies</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">energy_stable_arruda_boyce</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kappa</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">))</span>
+            <span class="n">energies</span> <span class="o">=</span> <span class="n">energies</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">energy_teran_invertible</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kappa</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">))</span>
             <span class="n">Jvals</span> <span class="o">=</span> <span class="n">Jvals</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">F</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">plotting</span><span class="p">:</span>
@@ -210,11 +219,11 @@
             <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;J&#39;</span><span class="p">)</span>  <span class="c1"># we already handled the x-label with ax1</span>
             <span class="n">legends5</span> <span class="o">=</span> <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">f_vals</span><span class="p">,</span> <span class="n">Jvals</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
 
-            <span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">legends1</span><span class="o">+</span><span class="n">legends2</span><span class="o">+</span><span class="n">legends3</span><span class="o">+</span><span class="n">legends4</span><span class="p">,[</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">legends1</span><span class="o">+</span><span class="n">legends2</span><span class="o">+</span><span class="n">legends3</span><span class="o">+</span><span class="n">legends4</span><span class="o">+</span><span class="n">legends5</span><span class="p">,[</span>
                 <span class="s2">&quot;Rokos Neo Hookean Volumetric term&quot;</span><span class="p">,</span> 
                 <span class="s2">&quot;Rokos Neo Hookean Isochoric term&quot;</span><span class="p">,</span> 
                 <span class="s2">&quot;Stable Neohookean energy&quot;</span><span class="p">,</span> 
-                <span class="s2">&quot;Stable Arruda Boyce energy&quot;</span><span class="p">,</span> 
+                <span class="s2">&quot;Teran invertible Neo Hookean&quot;</span><span class="p">,</span> 
                 <span class="s2">&quot;Volume change J&quot;</span>
             <span class="p">],</span>
             <span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -223,6 +232,7 @@
 
             <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;energy_vs_compression.png&#39;</span><span class="p">)</span></div>
 </div>
+
 
 
 
