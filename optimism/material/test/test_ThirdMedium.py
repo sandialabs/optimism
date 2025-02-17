@@ -3,6 +3,7 @@ from optimism.test.TestFixture import TestFixture
 import jax
 import jax.numpy as np
 from optimism.material import Neohookean
+from optimism.material import ThirdMediumNeoHookean
 
 from matplotlib import pyplot as plt
 
@@ -51,6 +52,11 @@ def energy_stable_arruda_boyce(dispGrad, kappa, mu):
     Wvol = lam/2.0 * (J - alpha)**2
     return Wiso + Wvol
 
+def energy_teran_invertible(dispGrad, kappa, mu):
+    lamda = kappa - (2.0/3.0) * mu
+    props = np.array([mu, kappa, lamda])
+    return ThirdMediumNeoHookean.teran_invertible_energy_density(dispGrad, props)
+
 class ThirdMediumModelFixture(TestFixture):
     def setUp(self):
         self.kappa = 100.0
@@ -91,7 +97,7 @@ class ThirdMediumModelFixture(TestFixture):
             energies = energies.at[0,n].set(energy_neo_hookean_rokos_volumetric(dispGrad, self.kappa, self.mu))
             energies = energies.at[1,n].set(energy_neo_hookean_rokos_isochoric(dispGrad, self.kappa, self.mu))
             energies = energies.at[2,n].set(energy_stable_neo_hookean(dispGrad, self.kappa, self.mu))
-            energies = energies.at[3,n].set(energy_stable_arruda_boyce(dispGrad, self.kappa, self.mu))
+            energies = energies.at[3,n].set(energy_teran_invertible(dispGrad, self.kappa, self.mu))
             Jvals = Jvals.at[n].set(np.linalg.det(F))
 
         if plotting:
@@ -110,11 +116,11 @@ class ThirdMediumModelFixture(TestFixture):
             ax2.set_ylabel('J')  # we already handled the x-label with ax1
             legends5 = ax2.plot(f_vals, Jvals, linestyle='--', color='k')
 
-            ax1.legend(legends1+legends2+legends3+legends4,[
+            ax1.legend(legends1+legends2+legends3+legends4+legends5,[
                 "Rokos Neo Hookean Volumetric term", 
                 "Rokos Neo Hookean Isochoric term", 
                 "Stable Neohookean energy", 
-                "Stable Arruda Boyce energy", 
+                "Teran invertible Neo Hookean", 
                 "Volume change J"
             ],
             loc=0, frameon=True)
@@ -122,6 +128,7 @@ class ThirdMediumModelFixture(TestFixture):
             fig.tight_layout()  # otherwise the right y-label is slightly clipped
 
             plt.savefig('energy_vs_compression.png')
+
 
 
 if __name__ == "__main__":
