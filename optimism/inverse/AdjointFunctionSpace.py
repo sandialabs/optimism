@@ -25,4 +25,4 @@ def construct_function_space_for_adjoint(coords, shapeOnRef, mesh, quadratureRul
                      parentElement=mesh.parentElement, parentElement1d=mesh.parentElement1d, blocks=mesh.blocks,
                      nodeSets=mesh.nodeSets, sideSets=mesh.sideSets)
 
-    return FunctionSpace.FunctionSpace(shapes, vols, shapeGrads, None, mesh, quadratureRule, isAxisymmetric)
+    return FunctionSpace.FunctionSpace(shapes, vols, shapeGrads, mesh, quadratureRule, isAxisymmetric)

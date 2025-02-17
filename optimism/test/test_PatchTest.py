@@ -78,7 +78,7 @@ class PatchTestFixture(MeshFixture.MeshFixture):
             
         dispGrads = FunctionSpace.compute_field_gradient(self.fs, U)
         ne, nqpe = self.fs.vols.shape
-        for dg in dispGrads.reshape(ne*nqpe,2,2):
+        for dg in dispGrads[:,:,0:2,0:2].reshape(ne*nqpe,2,2):
             self.assertArrayNear(dg, targetDispGrad, 14)
 
         grad_func = jax.jit(jax.grad(objective))

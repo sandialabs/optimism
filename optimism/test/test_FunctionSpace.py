@@ -170,10 +170,6 @@ class TestFunctionSpaceMultiQuadPointFixture(MeshFixture.MeshFixture):
         self.assertTrue(np.allclose(dispGrads, exact))
 
 
-    def test_field_hessian_throws(self):
-        self.assertRaises(NotImplementedError, FunctionSpace.compute_field_hessian, self.fs, self.U)
-
-
     def test_integrate_constant_field_multi_point_quadrature(self):
         integralOfOne = FunctionSpace.integrate_over_block(self.fs,
                                                            self.U,
@@ -291,7 +287,7 @@ class ParameterizationTestSuite(MeshFixture.MeshFixture):
 
 class TestFunctionSpaceWithQuadraticLagrangeElementFixture(MeshFixture.MeshFixture):
     def setUp(self):
-        self.quadratureRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
+        self.quadratureRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2)
 
         # mesh
         self.Nx = 2
@@ -319,12 +315,17 @@ class TestFunctionSpaceWithQuadraticLagrangeElementFixture(MeshFixture.MeshFixtu
                                  [self.targetDispHessian[1,0]*x[0] + self.targetDispHessian[1,2]*x[1], self.targetDispHessian[1,2]*x[0] + self.targetDispHessian[1,1]*x[1]]])
             return jax.vmap(compute_qp_displacement_grad, (None, 0))(elemNodalX, elemShapeFunctions)
 
-        dispGrads = FunctionSpace.compute_field_gradient(self.fs, self.U)
+        from optimism import Mechanics
+        dispGradsAndHessians = FunctionSpace.compute_field_gradient(self.fs, self.U, modify_element_gradient=Mechanics.plane_strain_gradient_transformation)
+
+        # check displacement gradients
+        dispGrads = dispGradsAndHessians[:,:,0:2,0:2]
         shapeOnRef = Interpolants.compute_shapes(self.mesh.parentElement, self.quadratureRule.xigauss)
         exact = jax.vmap(compute_expected_displacement_grads, (None, 0, None))(self.mesh.coords, self.mesh.conns, shapeOnRef.values)
         self.assertTrue(np.allclose(dispGrads, exact))
 
-        dispHessians = FunctionSpace.compute_field_hessian(self.fs, self.U)
+        # check displacement hessians
+        dispHessians = dispGradsAndHessians[:,:,0:2,3:]
         nElements = Mesh.num_elements(self.mesh)
         npts = self.quadratureRule.xigauss.shape[0]
         exact = np.tile(self.targetDispHessian, (nElements, npts, 1, 1))

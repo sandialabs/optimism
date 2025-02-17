@@ -52,7 +52,9 @@ class NewmarkParameters(eqx.Module):
 
 
 def plane_strain_gradient_transformation(elemDispGrads, elemShapes, elemVols, elemNodalDisps, elemNodalCoords):
-    return vmap(tensor_2D_to_3D)(elemDispGrads)
+    def map_2D_tensor_to_3D(H):
+        return np.zeros((3,H.shape[1]+1)).at[ 0:H.shape[0], 0:2 ].set(H[:,0:2]).at[ 0:H.shape[0], 3: ].set(H[:,2:])
+    return vmap(map_2D_tensor_to_3D)(elemDispGrads)
 
 
 def volume_average_J_gradient_transformation(elemDispGrads, elemVols, pShapes):
