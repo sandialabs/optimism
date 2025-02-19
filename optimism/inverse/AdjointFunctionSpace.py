@@ -3,8 +3,9 @@ from optimism import Interpolants
 from optimism import Mesh
 from optimism.FunctionSpace import compute_element_volumes
 from optimism.FunctionSpace import compute_element_volumes_axisymmetric
-from optimism.FunctionSpace import map_element_shape_grads
+from optimism.FunctionSpace import map_element_shape_grads, map_element_shape_hessians
 from jax import vmap
+import jax.numpy as np
 
 def construct_function_space_for_adjoint(coords, shapeOnRef, mesh, quadratureRule, mode2D='cartesian'):
 
@@ -25,4 +26,9 @@ def construct_function_space_for_adjoint(coords, shapeOnRef, mesh, quadratureRul
                      parentElement=mesh.parentElement, parentElement1d=mesh.parentElement1d, blocks=mesh.blocks,
                      nodeSets=mesh.nodeSets, sideSets=mesh.sideSets)
 
-    return FunctionSpace.FunctionSpace(shapes, vols, shapeGrads, mesh, quadratureRule, isAxisymmetric)
+    if mesh.parentElement.elementType == Interpolants.LAGRANGE_TRIANGLE_ELEMENT:
+        shapeOnRefHessians = Interpolants.shape2d_lagrange_second_derivatives(mesh.parentElement.degree, mesh.parentElement.coordinates, quadratureRule.xigauss)
+        shapeHessians = vmap(map_element_shape_hessians, (None, 0, None, None, None))(coords, mesh.conns, mesh.parentElement, shapeOnRef.gradients, shapeOnRefHessians)
+        return FunctionSpace.FunctionSpace(shapes, vols, np.concatenate((shapeGrads, shapeHessians), axis=-1), mesh, quadratureRule, isAxisymmetric)
+    else:
+        return FunctionSpace.FunctionSpace(shapes, vols, shapeGrads, mesh, quadratureRule, isAxisymmetric)
