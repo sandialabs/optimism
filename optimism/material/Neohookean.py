@@ -24,17 +24,23 @@ def create_material_model_functions(properties):
             
     def strain_energy(dispGrad, internalVars, dt):
         del dt
-        return energy_density(dispGrad, internalVars, props)
+        return energy_density(dispGrad[0:3,0:3], internalVars, props)
 
     def compute_state_new(dispGrad, internalVars, dt):
         del dt
-        return _compute_state_new(dispGrad, internalVars, props)
+        return _compute_state_new(dispGrad[0:3,0:3], internalVars, props)
 
     density = properties.get('density')
+
+    def compute_material_qoi(dispGrad, internalVars, dt):
+        del internalVars
+        del dt
+        return _compute_volumetric_jacobian(dispGrad[0:3,0:3])
 
     return MaterialModel(compute_energy_density = strain_energy,
                          compute_initial_state = make_initial_state,
                          compute_state_new = compute_state_new,
+                         compute_material_qoi = compute_material_qoi,
                          density = density)
 
 
@@ -78,3 +84,7 @@ def _compute_state_new(dispGrad, internalVars, props):
     del dispGrad
     del props
     return internalVars
+
+def _compute_volumetric_jacobian(dispGrad):
+    F = dispGrad + np.eye(3)
+    return np.linalg.det(F)

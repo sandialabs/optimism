@@ -209,15 +209,20 @@ def create_edges(conns):
     return edgeConns, edges
 
 
-def create_higher_order_mesh_from_simplex_mesh(mesh, order, useBubbleElement=False, copyNodeSets=False, createNodeSetsFromSideSets=False):
+def create_higher_order_mesh_from_simplex_mesh(mesh, order, interpolationType = Interpolants.InterpolationType.LOBATTO, useBubbleElement=False, copyNodeSets=False, createNodeSetsFromSideSets=False):
     if order==1: return mesh
 
-    parentElement1d = Interpolants.make_parent_element_1d(order)
-    
-    if useBubbleElement:
-        basis = Interpolants.make_parent_element_2d_with_bubble(order)
+    if interpolationType == Interpolants.InterpolationType.LAGRANGE:
+        if useBubbleElement:
+            raise NotImplementedError
+        parentElement1d = Interpolants.make_lagrange_parent_element_1d(order)
+        basis = Interpolants.make_lagrange_parent_element_2d(order)
     else:
-        basis = Interpolants.make_parent_element_2d(order)
+        parentElement1d = Interpolants.make_parent_element_1d(order)
+        if useBubbleElement:
+            basis = Interpolants.make_parent_element_2d_with_bubble(order)
+        else:
+            basis = Interpolants.make_parent_element_2d(order)
 
     conns = np.zeros((num_elements(mesh), basis.coordinates.shape[0]), dtype=np.int_)
 
