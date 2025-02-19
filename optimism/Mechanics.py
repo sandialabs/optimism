@@ -254,7 +254,7 @@ def create_multi_block_mechanics_functions(functionSpace, mode2D, materialModels
             elemIds = fs.mesh.blocks[blockKey]
             blockEnergyDensities, blockStresses = FunctionSpace.evaluate_on_block(fs, U, stateVariables, dt, output_constitutive, elemIds, modify_element_gradient=modify_element_gradient)
             energy_densities = energy_densities.at[elemIds].set(blockEnergyDensities)
-            stresses = stresses.at[elemIds].set(blockStresses)
+            stresses = stresses.at[elemIds].set(blockStresses[:,:,0:3,0:3])
         return energy_densities, stresses
 
     def compute_initial_state():
