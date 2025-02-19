@@ -14,7 +14,7 @@
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../../_static/copybutton.js?v=f281be69"></script>
@@ -178,6 +178,33 @@
 
         <span class="n">energy</span> <span class="o">=</span> <span class="n">energy_neo_hookean_adagio</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">kappa</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">energy_gold</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="ThirdMediumModelFixture.test_regularization_term">
+<a class="viewcode-back" href="../../../../optimism.material.test.html#optimism.material.test.test_ThirdMedium.ThirdMediumModelFixture.test_regularization_term">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_regularization_term</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;bulk modulus&#39;</span><span class="p">:</span>  <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s1">&#39;shear modulus&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s1">&#39;regularization_constant&#39;</span><span class="p">:</span> <span class="mf">1.0</span>
+        <span class="p">}</span>
+        <span class="n">material</span> <span class="o">=</span> <span class="n">ThirdMediumNeoHookean</span><span class="o">.</span><span class="n">create_material_model_functions</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
+
+        <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">dispHessian</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">dispGradAndHessian</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+        <span class="n">dispGradAndHessian</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">:]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">dispHessian</span><span class="p">)</span>
+
+        <span class="n">internalVariables</span> <span class="o">=</span> <span class="n">material</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="n">energy</span> <span class="o">=</span> <span class="n">material</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">(</span><span class="n">dispGradAndHessian</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        
+        <span class="n">dispHessianFull</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+        <span class="n">dispHessianFull</span><span class="o">.</span><span class="n">at</span><span class="p">[:,</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">dispHessian</span><span class="p">)</span>
+        <span class="n">dispHessianFull</span><span class="o">.</span><span class="n">at</span><span class="p">[:,</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">dispHessian</span><span class="p">[:,</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">exact</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">dispHessianFull</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">dispHessianFull</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">energy</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">exact</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ThirdMediumModelFixture.test_plot_biaxial_response">

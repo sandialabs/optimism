@@ -14,7 +14,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -379,7 +379,7 @@
             <span class="n">elemIds</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">blockKey</span><span class="p">]</span>
             <span class="n">blockEnergyDensities</span><span class="p">,</span> <span class="n">blockStresses</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">evaluate_on_block</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">output_constitutive</span><span class="p">,</span> <span class="n">elemIds</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">modify_element_gradient</span><span class="p">)</span>
             <span class="n">energy_densities</span> <span class="o">=</span> <span class="n">energy_densities</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">elemIds</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">blockEnergyDensities</span><span class="p">)</span>
-            <span class="n">stresses</span> <span class="o">=</span> <span class="n">stresses</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">elemIds</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">blockStresses</span><span class="p">)</span>
+            <span class="n">stresses</span> <span class="o">=</span> <span class="n">stresses</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">elemIds</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">blockStresses</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">energy_densities</span><span class="p">,</span> <span class="n">stresses</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_initial_state</span><span class="p">():</span>
