@@ -9,19 +9,22 @@ from optimism import ScalarRootFind
 PROPS_MU     = 0
 PROPS_KAPPA  = 1
 PROPS_LAMBDA = 2
+PROPS_REGULARIZATION_CONSTANT = 3
 
 def create_material_model_functions(properties):
 
     density = properties.get('density')
     props = _make_properties(properties['bulk modulus'],
-                             properties['shear modulus'])
+                             properties['shear modulus'],
+                             properties['regularization_constant'])
 
     def strain_energy(dispGrad, internalVars, dt):
         del internalVars
         del dt
-        # return neo_hookean_energy_density(dispGrad, props)
+        # return neo_hookean_energy_density(dispGrad[0:3,0:3], props)
         # return stabilized_neo_hookean_energy_density(dispGrad, props)
-        return teran_invertible_energy_density(dispGrad, props)
+        # return teran_invertible_energy_density(dispGrad, props)
+        return neo_hookean_energy_density(dispGrad[0:3,0:3], props) + _regularization_energy(dispGrad[0:2, 3:], props)
 
     def compute_state_new(dispGrad, internalVars, dt):
         del dispGrad
@@ -31,7 +34,7 @@ def create_material_model_functions(properties):
     def compute_material_qoi(dispGrad, internalVars, dt):
         del internalVars
         del dt
-        return _compute_volumetric_jacobian(dispGrad)
+        return _compute_volumetric_jacobian(dispGrad[0:3,0:3])
 
     return MaterialModel(compute_energy_density = strain_energy,
                          compute_initial_state = make_initial_state,
@@ -42,9 +45,9 @@ def create_material_model_functions(properties):
 def make_initial_state():
     return np.array([])
 
-def _make_properties(kappa, mu):
+def _make_properties(kappa, mu, c):
     lamda = kappa - (2.0/3.0) * mu
-    return np.array([mu, kappa, lamda])
+    return np.array([mu, kappa, lamda, c])
 
 def neo_hookean_energy_density(dispGrad, props):
     F = dispGrad + np.eye(3)
@@ -103,3 +106,8 @@ def _stabilizing_energy_extension(dispGrad, props, J_min):
 def _compute_volumetric_jacobian(dispGrad):
     F = dispGrad + np.eye(3)
     return np.linalg.det(F)
+
+def _regularization_energy(dispHessian, props):
+    def third_order_inner_product(A, B):
+        return np.dot(A[:,0:2].flatten(), B[:,0:2].flatten()) + 2.0*np.dot(A[:,3], B[:,3])
+    return 0.5 * props[PROPS_REGULARIZATION_CONSTANT] * third_order_inner_product(dispHessian, dispHessian)

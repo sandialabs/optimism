@@ -78,6 +78,30 @@ class ThirdMediumModelFixture(TestFixture):
 
         energy = energy_neo_hookean_adagio(dispGrad, self.kappa, self.mu)
         self.assertAlmostEqual(energy, energy_gold, 12)
+    
+    def test_regularization_term(self):
+        props = {
+            'bulk modulus':  0.0,
+            'shear modulus': 0.0,
+            'regularization_constant': 1.0
+        }
+        material = ThirdMediumNeoHookean.create_material_model_functions(props)
+
+        key = jax.random.PRNGKey(1)
+        dispHessian = jax.random.uniform(key, (2, 3))
+        dispGradAndHessian = np.zeros((3,6))
+        dispGradAndHessian.at[0:2,3:].set(dispHessian)
+
+        internalVariables = material.compute_initial_state()
+        dt = 0.0
+
+        energy = material.compute_energy_density(dispGradAndHessian, internalVariables, dt)
+        
+        dispHessianFull = np.zeros((2,4))
+        dispHessianFull.at[:,0:3].set(dispHessian)
+        dispHessianFull.at[:,3].set(dispHessian[:,-1])
+        exact = 0.5*np.dot(dispHessianFull.flatten(), dispHessianFull.flatten())
+        self.assertAlmostEqual(energy.item(), exact, 12)
 
     def test_plot_biaxial_response(self):
         n_steps = 100
