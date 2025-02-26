@@ -27,3 +27,7 @@ spack.lock
 .spack-env/
 *.npz
 *.vtk
+
+cubit*
+spack-build*
+ROL*

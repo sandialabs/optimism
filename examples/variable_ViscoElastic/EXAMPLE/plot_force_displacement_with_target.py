@@ -62,7 +62,7 @@ if compareOptimized:
 
     F2 = norm_y*np.abs(loadDisp['targetForces'])
     U2 = norm_x*np.abs(loadDisp['targetDisplacements'])
-    plt.scatter(U2, F2, marker='x', c='r', s=80)
+    # plt.scatter(U2, F2, marker='x', c='r', s=80)
     plt.legend(["Response","Target"], loc=0, frameon=True)
     # plt.legend(["dt 005 H H", "dt 005 H","dt 005", "dt 025","dt 05","dt 1",  "dt 2"], loc=0, frameon=True)
 else:

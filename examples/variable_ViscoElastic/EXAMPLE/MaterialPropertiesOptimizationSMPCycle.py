@@ -1,6 +1,7 @@
 from jax import grad
 from jax import jit
 from jax import vmap
+from jax import random
 from optimism import EquationSolver
 from optimism import VTKWriter
 from optimism import FunctionSpace
@@ -41,8 +42,10 @@ class MaterialPropertiesOptimization:
         self.lineQuadRule = QuadratureRule.create_quadrature_rule_1D(degree=2)
 
         self.ebcs = [
-            EssentialBC(nodeSet='nset_outer_bottom', component=0),
-            EssentialBC(nodeSet='nset_outer_bottom', component=1),
+            # EssentialBC(nodeSet='nset_outer_bottom', component=0),
+            # EssentialBC(nodeSet='nset_outer_bottom', component=1),
+            EssentialBC(nodeSet='yminus_nodeset',component=0),
+            EssentialBC(nodeSet='yminus_nodeset',component=1)
             # EssentialBC(nodeSet='yplus_sideset', component=0),
             # EssentialBC(nodeSet='yplus_sideset', component=1)
         ]
@@ -73,7 +76,8 @@ class MaterialPropertiesOptimization:
         )
 
         # self.input_mesh = './unit_test.exo'
-        self.input_mesh = './geometry.g'
+        # self.input_mesh = './geometry.g'
+        self.input_mesh = './beam_test_2.exo'
         origMesh = ReadExodusMesh.read_exodus_mesh(self.input_mesh)
 
         # first order mesh
@@ -83,7 +87,7 @@ class MaterialPropertiesOptimization:
         # second order mesh
         self.mesh = origMesh
         # self.mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(origMesh, order=2, createNodeSetsFromSideSets=True)
-        self.index = (self.mesh.nodeSets['nset_outer_top'], 1)
+        self.index = (self.mesh.nodeSets['yplus_nodeset'], 1)
         self.func_space = FunctionSpace.construct_function_space(self.mesh, self.quad_rule)
         self.dof_manager = DofManager(self.func_space, 2, self.ebcs)
         self.mech_funcs = Mechanics.create_mechanics_functions(self.func_space, mode2D='plane strain', materialModel=self.mat_model)
@@ -91,7 +95,7 @@ class MaterialPropertiesOptimization:
         self.plot_file = 'force_control_response.npz'
 
         stageTime = 0.25
-        self.maxForce = 0.1
+        self.maxForce = -5
         self.maxDisp = 0.2
         self.stages = 2
         self.steps_per_stage = 40
@@ -102,7 +106,7 @@ class MaterialPropertiesOptimization:
         self.hot_temp = 80.
         self.heating_rate = 10.
 
-        surfaceXCoords = self.mesh.coords[self.mesh.nodeSets['nset_outer_top']][:,0]
+        surfaceXCoords = self.mesh.coords[self.mesh.nodeSets['yplus_nodeset']][:,0]
         self.tractionArea = np.max(surfaceXCoords) - np.min(surfaceXCoords)
 
     def create_field(self, Uu, disp):
@@ -120,7 +124,7 @@ class MaterialPropertiesOptimization:
         if len(self.mesh.blocks) > 1:
             raise ValueError('Global element ID mapping is currently only set up for single block.')
         
-        self.elementMap = onp.argsort(self.mesh.block_maps['block_1'])
+        self.elementMap = onp.argsort(self.mesh.block_maps['Block_1'])
 
         # print(self.elementMap)
         # print(materialProperties)        
@@ -161,7 +165,7 @@ class MaterialPropertiesOptimization:
                 return np.array([0.0, F/self.tractionArea])
             
             loadPotential = Mechanics.compute_traction_potential_energy(
-                self.func_space, U, self.lineQuadRule, self.mesh.sideSets['sset_outer_top'], 
+                self.func_space, U, self.lineQuadRule, self.mesh.sideSets['yplus_sideset'], 
                 force_function)
             
             return strainEnergy + loadPotential
@@ -307,7 +311,7 @@ class MaterialPropertiesOptimization:
             globalStep += 1
 
         # relax (do nothing)
-        for step in range(1, 200):
+        for step in range(1, 100):
 
             print('--------------------------------------')
             print('LOAD STEP ', globalStep)
@@ -344,6 +348,33 @@ class MaterialPropertiesOptimization:
 
             p = Objective.param_index_update(p, 0, force)
             p = Objective.param_index_update(p, 6, self.elementProperties)
+            Uu, solverSuccess = EquationSolver.nonlinear_equation_solve(self.objective, Uu, p, self.eq_settings)
+            if solverSuccess == False:
+                raise ValueError('Solver failed to converge.')
+
+            U = self.create_field(Uu, p.bc_data)
+            self.ivs = self.mech_funcs.compute_updated_internal_variables(U, p.state_data, self.elementProperties, self.dt)
+            p = Objective.param_index_update(p, 1, self.ivs)
+
+            store_force_displacement(Uu, force, fd_force, fd_disp)
+
+            self.state.append((Uu, p))
+
+            if self.writeOutput:
+              write_vtk_output(Uu, p, globalStep + 1)
+            
+            globalStep += 1
+
+        # relax again (do nothing)
+        for step in range(1, 100):
+
+            print('--------------------------------------')
+            print('LOAD STEP ', globalStep)
+            # force += force_inc
+            # temperature -= temp_inc
+            # self.elementProperties = self.elementProperties.at[:, 1].set(temperature)
+
+            p = Objective.param_index_update(p, 0, force)
             Uu, solverSuccess = EquationSolver.nonlinear_equation_solve(self.objective, Uu, p, self.eq_settings)
             if solverSuccess == False:
                 raise ValueError('Solver failed to converge.')
@@ -450,36 +481,28 @@ class MaterialPropertiesOptimization:
 if __name__ == '__main__':
     mpo = MaterialPropertiesOptimization()
 
-    # constProperties = [
-    #     855,
-    #     0.855,
-    #     3.42,
-    #     0.1,
-    #     0.01, 
-    #     18959, 
-    #     8.3145, 
-    #     109603, 
-    #     722.20, 
-    #     3.73, 
-    #     8.86, #61000, 
-    #     101.6, #511.792, 
-    #     0.12, 
-    #     1.059,
-    #     3.321,
-    #     5.248,
-    #     0.1
-    # ]
+    ## Import dummy parameters
 
-    # Import dummy parameters
+    # initial uniform density value
     densityValue = 1.0
-    densityArray = np.array(range(1, 1 + mpo.mesh.conns.shape[0]))/mpo.mesh.conns.shape[0]
-    # materialProperties = np.full((mpo.mesh.conns.shape[0]), densityValue).tolist()
-    mpo.import_parameters(densityArray.tolist())
+
+    # create a linearly increasing array from 0-1 of size 1 by number-of-elements
+    # densityArray = np.array(range(1, 1 + mpo.mesh.conns.shape[0]))/mpo.mesh.conns.shape[0]
     
-    # print(HyperViscoelastic_VariableProps._make_properties(densityArray, constProperties))
+    # create a random key
+    key = random.PRNGKey(42)
 
+    # create a random array of shape 1 by number-of-elements using the key, where
+    # random.uniform is a distribution between 0 and 1 (default)
+    densityArray = random.uniform(key, shape = (1, mpo.mesh.conns.shape[0]))
+    # print(densityArray[0])
 
+    # create a list full of the uniform density value
+    # materialProperties = np.full((mpo.mesh.conns.shape[0]), densityValue).tolist()
 
+    # assign density value to the mesh
+    # mpo.import_parameters(densityArray.tolist())
+    mpo.import_parameters(densityArray[0].tolist())
 
     val = mpo.get_objective()
     print("\n objective value")
