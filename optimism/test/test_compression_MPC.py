@@ -3,24 +3,25 @@
 # --------------------------------------------------------------------------
 # Note - Using Cubit Coreform for meshing, solved using NON-LINEAR SOLVER
 # --------------------------------------------------------------------------
+import sys
+sys.path.insert(0, "/home/sarvesh/Documents/Github/optimism")
 
 from jax import jit
-from jax.scipy.linalg import solve
 from optimism import VTKWriter
-from optimism import FunctionSpace
 from optimism import EquationSolver
+from optimism import FunctionSpace
 from optimism import Mechanics
 from optimism import Mesh
 from optimism import Objective
 from optimism import QuadratureRule
 from optimism import ReadExodusMesh
-from optimism.FunctionSpace import DofManager
+from optimism.FunctionSpace import DofManagerMPC
 from optimism.FunctionSpace import EssentialBC
 from optimism.material import Neohookean
 
 import jax.numpy as np
 import numpy as onp
-
+from scipy.spatial import cKDTree
 
 
 class CompressionTest:
@@ -50,7 +51,7 @@ class CompressionTest:
 
         self.input_mesh = 'square_mesh_compression.exo'
 
-        self.maxForce = -0.1
+        self.maxForce = -0.2
         self.steps = 50
 
     def create_field(self, Uu):
@@ -63,9 +64,32 @@ class CompressionTest:
     def reload_mesh(self):
         origMesh = ReadExodusMesh.read_exodus_mesh(self.input_mesh)
         self.mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(origMesh, order=2, createNodeSetsFromSideSets=True)
+        coords = self.mesh.coords
+        tol = 1e-8
+
+        # Creating nodesets for master and slave
+        self.mesh.nodeSets['master'] = np.flatnonzero(coords[:,0] < -0.5 + tol)
+        self.mesh.nodeSets['slave'] = np.flatnonzero(coords[:,0] > 0.5 - tol)
+
+        # Get master and slave node coordinates
+        master_coords = coords[self.mesh.nodeSets['master']]
+        slave_coords = coords[self.mesh.nodeSets['slave']]
+
+        # Sort nodes by y-coordinate to ensure correct pairing
+        master_sorted_idx = np.argsort(master_coords[:, 1])
+        slave_sorted_idx = np.argsort(slave_coords[:, 1])
+
+        # Ensure one-to-one pairing by iterating through sorted nodes
+        self.master_slave_pairs = {
+            int(self.mesh.nodeSets['master'][master_sorted_idx[i]]): 
+            int(self.mesh.nodeSets['slave'][slave_sorted_idx[i]])
+            for i in range(min(len(master_sorted_idx), len(slave_sorted_idx)))
+        }
+
+        print("Master-Slave Pairs:", self.master_slave_pairs)
 
         funcSpace = FunctionSpace.construct_function_space(self.mesh, self.quadRule)
-        self.dofManager = DofManager(funcSpace, 2, self.EBCs)
+        self.dofManager = DofManagerMPC(funcSpace, 2, self.EBCs, self.master_slave_pairs)
 
         surfaceXCoords = self.mesh.coords[self.mesh.nodeSets['top']][:,0]
         self.tractionArea = np.max(surfaceXCoords) - np.min(surfaceXCoords)
@@ -110,16 +134,13 @@ class CompressionTest:
         Uu = self.dofManager.get_unknown_values(np.zeros(self.mesh.coords.shape))
         ivs = mechFuncs.compute_initial_state()
         p = Objective.Params(bc_data=0., state_data=ivs)
-        self.objective = Objective.Objective(energy_function, Uu, p)
+        self.objective = Objective.ObjectiveMPC(energy_function, Uu, p, self.dofManager, precondStrategy=None)
 
         # Load over the steps
         force = 0.
 
         force_inc = self.maxForce / self.steps
         
-        # K = self.objective.hessian(Uu)
-        # print(f"Hessian first row: {K[0,:5]}") 
-        # print(f"Hessian Shape: {K.shape}")
 
         for step in range(1, self.steps):
             print('------------------------------------')

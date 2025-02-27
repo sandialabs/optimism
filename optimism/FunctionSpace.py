@@ -8,6 +8,7 @@ import equinox as eqx
 import jax
 import jax.numpy as np
 import numpy as onp
+import scipy.sparse as sp
 
 
 class EssentialBC(eqx.Module):
@@ -362,31 +363,6 @@ def integrate_function_on_edges(functionSpace, func, U, quadRule, edges):
     integrate_on_edges = jax.vmap(integrate_function_on_edge, (None, None, None, None, 0))
     return np.sum(integrate_on_edges(functionSpace, func, U, quadRule, edges))
 
-def create_nodeset_layers(mesh):
-    coords = mesh.coords
-    tol = 1e-8
-    # Create unique layers of nodesets along the y-direction
-    unique_layers = sorted(onp.unique(coords[:,1]))
-    Ny = int(input("Enter the expected number of nodeset layers in y-direction: "))
-    assert len(unique_layers) == Ny, f"ERROR - Expected {Ny} layers, but found {len(unique_layers)}."
-
-    layer_rows = []
-
-    for i, y_val in enumerate(unique_layers):
-        nodes_in_layer = onp.flatnonzero(onp.abs(coords[:, 1] - y_val) < tol)
-        layer_rows.append(nodes_in_layer)
-
-    max_nodes_per_layer = max(len(row) for row in layer_rows)
-    y_layers = -1 * np.ones((len(layer_rows), max_nodes_per_layer), dtype=int)  # Initialize with -1
-
-    for i, row in enumerate(layer_rows):
-        y_layers = y_layers.at[i, :len(row)].set(row)  # Fill each row with nodes from the layer
-
-    # # For debugging
-    # print("Layers in y-direction: ", y_layers)
-    return y_layers
-
-
 class DofManager(eqx.Module):
     # TODO get type hints below correct
     # TODO this one could be moved to jax types if we move towards
@@ -492,332 +468,211 @@ class DofManager(eqx.Module):
         return hessian_bc_mask
 
 
-# # DofManager for Multi-Point Constrained Problem
+# DofManager for Multi-Point Constrained Problem
 
-# class DofManagerMPC(eqx.Module):
-#     fieldShape: Tuple[int, int]
-#     isBc: np.ndarray
-#     isUnknown: np.ndarray
-#     ids: np.ndarray
-#     unknownIndices: np.ndarray
-#     bcIndices: np.ndarray
-#     dofToUnknown: np.ndarray
-#     HessRowCoords: np.ndarray
-#     HessColCoords: np.ndarray
-#     hessian_bc_mask: np.ndarray
-#     master_layer: int = eqx.static_field()
-#     slave_layer: int = eqx.static_field()
-#     master_array: np.ndarray
-#     slave_array: np.ndarray
-#     layers: List[List[int]] = eqx.static_field()
+# class DofManagerMPC(DofManager):
+#     master_slave_pairs: any
+#     T: any
+#     s_tilde: any
+#     isIndependent: any
+#     dim: any
 
-#     def __init__(self, functionSpace, dim, EssentialBCs, mesh):
-#         self.fieldShape = (Mesh.num_nodes(functionSpace.mesh), dim)
-#         self.isBc = onp.full(self.fieldShape, False, dtype=bool)
-#         for ebc in EssentialBCs:
-#             self.isBc[functionSpace.mesh.nodeSets[ebc.nodeSet], ebc.component] = True
-#         self.isUnknown = ~self.isBc
+#     def __init__(self, functionSpace, dim, EssentialBCs, master_slave_pairs):
+#         super().__init__(functionSpace, dim, EssentialBCs)
+        
+#         self.master_slave_pairs = master_slave_pairs
+#         self.dim = dim  # Store the dimension (2D or 3D)
+#         self.create_mpc_transformation()
 
-#         self.ids = onp.arange(self.isBc.size).reshape(self.fieldShape)
+#     def create_mpc_transformation(self):
+#         """
+#         Constructs the transformation matrix T and shift vector s_tilde
+#         for condensation of multipoint constraints.
 
-#         # Create layers and assign master and slave rows
-#         self.layers = create_nodeset_layers(mesh)
-#         print("These are the layers created for the mesh: ", self.layers)
-#         self.master_layer = int(input("Choose the row index for master nodes: "))
-#         self.slave_layer = int(input("Choose the row index for slave nodes: "))
+#         - Independent DOFs (`ui` + `up`) remain.
+#         - Constrained DOFs (`uc`) are condensed out.
+#         - Transformation follows `u = T ũ + s̃` as per the condensation method.
+#         """
+#         num_dofs = self.ids.size  # Total DOFs
+#         num_total_dofs = num_dofs * self.dim  # Account for x, y (or x, y, z)
 
-#         # Generate master and slave arrays
-#         self.master_array = self._create_layer_array(self.master_layer)
-#         self.slave_array = self._create_layer_array(self.slave_layer)
+#         # Identify independent (ui + up) and constrained DOFs (uc)
+#         independent_mask = ~onp.isin(self.ids, list(self.master_slave_pairs.keys()))
+#         independent_indices = onp.where(independent_mask)[0]
+#         constrained_indices = onp.array(list(self.master_slave_pairs.keys()))
 
-#         # Create DOF mappings for unknowns
-#         self.unknownIndices = self.ids[self.isUnknown]
+#         num_independent_dofs = len(independent_indices)
+
+#         # Initialize T matrix and shift vector s_tilde
+#         T = onp.zeros((num_total_dofs, num_independent_dofs * self.dim))
+#         s_tilde = onp.zeros((num_total_dofs,))  # Ensures correct shape
+
+#         # Identity mapping for independent DOFs (ui and up)
+#         for i, dof in enumerate(independent_indices):
+#             for d in range(self.dim):
+#                 T[dof * self.dim + d, i * self.dim + d] = 1  # Block identity
+
+#         # ** Compute Constraint Matrix `C` **
+#         C = onp.zeros((len(constrained_indices) * self.dim, num_independent_dofs * self.dim))
+
+#         # Define `A_c` and `A_p` from constraint relationships
+#         A_c = onp.eye(len(constrained_indices) * self.dim)  # Identity matrix for simplicity
+#         A_p = onp.zeros((len(constrained_indices) * self.dim, num_independent_dofs * self.dim))
+
+#         for i, slave in enumerate(constrained_indices):
+#             master = self.master_slave_pairs[slave]
+#             master_index = onp.where(independent_indices == master)[0][0]  # Locate master in independent list
+
+#             for d in range(self.dim):
+#                 A_p[i * self.dim + d, master_index * self.dim + d] = 1  # Master-Slave dependency
+
+#         # Solve for `C = -A_c⁻¹ A_p` (since `A_c` is identity, `C = -A_p`)
+#         C = -A_p  # Direct assignment
+
+#         # Compute shift vector `s_tilde = A_c⁻¹ b` (assume b = 0 for now)
+#         b = onp.zeros(len(constrained_indices) * self.dim)  # Modify if external forces exist
+#         s_tilde_constrained = np.linalg.solve(A_c, b)  # Solve A_c * uc = b
+#         for i, slave in enumerate(constrained_indices):
+#             for d in range(self.dim):
+#                 s_tilde[slave * self.dim + d] = s_tilde_constrained[i * self.dim + d]  # **Fixed Indexing**
+
+#         # Assign constraints to transformation matrix `T`
+#         for i, slave in enumerate(constrained_indices):
+#             for d in range(self.dim):
+#                 T[slave * self.dim + d, :] = C[i * self.dim + d, :]  # Apply condensation row
+
+#         # ** Convert to JAX-compatible arrays after full setup **
+#         self.T = np.array(T)  # Shape (total DOFs * dim, independent DOFs * dim)
+#         self.s_tilde = np.array(s_tilde)  # Convert shift vector properly
+
+#         # ** Update unknown indices **
+#         self.isIndependent = independent_mask
+#         self.unknownIndices = self.ids[self.isIndependent]
 #         self.bcIndices = self.ids[self.isBc]
 
-#         ones = np.ones(self.isBc.size, dtype=int) * -1
-#         self.dofToUnknown = ones.at[self.unknownIndices].set(np.arange(self.unknownIndices.size))
+#         ones = onp.ones(num_dofs, dtype=int) * -1
+#         self.dofToUnknown = ones
+#         self.dofToUnknown[self.unknownIndices] = onp.arange(self.unknownIndices.size)
 
-#         # Compute Hessian-related data
-#         self.HessRowCoords, self.HessColCoords = self._make_hessian_coordinates(functionSpace.mesh.conns)
-#         self.hessian_bc_mask = self._make_hessian_bc_mask(functionSpace.mesh.conns)
+#         return self.T, self.s_tilde  # **Explicitly Return Transformation Matrix and Shift Vector**
 
-#     def get_bc_size(self):
-#         return np.sum(self.isBc).item()
+#     def create_field(self, Uu, Ubc=None):
+#         """
+#         Constructs the field using only the independent DOFs (ui and up).
+#         """
+#         num_dofs = self.unknownIndices.shape[0]  # Number of independent DOFs
+#         U_unconstrained = np.zeros((num_dofs, self.dim))  # Shape (num_independent_dofs, dim)
 
-#     def get_unknown_size(self):
-#         return np.sum(self.isUnknown).item()
+#         # Fix: Convert isIndependent to a NumPy array before using np.where
+#         independent_indices = onp.where(onp.array(self.isIndependent).reshape(-1, self.dim))[0]
 
-#     def create_field(self, Uu, Ubc=0.0):
-#         U = np.zeros(self.isBc.shape).at[self.isBc].set(Ubc)
-#         return U.at[self.isUnknown].set(Uu)
+#         # Set independent DOFs (ui and up)
+#         U_unconstrained = U_unconstrained.at[independent_indices].set(Uu)
+
+#         # Apply transformation: u = T * ũ + s̃
+#         return np.matmul(self.T, U_unconstrained.reshape(-1)) + self.s_tilde
+
+#     def get_unknown_values(self, U):
+#         """
+#         Retrieves only the independent DOF values.
+#         """
+#         independent_indices = onp.where(self.isIndependent)[0]  # Get independent DOF indices
+#         return U[independent_indices]  # Directly index U without reshaping
 
 #     def get_bc_values(self, U):
 #         return U[self.isBc]
 
-#     def get_unknown_values(self, U):
-#         return U[self.isUnknown]
+class DofManagerMPC(DofManager):
+    def __init__(self, functionSpace, dim, EssentialBCs, master_slave_pairs, C, s):
+        """
+        Initializes the DOF manager for MPC using precomputed C (constraint matrix)
+        and s (shift vector).
+        
+        Parameters:
+        - functionSpace: The function space used for DOF management.
+        - dim: Number of spatial dimensions (2D or 3D).
+        - EssentialBCs: Essential boundary conditions applied to the problem.
+        - master_slave_pairs: Dictionary mapping master nodes to slave nodes.
+        - C: Constraint matrix that enforces u_s = C * u_m + s.
+        - s: Shift vector (s̃) for enforcing non-homogeneous constraints.
+        """
+        super().__init__(functionSpace, dim, EssentialBCs)
+        
+        self.master_slave_pairs = master_slave_pairs
+        self.dim = dim  
+        self.C = np.array(C)  # Constraint matrix (already precomputed)
+        self.s_tilde = np.array(s)  # Shift vector
 
-#     def get_master_values(self, U):
-#         return U[self.master_array[:, 1:]]
+        self.create_mpc_transformation()
 
-#     def get_slave_values(self, U):
-#         return U[self.slave_array[:, 1:]]
+    def create_mpc_transformation(self):
+        """
+        Constructs the transformation matrix T and updates the DOF mapping.
+        """
+        num_dofs = self.ids.size  # Total DOFs in the system
+        num_total_dofs = num_dofs * self.dim  
 
-#     def _create_layer_array(self, layer_index):
-#         """Creates an array for the specified layer (master or slave) with DOF mappings."""
-#         layer_nodes = self.layers[layer_index]
-#         layer_array = []
-#         for node in layer_nodes:
-#             node_dofs = self.ids[node]
-#             layer_array.append([node, *node_dofs])
-#         return np.array(layer_array, dtype=int)
+        # Identify independent (ui + up) and constrained DOFs (uc)
+        independent_mask = ~np.isin(self.ids, list(self.master_slave_pairs.keys()))
+        independent_indices = np.where(independent_mask)[0]
+        constrained_indices = np.array(list(self.master_slave_pairs.keys()))
 
-#     def _make_hessian_coordinates(self, conns):
-#         """Creates row and column coordinates for the Hessian, considering master and slave nodes."""
-#         nElUnknowns = onp.zeros(conns.shape[0], dtype=int)
-#         nHessianEntries = 0
-#         for e, eNodes in enumerate(conns):
-#             elUnknownFlags = self.isUnknown[eNodes, :].ravel()
-#             nElUnknowns[e] = onp.sum(elUnknownFlags)
+        num_independent_dofs = len(independent_indices)
 
-#             # Include master and slave nodes in the size calculation
-#             eNodes_list = onp.asarray(eNodes).tolist()
-#             elMasterNodes = set(eNodes_list).intersection(set(onp.array(self.master_array[:, 0])))
-#             elSlaveNodes = set(eNodes_list).intersection(set(onp.array(self.slave_array[:, 0])))
+        # ** Directly use precomputed C instead of constructing it manually **
+        T = np.zeros((num_total_dofs, num_independent_dofs * self.dim))
+        s_tilde = np.zeros((num_total_dofs,))  # Ensures correct shape
 
-#             nElMasters = sum(len(self.master_array[onp.where(self.master_array[:, 0] == node)[0], 1:].ravel()) for node in elMasterNodes)
-#             nElSlaves = sum(len(self.slave_array[onp.where(self.slave_array[:, 0] == node)[0], 1:].ravel()) for node in elSlaveNodes)
+        # Identity mapping for independent DOFs
+        for i, dof in enumerate(independent_indices):
+            for d in range(self.dim):
+                T[dof * self.dim + d, i * self.dim + d] = 1  
 
-#             totalDOFs = nElUnknowns[e] + nElMasters + nElSlaves
-#             nHessianEntries += totalDOFs ** 2
+        # Assign constraints from precomputed `C`
+        for i, slave in enumerate(constrained_indices):
+            for d in range(self.dim):
+                T[slave * self.dim + d, :] = self.C[i * self.dim + d, :]  # Assigning rows from `C`
+                s_tilde[slave * self.dim + d] = self.s_tilde[i * self.dim + d]  # Applying shift
 
-#         # Allocate sufficient space for Hessian coordinates
-#         rowCoords = onp.zeros(nHessianEntries, dtype=int)
-#         colCoords = onp.zeros(nHessianEntries, dtype=int)
-#         rangeBegin = 0
+        # Store transformation matrix and shift vector
+        self.T = T  
+        self.s_tilde = s_tilde
 
-#         for e, eNodes in enumerate(conns):
-#             eNodes_list = onp.asarray(eNodes).tolist()
-#             elDofs = self.ids[eNodes, :]
-#             elUnknownFlags = self.isUnknown[eNodes, :]
-#             elUnknowns = self.dofToUnknown[elDofs[elUnknownFlags]]
+        # ** Update unknown DOFs mapping **
+        self.isIndependent = independent_mask
+        self.unknownIndices = self.ids[self.isIndependent]  # Independent DOFs
+        self.bcIndices = self.ids[self.isBc]  # Essential BC indices
 
-#             # Identify master and slave DOFs for the element
-#             elMasterNodes = set(eNodes_list).intersection(set(onp.array(self.master_array[:, 0])))
-#             elSlaveNodes = set(eNodes_list).intersection(set(onp.array(self.slave_array[:, 0])))
+        ones = np.ones(num_dofs, dtype=int) * -1
+        self.dofToUnknown = ones
+        self.dofToUnknown[self.unknownIndices] = np.arange(self.unknownIndices.size)
 
-#             elMasterDofs = []
-#             for node in elMasterNodes:
-#                 master_idx = onp.where(self.master_array[:, 0] == node)[0]
-#                 elMasterDofs.extend(self.master_array[master_idx, 1:].ravel())
+        return self.T, self.s_tilde  
 
-#             elSlaveDofs = []
-#             for node in elSlaveNodes:
-#                 slave_idx = onp.where(self.slave_array[:, 0] == node)[0]
-#                 elSlaveDofs.extend(self.slave_array[slave_idx, 1:].ravel())
+    def create_field(self, Uu, Ubc=None):
+        """
+        Constructs the field using only the independent DOFs (ui and up).
+        Applies transformation `u = T * ũ + s̃`.
+        """
+        num_dofs = self.unknownIndices.shape[0]  
+        U_unconstrained = np.zeros((num_dofs, self.dim))  
 
-#             # Combine unknowns, master, and slave DOFs
-#             elAllUnknowns = onp.concatenate([elUnknowns, elMasterDofs, elSlaveDofs])
-#             elHessCoords = onp.tile(elAllUnknowns, (len(elAllUnknowns), 1))
+        # Set independent DOFs
+        independent_indices = np.where(np.array(self.isIndependent).reshape(-1, self.dim))[0]
+        U_unconstrained[independent_indices] = Uu
 
-#             nElHessianEntries = len(elAllUnknowns) ** 2
-#             rangeEnd = rangeBegin + nElHessianEntries
-
-#             # Assign values to the Hessian coordinate arrays
-#             rowCoords[rangeBegin:rangeEnd] = elHessCoords.ravel()
-#             colCoords[rangeBegin:rangeEnd] = elHessCoords.T.ravel()
-
-#             rangeBegin += nElHessianEntries
-
-#         return rowCoords, colCoords
-
-#     def _make_hessian_bc_mask(self, conns):
-#         """Creates a mask for BCs in the Hessian, considering master and slave nodes."""
-#         nElements, nNodesPerElement = conns.shape
-#         nFields = self.ids.shape[1]
-#         nDofPerElement = nNodesPerElement * nFields
-
-#         hessian_bc_mask = onp.full((nElements, nDofPerElement, nDofPerElement), True, dtype=bool)
-#         for e, eNodes in enumerate(conns):
-#             # Get boundary condition flags for all DOFs
-#             eFlag = self.isBc[eNodes, :].ravel()
-
-#             # Identify master and slave nodes
-#             eNodes_list = onp.asarray(eNodes).tolist()
-#             masterFlag = onp.isin(eNodes_list, self.master_array[:, 0])
-#             slaveFlag = onp.isin(eNodes_list, self.slave_array[:, 0])
-
-#             # Expand master and slave flags to match the DOF shape
-#             masterFlag_expanded = onp.repeat(masterFlag, nFields)
-#             slaveFlag_expanded = onp.repeat(slaveFlag, nFields)
-
-#             # Combine flags
-#             combinedFlag = eFlag | masterFlag_expanded | slaveFlag_expanded
-
-#             # Update Hessian mask
-#             hessian_bc_mask[e, combinedFlag, :] = False
-#             hessian_bc_mask[e, :, combinedFlag] = False
-
-#         return hessian_bc_mask
-
-
-
-class DofManagerMPC(eqx.Module):
-    fieldShape: Tuple[int, int]
-    isBc: np.ndarray
-    isUnknown: np.ndarray
-    ids: np.ndarray
-    unknownIndices: np.ndarray
-    bcIndices: np.ndarray
-    dofToUnknown: np.ndarray
-    HessRowCoords: np.ndarray
-    HessColCoords: np.ndarray
-    hessian_bc_mask: np.ndarray
-    master_array: np.ndarray
-    slave_array: np.ndarray
-
-    def __init__(self, functionSpace, dim, EssentialBCs, mesh):
-        self.fieldShape = (Mesh.num_nodes(functionSpace.mesh), dim)
-        self.isBc = onp.full(self.fieldShape, False, dtype=bool)
-        for ebc in EssentialBCs:
-            self.isBc[functionSpace.mesh.nodeSets[ebc.nodeSet], ebc.component] = True
-        self.isUnknown = ~self.isBc
-
-        self.ids = onp.arange(self.isBc.size).reshape(self.fieldShape)
-
-        # Ensure master and slave nodesets are defined
-        if "master" not in functionSpace.mesh.nodeSets or "slave" not in functionSpace.mesh.nodeSets:
-            raise ValueError("Node sets 'master' and 'slave' must be defined in the mesh.")
-
-        # Assign master and slave arrays directly from nodesets
-        self.master_array = self._create_layer_array(functionSpace.mesh.nodeSets["master"])
-        self.slave_array = self._create_layer_array(functionSpace.mesh.nodeSets["slave"])
-
-        # Create DOF mappings for unknowns
-        self.unknownIndices = self.ids[self.isUnknown]
-        self.bcIndices = self.ids[self.isBc]
-
-        ones = np.ones(self.isBc.size, dtype=int) * -1
-        self.dofToUnknown = ones.at[self.unknownIndices].set(np.arange(self.unknownIndices.size))
-
-        # Compute Hessian-related data
-        self.HessRowCoords, self.HessColCoords = self._make_hessian_coordinates(functionSpace.mesh.conns)
-        self.hessian_bc_mask = self._make_hessian_bc_mask(functionSpace.mesh.conns)
-
-    def get_bc_size(self):
-        return np.sum(self.isBc).item()
-
-    def get_unknown_size(self):
-        return np.sum(self.isUnknown).item()
-
-    def create_field(self, Uu, Ubc=0.0):
-        U = np.zeros(self.isBc.shape).at[self.isBc].set(Ubc)
-        return U.at[self.isUnknown].set(Uu)
-
-    def get_bc_values(self, U):
-        return U[self.isBc]
+        # Apply transformation: u = T * ũ + s̃
+        return np.matmul(self.T, U_unconstrained.reshape(-1)) + self.s_tilde
 
     def get_unknown_values(self, U):
-        return U[self.isUnknown]
+        """
+        Retrieves only the independent DOF values.
+        """
+        independent_indices = np.where(self.isIndependent)[0]
+        return U[independent_indices]
 
-    def get_master_values(self, U):
-        return U[self.master_array[:, 1:]]
-
-    def get_slave_values(self, U):
-        return U[self.slave_array[:, 1:]]
-
-    def _create_layer_array(self, layer_nodes):
-        """Creates an array for the specified layer (master or slave) with DOF mappings."""
-        layer_array = []
-        for node in layer_nodes:
-            node_dofs = self.ids[node]
-            layer_array.append([node, *node_dofs])
-        return np.array(layer_array, dtype=int)
-
-    def _make_hessian_coordinates(self, conns):
-        """Creates row and column coordinates for the Hessian, considering master and slave nodes."""
-        nElUnknowns = onp.zeros(conns.shape[0], dtype=int)
-        nHessianEntries = 0
-        for e, eNodes in enumerate(conns):
-            elUnknownFlags = self.isUnknown[eNodes, :].ravel()
-            nElUnknowns[e] = onp.sum(elUnknownFlags)
-
-            # Include master and slave nodes in the size calculation
-            eNodes_list = onp.asarray(eNodes).tolist()
-            elMasterNodes = set(eNodes_list).intersection(set(onp.array(self.master_array[:, 0])))
-            elSlaveNodes = set(eNodes_list).intersection(set(onp.array(self.slave_array[:, 0])))
-
-            nElMasters = sum(len(self.master_array[onp.where(self.master_array[:, 0] == node)[0], 1:].ravel()) for node in elMasterNodes)
-            nElSlaves = sum(len(self.slave_array[onp.where(self.slave_array[:, 0] == node)[0], 1:].ravel()) for node in elSlaveNodes)
-
-            totalDOFs = nElUnknowns[e] + nElMasters + nElSlaves
-            nHessianEntries += totalDOFs ** 2
-
-        # Allocate sufficient space for Hessian coordinates
-        rowCoords = onp.zeros(nHessianEntries, dtype=int)
-        colCoords = onp.zeros(nHessianEntries, dtype=int)
-        rangeBegin = 0
-
-        for e, eNodes in enumerate(conns):
-            eNodes_list = onp.asarray(eNodes).tolist()
-            elDofs = self.ids[eNodes, :]
-            elUnknownFlags = self.isUnknown[eNodes, :]
-            elUnknowns = self.dofToUnknown[elDofs[elUnknownFlags]]
-
-            # Identify master and slave DOFs for the element
-            elMasterNodes = set(eNodes_list).intersection(set(onp.array(self.master_array[:, 0])))
-            elSlaveNodes = set(eNodes_list).intersection(set(onp.array(self.slave_array[:, 0])))
-
-            elMasterDofs = []
-            for node in elMasterNodes:
-                master_idx = onp.where(self.master_array[:, 0] == node)[0]
-                elMasterDofs.extend(self.master_array[master_idx, 1:].ravel())
-
-            elSlaveDofs = []
-            for node in elSlaveNodes:
-                slave_idx = onp.where(self.slave_array[:, 0] == node)[0]
-                elSlaveDofs.extend(self.slave_array[slave_idx, 1:].ravel())
-
-            # Combine unknowns, master, and slave DOFs
-            elAllUnknowns = onp.concatenate([elUnknowns, elMasterDofs, elSlaveDofs])
-            elHessCoords = onp.tile(elAllUnknowns, (len(elAllUnknowns), 1))
-
-            nElHessianEntries = len(elAllUnknowns) ** 2
-            rangeEnd = rangeBegin + nElHessianEntries
-
-            # Assign values to the Hessian coordinate arrays
-            rowCoords[rangeBegin:rangeEnd] = elHessCoords.ravel()
-            colCoords[rangeBegin:rangeEnd] = elHessCoords.T.ravel()
-
-            rangeBegin += nElHessianEntries
-
-        return rowCoords, colCoords
-
-    def _make_hessian_bc_mask(self, conns):
-        """Creates a mask for BCs in the Hessian, considering master and slave nodes."""
-        nElements, nNodesPerElement = conns.shape
-        nFields = self.ids.shape[1]
-        nDofPerElement = nNodesPerElement * nFields
-
-        hessian_bc_mask = onp.full((nElements, nDofPerElement, nDofPerElement), True, dtype=bool)
-        for e, eNodes in enumerate(conns):
-            # Get boundary condition flags for all DOFs
-            eFlag = self.isBc[eNodes, :].ravel()
-
-            # Identify master and slave nodes
-            eNodes_list = onp.asarray(eNodes).tolist()
-            masterFlag = onp.isin(eNodes_list, self.master_array[:, 0])
-            slaveFlag = onp.isin(eNodes_list, self.slave_array[:, 0])
-
-            # Expand master and slave flags to match the DOF shape
-            masterFlag_expanded = onp.repeat(masterFlag, nFields)
-            slaveFlag_expanded = onp.repeat(slaveFlag, nFields)
-
-            # Combine flags
-            combinedFlag = eFlag | masterFlag_expanded | slaveFlag_expanded
-
-            # Update Hessian mask
-            hessian_bc_mask[e, combinedFlag, :] = False
-            hessian_bc_mask[e, :, combinedFlag] = False
-
-        return hessian_bc_mask
+    def get_bc_values(self, U):
+        """
+        Retrieves boundary condition values.
+        """
+        return U[self.isBc]

@@ -3,24 +3,25 @@
 # --------------------------------------------------------------------------
 # Note - Using Cubit Coreform for meshing, solved using NON-LINEAR SOLVER
 # --------------------------------------------------------------------------
-import sys
-sys.path.insert(0, "/home/sarvesh/Documents/Github/optimism")
 
 from jax import jit
+from jax.scipy.linalg import solve
 from optimism import VTKWriter
-from optimism import EquationSolver
 from optimism import FunctionSpace
+from optimism import EquationSolver
 from optimism import Mechanics
 from optimism import Mesh
 from optimism import Objective
 from optimism import QuadratureRule
 from optimism import ReadExodusMesh
-from optimism.FunctionSpace import DofManagerMPC
+from optimism.FunctionSpace import DofManager
 from optimism.FunctionSpace import EssentialBC
 from optimism.material import Neohookean
 
 import jax.numpy as np
 import numpy as onp
+
+
 
 class CompressionTest:
 
@@ -62,16 +63,9 @@ class CompressionTest:
     def reload_mesh(self):
         origMesh = ReadExodusMesh.read_exodus_mesh(self.input_mesh)
         self.mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(origMesh, order=2, createNodeSetsFromSideSets=True)
-        coords = self.mesh.coords
-        tol = 1e-8
-        # self.mesh.nodeSets = {}
-
-        # Creating nodesets for master and slave
-        self.mesh.nodeSets['master'] = np.flatnonzero(coords[:,0] < -0.5 + tol)
-        self.mesh.nodeSets['slave'] = np.flatnonzero(coords[:,0] > 0.5 - tol)
 
         funcSpace = FunctionSpace.construct_function_space(self.mesh, self.quadRule)
-        self.dofManager = DofManagerMPC(funcSpace, 2, self.EBCs, self.mesh)
+        self.dofManager = DofManager(funcSpace, 2, self.EBCs)
 
         surfaceXCoords = self.mesh.coords[self.mesh.nodeSets['top']][:,0]
         self.tractionArea = np.max(surfaceXCoords) - np.min(surfaceXCoords)
@@ -116,7 +110,7 @@ class CompressionTest:
         Uu = self.dofManager.get_unknown_values(np.zeros(self.mesh.coords.shape))
         ivs = mechFuncs.compute_initial_state()
         p = Objective.Params(bc_data=0., state_data=ivs)
-        self.objective = Objective.ObjectiveMPC(energy_function, Uu, p, self.dofManager)
+        self.objective = Objective.Objective(energy_function, Uu, p)
 
         # Load over the steps
         force = 0.
