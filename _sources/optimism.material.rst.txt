@@ -93,15 +93,6 @@ optimism.material.Neohookean module
    :show-inheritance:
    :private-members:
 
-optimism.material.ThirdMediumNeoHookean module
-----------------------------------------------
-
-.. automodule:: optimism.material.ThirdMediumNeoHookean
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :private-members:
-
 Module contents
 ---------------
 

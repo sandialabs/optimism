@@ -14,7 +14,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -81,9 +81,10 @@
 
 <span class="n">exodusToNativeTri6NodeOrder</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
 
+
 <div class="viewcode-block" id="read_exodus_mesh">
 <a class="viewcode-back" href="../../optimism.html#optimism.ReadExodusMesh.read_exodus_mesh">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">read_exodus_mesh</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="n">interpolationType</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">InterpolationType</span><span class="o">.</span><span class="n">LOBATTO</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_exodus_mesh</span><span class="p">(</span><span class="n">fileName</span><span class="p">):</span>
     <span class="k">with</span> <span class="n">netCDF4</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span> <span class="k">as</span> <span class="n">exData</span><span class="p">:</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="n">_read_coordinates</span><span class="p">(</span><span class="n">exData</span><span class="p">)</span>
         <span class="n">conns</span><span class="p">,</span> <span class="n">blocks</span> <span class="o">=</span> <span class="n">_read_blocks</span><span class="p">(</span><span class="n">exData</span><span class="p">)</span>
@@ -93,20 +94,14 @@
 
         <span class="n">elementType</span> <span class="o">=</span> <span class="n">_read_element_type</span><span class="p">(</span><span class="n">exData</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">elementType</span> <span class="o">==</span> <span class="s2">&quot;tri3&quot;</span> <span class="ow">or</span> <span class="n">elementType</span> <span class="o">==</span> <span class="s2">&quot;tri&quot;</span><span class="p">:</span>
-            <span class="n">degree</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">basis</span><span class="p">,</span> <span class="n">basis1d</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">make_parent_elements</span><span class="p">(</span><span class="n">degree</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">simplexNodesOrdinals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">elif</span> <span class="n">elementType</span> <span class="o">==</span> <span class="s2">&quot;tri6&quot;</span><span class="p">:</span>
-            <span class="n">degree</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="n">basis</span><span class="p">,</span> <span class="n">basis1d</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">make_parent_elements</span><span class="p">(</span><span class="n">degree</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
             <span class="n">simplexNodesOrdinals</span> <span class="o">=</span> <span class="n">_get_vertex_nodes_from_exodus_tri6_mesh</span><span class="p">(</span><span class="n">conns</span><span class="p">)</span>
             <span class="n">conns</span> <span class="o">=</span> <span class="n">conns</span><span class="p">[:,</span> <span class="n">exodusToNativeTri6NodeOrder</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span>
-
-        <span class="k">if</span> <span class="n">interpolationType</span> <span class="o">==</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">InterpolationType</span><span class="o">.</span><span class="n">LAGRANGE</span><span class="p">:</span>
-            <span class="n">basis1d</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">make_lagrange_parent_element_1d</span><span class="p">(</span><span class="n">degree</span><span class="p">)</span>
-            <span class="n">basis</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">make_lagrange_parent_element_2d</span><span class="p">(</span><span class="n">degree</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">basis</span><span class="p">,</span> <span class="n">basis1d</span> <span class="o">=</span> <span class="n">Interpolants</span><span class="o">.</span><span class="n">make_parent_elements</span><span class="p">(</span><span class="n">degree</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">Mesh</span><span class="o">.</span><span class="n">Mesh</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">conns</span><span class="p">,</span> <span class="n">simplexNodesOrdinals</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">basis1d</span><span class="p">,</span>
                          <span class="n">blocks</span><span class="p">,</span> <span class="n">nodeSets</span><span class="p">,</span> <span class="n">sideSets</span><span class="p">,</span> <span class="n">blockMaps</span><span class="p">)</span></div>
