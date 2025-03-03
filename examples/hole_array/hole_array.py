@@ -30,7 +30,7 @@ if __name__ == '__main__':
     ]
 
     dofManager = DofManager(func_space, 2, ebcs)
-
+    print(dofManager)
     props = {'elastic modulus': 3. * 10.0 * (1. - 2. * 0.3),
              'poisson ratio': 0.3,
              'version': 'coupled'}
@@ -53,11 +53,11 @@ if __name__ == '__main__':
         V = np.zeros(mesh.coords.shape)
         index = (mesh.nodeSets['yplus_nodeset'], 1)
         V = V.at[index].set(yLoc)
-        return dofManager.get_bc_values(V)
+        return p.dof_manager.get_bc_values(V)
 
 
     def create_field(Uu, p):
-        return dofManager.create_field(Uu, get_ubcs(p))
+        return p.dof_manager.create_field(Uu, get_ubcs(p))
 
 
     def energy_function(Uu, p):
@@ -120,7 +120,7 @@ if __name__ == '__main__':
         Uu = dofManager.get_unknown_values(np.zeros(mesh.coords.shape))
         disp = 0.0
         ivs = mech_funcs.compute_initial_state()
-        p = Objective.Params(disp, ivs)
+        p = Objective.Params(disp, ivs, dof_manager=dofManager)
         precond_strategy = Objective.PrecondStrategy(assemble_sparse)
         objective = Objective.Objective(energy_function, Uu, p, precond_strategy)
 
