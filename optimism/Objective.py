@@ -13,25 +13,28 @@ Params = namedtuple('Params',
                      'app_data',
                      'time',
                      'dynamic_data',
-                     'prop_data'],
-                     defaults=(None,None,None,None,None,None,None))
+                     'prop_data',
+                     'dof_manager'],
+                     defaults=(None,None,None,None,None,None,None,None))
 
 
 def param_index_update(p, index, newParam):
     if index==0:
-        return Params(newParam, p[1], p[2], p[3], p[4], p[5], p[6])
+        return Params(newParam, p[1], p[2], p[3], p[4], p[5], p[6], p[7])
     if index==1:
-        return Params(p[0], newParam, p[2], p[3], p[4], p[5], p[6])
+        return Params(p[0], newParam, p[2], p[3], p[4], p[5], p[6], p[7])
     if index==2:
-        return Params(p[0], p[1], newParam, p[3], p[4], p[5], p[6])
+        return Params(p[0], p[1], newParam, p[3], p[4], p[5], p[6], p[7])
     if index==3:
-        return Params(p[0], p[1], p[2], newParam, p[4], p[5], p[6])
+        return Params(p[0], p[1], p[2], newParam, p[4], p[5], p[6], p[7])
     if index==4:
-        return Params(p[0], p[1], p[2], p[3], newParam, p[5], p[6])
+        return Params(p[0], p[1], p[2], p[3], newParam, p[5], p[6], p[7])
     if index==5:
-        return Params(p[0], p[1], p[2], p[3], p[4], newParam, p[6])
+        return Params(p[0], p[1], p[2], p[3], p[4], newParam, p[6], p[7])
     if index==6:
-        return Params(p[0], p[1], p[2], p[3], p[4], p[5], newParam)
+        return Params(p[0], p[1], p[2], p[3], p[4], p[5], newParam, p[7])
+    if index==7:
+        return Params(p[0], p[1], p[2], p[3], p[4], p[5], p[6], newParam)
     print('invalid index passed to param_index_update = ', index)
 
 

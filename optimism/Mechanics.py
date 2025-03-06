@@ -385,11 +385,11 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel,
 
 
 # TODO need to update this for props. Eigen won't work otherwise
-def _compute_kinetic_energy(functionSpace, V, internals, density):
-    def lagrangian_density(U, gradU, Q, X, dt):
+def _compute_kinetic_energy(functionSpace, V, internals, props, density):
+    def lagrangian_density(U, gradU, Q, X, P, dt):
         return kinetic_energy_density(U, density)
     unused = 0.0
-    return FunctionSpace.integrate_over_block(functionSpace, V, internals, unused, lagrangian_density, slice(None))
+    return FunctionSpace.integrate_over_block(functionSpace, V, internals, props, unused, lagrangian_density, slice(None))
 
 # TODO need to update this for props. Eigen won't work otherwise
 def _compute_element_masses(functionSpace, U, internals, density, modify_element_gradient):
@@ -488,9 +488,9 @@ def create_dynamics_functions(functionSpace, mode2D, materialModel, newmarkParam
     def compute_output_potential_densities_and_stresses(U, stateVariables, dt):
         return FunctionSpace.evaluate_on_block(fs, U, stateVariables, dt, output_constitutive, slice(None), modify_element_gradient=modify_element_gradient)
 
-    def compute_kinetic_energy(V):
+    def compute_kinetic_energy(V,props):
         stateVariables = np.zeros((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule)))
-        return _compute_kinetic_energy(functionSpace, V, stateVariables, materialModel.density)
+        return _compute_kinetic_energy(functionSpace, V, stateVariables, props, materialModel.density)
 
     def compute_output_strain_energy(U, stateVariables, dt):
         return _compute_strain_energy(functionSpace, U, stateVariables, dt, materialModel.compute_energy_density, modify_element_gradient)
