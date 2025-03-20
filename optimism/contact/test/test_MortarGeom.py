@@ -70,7 +70,7 @@ class TestMortarGeom(TestFixture):
         # eventually...
         # can give options on integrating on common vs different surfaces
         # can give options on quadrature rule on common surface
-        commonArea = MortarContact.integrate_with_mortar(edgeA, edgeB, self.f_common_normal, lambda xiA, xiB, g: g)
+        commonArea = MortarContact.integrate_with_mortar(edgeA, edgeB, self.f_common_normal, lambda xiA, xiB, g: g, relativeSmoothingSize=1e-7, f_clamp_gaps=MortarContact.no_clamp)
         self.assertNear(commonArea, 0.002, 9)
 
 
@@ -94,7 +94,7 @@ class TestMortarGeom(TestFixture):
                 lamA = MortarContact.eval_linear_field_on_edge(lambdaA, xiA)
                 lamB = MortarContact.eval_linear_field_on_edge(lambdaB, xiB)
                 return g * (lamA + lamB)
-            return MortarContact.integrate_with_mortar(edgeA, edgeB, self.f_common_normal, q, relativeSmoothingSize = 0.03)
+            return MortarContact.integrate_with_mortar(edgeA, edgeB, self.f_common_normal, q, relativeSmoothingSize = 0.03, f_clamp_gaps=MortarContact.no_clamp)
 
         edgeA = np.array([[1.0, 0.1], [2.0, 0.1]])
         edgeB = np.array([[3.0, 0.0], [2.0, 0.0]])

@@ -32,6 +32,13 @@ def eval_linear_field_on_edge(field, xi):
 def smooth_linear(xi, l):                
     return jnp.where( xi < l, 0.5*xi*xi/l, jnp.where(xi > 1.0-l, 1.0-l-0.5*(1.0-xi)*(1.0-xi)/l, xi-0.5*l) )
 
+# utilities for clamping gap values
+
+def no_clamp(xiA, g):
+    return xiA
+
+def clamp_max_penetration(xiA, g, max_penetration_depth):
+    return jnp.where(g < -max_penetration_depth, jnp.nan, xiA)
 
 # some actual mortar integrals
 
@@ -45,7 +52,11 @@ def compute_intersection(edgeA, edgeB, f_common_normal):
         xig = jnp.linalg.solve(M,r)
         return xig[0], xig[1]
 
-    normal = f_common_normal(edgeA, edgeB)
+    normal = jax.lax.cond(jnp.dot(compute_normal(edgeA), compute_normal(edgeB)) == 0.0, 
+                        lambda eA, eB: jnp.array([jnp.nan, jnp.nan]),
+                        lambda eA, eB: f_common_normal(eA, eB), 
+                        edgeA, edgeB)
+
     xiBs1, gs1 = jax.vmap(compute_xi, (0,None,None))(edgeA, edgeB, normal)
     xiAs2, gs2 = jax.vmap(compute_xi, (0,None,None))(edgeB, edgeA,-normal)
 
@@ -82,8 +93,10 @@ def integrate_with_mortar(edgeA : jnp.array,
                           edgeB : jnp.array, 
                           f_common_normal : Callable[[jnp.array,jnp.array],jnp.array],
                           func_of_xiA_xiB_g : Callable[[float,float,float],float],
-                          relativeSmoothingSize : float = 1e-7):
+                          relativeSmoothingSize : float,
+                          f_clamp_gaps: Callable):
     xiA,xiB,g = compute_intersection(edgeA, edgeB, f_common_normal)
+    xiA = f_clamp_gaps(xiA, g)
     branches = [lambda : integrate_with_active_mortar(xiA, xiB, g, 
                                                       jnp.linalg.norm(edgeA[0] - edgeA[1]), 
                                                       jnp.linalg.norm(edgeB[0] - edgeB[1]),
@@ -91,12 +104,13 @@ def integrate_with_mortar(edgeA : jnp.array,
                                                       relativeSmoothingSize),
                 lambda : 0.0]
 
-    return jax.lax.switch(1*jnp.any(xiA==jnp.nan), branches) #jax.lax.cond(jnp.any(xiA==jnp.nan), branches[1], branches[0]) #
+    return jax.lax.switch(1*jnp.any(jnp.isnan(xiA)), branches) #jax.lax.cond(jnp.any(jnp.isnan(xiA)), branches[1], branches[0]) #
 
 
 def assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighborList, 
                              f_average_normal : Callable,
-                             f_integrand : Callable):
+                             f_integrand : Callable,
+                             f_clamp_gaps : Callable):
     def compute_nodal_gap_area(segB, neighborSegsA):
         nodeLeft = segB[0]
         nodeRight = segB[1]
@@ -105,8 +119,8 @@ def assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighbo
             coordsSegB = coords[segB] + disp[segB]
             coordsSegA = coords[segA] + disp[segA]
 
-            gapAreaLeft = integrate_with_mortar(coordsSegB, coordsSegA, f_average_normal, lambda xiA, xiB, gap: f_integrand(gap) * (1.0-xiA), 1e-9)
-            gapAreaRight = integrate_with_mortar(coordsSegB, coordsSegA, f_average_normal, lambda xiA, xiB, gap: f_integrand(gap) * xiA, 1e-9)
+            gapAreaLeft = integrate_with_mortar(coordsSegB, coordsSegA, f_average_normal, lambda xiA, xiB, gap: f_integrand(gap) * (1.0-xiA), 1e-9, f_clamp_gaps)
+            gapAreaRight = integrate_with_mortar(coordsSegB, coordsSegA, f_average_normal, lambda xiA, xiB, gap: f_integrand(gap) * xiA, 1e-9, f_clamp_gaps)
             return gapAreaLeft, gapAreaRight
 
         gapAreaLeft, gapAreaRight = jax.vmap(compute_quantities_for_segment_pair, (None,0))(segB, neighborSegsA)
@@ -122,11 +136,15 @@ def assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighbo
 
 
 def assemble_area_weighted_gaps(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal : Callable):
-    return assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal, lambda gap : gap)
+    return assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal, lambda gap : gap, no_clamp)
+
+
+def assemble_area_weighted_clamped_gaps(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal : Callable, f_clamp_gaps : Callable):
+    return assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal, lambda gap : gap, f_clamp_gaps)
 
 
 def assemble_nodal_areas(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal : Callable):
-    return assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal, lambda gap : 1.0)
+    return assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal, lambda gap : 1.0, no_clamp)
 
 # utilities for setting up mortar contact data structures
 
@@ -136,11 +154,23 @@ def get_closest_neighbors(edgeSetA : jnp.array,
                           mesh : Mesh.Mesh,
                           disp : jnp.array,
                           maxNeighbors : int):
-    def min_dist_squared(edge1, edge2, coords, disp):
+    def edges_are_adjacent(edge1, edge2):
+        return (edge1[0] == edge2[0]) | \
+               (edge1[0] == edge2[1]) | \
+               (edge1[1] == edge2[0]) | \
+               (edge1[1] == edge2[1])
+
+    def compute_distances(edge1, edge2, coords, disp):
         xs1 = coords[edge1] + disp[edge1]
         xs2 = coords[edge2] + disp[edge2]
         dists = jax.vmap( lambda x: jax.vmap( lambda y: (x-y)@(x-y) )(xs1) ) (xs2)    
         return jnp.min(dists)
+
+    def min_dist_squared(edge1, edge2, coords, disp):
+        return jax.lax.cond(edges_are_adjacent(edge1, edge2), 
+                            lambda e1, e2: jnp.nan, 
+                            lambda e1, e2: compute_distances(e1, e2, coords, disp), 
+                            edge1, edge2)
     
     def get_close_edge_indices(surfaceA, edgeB):
         minDistsToA = jax.vmap(min_dist_squared, (0,None,None,None))(surfaceA, edgeB, mesh.coords, disp)
