@@ -73,97 +73,40 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.Objective</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">optimism.FunctionSpace</span><span class="w"> </span><span class="kn">import</span> <span class="n">DofManager</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">optimism.SparseCholesky</span><span class="w"> </span><span class="kn">import</span> <span class="n">SparseCholesky</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">onp</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">diags</span> <span class="k">as</span> <span class="n">sparse_diags</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">csc_matrix</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">equinox</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">eqx</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">onp</span>
-
 
 <span class="c1"># static vs dynamics</span>
 <span class="c1"># differentiable vs undifferentiable</span>
-<span class="c1"># TODO fix some of these type hints for better clarity. </span>
-<span class="c1"># maybe this will help formalize what&#39;s what when</span>
-<div class="viewcode-block" id="Params">
-<a class="viewcode-back" href="../../optimism.html#optimism.Objective.Params">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Params</span><span class="p">(</span><span class="n">eqx</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="n">bc_data</span><span class="p">:</span> <span class="nb">any</span>
-    <span class="n">state_data</span><span class="p">:</span> <span class="nb">any</span>
-    <span class="n">design_data</span><span class="p">:</span> <span class="nb">any</span>
-    <span class="n">app_data</span><span class="p">:</span> <span class="nb">any</span>
-    <span class="n">time</span><span class="p">:</span> <span class="nb">any</span>
-    <span class="n">dynamic_data</span><span class="p">:</span> <span class="nb">any</span>
-    <span class="c1"># Need the eqx.field(static=True) since DofManager</span>
-    <span class="c1"># is composed of mainly og numpy arrays which leads</span>
-    <span class="c1"># to the error</span>
-    <span class="c1">#jax.errors.NonConcreteBooleanIndexError: Array boolean indices must be concrete; got ShapedArray(bool[x,x])</span>
-    <span class="n">dof_manager</span><span class="p">:</span> <span class="n">DofManager</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> 
-        <span class="n">bc_data</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
-        <span class="n">state_data</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
-        <span class="n">design_data</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
-        <span class="n">app_data</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
-        <span class="n">time</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
-        <span class="n">dynamic_data</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
-        <span class="n">dof_manager</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DofManager</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="p">):</span> 
-        <span class="bp">self</span><span class="o">.</span><span class="n">bc_data</span> <span class="o">=</span> <span class="n">bc_data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">state_data</span> <span class="o">=</span> <span class="n">state_data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">design_data</span> <span class="o">=</span> <span class="n">design_data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">app_data</span> <span class="o">=</span> <span class="n">app_data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">time</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dynamic_data</span> <span class="o">=</span> <span class="n">dynamic_data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dof_manager</span> <span class="o">=</span> <span class="n">dof_manager</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bc_data</span>
-        <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_data</span>
-        <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">design_data</span>
-        <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_data</span>
-        <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span>
-        <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamic_data</span>
-        <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dof_manager</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Bad index value </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+<span class="n">Params</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Params&#39;</span><span class="p">,</span>
+                    <span class="p">[</span><span class="s1">&#39;bc_data&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;state_data&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;design_data&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;app_data&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;time&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;dynamic_data&#39;</span><span class="p">],</span>
+                     <span class="n">defaults</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">))</span>
 
 
-
-<span class="c1"># written for backwards compatability</span>
-<span class="c1"># we can just use the eqx.tree_at syntax in simulations</span>
-<span class="c1"># or we could write a single method bound to Params for this...</span>
 <div class="viewcode-block" id="param_index_update">
 <a class="viewcode-back" href="../../optimism.html#optimism.Objective.param_index_update">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">param_index_update</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">newParam</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">bc_data</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">newParam</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">state_data</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">newParam</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">design_data</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">newParam</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">app_data</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">newParam</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">newParam</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">dynamic_data</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">newParam</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">eqx</span><span class="o">.</span><span class="n">tree_at</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">dof_manager</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">newParam</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Bad index value </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">p</span></div>
+    <span class="k">if</span> <span class="n">index</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Params</span><span class="p">(</span><span class="n">newParam</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">index</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Params</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">newParam</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">index</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Params</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">newParam</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">index</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Params</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">newParam</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">index</span><span class="o">==</span><span class="mi">4</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Params</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">newParam</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">index</span><span class="o">==</span><span class="mi">5</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Params</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">newParam</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;invalid index passed to param_index_update = &#39;</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span></div>
 
 
 

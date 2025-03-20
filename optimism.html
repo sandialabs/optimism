@@ -937,11 +937,14 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#optimism.Objective.Params"><code class="docutils literal notranslate"><span class="pre">Params</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#optimism.Objective.Params._abc_impl"><code class="docutils literal notranslate"><span class="pre">Params._abc_impl</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#optimism.Objective.Params._asdict"><code class="docutils literal notranslate"><span class="pre">Params._asdict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#optimism.Objective.Params._field_defaults"><code class="docutils literal notranslate"><span class="pre">Params._field_defaults</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#optimism.Objective.Params._fields"><code class="docutils literal notranslate"><span class="pre">Params._fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#optimism.Objective.Params._make"><code class="docutils literal notranslate"><span class="pre">Params._make()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#optimism.Objective.Params._replace"><code class="docutils literal notranslate"><span class="pre">Params._replace()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Objective.Params.app_data"><code class="docutils literal notranslate"><span class="pre">Params.app_data</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Objective.Params.bc_data"><code class="docutils literal notranslate"><span class="pre">Params.bc_data</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Objective.Params.design_data"><code class="docutils literal notranslate"><span class="pre">Params.design_data</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#optimism.Objective.Params.dof_manager"><code class="docutils literal notranslate"><span class="pre">Params.dof_manager</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Objective.Params.dynamic_data"><code class="docutils literal notranslate"><span class="pre">Params.dynamic_data</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Objective.Params.state_data"><code class="docutils literal notranslate"><span class="pre">Params.state_data</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#optimism.Objective.Params.time"><code class="docutils literal notranslate"><span class="pre">Params.time</span></code></a></li>
@@ -1342,9 +1345,11 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="optimism.contact.html#module-optimism.contact.MortarContact">optimism.contact.MortarContact module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.assemble_area_weighted_clamped_gaps"><code class="docutils literal notranslate"><span class="pre">assemble_area_weighted_clamped_gaps()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.assemble_area_weighted_gaps"><code class="docutils literal notranslate"><span class="pre">assemble_area_weighted_gaps()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.assemble_nodal_areas"><code class="docutils literal notranslate"><span class="pre">assemble_nodal_areas()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.assembly_mortar_integral"><code class="docutils literal notranslate"><span class="pre">assembly_mortar_integral()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.clamp_max_penetration"><code class="docutils literal notranslate"><span class="pre">clamp_max_penetration()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.compute_average_normal"><code class="docutils literal notranslate"><span class="pre">compute_average_normal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.compute_intersection"><code class="docutils literal notranslate"><span class="pre">compute_intersection()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.compute_normal"><code class="docutils literal notranslate"><span class="pre">compute_normal()</span></code></a></li>
@@ -1354,6 +1359,7 @@
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.get_facet_connectivities"><code class="docutils literal notranslate"><span class="pre">get_facet_connectivities()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.integrate_with_active_mortar"><code class="docutils literal notranslate"><span class="pre">integrate_with_active_mortar()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.integrate_with_mortar"><code class="docutils literal notranslate"><span class="pre">integrate_with_mortar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.no_clamp"><code class="docutils literal notranslate"><span class="pre">no_clamp()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.smooth_linear"><code class="docutils literal notranslate"><span class="pre">smooth_linear()</span></code></a></li>
 </ul>
 </li>
@@ -4816,47 +4822,71 @@ edge: tuple containing the element number containing the edge and the</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="optimism.Objective.Params">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.Objective.</span></span><span class="sig-name descname"><span class="pre">Params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bc_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">design_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamic_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dof_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#optimism.FunctionSpace.DofManager" title="optimism.FunctionSpace.DofManager"><span class="pre">optimism.FunctionSpace.DofManager</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/Objective.html#Params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.Objective.Params" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">optimism.Objective.</span></span><span class="sig-name descname"><span class="pre">Params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bc_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">design_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamic_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.Objective.Params" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.Objective.Params._asdict">
+<span class="sig-name descname"><span class="pre">_asdict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#optimism.Objective.Params._asdict" title="Link to this definition"></a></dt>
+<dd><p>Return a new dict which maps field names to their values.</p>
+</dd></dl>
+
 <dl class="py attribute">
-<dt class="sig sig-object py" id="optimism.Objective.Params._abc_impl">
-<span class="sig-name descname"><span class="pre">_abc_impl</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc._abc_data</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#optimism.Objective.Params._abc_impl" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="optimism.Objective.Params._field_defaults">
+<span class="sig-name descname"><span class="pre">_field_defaults</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'app_data':</span> <span class="pre">None,</span> <span class="pre">'bc_data':</span> <span class="pre">None,</span> <span class="pre">'design_data':</span> <span class="pre">None,</span> <span class="pre">'dynamic_data':</span> <span class="pre">None,</span> <span class="pre">'state_data':</span> <span class="pre">None,</span> <span class="pre">'time':</span> <span class="pre">None}</span></em><a class="headerlink" href="#optimism.Objective.Params._field_defaults" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="optimism.Objective.Params._fields">
+<span class="sig-name descname"><span class="pre">_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('bc_data',</span> <span class="pre">'state_data',</span> <span class="pre">'design_data',</span> <span class="pre">'app_data',</span> <span class="pre">'time',</span> <span class="pre">'dynamic_data')</span></em><a class="headerlink" href="#optimism.Objective.Params._fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.Objective.Params._make">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_make</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.Objective.Params._make" title="Link to this definition"></a></dt>
+<dd><p>Make a new Params object from a sequence or iterable</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="optimism.Objective.Params._replace">
+<span class="sig-name descname"><span class="pre">_replace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#optimism.Objective.Params._replace" title="Link to this definition"></a></dt>
+<dd><p>Return a new Params object replacing specified fields with new values</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="optimism.Objective.Params.app_data">
-<span class="sig-name descname"><span class="pre">app_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">any</span></em><a class="headerlink" href="#optimism.Objective.Params.app_data" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">app_data</span></span><a class="headerlink" href="#optimism.Objective.Params.app_data" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="optimism.Objective.Params.bc_data">
-<span class="sig-name descname"><span class="pre">bc_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">any</span></em><a class="headerlink" href="#optimism.Objective.Params.bc_data" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">bc_data</span></span><a class="headerlink" href="#optimism.Objective.Params.bc_data" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="optimism.Objective.Params.design_data">
-<span class="sig-name descname"><span class="pre">design_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">any</span></em><a class="headerlink" href="#optimism.Objective.Params.design_data" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="optimism.Objective.Params.dof_manager">
-<span class="sig-name descname"><span class="pre">dof_manager</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#optimism.FunctionSpace.DofManager" title="optimism.FunctionSpace.DofManager"><span class="pre">DofManager</span></a></em><a class="headerlink" href="#optimism.Objective.Params.dof_manager" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">design_data</span></span><a class="headerlink" href="#optimism.Objective.Params.design_data" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="optimism.Objective.Params.dynamic_data">
-<span class="sig-name descname"><span class="pre">dynamic_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">any</span></em><a class="headerlink" href="#optimism.Objective.Params.dynamic_data" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">dynamic_data</span></span><a class="headerlink" href="#optimism.Objective.Params.dynamic_data" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="optimism.Objective.Params.state_data">
-<span class="sig-name descname"><span class="pre">state_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">any</span></em><a class="headerlink" href="#optimism.Objective.Params.state_data" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">state_data</span></span><a class="headerlink" href="#optimism.Objective.Params.state_data" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="optimism.Objective.Params.time">
-<span class="sig-name descname"><span class="pre">time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">any</span></em><a class="headerlink" href="#optimism.Objective.Params.time" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#optimism.Objective.Params.time" title="Link to this definition"></a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
 
 </dd></dl>
 
