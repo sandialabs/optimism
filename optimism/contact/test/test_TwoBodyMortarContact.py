@@ -49,7 +49,7 @@ class TwoBodyContactFixture(MeshFixture):
                 segA = self.segmentConnsA[indexA]
                 coordsSegB = self.mesh.coords[segB] + self.disp[segB]
                 coordsSegA = self.mesh.coords[segA] + self.disp[segA]
-                return MortarContact.integrate_with_mortar(coordsSegB, coordsSegA, MortarContact.compute_average_normal, lambda xiA, xiB, gap: 1.0, 1e-9, f_clamp_gaps=MortarContact.no_clamp)
+                return MortarContact.integrate_with_mortar(coordsSegB, coordsSegA, MortarContact.compute_average_normal, lambda xiA, xiB, gap: 1.0, 1e-9)
             
             return np.sum(vmap(compute_area_for_segment_pair, (None,0))(segB, neighborSegsA))
         
@@ -84,14 +84,14 @@ class TwoBodySelfContactFixture(MeshFixture):
         m1 = self.create_mesh_and_disp(2, 4, [0.0, 1.0], [0.0, 1.0],
                                         lambda x : self.targetDispGrad.dot(x), '1')
 
-        # Have second block offest (not penetrating) to test clamping of gaps for values larger than half the block width.
-        # Clamping removes gap values computed for edges on opposite faces of a body (they shouldn't be considered as penetrating)
+        # Have second block offest (not penetrating) to test that neighbor search excludes edges on opposite faces of the same body
+        # by using maxPenetrationDistance = 1/2 the body length
         m2 = self.create_mesh_and_disp(2, 3, [1.1, 2.0], [0.0, 1.0],
                                         lambda x : self.targetDispGrad.dot(x), '2')
         
         self.mesh, _ = Mesh.combine_mesh(m1, m2)
         order=2
-        self.mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(self.mesh, order=order, copyNodeSets=False)
+        self.mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(self.mesh, order=order, copyNodeSets=True)
         self.disp = np.zeros(self.mesh.coords.shape)
 
         self.numNeighbors = 8 # include enough neighbors so that search includes edges on opposite faces
@@ -103,7 +103,7 @@ class TwoBodySelfContactFixture(MeshFixture):
     
 
     def test_neighbor_search_excludes_current_and_adjacent_edges(self):
-        neighborList = MortarContact.get_closest_neighbors(self.segmentConnsA, self.segmentConnsB, self.mesh, self.disp, self.numNeighbors)
+        neighborList = MortarContact.get_closest_neighbors_for_self_contact(self.segmentConnsA, self.segmentConnsB, self.mesh, self.disp, self.numNeighbors, maxPenetrationDistance=1.0)
 
         def edges_are_adjacent(edge1, edge2):
             return (edge1[0] == edge2[0]) | \
@@ -125,7 +125,7 @@ class TwoBodySelfContactFixture(MeshFixture):
         nodesB = np.unique(np.concatenate(self.segmentConnsB))
         self.assertArrayEqual(nodesA, nodesB)
 
-        neighborList = MortarContact.get_closest_neighbors(self.segmentConnsA, self.segmentConnsB, self.mesh, self.disp, self.numNeighbors)
+        neighborList = MortarContact.get_closest_neighbors_for_self_contact(self.segmentConnsA, self.segmentConnsB, self.mesh, self.disp, self.numNeighbors, maxPenetrationDistance=0.5)
 
         nodalAreaField = MortarContact.assembly_mortar_integral(self.mesh.coords, 
                                                                 self.disp, 
@@ -133,36 +133,42 @@ class TwoBodySelfContactFixture(MeshFixture):
                                                                 self.segmentConnsB, 
                                                                 neighborList, 
                                                                 MortarContact.compute_average_normal, 
-                                                                lambda gap: 1.0, 
-                                                                MortarContact.no_clamp)
-        clampedNodalAreaField = MortarContact.assembly_mortar_integral(self.mesh.coords, 
-                                                                       self.disp, 
-                                                                       self.segmentConnsA, 
-                                                                       self.segmentConnsB, 
-                                                                       neighborList, 
-                                                                       MortarContact.compute_average_normal, 
-                                                                       lambda gap: 1.0, 
-                                                                       lambda xiA, g: MortarContact.clamp_max_penetration(xiA, g, max_penetration_depth=0.5))
+                                                                lambda gap: 1.0) 
 
-        # check that area is wrong if clamping is not used (gaps computed for edges on opposite faces)
-        self.assertNotAlmostEqual(np.sum(nodalAreaField), 2.0, 8) # double counting each edge, so area is doubled
-
-        # check that area is correct if clamping is used 
-        self.assertNear(np.sum(clampedNodalAreaField), 2.0, 8) # double counting each edge, so area is doubled
-        self.assertNear(np.sum(clampedNodalAreaField), np.sum(clampedNodalAreaField[nodesA]), 14)
-        mask = np.ones(len(clampedNodalAreaField), dtype=np.int8)
+        self.assertNear(np.sum(nodalAreaField), 2.0, 8) # double counting each edge, so area is doubled
+        self.assertNear(np.sum(nodalAreaField), np.sum(nodalAreaField[nodesA]), 14)
+        mask = np.ones(len(nodalAreaField), dtype=np.int8)
         mask = mask.at[nodesA].set(0).astype(bool)
 
-        self.assertNear(np.sum(clampedNodalAreaField[mask]), 0.0, 14)
+        self.assertNear(np.sum(nodalAreaField[mask]), 0.0, 14)
 
 
-    def test_clamped_mortar_integral_computes_no_penetration(self):
-        neighborList = MortarContact.get_closest_neighbors(self.segmentConnsA, self.segmentConnsB, self.mesh, self.disp, self.numNeighbors)
+    def test_mortar_integral_computes_no_penetration(self):
+        neighborList = MortarContact.get_closest_neighbors_for_self_contact(self.segmentConnsA, self.segmentConnsB, self.mesh, self.disp, self.numNeighbors, maxPenetrationDistance=0.5)
         nodalGapField = MortarContact.assemble_area_weighted_gaps(self.mesh.coords, self.disp, self.segmentConnsA, self.segmentConnsB, neighborList, MortarContact.compute_average_normal)
-        clampedNodalGapField = MortarContact.assemble_area_weighted_clamped_gaps(self.mesh.coords, self.disp, self.segmentConnsA, self.segmentConnsB, neighborList, MortarContact.compute_average_normal, lambda xiA, g: MortarContact.clamp_max_penetration(xiA, g, max_penetration_depth=0.5))
 
-        self.assertFalse(np.all(nodalGapField >= 0.0)) # negative gap values computed since edges on opposite faces are included
-        self.assertTrue(np.all(clampedNodalGapField >= 0.0)) # negative gap values computed since edges on opposite faces are included
+        self.assertTrue(np.all(nodalGapField >= 0.0)) # negative gap values computed since edges on opposite faces are included
+    
+
+    def test_penalty_potential_gradient_contains_no_nan(self):
+        def penalty_contact_potential(U, neighborList):
+            gaps = MortarContact.assemble_area_weighted_gaps(self.mesh.coords, 
+                                                             U, 
+                                                             self.segmentConnsA, 
+                                                             self.segmentConnsB, 
+                                                             neighborList, 
+                                                             MortarContact.compute_average_normal)
+            active_gaps = np.where(gaps > 0, 0.0, gaps)
+            return 0.5*np.tensordot(active_gaps, active_gaps, axes=1)
+        
+
+        index = (self.mesh.nodeSets['right1'], 0) 
+        disp = np.zeros(self.mesh.coords.shape)
+        disp = disp.at[index].set(0.2) # set displacement to cause penetration
+        neighborList = MortarContact.get_closest_neighbors_for_self_contact(self.segmentConnsA, self.segmentConnsB, self.mesh, disp, self.numNeighbors, maxPenetrationDistance=0.5)
+
+        penalty_grad = grad(penalty_contact_potential,0)(disp, neighborList)
+        self.assertFalse(np.any(np.isnan(penalty_grad)))
 
 
 if __name__ == '__main__':

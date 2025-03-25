@@ -16,12 +16,16 @@ def compute_normal(edgeCoords):
 def compute_average_normal(edgeA : jnp.array, edgeB : jnp.array) -> jnp.array:
     nA = compute_normal(edgeA)
     nB = compute_normal(edgeB)
-    normal = nA - nB
+    normal = jnp.where(nA != nB, nA - nB, nA)
     return normal / jnp.linalg.norm(normal)
 
 
 def compute_normal_from_a(edgeA : jnp.array, edgeB : jnp.array) -> jnp.array:
     return compute_normal(edgeA)
+
+
+def normals_are_facing(edgeA, edgeB):
+    return jnp.dot(compute_normal(edgeA), compute_normal(edgeB)) < 0.0
 
 # field utilities
 
@@ -31,14 +35,6 @@ def eval_linear_field_on_edge(field, xi):
 
 def smooth_linear(xi, l):                
     return jnp.where( xi < l, 0.5*xi*xi/l, jnp.where(xi > 1.0-l, 1.0-l-0.5*(1.0-xi)*(1.0-xi)/l, xi-0.5*l) )
-
-# utilities for clamping gap values
-
-def no_clamp(xiA, g):
-    return xiA
-
-def clamp_max_penetration(xiA, g, max_penetration_depth):
-    return jnp.where(g < -max_penetration_depth, jnp.nan, xiA)
 
 # some actual mortar integrals
 
@@ -52,10 +48,7 @@ def compute_intersection(edgeA, edgeB, f_common_normal):
         xig = jnp.linalg.solve(M,r)
         return xig[0], xig[1]
 
-    normal = jax.lax.cond(jnp.dot(compute_normal(edgeA), compute_normal(edgeB)) == 0.0, 
-                        lambda eA, eB: jnp.array([jnp.nan, jnp.nan]),
-                        lambda eA, eB: f_common_normal(eA, eB), 
-                        edgeA, edgeB)
+    normal = f_common_normal(edgeA, edgeB)
 
     xiBs1, gs1 = jax.vmap(compute_xi, (0,None,None))(edgeA, edgeB, normal)
     xiAs2, gs2 = jax.vmap(compute_xi, (0,None,None))(edgeB, edgeA,-normal)
@@ -93,10 +86,8 @@ def integrate_with_mortar(edgeA : jnp.array,
                           edgeB : jnp.array, 
                           f_common_normal : Callable[[jnp.array,jnp.array],jnp.array],
                           func_of_xiA_xiB_g : Callable[[float,float,float],float],
-                          relativeSmoothingSize : float,
-                          f_clamp_gaps: Callable):
+                          relativeSmoothingSize : float):
     xiA,xiB,g = compute_intersection(edgeA, edgeB, f_common_normal)
-    xiA = f_clamp_gaps(xiA, g)
     branches = [lambda : integrate_with_active_mortar(xiA, xiB, g, 
                                                       jnp.linalg.norm(edgeA[0] - edgeA[1]), 
                                                       jnp.linalg.norm(edgeB[0] - edgeB[1]),
@@ -104,13 +95,12 @@ def integrate_with_mortar(edgeA : jnp.array,
                                                       relativeSmoothingSize),
                 lambda : 0.0]
 
-    return jax.lax.switch(1*jnp.any(jnp.isnan(xiA)), branches) #jax.lax.cond(jnp.any(jnp.isnan(xiA)), branches[1], branches[0]) #
+    return jax.lax.switch(1*jnp.logical_not(normals_are_facing(edgeA, edgeB)), branches) 
 
 
 def assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighborList, 
                              f_average_normal : Callable,
-                             f_integrand : Callable,
-                             f_clamp_gaps : Callable):
+                             f_integrand : Callable):
     def compute_nodal_gap_area(segB, neighborSegsA):
         nodeLeft = segB[0]
         nodeRight = segB[1]
@@ -119,8 +109,8 @@ def assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighbo
             coordsSegB = coords[segB] + disp[segB]
             coordsSegA = coords[segA] + disp[segA]
 
-            gapAreaLeft = integrate_with_mortar(coordsSegB, coordsSegA, f_average_normal, lambda xiA, xiB, gap: f_integrand(gap) * (1.0-xiA), 1e-9, f_clamp_gaps)
-            gapAreaRight = integrate_with_mortar(coordsSegB, coordsSegA, f_average_normal, lambda xiA, xiB, gap: f_integrand(gap) * xiA, 1e-9, f_clamp_gaps)
+            gapAreaLeft = integrate_with_mortar(coordsSegB, coordsSegA, f_average_normal, lambda xiA, xiB, gap: f_integrand(gap) * (1.0-xiA), 1e-9)
+            gapAreaRight = integrate_with_mortar(coordsSegB, coordsSegA, f_average_normal, lambda xiA, xiB, gap: f_integrand(gap) * xiA, 1e-9)
             return gapAreaLeft, gapAreaRight
 
         gapAreaLeft, gapAreaRight = jax.vmap(compute_quantities_for_segment_pair, (None,0))(segB, neighborSegsA)
@@ -136,17 +126,18 @@ def assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighbo
 
 
 def assemble_area_weighted_gaps(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal : Callable):
-    return assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal, lambda gap : gap, no_clamp)
-
-
-def assemble_area_weighted_clamped_gaps(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal : Callable, f_clamp_gaps : Callable):
-    return assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal, lambda gap : gap, f_clamp_gaps)
+    return assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal, lambda gap : gap)
 
 
 def assemble_nodal_areas(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal : Callable):
-    return assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal, lambda gap : 1.0, no_clamp)
+    return assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighborList, f_average_normal, lambda gap : 1.0)
 
 # utilities for setting up mortar contact data structures
+
+def minimum_squared_distance(xs1, xs2):
+    dists = jax.vmap( lambda x: jax.vmap( lambda y: (x-y)@(x-y) )(xs1) ) (xs2)    
+    return jnp.min(dists)
+
 
 @partial(jax.jit, static_argnums=(4,))
 def get_closest_neighbors(edgeSetA : jnp.array,
@@ -154,26 +145,54 @@ def get_closest_neighbors(edgeSetA : jnp.array,
                           mesh : Mesh.Mesh,
                           disp : jnp.array,
                           maxNeighbors : int):
+    def min_dist_squared(edge1, edge2, coords, disp):
+        xs1 = coords[edge1] + disp[edge1]
+        xs2 = coords[edge2] + disp[edge2]
+        return minimum_squared_distance(xs1, xs2)
+    
+    return _neighbor_search(edgeSetA, edgeSetB, mesh, disp, maxNeighbors, min_dist_squared)
+
+
+@partial(jax.jit, static_argnums=(4,5))
+def get_closest_neighbors_for_self_contact(edgeSetA : jnp.array,
+                                           edgeSetB : jnp.array,
+                                           mesh : Mesh.Mesh,
+                                           disp : jnp.array,
+                                           maxNeighbors : int,
+                                           maxPenetrationDistance : float):
     def edges_are_adjacent(edge1, edge2):
         return (edge1[0] == edge2[0]) | \
                (edge1[0] == edge2[1]) | \
                (edge1[1] == edge2[0]) | \
                (edge1[1] == edge2[1])
+    
+    def edge_is_penetrating_beyond_max_distance(xs1, xs2, minSqiaredDistance):
+        return jnp.logical_and(normals_are_facing(xs1, xs2),
+                               minSqiaredDistance > maxPenetrationDistance**2)
 
-    def compute_distances(edge1, edge2, coords, disp):
+    def min_dist_conditional(edge1, edge2, coords, disp):
         xs1 = coords[edge1] + disp[edge1]
         xs2 = coords[edge2] + disp[edge2]
-        dists = jax.vmap( lambda x: jax.vmap( lambda y: (x-y)@(x-y) )(xs1) ) (xs2)    
-        return jnp.min(dists)
-
-    def min_dist_squared(edge1, edge2, coords, disp):
-        return jax.lax.cond(edges_are_adjacent(edge1, edge2), 
-                            lambda e1, e2: jnp.nan, 
-                            lambda e1, e2: compute_distances(e1, e2, coords, disp), 
+        minSqiaredDistance = minimum_squared_distance(xs1, xs2)
+        excludeEdges = jnp.logical_or(edges_are_adjacent(edge1, edge2), 
+                                      edge_is_penetrating_beyond_max_distance(xs1, xs2, minSqiaredDistance))
+        return jax.lax.cond(excludeEdges, 
+                            lambda e1, e2: jnp.inf, 
+                            lambda e1, e2: minSqiaredDistance, 
                             edge1, edge2)
     
+    return _neighbor_search(edgeSetA, edgeSetB, mesh, disp, maxNeighbors, min_dist_conditional)
+
+
+def _neighbor_search(edgeSetA : jnp.array,
+                     edgeSetB : jnp.array,
+                     mesh : Mesh.Mesh,
+                     disp : jnp.array,
+                     maxNeighbors : int,
+                     f_min_distance : Callable):
+    
     def get_close_edge_indices(surfaceA, edgeB):
-        minDistsToA = jax.vmap(min_dist_squared, (0,None,None,None))(surfaceA, edgeB, mesh.coords, disp)
+        minDistsToA = jax.vmap(f_min_distance, (0,None,None,None))(surfaceA, edgeB, mesh.coords, disp)
         return jnp.argsort(minDistsToA)[:maxNeighbors]
     
     return jax.vmap(get_close_edge_indices, (None,0))(edgeSetA, edgeSetB) # loop over surface B, get neighbor index in A
