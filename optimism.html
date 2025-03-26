@@ -1275,6 +1275,7 @@
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#module-optimism.contact.test.test_EdgeIntersection">optimism.contact.test.test_EdgeIntersection module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#module-optimism.contact.test.test_LevelsetConstraint">optimism.contact.test.test_LevelsetConstraint module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#module-optimism.contact.test.test_MortarGeom">optimism.contact.test.test_MortarGeom module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#module-optimism.contact.test.test_NeighborSearch">optimism.contact.test.test_NeighborSearch module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#module-optimism.contact.test.test_NewtonGlobalization">optimism.contact.test.test_NewtonGlobalization module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#module-optimism.contact.test.test_Search">optimism.contact.test.test_Search module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#module-optimism.contact.test.test_TwoBodyContact">optimism.contact.test.test_TwoBodyContact module</a></li>
@@ -1345,21 +1346,22 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="optimism.contact.html#module-optimism.contact.MortarContact">optimism.contact.MortarContact module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.assemble_area_weighted_clamped_gaps"><code class="docutils literal notranslate"><span class="pre">assemble_area_weighted_clamped_gaps()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact._neighbor_search"><code class="docutils literal notranslate"><span class="pre">_neighbor_search()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.assemble_area_weighted_gaps"><code class="docutils literal notranslate"><span class="pre">assemble_area_weighted_gaps()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.assemble_nodal_areas"><code class="docutils literal notranslate"><span class="pre">assemble_nodal_areas()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.assembly_mortar_integral"><code class="docutils literal notranslate"><span class="pre">assembly_mortar_integral()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.clamp_max_penetration"><code class="docutils literal notranslate"><span class="pre">clamp_max_penetration()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.compute_average_normal"><code class="docutils literal notranslate"><span class="pre">compute_average_normal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.compute_intersection"><code class="docutils literal notranslate"><span class="pre">compute_intersection()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.compute_normal"><code class="docutils literal notranslate"><span class="pre">compute_normal()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.compute_normal_from_a"><code class="docutils literal notranslate"><span class="pre">compute_normal_from_a()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.eval_linear_field_on_edge"><code class="docutils literal notranslate"><span class="pre">eval_linear_field_on_edge()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.get_closest_neighbors"><code class="docutils literal notranslate"><span class="pre">get_closest_neighbors()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.get_closest_neighbors_for_self_contact"><code class="docutils literal notranslate"><span class="pre">get_closest_neighbors_for_self_contact()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.get_facet_connectivities"><code class="docutils literal notranslate"><span class="pre">get_facet_connectivities()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.integrate_with_active_mortar"><code class="docutils literal notranslate"><span class="pre">integrate_with_active_mortar()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.integrate_with_mortar"><code class="docutils literal notranslate"><span class="pre">integrate_with_mortar()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.no_clamp"><code class="docutils literal notranslate"><span class="pre">no_clamp()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.minimum_squared_distance"><code class="docutils literal notranslate"><span class="pre">minimum_squared_distance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.normals_are_facing"><code class="docutils literal notranslate"><span class="pre">normals_are_facing()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.html#optimism.contact.MortarContact.smooth_linear"><code class="docutils literal notranslate"><span class="pre">smooth_linear()</span></code></a></li>
 </ul>
 </li>

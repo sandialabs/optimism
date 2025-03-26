@@ -425,6 +425,8 @@
         <li><a href="optimism.material.html#optimism.material.Neohookean._make_properties">(in module optimism.material.Neohookean)</a>
 </li>
       </ul></li>
+      <li><a href="optimism.contact.html#optimism.contact.MortarContact._neighbor_search">_neighbor_search() (in module optimism.contact.MortarContact)</a>
+</li>
       <li><a href="optimism.material.html#optimism.material.Neohookean._neohookean_3D_energy_density">_neohookean_3D_energy_density() (in module optimism.material.Neohookean)</a>
 </li>
       <li><a href="optimism.material.html#optimism.material.HyperViscoelastic._neq_strain_energy">_neq_strain_energy() (in module optimism.material.HyperViscoelastic)</a>
@@ -567,12 +569,10 @@
 </li>
       <li><a href="optimism.contact.html#optimism.contact.EdgeCpp.area">area() (in module optimism.contact.EdgeCpp)</a>
 </li>
-      <li><a href="optimism.contact.html#optimism.contact.MortarContact.assemble_area_weighted_clamped_gaps">assemble_area_weighted_clamped_gaps() (in module optimism.contact.MortarContact)</a>
+      <li><a href="optimism.contact.html#optimism.contact.MortarContact.assemble_area_weighted_gaps">assemble_area_weighted_gaps() (in module optimism.contact.MortarContact)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="optimism.contact.html#optimism.contact.MortarContact.assemble_area_weighted_gaps">assemble_area_weighted_gaps() (in module optimism.contact.MortarContact)</a>
-</li>
       <li><a href="optimism.contact.html#optimism.contact.MortarContact.assemble_nodal_areas">assemble_nodal_areas() (in module optimism.contact.MortarContact)</a>
 </li>
       <li><a href="optimism.html#optimism.SparseMatrixAssembler.assemble_sparse_stiffness_matrix">assemble_sparse_stiffness_matrix() (in module optimism.SparseMatrixAssembler)</a>
@@ -675,8 +675,6 @@
         <li><a href="optimism.html#optimism.SparseCholesky.SparseCholesky.check_stability">(optimism.SparseCholesky.SparseCholesky method)</a>
 </li>
       </ul></li>
-      <li><a href="optimism.contact.html#optimism.contact.MortarContact.clamp_max_penetration">clamp_max_penetration() (in module optimism.contact.MortarContact)</a>
-</li>
       <li><a href="optimism.html#optimism.Mesh.combine_blocks">combine_blocks() (in module optimism.Mesh)</a>
 </li>
       <li><a href="optimism.html#optimism.Mesh.combine_mesh">combine_mesh() (in module optimism.Mesh)</a>
@@ -861,10 +859,10 @@
 </li>
       <li><a href="optimism.contact.html#optimism.contact.Contact.compute_projection_dists_smooth">compute_projection_dists_smooth() (in module optimism.contact.Contact)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="optimism.contact.html#optimism.contact.Contact.compute_q_coordinates">compute_q_coordinates() (in module optimism.contact.Contact)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="optimism.contact.html#optimism.contact.Contact.compute_q_coordinates_from_field_weights">compute_q_coordinates_from_field_weights() (in module optimism.contact.Contact)</a>
 </li>
       <li><a href="optimism.html#optimism.FunctionSpace.compute_quadrature_point_field_gradient">compute_quadrature_point_field_gradient() (in module optimism.FunctionSpace)</a>
@@ -1380,6 +1378,8 @@
       <li><a href="optimism.contact.html#optimism.contact.Contact.get_closest_distance_smooth">get_closest_distance_smooth() (in module optimism.contact.Contact)</a>
 </li>
       <li><a href="optimism.contact.html#optimism.contact.MortarContact.get_closest_neighbors">get_closest_neighbors() (in module optimism.contact.MortarContact)</a>
+</li>
+      <li><a href="optimism.contact.html#optimism.contact.MortarContact.get_closest_neighbors_for_self_contact">get_closest_neighbors_for_self_contact() (in module optimism.contact.MortarContact)</a>
 </li>
       <li><a href="optimism.contact.html#optimism.contact.Contact.get_closest_two_edges">get_closest_two_edges() (in module optimism.contact.Contact)</a>
 </li>
@@ -1905,6 +1905,8 @@
       </ul></li>
       <li><a href="optimism.html#optimism.MinimizeScalar.minimize_scalar">minimize_scalar() (in module optimism.MinimizeScalar)</a>
 </li>
+      <li><a href="optimism.contact.html#optimism.contact.MortarContact.minimum_squared_distance">minimum_squared_distance() (in module optimism.contact.MortarContact)</a>
+</li>
       <li><a href="optimism.html#optimism.TensorMath.mises_invariant">mises_invariant() (in module optimism.TensorMath)</a>
 </li>
       <li><a href="optimism.html#optimism.EquationSolverSubspace.ModelProblem">ModelProblem (class in optimism.EquationSolverSubspace)</a>
@@ -1954,6 +1956,8 @@
         <li><a href="optimism.contact.test.html#module-optimism.contact.test.test_LevelsetConstraint">optimism.contact.test.test_LevelsetConstraint</a>
 </li>
         <li><a href="optimism.contact.test.html#module-optimism.contact.test.test_MortarGeom">optimism.contact.test.test_MortarGeom</a>
+</li>
+        <li><a href="optimism.contact.test.html#module-optimism.contact.test.test_NeighborSearch">optimism.contact.test.test_NeighborSearch</a>
 </li>
         <li><a href="optimism.contact.test.html#module-optimism.contact.test.test_NewtonGlobalization">optimism.contact.test.test_NewtonGlobalization</a>
 </li>
@@ -2196,8 +2200,6 @@
         <li><a href="optimism.html#optimism.ScalarRootFind.newton_step">(in module optimism.ScalarRootFind)</a>
 </li>
       </ul></li>
-      <li><a href="optimism.contact.html#optimism.contact.MortarContact.no_clamp">no_clamp() (in module optimism.contact.MortarContact)</a>
-</li>
       <li><a href="optimism.test.html#optimism.test.test_TrustRegionSPG.TestTrustRegionSPGFixture.no_test_cgunbound">no_test_cgunbound() (optimism.test.test_TrustRegionSPG.TestTrustRegionSPGFixture method)</a>
 </li>
       <li><a href="optimism.test.html#optimism.test.test_TrustRegionSPG.TestTrustRegionSPGRosenbrock.no_test_hessian">no_test_hessian() (optimism.test.test_TrustRegionSPG.TestTrustRegionSPGRosenbrock method)</a>
@@ -2216,10 +2218,10 @@
 </li>
       <li><a href="optimism.html#optimism.FunctionSpace.EssentialBC.nodeSet">nodeSet (optimism.FunctionSpace.EssentialBC attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="optimism.html#id18">nodeSets (optimism.Mesh.Mesh attribute)</a>, <a href="optimism.html#optimism.Mesh.Mesh.nodeSets">[1]</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="optimism.html#optimism.EquationSolver.nonlinear_equation_solve">nonlinear_equation_solve() (in module optimism.EquationSolver)</a>
 </li>
       <li><a href="optimism.html#optimism.TrustRegionSPG.nonmonotone_line_search">nonmonotone_line_search() (in module optimism.TrustRegionSPG)</a>
@@ -2231,6 +2233,8 @@
       <li><a href="optimism.html#optimism.TensorMath.norm_of_deviator_squared">norm_of_deviator_squared() (in module optimism.TensorMath)</a>
 </li>
       <li><a href="optimism.contact.html#optimism.contact.EdgeCpp.norm_squared">norm_squared() (in module optimism.contact.EdgeCpp)</a>
+</li>
+      <li><a href="optimism.contact.html#optimism.contact.MortarContact.normals_are_facing">normals_are_facing() (in module optimism.contact.MortarContact)</a>
 </li>
       <li><a href="optimism.test.html#optimism.test.test_MinimizeScalar.TestMinimizeScalarFixture.notest_grad">notest_grad() (optimism.test.test_MinimizeScalar.TestMinimizeScalarFixture method)</a>
 </li>
@@ -2413,6 +2417,13 @@
 
       <ul>
         <li><a href="optimism.contact.test.html#module-optimism.contact.test.test_MortarGeom">module</a>
+</li>
+      </ul></li>
+      <li>
+    optimism.contact.test.test_NeighborSearch
+
+      <ul>
+        <li><a href="optimism.contact.test.html#module-optimism.contact.test.test_NeighborSearch">module</a>
 </li>
       </ul></li>
       <li>
@@ -2681,6 +2692,8 @@
         <li><a href="optimism.html#module-optimism.Objective">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     optimism.phasefield
 
@@ -2688,8 +2701,6 @@
         <li><a href="optimism.phasefield.html#module-optimism.phasefield">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     optimism.phasefield.MaterialPointSimulator
 
@@ -3343,6 +3354,8 @@
         <li><a href="optimism.html#optimism.Objective.ScaledPrecondStrategy">(class in optimism.Objective)</a>
 </li>
       </ul></li>
+      <li><a href="optimism.contact.test.html#optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture">SelfContactPenaltyFixture (class in optimism.contact.test.test_NeighborSearch)</a>
+</li>
       <li><a href="optimism.test.html#optimism.test.test_Newmark.DynamicsFixture.set_initial_conditions">set_initial_conditions() (optimism.test.test_Newmark.DynamicsFixture method)</a>
 </li>
       <li><a href="optimism.html#optimism.AlSolver.Settings">Settings (class in optimism.AlSolver)</a>
@@ -3375,6 +3388,8 @@
         <li><a href="optimism.contact.test.html#optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint.setUp">(optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint method)</a>
 </li>
         <li><a href="optimism.contact.test.html#optimism.contact.test.test_MortarGeom.TestMortarGeom.setUp">(optimism.contact.test.test_MortarGeom.TestMortarGeom method)</a>
+</li>
+        <li><a href="optimism.contact.test.html#optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture.setUp">(optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture method)</a>
 </li>
         <li><a href="optimism.contact.test.html#optimism.contact.test.test_NewtonGlobalization.TestGMRESSolver.setUp">(optimism.contact.test.test_NewtonGlobalization.TestGMRESSolver method)</a>
 </li>
@@ -3681,8 +3696,6 @@
 </li>
       <li><a href="optimism.test.html#optimism.test.test_TrustRegionSPG.TRSPGCauchyPointFixture.test_cauchy_point_with_active_constraints_achieves_sufficient_decrease">test_cauchy_point_with_active_constraints_achieves_sufficient_decrease() (optimism.test.test_TrustRegionSPG.TRSPGCauchyPointFixture method)</a>
 </li>
-      <li><a href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyMortarContact.TwoBodySelfContactFixture.test_clamped_mortar_integral_computes_no_penetration">test_clamped_mortar_integral_computes_no_penetration() (optimism.contact.test.test_TwoBodyMortarContact.TwoBodySelfContactFixture method)</a>
-</li>
       <li><a href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.test_combining_nodesets">test_combining_nodesets() (optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture method)</a>
 </li>
       <li><a href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.test_combining_sidesets">test_combining_sidesets() (optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture method)</a>
@@ -3795,6 +3808,10 @@
         <li><a href="optimism.test.html#optimism.test.test_ReadMesh.TestMeshReadData.test_entity_counts">(optimism.test.test_ReadMesh.TestMeshReadData method)</a>
 </li>
       </ul></li>
+      <li><a href="optimism.contact.test.html#optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture.test_exclusion_of_current_and_adjacent_edges">test_exclusion_of_current_and_adjacent_edges() (optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture method)</a>
+</li>
+      <li><a href="optimism.contact.test.html#optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture.test_exclusion_of_edges_on_opposite_face">test_exclusion_of_edges_on_opposite_face() (optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture method)</a>
+</li>
       <li><a href="optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_exp_symm_at_identity">test_exp_symm_at_identity() (optimism.test.test_TensorMath.TensorMathFixture method)</a>
 </li>
       <li><a href="optimism.test.html#optimism.test.test_TensorMath.TensorMathFixture.test_exp_symm_double_eigs">test_exp_symm_double_eigs() (optimism.test.test_TensorMath.TensorMathFixture method)</a>
@@ -3844,6 +3861,8 @@
       <li><a href="optimism.test.html#optimism.test.test_Math.TestMathSum.test_grad_on_sum2_works">test_grad_on_sum2_works() (optimism.test.test_Math.TestMathSum method)</a>
 </li>
       <li><a href="optimism.test.html#optimism.test.test_Newmark.DynamicsFixture.test_hessian_matrix_is_symmetric">test_hessian_matrix_is_symmetric() (optimism.test.test_Newmark.DynamicsFixture method)</a>
+</li>
+      <li><a href="optimism.contact.test.html#optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture.test_inclusion_of_edges_on_adjacent_face">test_inclusion_of_edges_on_adjacent_face() (optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture method)</a>
 </li>
       <li><a href="optimism.test.html#optimism.test.test_SparsePreconditioner.SparseCholeskyFixture.test_indefinite_fixed_by_shift">test_indefinite_fixed_by_shift() (optimism.test.test_SparsePreconditioner.SparseCholeskyFixture method)</a>
 </li>
@@ -3957,6 +3976,8 @@
 </li>
       <li><a href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyMortarContact.TwoBodySelfContactFixture.test_mortar_integral_computes_expected_area">test_mortar_integral_computes_expected_area() (optimism.contact.test.test_TwoBodyMortarContact.TwoBodySelfContactFixture method)</a>
 </li>
+      <li><a href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyMortarContact.TwoBodySelfContactFixture.test_mortar_integral_computes_no_penetration">test_mortar_integral_computes_no_penetration() (optimism.contact.test.test_TwoBodyMortarContact.TwoBodySelfContactFixture method)</a>
+</li>
       <li><a href="optimism.test.html#optimism.test.test_SparsePreconditioner.SparseCholeskyFixture.test_multiply_by_transpose">test_multiply_by_transpose() (optimism.test.test_SparsePreconditioner.SparseCholeskyFixture method)</a>
 </li>
       <li><a href="optimism.contact.test.html#optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.test_negative_curvature">test_negative_curvature() (optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver method)</a>
@@ -3999,6 +4020,8 @@
         <li><a href="optimism.test.html#optimism.test.test_Newmark.DynamicPatchTest.test_patch_test">(optimism.test.test_Newmark.DynamicPatchTest method)</a>
 </li>
       </ul></li>
+      <li><a href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyMortarContact.TwoBodySelfContactFixture.test_penalty_potential_gradient_contains_no_nan">test_penalty_potential_gradient_contains_no_nan() (optimism.contact.test.test_TwoBodyMortarContact.TwoBodySelfContactFixture method)</a>
+</li>
       <li><a href="optimism.material.test.html#optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture.test_plastic_strain_path">test_plastic_strain_path() (optimism.material.test.test_J2Plastic.GradOfPlasticityModelFixture method)</a>
 </li>
       <li><a href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture.test_plastic_stress">test_plastic_stress() (optimism.phasefield.test.test_PhaseFieldLorentzPlastic.GradOfPlasticPhaseFieldModelFixture method)</a>
@@ -4007,12 +4030,12 @@
         <li><a href="optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture.test_plastic_stress">(optimism.phasefield.test.test_PhaseFieldThresholdPlastic.GradOfPlasticPhaseFieldModelFixture method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="optimism.material.test.html#optimism.material.test.test_J2Plastic.PlasticityOnMesh.test_plasticity_with_mesh">test_plasticity_with_mesh() (optimism.material.test.test_J2Plastic.PlasticityOnMesh method)</a>
 </li>
       <li><a href="optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_plot">test_plot() (optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.test_plot2">test_plot2() (optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection method)</a>
 </li>
       <li><a href="optimism.contact.test.html#optimism.contact.test.test_Cpp.TestEdgeIntersection.test_plot_smooth_min">test_plot_smooth_min() (optimism.contact.test.test_Cpp.TestEdgeIntersection method)</a>
