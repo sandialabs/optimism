@@ -166,20 +166,26 @@ def get_closest_neighbors_for_self_contact(edgeSetA : jnp.array,
                (edge1[1] == edge2[0]) | \
                (edge1[1] == edge2[1])
     
-    def edge_is_penetrating_beyond_max_distance(xs1, xs2, minSqiaredDistance):
-        return jnp.logical_and(normals_are_facing(xs1, xs2),
-                               minSqiaredDistance > maxPenetrationDistance**2)
+    def edge_A_is_penetrating_beyond_max_distance(xsA, xsB, minSquaredDistance):
+        def edge_A_is_penetrating(xsA, xsB):
+            normalB = compute_normal(xsB)
+            dists = xsA - xsB
+            return jnp.any(jnp.dot(dists, normalB) < 0.0)
+        return jnp.logical_and(edge_A_is_penetrating(xsA, xsB),
+                               minSquaredDistance > maxPenetrationDistance**2)
 
-    def min_dist_conditional(edge1, edge2, coords, disp):
-        xs1 = coords[edge1] + disp[edge1]
-        xs2 = coords[edge2] + disp[edge2]
-        minSqiaredDistance = minimum_squared_distance(xs1, xs2)
-        excludeEdges = jnp.logical_or(edges_are_adjacent(edge1, edge2), 
-                                      edge_is_penetrating_beyond_max_distance(xs1, xs2, minSqiaredDistance))
+    def min_dist_conditional(edgeA, edgeB, coords, disp):
+        xsA = coords[edgeA] + disp[edgeA]
+        xsB = coords[edgeB] + disp[edgeB]
+        minSquaredDistance = minimum_squared_distance(xsA, xsB)
+        excludeEdges = jnp.logical_or(
+            jnp.logical_or(edges_are_adjacent(edgeA, edgeB), 
+                            edge_A_is_penetrating_beyond_max_distance(xsA, xsB, minSquaredDistance)),
+                            jnp.logical_not(normals_are_facing(xsA, xsB)))
         return jax.lax.cond(excludeEdges, 
                             lambda e1, e2: jnp.inf, 
-                            lambda e1, e2: minSqiaredDistance, 
-                            edge1, edge2)
+                            lambda e1, e2: minSquaredDistance, 
+                            edgeA, edgeB)
     
     return _neighbor_search(edgeSetA, edgeSetB, mesh, disp, maxNeighbors, min_dist_conditional)
 
