@@ -109,8 +109,12 @@ def assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighbo
             coordsSegB = coords[segB] + disp[segB]
             coordsSegA = coords[segA] + disp[segA]
 
-            gapAreaLeft = integrate_with_mortar(coordsSegB, coordsSegA, f_average_normal, lambda xiA, xiB, gap: f_integrand(gap) * (1.0-xiA), 1e-9)
-            gapAreaRight = integrate_with_mortar(coordsSegB, coordsSegA, f_average_normal, lambda xiA, xiB, gap: f_integrand(gap) * xiA, 1e-9)
+            gapAreaLeft = jax.lax.cond(indexA == -1,
+                                       lambda : 0.0,
+                                       lambda : integrate_with_mortar(coordsSegB, coordsSegA, f_average_normal, lambda xiA, xiB, gap: f_integrand(gap) * (1.0-xiA), 1e-9))
+            gapAreaRight = jax.lax.cond(indexA == -1,
+                                        lambda : 0.0,
+                                        lambda : integrate_with_mortar(coordsSegB, coordsSegA, f_average_normal, lambda xiA, xiB, gap: f_integrand(gap) * xiA, 1e-9))
             return gapAreaLeft, gapAreaRight
 
         gapAreaLeft, gapAreaRight = jax.vmap(compute_quantities_for_segment_pair, (None,0))(segB, neighborSegsA)
@@ -199,7 +203,9 @@ def _neighbor_search(edgeSetA : jnp.array,
     
     def get_close_edge_indices(surfaceA, edgeB):
         minDistsToA = jax.vmap(f_min_distance, (0,None,None,None))(surfaceA, edgeB, mesh.coords, disp)
-        return jnp.argsort(minDistsToA)[:maxNeighbors]
+        sortedEntries = jnp.argsort(minDistsToA)[:maxNeighbors]
+        validEntries = jnp.isfinite(minDistsToA)[sortedEntries]
+        return jnp.where(validEntries == True, sortedEntries, -1)
     
     return jax.vmap(get_close_edge_indices, (None,0))(edgeSetA, edgeSetB) # loop over surface B, get neighbor index in A
 

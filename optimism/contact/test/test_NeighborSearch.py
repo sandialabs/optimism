@@ -109,5 +109,16 @@ class SelfContactPenaltyFixture(MeshFixture):
         self.assertArrayEqual(neighborList, goldNeighbors)
     
 
+    def test_invalid_entries_have_minus_one_if_included(self):
+        coordsSegA = np.array([[0, 1], [1, 3], [3, 5], [12, 10]])
+        coordsSegB = np.array([[1, 3]]) 
+
+        numNeighbors = 2
+        neighborList = MortarContact.get_closest_neighbors_for_self_contact(coordsSegA, coordsSegB, self.mesh, self.disp, numNeighbors, self.maxPenetrationDistance)
+
+        goldNeighbors = np.array([[3, -1]])
+        self.assertArrayEqual(neighborList, goldNeighbors)
+    
+
 if __name__ == '__main__':
     unittest.main()
