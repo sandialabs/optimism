@@ -49,15 +49,6 @@ optimism.contact.test.test\_MortarGeom module
    :show-inheritance:
    :private-members:
 
-optimism.contact.test.test\_NeighborSearch module
--------------------------------------------------
-
-.. automodule:: optimism.contact.test.test_NeighborSearch
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :private-members:
-
 optimism.contact.test.test\_NewtonGlobalization module
 ------------------------------------------------------
 
