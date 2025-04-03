@@ -193,7 +193,7 @@ def _read_element_type(exodusDataset):
     for i in range(nBlocks):
         key = 'connect' + str(i + 1)
         blockElemType = exodusDataset[key].elem_type
-        assert (blockElemType == elemType), 'Different element types present in exodus file'
+        assert (blockElemType.lower() == elemType.lower()), 'Different element types present in exodus file'
     return elemType
 
 
