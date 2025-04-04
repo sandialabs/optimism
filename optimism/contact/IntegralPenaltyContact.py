@@ -5,7 +5,6 @@ from typing import Callable
 def compute_normal(edgeCoords):
     tangent = edgeCoords[1]-edgeCoords[0]
     normal = jnp.array([tangent[1], -tangent[0]])
-    #normalize = normal @ normal
     normalize = jnp.linalg.norm(normal)
     normalize = jnp.where(normalize < 1e-12, 1.0, normalize)
     return normal / normalize
@@ -136,15 +135,6 @@ def integrate_mortar_barrier(edgeA : jnp.array,
     g = scaling * (gA) + allowed_overlap_dist
 
     lA = jnp.linalg.norm(edgeA[0] - edgeA[1])
-
-    #def penalty(g):
-    #    return np.where(g < 0.0, np.inf,
-    #                    np.where(g > allowed_overlap_dist, 
-    #                             0.0,
-    #                             -(g - allowed_overlap_dist)*(g -allowed_overlap_dist) * np.log(g/allowed_overlap_dist)
-    #                            )
-    #                    )
-    #integralA = lA * (xiA[1] - xiA[0]) * 0.5 * (penalty(g[0]) + penalty(g[1]))
 
     integral = integrate_gap(xiA, g, allowed_overlap_dist)
 
