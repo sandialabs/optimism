@@ -12,18 +12,14 @@ def compute_normal(edgeCoords):
 
 
 def compute_normal_from_b(edgeA : jnp.array, edgeB : jnp.array) -> jnp.array:
-    normal = compute_normal(edgeB)
-    #normalize = jnp.linalg.norm(normal)
-    #normalize = jnp.where(normalize < 1e-13, 1.0, normalize)
-    return -normal # / normalize
+    return -compute_normal(edgeB)
 
 
 def smooth_linear(xi, l):                
     return jnp.where( xi < l, 0.5*xi*xi/l, jnp.where(xi > 1.0-l, 1.0-l-0.5*(1.0-xi)*(1.0-xi)/l, xi-0.5*l) ) / (1.0 - l)
 
 
-
-def compute_intersection_c_plus_plus(edgeA, edgeB, normal, smoothing):
+def compute_intersection(edgeA, edgeB, normal, smoothing):
 
     def compute_xi(xa, edgeB, normal):
         # solve xa - xb(xi) + g * normal = 0
@@ -135,7 +131,7 @@ def integrate_mortar_barrier(edgeA : jnp.array,
     this_should_be_positive = -(nA @ nB)
     scaling = jnp.where( this_should_be_positive > 0, this_should_be_positive, 0.0)
 
-    xiA,gA = compute_intersection_c_plus_plus(edgeA, edgeB, normal, relativeSmoothingSize)
+    xiA,gA = compute_intersection(edgeA, edgeB, normal, relativeSmoothingSize)
 
     g = scaling * (gA) + allowed_overlap_dist
 

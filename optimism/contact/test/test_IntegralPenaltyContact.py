@@ -13,7 +13,6 @@ class TestEdgeIntersection(unittest.TestCase):
         self.edge_smoothing = 0.2
         self.delta = 0.5
         self.xi = np.array([0.2, 0.9])
-        return
 
 
     def utest_plot(self):
@@ -23,6 +22,10 @@ class TestEdgeIntersection(unittest.TestCase):
         pyplot.plot(g, p(g))
         pyplot.show()
 
+
+    # negative value here means there is overlap, which is penalized to inf
+    # a positive gap value less that self.delta=0.5, means there is a contact interaction
+    # a larger gap value will be considered not in contact at all
 
     def test_integral_some_in_overlap(self):
         self.assertAlmostEqual(integrate_gap(self.xi, np.array([-0.1, 0.1]), self.delta), np.inf,)
@@ -88,26 +91,6 @@ class TestEdgeIntersection(unittest.TestCase):
         self.assertAlmostEqual(integral1, integral2, 13)
         integral3 = integrate_gap_numeric(self.xi, g, self.delta)
         self.assertAlmostEqual(integral1, integral3, 7)
-
-
-    def utest_debug(self):
-
-        edgeA = np.array([[ 0.55,  0.05      ],
-                          [ 0.50, -0.01 ]] )
-        #edgeB = np.array([[0.1, 0. ],
-        #                  [0.8, 1.4 ]])
-        edgeB = np.array([[0.0, 0. ],
-                          [1.0, 0.  ]])
-
-        #edgeA = np.array([[ 0.53061224, 0.05],[0.59183673, -0.17346939]])
-        #edgeB = np.array([[0.8, 0. ], [1.4, 0. ]])
-
-        #normal_calc = compute_average_normal
-        #normal_calc = compute_normal_from_b
-        normal_calc = compute_normal_from_b
-
-        energy1 = integrate_mortar_barrier(edgeA, edgeB, normal_calc, self.penalty_length)
-        print("example energy = ", energy1)
 
 
     def test_plot_smoothness(self):
@@ -248,13 +231,6 @@ class TestEdgeIntersection(unittest.TestCase):
         p.plot(2, partial(force_at_time,e=0,n=1,d=1), 'go')
 
         axs[2].legend(['force_x r', '_nolegend_', 'force_y r', '_nolegend_', 'force_x l', '_nolegend_', 'force_y l', '_nolegend_'])
-        # axs[2].set_ylim([-2, 1.2])
-
         p.show()
-
-        #pyplot.clf()
-        #x = np.linspace(-1.5,1.5,300)
-        #pyplot.plot(x, spline_ramp(x))
-        #pyplot.show()
 
 unittest.main()
