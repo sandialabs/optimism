@@ -292,15 +292,13 @@ class TestEdgeIntersection(unittest.TestCase):
         pyplot.show()
 
 
-    def test_pacman_detection(self):
+    def test_pacman_detection_1(self):
         edgeA = np.array([0,1], dtype=int)
         xA = np.array([[1.0,0.0],[0.0,0.0]])
 
         edgeB = np.array([1,2], dtype=int)
         xB = np.array([[0.0,0.0],[-1.0,0.5]])
-        #
-           #
-              #  #  #  #
+
         self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
 
         xB = np.array([[0.0,0.0],[1.0,0.001]])
@@ -320,5 +318,33 @@ class TestEdgeIntersection(unittest.TestCase):
 
         edgeB = np.array([2,3], dtype=int)
         self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
+
+
+    def test_pacman_detection_2(self):
+        edgeA = np.array([0,1], dtype=int)
+        xA = np.array([[1.0,0.0],[0.0,0.0]])
+
+        edgeB = np.array([1,2], dtype=int)
+        xB = np.array([[0.0,0.0],[-1.0,0.5]])
+
+        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
+
+        xB = np.array([[0.0,0.0],[1.0,0.001]])
+        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
+
+        xB = np.array([[0.0,0.0],[1.0,-0.001]])
+        self.assertTrue(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
+
+        xB = np.array([[0.0,0.0],[-1.0,-0.5]])
+        self.assertTrue(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
+
+        xB = np.array([[0.0,0.0],[-0.5,0.00001]])
+        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
+
+        xB = np.array([[0.0,0.0],[-0.5,-0.00001]])
+        self.assertTrue(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
+
+        edgeB = np.array([2,3], dtype=int)
+        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
 
 unittest.main()
