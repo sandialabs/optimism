@@ -284,5 +284,54 @@ class ParameterizationTestSuite(MeshFixture.MeshFixture):
         exact = 1.5*self.xRange[1]*self.yRange[1]
         self.assertAlmostEqual(f, exact, 12)
 
+
+class TestFunctionSpaceWithQuadraticLagrangeElementFixture(MeshFixture.MeshFixture):
+    def setUp(self):
+        self.quadratureRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=2)
+
+        # mesh
+        self.Nx = 2
+        self.Ny = 2
+        self.xRange = [0.,1.]
+        self.yRange = [0.,1.]
+        self.targetDispHessian = np.array([[0.1, -0.2, 0.6],[-0.4, 0.5, -0.6]])
+
+        # u_i = 0.5 G_ijk x_j x_k
+        initial_disp_func = lambda x : 0.5*self.targetDispHessian.dot(np.array([x[0]*x[0], x[1]*x[1], 2.0*x[0]*x[1]]))
+        mesh, _ = self.create_mesh_and_disp(self.Nx, self.Ny, self.xRange, self.yRange,
+                                                 initial_disp_func)
+        self.mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(mesh, order=2, 
+                                                                    interpolationType=Interpolants.InterpolationType.LAGRANGE)
+        self.U = jax.vmap(initial_disp_func)(self.mesh.coords)
+        self.fs = FunctionSpace.construct_function_space(self.mesh, self.quadratureRule)
+
+    def test_quadratic_reproducing_gradient_and_hessian(self):
+        # du_i / dx_p = G_ipk x_k
+        def compute_expected_displacement_grads(X, elemConnectivity, elemShapeFunctions):
+            elemNodalX = X[elemConnectivity]
+            def compute_qp_displacement_grad(NodalX, shapeFuncs):
+                x = np.dot(shapeFuncs, NodalX)
+                return np.array([[self.targetDispHessian[0,0]*x[0] + self.targetDispHessian[0,2]*x[1], self.targetDispHessian[0,2]*x[0] + self.targetDispHessian[0,1]*x[1]],
+                                 [self.targetDispHessian[1,0]*x[0] + self.targetDispHessian[1,2]*x[1], self.targetDispHessian[1,2]*x[0] + self.targetDispHessian[1,1]*x[1]]])
+            return jax.vmap(compute_qp_displacement_grad, (None, 0))(elemNodalX, elemShapeFunctions)
+
+        from optimism import Mechanics
+        dispGradsAndHessians = FunctionSpace.compute_field_gradient(self.fs, self.U, modify_element_gradient=Mechanics.plane_strain_gradient_transformation)
+
+        # check displacement gradients
+        dispGrads = dispGradsAndHessians[:,:,0:2,0:2]
+        shapeOnRef = Interpolants.compute_shapes(self.mesh.parentElement, self.quadratureRule.xigauss)
+        exact = jax.vmap(compute_expected_displacement_grads, (None, 0, None))(self.mesh.coords, self.mesh.conns, shapeOnRef.values)
+        self.assertTrue(np.allclose(dispGrads, exact))
+
+        # check displacement hessians
+        dispHessians = dispGradsAndHessians[:,:,0:2,3:]
+        nElements = Mesh.num_elements(self.mesh)
+        npts = self.quadratureRule.xigauss.shape[0]
+        exact = np.tile(self.targetDispHessian, (nElements, npts, 1, 1))
+        self.assertTrue(np.allclose(dispHessians, exact))
+
+
+
 if __name__ == '__main__':
     unittest.main()

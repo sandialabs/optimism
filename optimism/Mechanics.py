@@ -52,7 +52,9 @@ class NewmarkParameters(eqx.Module):
 
 
 def plane_strain_gradient_transformation(elemDispGrads, elemShapes, elemVols, elemNodalDisps, elemNodalCoords):
-    return vmap(tensor_2D_to_3D)(elemDispGrads)
+    def map_2D_tensor_to_3D(H):
+        return np.zeros((3,H.shape[1]+1)).at[ 0:H.shape[0], 0:2 ].set(H[:,0:2]).at[ 0:H.shape[0], 3: ].set(H[:,2:])
+    return vmap(map_2D_tensor_to_3D)(elemDispGrads)
 
 
 def volume_average_J_gradient_transformation(elemDispGrads, elemVols, pShapes):
@@ -252,15 +254,40 @@ def create_multi_block_mechanics_functions(functionSpace, mode2D, materialModels
             elemIds = fs.mesh.blocks[blockKey]
             blockEnergyDensities, blockStresses = FunctionSpace.evaluate_on_block(fs, U, stateVariables, dt, output_constitutive, elemIds, modify_element_gradient=modify_element_gradient)
             energy_densities = energy_densities.at[elemIds].set(blockEnergyDensities)
-            stresses = stresses.at[elemIds].set(blockStresses)
+            stresses = stresses.at[elemIds].set(blockStresses[:,:,0:3,0:3])
         return energy_densities, stresses
-
 
     def compute_initial_state():
         return _compute_initial_state_multi_block(fs, materialModels)
 
-    
-    return MechanicsFunctions(compute_strain_energy, jit(compute_updated_internal_variables), jit(compute_element_stiffnesses), jit(compute_output_energy_densities_and_stresses), compute_initial_state, None, None)
+    def qoi_to_lagrangian_qoi(compute_material_qoi):
+        def L(U, gradU, Q, X, dt):
+            return compute_material_qoi(gradU, Q, dt)
+        return L
+
+    def integrated_material_qoi(U, stateVariables, dt=0.0):
+        material_qoi = np.zeros((Mesh.num_elements(fs.mesh), len(fs.quadratureRule)))
+        for blockKey in materialModels:
+            elemIds = fs.mesh.blocks[blockKey]
+            block_qoi = FunctionSpace.integrate_over_block(fs, U, stateVariables, dt, 
+                                                  qoi_to_lagrangian_qoi(materialModels[blockKey].compute_material_qoi),
+                                                  elemIds,
+                                                  modify_element_gradient=modify_element_gradient)
+            material_qoi = material_qoi.at[elemIds].set(block_qoi)
+        return material_qoi
+
+    def compute_output_material_qoi(U, stateVariables, dt=0.0):
+        material_qoi = np.zeros((Mesh.num_elements(fs.mesh), len(fs.quadratureRule)))
+        for blockKey in materialModels:
+            elemIds = fs.mesh.blocks[blockKey]
+            block_qoi = FunctionSpace.evaluate_on_block(fs, U, stateVariables, dt, 
+                                                        qoi_to_lagrangian_qoi(materialModels[blockKey].compute_material_qoi), 
+                                                        elemIds, 
+                                                        modify_element_gradient=modify_element_gradient)
+            material_qoi = material_qoi.at[elemIds].set(block_qoi)
+        return material_qoi
+
+    return MechanicsFunctions(compute_strain_energy, jit(compute_updated_internal_variables), jit(compute_element_stiffnesses), jit(compute_output_energy_densities_and_stresses), compute_initial_state, integrated_material_qoi, jit(compute_output_material_qoi))
 
 
 ######

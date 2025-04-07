@@ -112,14 +112,38 @@ def construct_function_space_from_parent_element(mesh, shapeOnRef, quadratureRul
         isAxisymmetric = True
     vols = jax.vmap(el_vols, (None, 0, None, 0, None))(mesh.coords, mesh.conns, mesh.parentElement, shapes, quadratureRule.wgauss)
 
-    return FunctionSpace(shapes, vols, shapeGrads, mesh, quadratureRule, isAxisymmetric)
+    if mesh.parentElement.elementType == Interpolants.LAGRANGE_TRIANGLE_ELEMENT:
+        shapeOnRefHessians = Interpolants.shape2d_lagrange_second_derivatives(mesh.parentElement.degree, mesh.parentElement.coordinates, quadratureRule.xigauss)
+        shapeHessians = jax.vmap(map_element_shape_hessians, (None, 0, None, None, None))(mesh.coords, mesh.conns, mesh.parentElement, shapeOnRef.gradients, shapeOnRefHessians)
+        return FunctionSpace(shapes, vols, np.concatenate((shapeGrads, shapeHessians), axis=-1), mesh, quadratureRule, isAxisymmetric)
+    else:
+        return FunctionSpace(shapes, vols, shapeGrads, mesh, quadratureRule, isAxisymmetric)
 
 
 def map_element_shape_grads(coordField, nodeOrdinals, parentElement, shapeGradients):
     Xn = coordField.take(nodeOrdinals,0)
     v = Xn[parentElement.vertexNodes]
-    J = np.column_stack((v[0] - v[2], v[1] - v[2]))
+    J = np.column_stack((v[0] - v[2], v[1] - v[2])) # assumes simplex element
     return jax.vmap(lambda dN: solve(J.T, dN.T).T)(shapeGradients)
+
+
+def map_element_shape_hessians(coordField, nodeOrdinals, parentElement, shapeGradients, shapeHessians):
+    Xn = coordField.take(nodeOrdinals,0)
+
+    dNdX = map_element_shape_grads(coordField, nodeOrdinals, parentElement, shapeGradients)
+
+    def quad_point_shape_hessian(shapeGrads, dNdX, shapeHessians):
+        dXdXi = np.tensordot(Xn, shapeGrads, axes=[0,0])
+        J = np.array([[dXdXi[0,0]**2, dXdXi[1,0]**2, 2.0*dXdXi[1,0]*dXdXi[0,0]],
+                      [dXdXi[0,1]**2, dXdXi[1,1]**2, 2.0*dXdXi[1,1]*dXdXi[0,1]],
+                      [dXdXi[0,0]*dXdXi[0,1], dXdXi[1,0]*dXdXi[1,1], dXdXi[1,0]*dXdXi[0,1] + dXdXi[0,0]*dXdXi[1,1]]])
+        
+        d2X_dXi2 = np.tensordot(Xn, shapeHessians, axes=[0,0])
+        b = np.array([shapeHessians[:,0].T - dNdX[:,0].T * d2X_dXi2[0,0] - dNdX[:,1].T * d2X_dXi2[1,0],
+                      shapeHessians[:,1].T - dNdX[:,0].T * d2X_dXi2[0,1] - dNdX[:,1].T * d2X_dXi2[1,1],
+                      shapeHessians[:,2].T - dNdX[:,0].T * d2X_dXi2[0,2] - dNdX[:,1].T * d2X_dXi2[1,2]])
+        return solve(J, b).T
+    return jax.vmap(quad_point_shape_hessian, (0, 0, 0))(shapeGradients, dNdX, shapeHessians) # vmap over nqpe
 
 
 def compute_element_volumes(coordField, nodeOrdinals, parentElement, shapes, weights):

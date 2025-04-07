@@ -6,8 +6,7 @@ import numpy as onp
 
 exodusToNativeTri6NodeOrder = np.array([0, 3, 1, 5, 4, 2])
 
-
-def read_exodus_mesh(fileName):
+def read_exodus_mesh(fileName, interpolationType = Interpolants.InterpolationType.LOBATTO):
     with netCDF4.Dataset(fileName) as exData:
         coords = _read_coordinates(exData)
         conns, blocks = _read_blocks(exData)
@@ -17,14 +16,20 @@ def read_exodus_mesh(fileName):
 
         elementType = _read_element_type(exData).lower()
         if elementType == "tri3" or elementType == "tri":
-            basis, basis1d = Interpolants.make_parent_elements(degree = 1)
+            degree = 1
             simplexNodesOrdinals = np.arange(coords.shape[0])
         elif elementType == "tri6":
-            basis, basis1d = Interpolants.make_parent_elements(degree = 2)
+            degree = 2
             simplexNodesOrdinals = _get_vertex_nodes_from_exodus_tri6_mesh(conns)
             conns = conns[:, exodusToNativeTri6NodeOrder]
         else:
             raise
+
+        if interpolationType == Interpolants.InterpolationType.LAGRANGE:
+            basis1d = Interpolants.make_lagrange_parent_element_1d(degree)
+            basis = Interpolants.make_lagrange_parent_element_2d(degree)
+        else:
+            basis, basis1d = Interpolants.make_parent_elements(degree)
 
         return Mesh.Mesh(coords, conns, simplexNodesOrdinals, basis, basis1d,
                          blocks, nodeSets, sideSets, blockMaps)

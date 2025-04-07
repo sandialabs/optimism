@@ -31,7 +31,7 @@ def create_material_model_functions(properties):
     def strain_energy(dispGrad, internalVars, dt):
         del internalVars
         del dt
-        strain = _strain(dispGrad)
+        strain = _strain(dispGrad[0:3,0:3])
         return _linear_elastic_energy_density(strain, props)
 
     density = properties.get('density')
