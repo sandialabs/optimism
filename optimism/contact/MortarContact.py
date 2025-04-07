@@ -157,6 +157,17 @@ def get_closest_neighbors(edgeSetA : jnp.array,
     return _neighbor_search(edgeSetA, edgeSetB, mesh, disp, maxNeighbors, min_dist_squared)
 
 
+def edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB):
+    case0 = edgeA[1] == edgeB[0]
+    case1 = edgeA[0] == edgeB[1]
+    x0 = jnp.where(case0, xA, xB)
+    x1 = jnp.where(case0, xB, xA)
+    edge0_dir = x0[1]-x0[0]
+    edge1_norm = compute_normal(x1)
+    is_pacman = edge0_dir @ edge1_norm < 0.0
+    return ~is_pacman & (case0 | case1)
+
+
 @partial(jax.jit, static_argnums=(4,5))
 def get_closest_neighbors_for_self_contact(edgeSetA : jnp.array,
                                            edgeSetB : jnp.array,
@@ -182,10 +193,8 @@ def get_closest_neighbors_for_self_contact(edgeSetA : jnp.array,
         xsA = coords[edgeA] + disp[edgeA]
         xsB = coords[edgeB] + disp[edgeB]
         minSquaredDistance = minimum_squared_distance(xsA, xsB)
-        excludeEdges = jnp.logical_or(
-            jnp.logical_or(edges_are_adjacent(edgeA, edgeB), 
-                            edge_A_is_penetrating_beyond_max_distance(xsA, xsB, minSquaredDistance)),
-                            jnp.logical_not(normals_are_facing(xsA, xsB)))
+        excludeEdges = jnp.logical_or(edges_are_adjacent_non_pacman(edgeA, edgeB, xsA, xsB),
+                                      edge_A_is_penetrating_beyond_max_distance(xsA, xsB, minSquaredDistance))
         return jax.lax.cond(excludeEdges, 
                             lambda e1, e2: jnp.inf, 
                             lambda e1, e2: minSquaredDistance, 

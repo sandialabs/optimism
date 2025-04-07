@@ -76,7 +76,6 @@ class TwoBodyContactFixture(MeshFixture):
         self.assertNear(np.sum(nodalAreaField[mask]), 0.0, 14)
 
 
-<<<<<<< HEAD
 class TwoBodySelfContactFixture(MeshFixture):
 
     def setUp(self):
@@ -172,27 +171,6 @@ class TwoBodySelfContactFixture(MeshFixture):
         self.assertFalse(np.any(np.isnan(penalty_grad)))
 
 
-=======
-    def test_contact_penalty(self):
-        self.plot_solution('mesh')
-
-        neighborList = MortarContact.get_closest_neighbors(self.segmentConnsA, self.segmentConnsB, self.mesh, self.disp, 5)
-
-        nodalGapField = MortarContact.assemble_area_weighted_gaps(self.mesh.coords, self.disp, self.segmentConnsA, self.segmentConnsB, neighborList, MortarContact.compute_average_normal)
-        nodalAreaField = MortarContact.assemble_nodal_areas(self.mesh.coords, self.disp, self.segmentConnsA, self.segmentConnsB, neighborList, MortarContact.compute_average_normal)
-
-        nodalGapField = vmap(lambda x, d : np.where( d > 0, x / d, 0.0))(nodalGapField, nodalAreaField)
-
-        mask = np.ones(len(nodalAreaField), dtype=np.int8)
-        nodesB = np.unique(np.concatenate(self.segmentConnsB))
-        mask = mask.at[nodesB].set(0)
-
-        self.assertNear(np.sum(nodalAreaField), 1.0, 8)
-        self.assertNear(np.sum(nodalAreaField), np.sum(nodalAreaField[nodesB]), 14)
-        self.assertNear(np.sum(nodalAreaField[mask]), 0.0, 14)
-
-
->>>>>>> tupek/smooth_integrated_contact_potential
 if __name__ == '__main__':
     unittest.main()
 

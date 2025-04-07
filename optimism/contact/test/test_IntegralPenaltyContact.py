@@ -5,6 +5,31 @@ import optimism.contact.SlidePlot as SlidePlot
 from jax import numpy as np
 from matplotlib import pyplot
 from functools import partial
+import optimism.contact.MortarContact as MortarContact
+
+from mpmath import mp
+mp.dps = 50  # Set precision to 50 decimal places
+
+def integral(xi0, xi1, g0, g1):
+    dxi = xi1-xi0
+    a = (g1-g0) / (xi1-xi0)
+    #return np.log(np.fabs(g1/g0)) / a + (0.5 * a * (xi1*xi1 - xi0*xi0) + g0*xi1 - g1*xi0 ) - 2*dxi
+    return (np.log(g1) - np.log(g0)) / a + (0.5 * a * (xi1*xi1 - xi0*xi0) + g0*xi1 - g1*xi0 ) - 2*dxi
+
+def precise_integral(xi0, xi1, g0, g1):
+    xi0 = mp.mpf(xi0)
+    xi1 = mp.mpf(xi1)
+    g0 = mp.mpf(g0)
+    g1 = mp.mpf(g1)
+    dxi = xi1-xi0
+    a = (g1-g0) / (xi1-xi0)
+    return mp.log(mp.fabs(g1/g0)) / a + (0.5 * a * (xi1*xi1 - xi0*xi0) + g0*xi1 - g1*xi0 ) - 2*dxi
+
+def taylor_integral(xi0, xi1, g0, g1):
+    dxi = (xi1-xi0)
+    gbar = 0.5 * (g0+g1)
+    dg = g1 - g0
+    return (1.0/gbar + gbar - 2) * dxi + 1./12. * dg * dg * dxi / (gbar*gbar*gbar)
 
 class TestEdgeIntersection(unittest.TestCase):
 
@@ -31,6 +56,8 @@ class TestEdgeIntersection(unittest.TestCase):
         self.assertAlmostEqual(integrate_gap(self.xi, np.array([-0.1, 0.1]), self.delta), np.inf,)
         self.assertAlmostEqual(integrate_gap(self.xi, np.array([0.1, -0.1]), self.delta), np.inf)
         self.assertAlmostEqual(integrate_gap(self.xi, np.array([-0.1, -0.1]), self.delta), np.inf)
+        self.assertAlmostEqual(integrate_gap(self.xi, np.array([-0.1, -0.2]), self.delta), np.inf)
+        self.assertAlmostEqual(integrate_gap(self.xi, np.array([-0.1, -0.1+1e-12]), self.delta), np.inf)
         self.assertAlmostEqual(integrate_gap(self.xi, np.array([-0.2, 0.6]), self.delta), np.inf,)
         self.assertAlmostEqual(integrate_gap(self.xi, np.array([0.7, -0.3]), self.delta), np.inf)
         self.assertAlmostEqual(integrate_gap(self.xi, np.array([0.7, 0.0]), self.delta), np.inf)
@@ -98,17 +125,23 @@ class TestEdgeIntersection(unittest.TestCase):
         self.penalty_length = 0.1
         self.edge_smoothing = 0.25
 
-        normal_calc = compute_normal_from_b
+        normal_calc = compute_normal_from_a
 
         x0a = np.array([ 0.0, 0.05])
-        #setup = 'flat', 'slant', 'perp', 'thinning'
-        setup = 'thinning'
+        #setup = 'flat', 'slant', 'perp', 'thinning', 'slant_up', 'accident', 'in_out'
+        setup = 'accident'
         if setup=='slant' or setup=='thinning':
-          x0b = np.array([-1.0, 0.03]) # -0.025, 0.03, 0.12, 0.05
+            x0b = np.array([-1.0, 0.03]) # -0.025, 0.03, 0.12, 0.05
         elif setup=='flat':
-          x0b = np.array([-1.0, 0.05])
+            x0b = np.array([-1.0, 0.05])
         elif setup=='perp':
-          x0b = np.array([-1.0, -0.2])
+            x0b = np.array([-1.0, -0.2])
+        elif setup=='slant_up':
+            x0b = np.array([ -1.0, 0.05-(1e-5)*self.penalty_length])
+        elif setup=='accident':
+            x0b = np.array([ -1.0, 0.05])
+        elif setup=='in_out':
+            x0b = np.array([ -1.0, 0.05])
 
         edge0 = np.array([x0a, x0b])
 
@@ -119,6 +152,12 @@ class TestEdgeIntersection(unittest.TestCase):
             velocities = np.array([[0.2, 0.0], [0.6, 0.01]])
         elif setup=='thinning':
             velocities = np.array([[0.2, 0.0], [0.3, 0.0]])
+        elif setup=='slant_up':
+            velocities = np.array([[0.2, 0.0], [0.2, (1e-4)*self.penalty_length]])
+        elif setup=='accident':
+            velocities = np.array([[0.2, 0.5], [0.3, -0.5]])
+        elif setup=='in_out':
+            velocities = np.array([[0.2, -0.01], [0.3, -0.01+1e-6]])
 
         x1a = np.array([0.1, 0.0])
         x1b = np.array([0.8, 0.0])
@@ -126,7 +165,7 @@ class TestEdgeIntersection(unittest.TestCase):
         edge2 = np.array([[0.8, 0.0], [1.4, 0.0]])
         edge3 = np.array([[1.4, 0.0], [2.4, 0.0]])
 
-        N = 500
+        N = 4000
         S = np.linspace(0.0, 13.0, N)
 
         fig, axs = pyplot.subplots(1, 3, gridspec_kw={'width_ratios' : [2.,1.,1.]})
@@ -219,6 +258,8 @@ class TestEdgeIntersection(unittest.TestCase):
         p.plot(1, energy_vs_time, 'k')
         p.plot(1, energy_at_time, 'go')
 
+        #xlim = [2.0, 2.6]
+        #axs[1].set_xlim(xlim)
         axs[1].legend(['energy'])
 
         p.plot(2, partial(force_vs_time,e=0,n=0,d=0), 'r--')
@@ -230,7 +271,54 @@ class TestEdgeIntersection(unittest.TestCase):
         p.plot(2, partial(force_vs_time,e=0,n=1,d=1), 'g')
         p.plot(2, partial(force_at_time,e=0,n=1,d=1), 'go')
 
+        #axs[2].set_xlim(xlim)
         axs[2].legend(['force_x r', '_nolegend_', 'force_y r', '_nolegend_', 'force_x l', '_nolegend_', 'force_y l', '_nolegend_'])
         p.show()
+
+
+    def untest_roundoff(self):
+        xi0 = 0.1
+        xi1 = 0.100001
+        g0 = 0.001   # g is g/delta
+        epss = np.linspace(1e-5*g0, 2.0e-4*g0, 1000)
+
+        sol1 = np.array([float(precise_integral(xi0,xi1,float(g0-eps),float(g0+eps))) for eps in epss])
+        sol2 = np.array([taylor_integral(xi0,xi1,float(g0-eps),float(g0+eps)) for eps in epss])
+        sol3 = np.array([integral(xi0,xi1,float(g0-eps),float(g0+eps)) for eps in epss])
+
+        pyplot.clf()
+        pyplot.plot(epss, sol3-sol1, 'k')
+        pyplot.plot(epss, sol2-sol1, 'r--')
+        pyplot.show()
+
+
+    def test_pacman_detection(self):
+        edgeA = np.array([0,1], dtype=int)
+        xA = np.array([[1.0,0.0],[0.0,0.0]])
+
+        edgeB = np.array([1,2], dtype=int)
+        xB = np.array([[0.0,0.0],[-1.0,0.5]])
+        #
+           #
+              #  #  #  #
+        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
+
+        xB = np.array([[0.0,0.0],[1.0,0.001]])
+        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
+
+        xB = np.array([[0.0,0.0],[1.0,-0.001]])
+        self.assertTrue(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
+
+        xB = np.array([[0.0,0.0],[-1.0,-0.5]])
+        self.assertTrue(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
+
+        xB = np.array([[0.0,0.0],[-0.5,0.00001]])
+        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
+
+        xB = np.array([[0.0,0.0],[-0.5,-0.00001]])
+        self.assertTrue(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
+
+        edgeB = np.array([2,3], dtype=int)
+        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
 
 unittest.main()
