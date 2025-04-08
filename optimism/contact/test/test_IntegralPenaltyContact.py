@@ -129,7 +129,7 @@ class TestEdgeIntersection(unittest.TestCase):
 
         x0a = np.array([ 0.0, 0.05])
         #setup = 'flat', 'slant', 'perp', 'thinning', 'slant_up', 'accident', 'in_out'
-        setup = 'accident'
+        setup = 'perp'
         if setup=='slant' or setup=='thinning':
             x0b = np.array([-1.0, 0.03]) # -0.025, 0.03, 0.12, 0.05
         elif setup=='flat':

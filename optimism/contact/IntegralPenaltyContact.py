@@ -140,16 +140,12 @@ def integrate_mortar_barrier(edgeA : jnp.array,
     scaling = jnp.where( this_should_be_positive > 0, this_should_be_positive, 0.0)
 
     edgeB = jnp.where(this_should_be_positive < 0, edgeA, edgeB) # dont compute for non-facing edges
-
     xiA, gA = compute_intersection(edgeA, edgeB, normal, relativeSmoothingSize)
 
     g = scaling * gA + allowed_overlap_dist
-
     lA = jnp.linalg.norm(edgeA[0] - edgeA[1])
-
     integral = integrate_gap(xiA, g, allowed_overlap_dist)
-
-    return lA * integral * scaling  #* scaling #smooth_heaviside_at_zero(scaling, 1.0)
+    return lA * integral * smooth_heaviside_at_zero(scaling, 1.0)
 
 
 def assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighborList, maxOverlapDist):

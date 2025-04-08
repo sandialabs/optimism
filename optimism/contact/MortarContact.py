@@ -158,15 +158,14 @@ def get_closest_neighbors(edgeSetA : jnp.array,
 
 
 def edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB):
-    return False
-    #case0 = edgeA[1] == edgeB[0]
-    #case1 = edgeA[0] == edgeB[1]
-    #x0 = jnp.where(case0, xA, xB)
-    #x1 = jnp.where(case0, xB, xA)
-    #edge0_dir = x0[1]-x0[0]
-    #edge1_norm = compute_normal(x1)
-    #is_pacman = edge0_dir @ edge1_norm < 0.0
-    #return ~is_pacman & (case0 | case1)
+    case0 = edgeA[1] == edgeB[0]
+    case1 = edgeA[0] == edgeB[1]
+    x0 = jnp.where(case0, xA, xB)
+    x1 = jnp.where(case0, xB, xA)
+    edge0_dir = x0[1]-x0[0]
+    edge1_norm = compute_normal(x1)
+    is_pacman = edge0_dir @ edge1_norm < 0.0
+    return ~is_pacman & (case0 | case1)
 
 
 @partial(jax.jit, static_argnums=(4,5))
