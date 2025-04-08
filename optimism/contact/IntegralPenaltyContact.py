@@ -109,44 +109,6 @@ def integrate_normalized_gap(xi, g):
 # integral_x0^x1 delta / g + g / delta - 2 {where g < delta} dxi
 def integrate_gap(xi, g, delta):
     return integrate_normalized_gap(xi, g / delta)
-    dxi = xi[1] - xi[0]
-    g0_large = g[0] > delta
-    g1_large = g[1] > delta
-
-    dxi_invalid = (dxi<=1e-14) | (g0_large & g1_large)
-    a = (g[1]-g[0]) / jnp.where(dxi_invalid, 1.0, dxi)
-
-    g0_old = g[0]
-
-    g = jnp.where(g0_large, g.at[0].set(delta), g)
-    g = jnp.where(g1_large, g.at[1].set(delta), g)
-
-    a_is_zero = jnp.abs(g[0]-g[1]) < 1e-4 * dxi
-    a = jnp.where(a_is_zero | dxi_invalid, 1.0, a)
-
-    xi = jnp.where(g0_large,
-                   xi.at[0].set((delta-g0_old) / a + xi[0]),
-                   xi)
-
-    xi = jnp.where(g1_large,
-                   xi.at[1].set((delta-g0_old) / a + xi[0]),
-                   xi)
-
-    dxi = xi[1] - xi[0]
-
-    xi0 = xi[0]
-    xi1 = xi[1]
-
-    intgl = (delta/a) * jnp.log(jnp.abs(g[1]/g[0])) + (0.5 * a * (xi1*xi1 - xi0*xi0) + g[0]*xi1 - g[1]*xi0 ) / delta - 2*dxi
-    gbar = 0.5*(g[0]+g[1])
-    intgl = jnp.where(a_is_zero, (delta/gbar+gbar/delta-2) * dxi, intgl)
-
-    any_neg = jnp.any(g <= 0)
-    intgl = jnp.where(any_neg, jnp.inf, intgl)
-    intgl = jnp.where(dxi_invalid, 0.0 * intgl, intgl)
-
-    return intgl
-
 
 def integrate_gap_numeric(xi, g, delta):
     N = 10000
@@ -187,7 +149,7 @@ def integrate_mortar_barrier(edgeA : jnp.array,
 
     integral = integrate_gap(xiA, g, allowed_overlap_dist)
 
-    return lA * integral * scaling * scaling #smooth_heaviside_at_zero(scaling, 1.0)
+    return lA * integral * scaling  #* scaling #smooth_heaviside_at_zero(scaling, 1.0)
 
 
 def assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighborList, maxOverlapDist):
