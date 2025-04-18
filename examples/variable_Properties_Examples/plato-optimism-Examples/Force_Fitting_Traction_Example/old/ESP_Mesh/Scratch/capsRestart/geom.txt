@@ -1,0 +1,10 @@
+8 1
+ligament_thickness_scaled
+apex_height_scaled
+span
+base_thickness
+pillar_height
+pillar_width
+num_cells_x
+num_cells_y
+MeshLength

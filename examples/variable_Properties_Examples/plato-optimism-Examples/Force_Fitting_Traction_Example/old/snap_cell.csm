@@ -1,0 +1,99 @@
+# v2.csm written by ocsmSave (v1.16)
+
+# Constant, Design, and Output Parameters:
+# In this order:
+# t
+# h
+# L
+# T
+# H
+# w
+despmtr ligament_thickness_scaled 0.28 lbound 0.0 ubound 1.0 initial 0.28
+despmtr apex_height_scaled 0.7 lbound 0.0 ubound 1.0 initial 0.7
+
+set ligament_thickness 3.0+(6.0/1.0)*(ligament_thickness_scaled-0.0) # scale to [3.0,9.0]
+set apex_height 10.0+(20.0/1.0)*(apex_height_scaled-0.0)             # scale to [10.0,30.0]
+
+conpmtr span 27.3
+conpmtr base_thickness 35.0 
+conpmtr pillar_height 54.0  
+conpmtr pillar_width 27.3
+
+conpmtr num_cells_x 1
+conpmtr num_cells_y 1
+
+# Global Attributes:
+outpmtr MeshLength
+set MeshLength 0.5*pillar_width
+
+# compute geometric values
+set cell_height base_thickness+2.0*pillar_height+apex_height+base_thickness
+set cell_width 4.0*pillar_width+2.0*span
+
+set ligament_angle atand(apex_height/span)
+set ligament_height ligament_thickness/cosd(ligament_angle)
+
+set adjusted_apex_height apex_height+ligament_height
+set ligament_angle2 atand(adjusted_apex_height/span)
+set ligament_length sqrt(span*span+adjusted_apex_height*adjusted_apex_height)
+
+# sketch outer dimensions
+skbeg     0   0   0
+   linseg     0   base_thickness+pillar_height   0
+      attribute label $left
+   linseg     pillar_width   base_thickness+pillar_height   0
+   linseg     pillar_width+span   base_thickness+pillar_height+apex_height+ligament_height   0
+      attribute capsMesh $ligament
+   linseg     pillar_width+span   base_thickness+pillar_height+apex_height+pillar_height   0
+   linseg     0   base_thickness+pillar_height+apex_height+pillar_height   0
+   linseg     0   base_thickness+pillar_height+apex_height+pillar_height+base_thickness   0
+      attribute label $left
+   linseg     4*pillar_width+2*span   base_thickness+pillar_height+apex_height+pillar_height+base_thickness   0
+      attribute label $top
+   linseg     4*pillar_width+2*span   base_thickness+pillar_height+apex_height+pillar_height   0
+      attribute label $right
+   linseg     3*pillar_width+span   base_thickness+pillar_height+apex_height+pillar_height   0
+   linseg     3*pillar_width+span   base_thickness+pillar_height+apex_height+ligament_height   0
+   linseg     3*pillar_width+2*span   base_thickness+pillar_height   0
+      attribute capsMesh $ligament
+   linseg     4*pillar_width+2*span   base_thickness+pillar_height   0
+   linseg     4*pillar_width+2*span   0   0
+      attribute label $right
+   linseg     0   0   0
+      attribute label $bottom
+skend     0
+
+# sketch inner dimensions
+skbeg     pillar_width   base_thickness   0
+   linseg     pillar_width   base_thickness+pillar_height-ligament_height   0
+   linseg     pillar_width+span   base_thickness+pillar_height+apex_height   0
+      attribute capsMesh $ligament
+   linseg     3*pillar_width+span   base_thickness+pillar_height+apex_height   0
+   linseg     3*pillar_width+2*span   base_thickness+pillar_height-ligament_height   0
+      attribute capsMesh $ligament
+   linseg     3*pillar_width+2*span   base_thickness   0
+   linseg     pillar_width   base_thickness   0
+skend     0
+
+subtract
+
+# attributions 
+select body
+select edge
+attribute capsGroup $remaining_surface_sideset
+
+select    body   
+select    edge   $label $left
+attribute capsGroup   $left_sideset
+
+select    body   
+select    edge   $label $bottom
+attribute capsGroup   $bottom_sideset
+
+select    body   
+select    edge   $label $right
+attribute capsGroup   $right_sideset
+
+select    body   
+select    edge   $label $top
+attribute capsGroup   $top_sideset

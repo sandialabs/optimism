@@ -1,0 +1,160 @@
+# v2.csm written by ocsmSave (v1.16)
+
+# Constant, Design, and Output Parameters:
+# supell parameters
+despmtr void11_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+despmtr void12_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+despmtr void13_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+despmtr void14_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+despmtr void15_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+
+despmtr void21_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+despmtr void22_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+despmtr void23_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+despmtr void24_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+despmtr void25_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+
+despmtr void31_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+despmtr void32_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+despmtr void33_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+despmtr void34_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+despmtr void35_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+
+despmtr void41_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+despmtr void42_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+despmtr void43_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+despmtr void44_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+despmtr void45_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+
+despmtr void51_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+despmtr void52_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+despmtr void53_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+despmtr void54_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+despmtr void55_power_scaled 0.2 lbound 0.0 ubound 1.0 initial 0.2
+
+# scale design parameters to their meaningful range
+set void11_power 1.5+(2.5/1.0)*(void11_power_scaled-0.0)        # scale to [1.5,4.0]
+set void12_power 1.5+(2.5/1.0)*(void12_power_scaled-0.0)        # scale to [1.5,4.0]
+set void13_power 1.5+(2.5/1.0)*(void13_power_scaled-0.0)        # scale to [1.5,4.0]
+set void14_power 1.5+(2.5/1.0)*(void14_power_scaled-0.0)        # scale to [1.5,4.0]
+set void15_power 1.5+(2.5/1.0)*(void15_power_scaled-0.0)        # scale to [1.5,4.0]
+
+set void21_power 1.5+(2.5/1.0)*(void21_power_scaled-0.0)        # scale to [1.5,4.0]
+set void22_power 1.5+(2.5/1.0)*(void22_power_scaled-0.0)        # scale to [1.5,4.0]
+set void23_power 1.5+(2.5/1.0)*(void23_power_scaled-0.0)        # scale to [1.5,4.0]
+set void24_power 1.5+(2.5/1.0)*(void24_power_scaled-0.0)        # scale to [1.5,4.0]
+set void25_power 1.5+(2.5/1.0)*(void25_power_scaled-0.0)        # scale to [1.5,4.0]
+
+set void31_power 1.5+(2.5/1.0)*(void31_power_scaled-0.0)        # scale to [1.5,4.0]
+set void32_power 1.5+(2.5/1.0)*(void32_power_scaled-0.0)        # scale to [1.5,4.0]
+set void33_power 1.5+(2.5/1.0)*(void33_power_scaled-0.0)        # scale to [1.5,4.0]
+set void34_power 1.5+(2.5/1.0)*(void34_power_scaled-0.0)        # scale to [1.5,4.0]
+set void35_power 1.5+(2.5/1.0)*(void35_power_scaled-0.0)        # scale to [1.5,4.0]
+
+set void41_power 1.5+(2.5/1.0)*(void41_power_scaled-0.0)        # scale to [1.5,4.0]
+set void42_power 1.5+(2.5/1.0)*(void42_power_scaled-0.0)        # scale to [1.5,4.0]
+set void43_power 1.5+(2.5/1.0)*(void43_power_scaled-0.0)        # scale to [1.5,4.0]
+set void44_power 1.5+(2.5/1.0)*(void44_power_scaled-0.0)        # scale to [1.5,4.0]
+set void45_power 1.5+(2.5/1.0)*(void45_power_scaled-0.0)        # scale to [1.5,4.0]
+
+set void51_power 1.5+(2.5/1.0)*(void51_power_scaled-0.0)        # scale to [1.5,4.0]
+set void52_power 1.5+(2.5/1.0)*(void52_power_scaled-0.0)        # scale to [1.5,4.0]
+set void53_power 1.5+(2.5/1.0)*(void53_power_scaled-0.0)        # scale to [1.5,4.0]
+set void54_power 1.5+(2.5/1.0)*(void54_power_scaled-0.0)        # scale to [1.5,4.0]
+set void55_power 1.5+(2.5/1.0)*(void55_power_scaled-0.0)        # scale to [1.5,4.0]
+
+# set values for building entire array (n_holes must be odd)
+conpmtr n_holes 5
+
+#--- conpmtr cell_width 12.55 # Bertoldi's
+#--- conpmtr radius 5.07492 # matches the area I used for my power law scaling (I'm not sure why...)
+conpmtr cell_width 10.0 # Craig's cell size but Bertoldi porosity (59.44% porosity)
+conpmtr radius 4.35     # Craig's cell size but Bertoldi porosity (59.44% porosity)
+
+conpmtr top_border 1.0
+conpmtr side_border 1.0
+set full_height n_holes*cell_width
+set full_length n_holes*cell_width
+
+# compute area of circle to keep constant
+set target_area pi(radius*radius)
+
+# Global Attributes:
+outpmtr MeshLength
+set MeshLength 0.05*cell_width
+
+# draw border
+box -side_border   -top_border   0   full_length+2*side_border   full_height+2*top_border   0
+
+# mark top and bottom edges
+select body 1
+select edge 2
+attribute label $bottom
+
+select body 1
+select edge 4
+attribute label $top
+
+# Fill in void-based power
+dimension void_powers n_holes n_holes
+
+set void_powers[1,1] void11_power
+set void_powers[1,2] void12_power
+set void_powers[1,3] void13_power
+set void_powers[1,4] void14_power
+set void_powers[1,5] void15_power
+
+set void_powers[2,1] void21_power
+set void_powers[2,2] void22_power
+set void_powers[2,3] void23_power
+set void_powers[2,4] void24_power
+set void_powers[2,5] void25_power
+
+set void_powers[3,1] void31_power
+set void_powers[3,2] void32_power
+set void_powers[3,3] void33_power
+set void_powers[3,4] void34_power
+set void_powers[3,5] void35_power
+
+set void_powers[4,1] void41_power
+set void_powers[4,2] void42_power
+set void_powers[4,3] void43_power
+set void_powers[4,4] void44_power
+set void_powers[4,5] void45_power
+
+set void_powers[5,1] void51_power
+set void_powers[5,2] void52_power
+set void_powers[5,3] void53_power
+set void_powers[5,4] void54_power
+set void_powers[5,5] void55_power
+
+# subtract holes
+set cyl_len 1
+
+patbeg   i   n_holes
+        patbeg   j   n_holes
+                udprim supell rx radius ry radius n void_powers[i,j]
+                set curr_area @area
+                scale (target_area/curr_area)^0.5
+                translate (2*i-1)*cell_width/2   (2*j-1)*cell_width/2   0
+                # extrude 0 0 cyl_len
+                subtract
+        patend
+patend
+
+#--- message area_=+val2str(@area,4)
+
+# attributions 
+select body
+select edge
+attribute capsGroup $remaining_surface_sideset
+
+select    body   
+select    edge   $label $bottom
+attribute capsGroup   $yminus_sideset
+
+select    body   
+select    edge   $label $top
+attribute capsGroup   $yplus_sideset
+
+end

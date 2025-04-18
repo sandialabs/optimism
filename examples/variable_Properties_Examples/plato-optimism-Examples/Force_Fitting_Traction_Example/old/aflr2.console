@@ -1,0 +1,269 @@
+--> enter ocsmLoad(filename=/home/lkgallu/plato-optimism-test/Force_Fitting_Snap_Cell/snap_cell_opt.csm)
+    nextline ( 0:   1)[   1]: attribute capsAIM $aflr2AIM;platoAIM
+    nextline ( 0:   2)[   1]: attribute capsMeshLength 1.0
+    nextline ( 0:   3)[   1]: # v2.csm written by ocsmSave (v1.16)
+    nextline ( 0:   4)[   1]: 
+    nextline ( 0:   5)[   1]: # Constant, Design, and Output Parameters:
+    nextline ( 0:   6)[   1]: # In this order:
+    nextline ( 0:   7)[   1]: # t
+    nextline ( 0:   8)[   1]: # h
+    nextline ( 0:   9)[   1]: # L
+    nextline ( 0:  10)[   1]: # T
+    nextline ( 0:  11)[   1]: # H
+    nextline ( 0:  12)[   1]: # w
+    nextline ( 0:  13)[   1]: despmtr ligament_thickness_scaled 0.28 lbound 0.0 ubound 1.0 initial 0.28
+    nextline ( 0:  14)[   1]: despmtr apex_height_scaled 0.7 lbound 0.0 ubound 1.0 initial 0.7
+    nextline ( 0:  15)[   1]: 
+    nextline ( 0:  16)[   1]: set ligament_thickness 3.0+(6.0/1.0)*(ligament_thickness_scaled-0.0) 
+    nextline ( 0:  17)[   2]: set apex_height 10.0+(20.0/1.0)*(apex_height_scaled-0.0)             
+    nextline ( 0:  18)[   3]: 
+    nextline ( 0:  19)[   3]: conpmtr span 27.3
+    nextline ( 0:  20)[   3]: conpmtr base_thickness 35.0
+    nextline ( 0:  21)[   3]: conpmtr pillar_height 54.0
+    nextline ( 0:  22)[   3]: conpmtr pillar_width 27.3
+    nextline ( 0:  23)[   3]: 
+    nextline ( 0:  24)[   3]: conpmtr num_cells_x 1
+    nextline ( 0:  25)[   3]: conpmtr num_cells_y 1
+    nextline ( 0:  26)[   3]: 
+    nextline ( 0:  27)[   3]: # Global Attributes:
+    nextline ( 0:  28)[   3]: outpmtr MeshLength
+    nextline ( 0:  29)[   3]: set MeshLength 0.5*pillar_width
+    nextline ( 0:  30)[   4]: 
+    nextline ( 0:  31)[   4]: # compute geometric values
+    nextline ( 0:  32)[   4]: set cell_height base_thickness+2.0*pillar_height+apex_height+base_thickness
+    nextline ( 0:  33)[   5]: set cell_width 4.0*pillar_width+2.0*span
+    nextline ( 0:  34)[   6]: 
+    nextline ( 0:  35)[   6]: set ligament_angle atand(apex_height/span)
+    nextline ( 0:  36)[   7]: set ligament_height ligament_thickness/cosd(ligament_angle)
+    nextline ( 0:  37)[   8]: 
+    nextline ( 0:  38)[   8]: set adjusted_apex_height apex_height+ligament_height
+    nextline ( 0:  39)[   9]: set ligament_angle2 atand(adjusted_apex_height/span)
+    nextline ( 0:  40)[  10]: set ligament_length sqrt(span*span+adjusted_apex_height*adjusted_apex_height)
+    nextline ( 0:  41)[  11]: 
+    nextline ( 0:  42)[  11]: # sketch outer dimensions
+    nextline ( 0:  43)[  11]: skbeg     0   0   0
+    nextline ( 0:  44)[  12]: linseg     0   base_thickness+pillar_height   0
+    nextline ( 0:  45)[  13]: attribute label $left
+    nextline ( 0:  46)[  13]: linseg     pillar_width   base_thickness+pillar_height   0
+    nextline ( 0:  47)[  14]: linseg     pillar_width+span   base_thickness+pillar_height+apex_height+ligament_height   0
+    nextline ( 0:  48)[  15]: attribute capsMesh $ligament
+    nextline ( 0:  49)[  15]: linseg     pillar_width+span   base_thickness+pillar_height+apex_height+pillar_height   0
+    nextline ( 0:  50)[  16]: linseg     0   base_thickness+pillar_height+apex_height+pillar_height   0
+    nextline ( 0:  51)[  17]: linseg     0   base_thickness+pillar_height+apex_height+pillar_height+base_thickness   0
+    nextline ( 0:  52)[  18]: attribute label $left
+    nextline ( 0:  53)[  18]: linseg     4*pillar_width+2*span   base_thickness+pillar_height+apex_height+pillar_height+base_thickness   0
+    nextline ( 0:  54)[  19]: attribute label $top
+    nextline ( 0:  55)[  19]: linseg     4*pillar_width+2*span   base_thickness+pillar_height+apex_height+pillar_height   0
+    nextline ( 0:  56)[  20]: attribute label $right
+    nextline ( 0:  57)[  20]: linseg     3*pillar_width+span   base_thickness+pillar_height+apex_height+pillar_height   0
+    nextline ( 0:  58)[  21]: linseg     3*pillar_width+span   base_thickness+pillar_height+apex_height+ligament_height   0
+    nextline ( 0:  59)[  22]: linseg     3*pillar_width+2*span   base_thickness+pillar_height   0
+    nextline ( 0:  60)[  23]: attribute capsMesh $ligament
+    nextline ( 0:  61)[  23]: linseg     4*pillar_width+2*span   base_thickness+pillar_height   0
+    nextline ( 0:  62)[  24]: linseg     4*pillar_width+2*span   0   0
+    nextline ( 0:  63)[  25]: attribute label $right
+    nextline ( 0:  64)[  25]: linseg     0   0   0
+    nextline ( 0:  65)[  26]: attribute label $bottom
+    nextline ( 0:  66)[  26]: skend     0
+    nextline ( 0:  67)[  27]: 
+    nextline ( 0:  68)[  27]: # sketch inner dimensions
+    nextline ( 0:  69)[  27]: skbeg     pillar_width   base_thickness   0
+    nextline ( 0:  70)[  28]: linseg     pillar_width   base_thickness+pillar_height-ligament_height   0
+    nextline ( 0:  71)[  29]: linseg     pillar_width+span   base_thickness+pillar_height+apex_height   0
+    nextline ( 0:  72)[  30]: attribute capsMesh $ligament
+    nextline ( 0:  73)[  30]: linseg     3*pillar_width+span   base_thickness+pillar_height+apex_height   0
+    nextline ( 0:  74)[  31]: linseg     3*pillar_width+2*span   base_thickness+pillar_height-ligament_height   0
+    nextline ( 0:  75)[  32]: attribute capsMesh $ligament
+    nextline ( 0:  76)[  32]: linseg     3*pillar_width+2*span   base_thickness   0
+    nextline ( 0:  77)[  33]: linseg     pillar_width   base_thickness   0
+    nextline ( 0:  78)[  34]: skend     0
+    nextline ( 0:  79)[  35]: 
+    nextline ( 0:  80)[  35]: subtract
+    nextline ( 0:  81)[  36]: 
+    nextline ( 0:  82)[  36]: # attributions
+    nextline ( 0:  83)[  36]: select body
+    nextline ( 0:  84)[  37]: select edge
+    nextline ( 0:  85)[  38]: attribute capsGroup $remaining_surface_sideset
+    nextline ( 0:  86)[  38]: 
+    nextline ( 0:  87)[  38]: select    body
+    nextline ( 0:  88)[  39]: select    edge   $label $left
+    nextline ( 0:  89)[  40]: attribute capsGroup   $left_sideset
+    nextline ( 0:  90)[  40]: 
+    nextline ( 0:  91)[  40]: select    body
+    nextline ( 0:  92)[  41]: select    edge   $label $bottom
+    nextline ( 0:  93)[  42]: attribute capsGroup   $bottom_sideset
+    nextline ( 0:  94)[  42]: 
+    nextline ( 0:  95)[  42]: select    body
+    nextline ( 0:  96)[  43]: select    edge   $label $right
+    nextline ( 0:  97)[  44]: attribute capsGroup   $right_sideset
+    nextline ( 0:  98)[  44]: 
+    nextline ( 0:  99)[  44]: select    body
+    nextline ( 0: 100)[  45]: select    edge   $label $top
+    nextline ( 0: 101)[  46]: attribute capsGroup   $top_sideset
+--> enter ocsmCheck()
+--> checks passed
+--> enter ocsmSave(filename=/home/lkgallu/plato-optimism-test/Force_Fitting_Snap_Cell/ESP_Mesh/Scratch/capsRestart.cpc)
+--> enter ocsmCheck()
+--> checks passed
+--> enter ocsmBuild(buildTo=0)
+
+    EGADS version  1.24 (with OpenCASCADE 7.7.0)
+
+    executing [   1] set:            ligament_thickness  3.0+(6.0/1.0)*(ligament_thickness_scaled-0.0)
+                          ligament_thickness =     4.68000     0.00000
+    executing [   2] set:            apex_height  10.0+(20.0/1.0)*(apex_height_scaled-0.0)
+                          apex_height =    24.00000     0.00000
+    executing [   3] set:            MeshLength  0.5*pillar_width
+                          MeshLength =    13.65000     0.00000
+    executing [   4] set:            cell_height  base_thickness+2.0*pillar_height+apex_height+base_thickness
+                          cell_height =   202.00000     0.00000
+    executing [   5] set:            cell_width  4.0*pillar_width+2.0*span
+                          cell_width =   163.80000     0.00000
+    executing [   6] set:            ligament_angle  atand(apex_height/span)
+                          ligament_angle =    41.31938     0.00000
+    executing [   7] set:            ligament_height  ligament_thickness/cosd(ligament_angle)
+                          ligament_height =     6.23135     0.00000
+    executing [   8] set:            adjusted_apex_height  apex_height+ligament_height
+                          adjusted_apex_height =    30.23135     0.00000
+    executing [   9] set:            ligament_angle2  atand(adjusted_apex_height/span)
+                          ligament_angle2 =    47.91683     0.00000
+    executing [  10] set:            ligament_length  sqrt(span*span+adjusted_apex_height*adjusted_apex_height)
+                          ligament_length =    40.73358     0.00000
+    executing [  11] skbeg:          0.00000      0.00000      0.00000      0.00000
+    executing [  12] linseg:         0.00000     89.00000      0.00000
+    executing [  13] linseg:        27.30000     89.00000      0.00000
+    executing [  14] linseg:        54.60000    119.23135      0.00000
+    executing [  15] linseg:        54.60000    167.00000      0.00000
+    executing [  16] linseg:         0.00000    167.00000      0.00000
+    executing [  17] linseg:         0.00000    202.00000      0.00000
+    executing [  18] linseg:       163.80000    202.00000      0.00000
+    executing [  19] linseg:       163.80000    167.00000      0.00000
+    executing [  20] linseg:       109.20000    167.00000      0.00000
+    executing [  21] linseg:       109.20000    119.23135      0.00000
+    executing [  22] linseg:       136.50000     89.00000      0.00000
+    executing [  23] linseg:       163.80000     89.00000      0.00000
+    executing [  24] linseg:       163.80000      0.00000      0.00000
+    executing [  25] linseg:         0.00000      0.00000      0.00000
+    executing [  26] skend:          0.00000
+WARNING:: Sketch is defined clockwise.  flipping direction
+                          Sketch   16 created with 14 Edges
+    executing [  27] skbeg:         27.30000     35.00000      0.00000      0.00000
+    executing [  28] linseg:        27.30000     82.76865      0.00000
+    executing [  29] linseg:        54.60000    113.00000      0.00000
+    executing [  30] linseg:       109.20000    113.00000      0.00000
+    executing [  31] linseg:       136.50000     82.76865      0.00000
+    executing [  32] linseg:       136.50000     35.00000      0.00000
+    executing [  33] linseg:        27.30000     35.00000      0.00000
+    executing [  34] skend:          0.00000
+WARNING:: Sketch is defined clockwise.  flipping direction
+                          Sketch   24 created with 6 Edges
+    executing [  35] subtract:   none      1.00000   0.0000e+00
+                          Body     25 created  (toler= 1.0000e-07, nnode=  20, nedge=  20, nface=   1)
+    executing [  36] select:   body
+    executing [  37] select:   edge
+                     putting Branch Attributes on Edge 1
+                     putting Branch Attributes on Edge 2
+                     putting Branch Attributes on Edge 3
+                     putting Branch Attributes on Edge 4
+                     putting Branch Attributes on Edge 5
+                     putting Branch Attributes on Edge 6
+                     putting Branch Attributes on Edge 7
+                     putting Branch Attributes on Edge 8
+                     putting Branch Attributes on Edge 9
+                     putting Branch Attributes on Edge 10
+                     putting Branch Attributes on Edge 11
+                     putting Branch Attributes on Edge 12
+                     putting Branch Attributes on Edge 13
+                     putting Branch Attributes on Edge 14
+                     putting Branch Attributes on Edge 15
+                     putting Branch Attributes on Edge 16
+                     putting Branch Attributes on Edge 17
+                     putting Branch Attributes on Edge 18
+                     putting Branch Attributes on Edge 19
+                     putting Branch Attributes on Edge 20
+    executing [  38] select:   body
+    executing [  39] select:   edge  label  left  *  *  *  * 
+                     putting Branch Attributes on Edge 9
+                     putting Branch Attributes on Edge 14
+    executing [  40] select:   body
+    executing [  41] select:   edge  label  bottom  *  *  *  * 
+                     putting Branch Attributes on Edge 1
+    executing [  42] select:   body
+    executing [  43] select:   edge  label  right  *  *  *  * 
+                     putting Branch Attributes on Edge 2
+                     putting Branch Attributes on Edge 7
+    executing [  44] select:   body
+    executing [  45] select:   edge  label  top  *  *  *  * 
+                     putting Branch Attributes on Edge 8
+    finalizing:
+Mapping capsMesh attributes ................
+	Number of unique capsMesh attributes = 1
+	Name = ligament, index = 1
+Mapping capsGroup attributes ................
+	Number of unique capsGroup attributes = 5
+	Name = bottom_sideset, index = 1
+	Name = right_sideset, index = 2
+	Name = remaining_surface_sideset, index = 3
+	Name = top_sideset, index = 4
+	Name = left_sideset, index = 5
+
+Getting mesh sizing parameters
+	Mesh sizing name - ligament
+	Done getting mesh sizing parameters
+Getting 2D mesh for body 1 (of 1)
+ 
+AFLR2    : ---------------------------------------
+AFLR2    : AFLR2 LIBRARY
+AFLR2    : ADVANCING-FRONT/LOCAL-RECONNECTION
+AFLR2    : TRIA/QUAD GRID GENERATOR
+AFLR2    : Version Number 9.14.7
+AFLR2    : Version Date   07/16/23 @ 01:42PM
+AFLR2    : Compile OS     Linux 3.10.0-1160.88.1.el7.x86_64 x86_64
+AFLR2    : Compile Date   07/25/23 @ 11:58AM
+AFLR2    : Copyright 1994-2021, D.L. Marcum
+AFLR2    : ---------------------------------------
+ 
+AFLR2 IC : INPUT DATA CHECK
+ 
+AFLR2 IC : Nodes, Faces      =       212         0
+ 
+AFLR2    : CPU Time          =     0.000   seconds
+ 
+AFLR2 EG : EDGE GRID RE-GENERATION
+ 
+AFLR2 EG : Nodes, Edges      =       212       212
+ 
+AFLR2    : CPU Time          =     0.000   seconds
+ 
+AFLR2 IG : INITIAL GRID GENERATION
+ 
+AFLR2 IG : Nodes, Faces      =         0         2
+AFLR2 IG : Nodes, Faces      =        44        90
+AFLR2 IG : Nodes, Faces      =        88       178
+AFLR2 IG : Nodes, Faces      =       132       266
+AFLR2 IG : Nodes, Faces      =       176       354
+AFLR2 IG : Nodes, Faces      =       193       388
+AFLR2 IG : Nodes, Faces      =       204       410
+AFLR2 IG : Nodes, Faces      =       212       426
+AFLR2 IG : Nodes, Faces      =       216       426
+AFLR2 IG : Nodes, Faces      =       212       212
+ 
+AFLR2    : CPU Time          =     0.000   seconds
+ 
+AFLR2 GG : FIELD GRID GENERATION
+ 
+AFLR2 GG : Nodes, Faces      =       212       212
+AFLR2 GG : Nodes, Faces      =       390       568
+AFLR2 GG : Nodes, Faces      =       438       664
+AFLR2 GG : Nodes, Faces      =       454       696
+AFLR2 GG : Nodes, Faces      =       456       700
+ 
+AFLR2    : CPU Time          =     0.000   seconds
+ 
+AFLR2 QI : QUALITY IMPROVEMENT
+ 
+AFLR2 QI : Nodes, Faces      =       456       700
+ 
+AFLR2    : CPU Time          =     0.000   seconds
+ 
+AFLR2    : DONE

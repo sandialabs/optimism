@@ -1,0 +1,80 @@
+# /home/lkgallu/plato-optimism-test/Force_Fitting_Snap_Cell/ESP_Mesh/Scratch/capsRestart.cpc written by ocsmSave (v1.24)
+
+# Constant, Design, and Output Parameters:
+DESPMTR   ligament_thickness_scaled       0.28000
+DESPMTR   apex_height_scaled       0.70000
+CONPMTR   span      27.30000
+CONPMTR   base_thickness      35.00000
+CONPMTR   pillar_height      54.00000
+CONPMTR   pillar_width      27.30000
+CONPMTR   num_cells_x       1.00000
+CONPMTR   num_cells_y       1.00000
+OUTPMTR   MeshLength
+
+# Global Attributes:
+ATTRIBUTE capsAIM   $aflr2AIM;platoAIM
+ATTRIBUTE capsMeshLength   1.0
+
+# Branches:
+SET       ligament_thickness 3.0+(6.0/1.0)*(ligament_thickness_scaled-0.0)
+SET       apex_height 10.0+(20.0/1.0)*(apex_height_scaled-0.0)
+SET       MeshLength 0.5*pillar_width
+SET       cell_height base_thickness+2.0*pillar_height+apex_height+base_thickness
+SET       cell_width 4.0*pillar_width+2.0*span
+SET       ligament_angle atand(apex_height/span)
+SET       ligament_height ligament_thickness/cosd(ligament_angle)
+SET       adjusted_apex_height apex_height+ligament_height
+SET       ligament_angle2 atand(adjusted_apex_height/span)
+SET       ligament_length sqrt(span*span+adjusted_apex_height*adjusted_apex_height)
+SKBEG     0   0   0   0
+   LINSEG    0   base_thickness+pillar_height   0
+ATTRIBUTE label   $left
+   LINSEG    pillar_width   base_thickness+pillar_height   0
+   LINSEG    pillar_width+span   base_thickness+pillar_height+apex_height+ligament_height   0
+ATTRIBUTE capsMesh   $ligament
+   LINSEG    pillar_width+span   base_thickness+pillar_height+apex_height+pillar_height   0
+   LINSEG    0   base_thickness+pillar_height+apex_height+pillar_height   0
+   LINSEG    0   base_thickness+pillar_height+apex_height+pillar_height+base_thickness   0
+ATTRIBUTE label   $left
+   LINSEG    4*pillar_width+2*span   base_thickness+pillar_height+apex_height+pillar_height+base_thickness   0
+ATTRIBUTE label   $top
+   LINSEG    4*pillar_width+2*span   base_thickness+pillar_height+apex_height+pillar_height   0
+ATTRIBUTE label   $right
+   LINSEG    3*pillar_width+span   base_thickness+pillar_height+apex_height+pillar_height   0
+   LINSEG    3*pillar_width+span   base_thickness+pillar_height+apex_height+ligament_height   0
+   LINSEG    3*pillar_width+2*span   base_thickness+pillar_height   0
+ATTRIBUTE capsMesh   $ligament
+   LINSEG    4*pillar_width+2*span   base_thickness+pillar_height   0
+   LINSEG    4*pillar_width+2*span   0   0
+ATTRIBUTE label   $right
+   LINSEG    0   0   0
+ATTRIBUTE label   $bottom
+SKEND     0
+SKBEG     pillar_width   base_thickness   0   0
+   LINSEG    pillar_width   base_thickness+pillar_height-ligament_height   0
+   LINSEG    pillar_width+span   base_thickness+pillar_height+apex_height   0
+ATTRIBUTE capsMesh   $ligament
+   LINSEG    3*pillar_width+span   base_thickness+pillar_height+apex_height   0
+   LINSEG    3*pillar_width+2*span   base_thickness+pillar_height-ligament_height   0
+ATTRIBUTE capsMesh   $ligament
+   LINSEG    3*pillar_width+2*span   base_thickness   0
+   LINSEG    pillar_width   base_thickness   0
+SKEND     0
+SUBTRACT  none   1   0
+SELECT    body
+SELECT    edge
+ATTRIBUTE capsGroup   $remaining_surface_sideset
+SELECT    body
+SELECT    edge   $label   $left   $*   $*   $*   $*
+ATTRIBUTE capsGroup   $left_sideset
+SELECT    body
+SELECT    edge   $label   $bottom   $*   $*   $*   $*
+ATTRIBUTE capsGroup   $bottom_sideset
+SELECT    body
+SELECT    edge   $label   $right   $*   $*   $*   $*
+ATTRIBUTE capsGroup   $right_sideset
+SELECT    body
+SELECT    edge   $label   $top   $*   $*   $*   $*
+ATTRIBUTE capsGroup   $top_sideset
+
+END

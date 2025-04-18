@@ -104,6 +104,20 @@ def _make_properties(props, const_props):
     p = 1 - np.exp(-constProps[CONST_PROPS_K]*light_dose)
 
     E = (constProps[CONST_PROPS_EC] * np.exp(constProps[CONST_PROPS_B] * (p - constProps[CONST_PROPS_PGEL]))) + constProps[CONST_PROPS_ED]
+
+    #############################################################################################
+    # This is a slightly more accurate grayscale to Elastic modulus, DOI: 10.1126/sciadv.aav5790
+    # It doesn't rely on degree of cure, but is based on experimental trends from the DOI above
+
+    gs_plot = [100, 89.99, 80.08, 69.97, 59.96, 49.95, 40.04, 29.82, 14.91, 0]
+    E_plot = [0, 2.00, 11.57, 24.52, 119.45, 198.72, 499.17, 837.16, 914.96, 1223.82]
+
+    #### Uncomment bellow to implement ####
+    #E = np.interp(dens*100, gs_plot,E_plot)
+    
+    # This is a slightly more accurate grayscale to Elastic modulus, DOI: 10.1126/sciadv.aav5790
+    #############################################################################################
+
     # we also want Poisson's ratio to be a "constant prop"
     # otherwise that's additional "dead" properties Ryan has to deal with
     nu = constProps[CONST_PROPS_NU]
