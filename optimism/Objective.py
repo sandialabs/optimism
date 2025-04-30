@@ -270,104 +270,75 @@ class ScaledObjective(Objective):
         return self.gradient(self.scaling * x)
 
 # Objective class for handling Multi-Point Constraints
-
-# class ObjectiveMPC:
-#     def __init__(self, f, x, p, dofManagerMPC, precondStrategy=None):
-#         """
-#         Objective function for Multi-Point Constraints (MPC), ensuring 
-#         condensation of independent DOFs (ui, up).
-#         """
-#         self.precond = None
-#         self.precondStrategy = precondStrategy
-#         self.dofManagerMPC = dofManagerMPC  # Store DOF Manager with MPC
-#         self.p = p
-
-#         # JIT compile function derivatives
-#         self.objective = jit(f)
-#         self.grad_x = jit(grad(f, 0))
-#         self.grad_p = jit(grad(f, 1))
-#         self.hess = jit(jacfwd(self.grad_x, 0))
-
-#         # Create transformation matrix & shift vector
-#         self.T = self.dofManagerMPC.T
-#         self.s_tilde = self.dofManagerMPC.s_tilde
-
-#     def value(self, x):
-#         """Compute objective function value."""
-#         x_full = self.expand_to_full_dofs(x)
-#         return self.objective(x_full, self.p)
-
-#     def gradient(self, x):
-#         """Compute reduced gradient."""
-#         x_full = self.expand_to_full_dofs(x)
-#         grad_full = self.grad_x(x_full, self.p)
-#         return np.matmul(self.T.T, grad_full)  # Reduce gradient
-
-#     def hessian(self, x):
-#         """Compute reduced Hessian H̃ = Tᵀ H_full T"""
-#         print("Computing Hessian with MPC...")
-        
-#         x_full = self.expand_to_full_dofs(x)
-#         H_full = self.hess(x_full, self.p)  # Compute full Hessian
-
-#         return np.matmul(self.T.T, np.matmul(H_full, self.T))  # Condensed Hessian
-
-#     def expand_to_full_dofs(self, x):
-#         """
-#         Expand reduced DOF vector `x` (ui, up) to full DOFs (including uc)
-#         using transformation: u = T ũ + s̃.
-#         """
-#         x_full = np.matmul(self.T, x) + self.s_tilde
-#         return x_full
-
-#     def update_precond(self, x):
-#         """Update preconditioner with reduced Hessian."""
-#         if self.precondStrategy is None:
-#             print("Updating with dense preconditioner in ObjectiveMPC.")
-#             H_reduced = csc_matrix(self.hessian(x))
-#             self.precond = H_reduced
-#         else:
-#             self.precondStrategy.initialize(x, self.p)
-#             self.precond = self.precondStrategy.precond_at_attempt
-
 class ObjectiveMPC(Objective):
-    def __init__(self, objective_func, dofManagerMPC, x0, p, precondStrategy=None):
+    def __init__(self, objective_func, x_full, p, dofManagerMPC, precondStrategy=None):
+        """
+        ObjectiveMPC: wraps the original energy functional to solve only for reduced DOFs.
+        - Applies u = T * ũ + s̃ for MPC condensation.
+        - Automatically condenses gradient and Hessian.
+        """
         self.dofManagerMPC = dofManagerMPC
-        self.T = np.array(dofManagerMPC.T)  # Transformation matrix
-        self.s_tilde = np.array(dofManagerMPC.s_tilde)  # Shift vector
-        self.scaling = 1.0  # Optional scaling factor
+        self.T = dofManagerMPC.T
+        self.s_tilde = dofManagerMPC.s_tilde
+        self.p = p
+        self.precondStrategy = precondStrategy
+
+        # Store full functional and derivatives
+        self.full_objective_func = jit(objective_func)
+        self.full_grad_x = jit(grad(objective_func, 0))
+        self.full_hess = jit(jacfwd(self.full_grad_x, 0))
+
+        self.scaling = 1.0
         self.invScaling = 1.0
 
-        def condensed_objective(xBar, p):
-            x = self.expand_to_full_dofs(xBar)
-            return objective_func(x, p)
-        
-        xBar0 = self.reduce_to_independent_dofs(x0)
-        super().__init__(condensed_objective, xBar0, p, precondStrategy)
-    
+        # Reduced initial guess from full vector
+        self.x_reduced0 = self.reduce_to_independent_dofs(x_full)
+
+        # Define reduced-space objective and gradient
+        self.objective = jit(lambda x_red, p: self.full_objective_func(self.expand_to_full_dofs(x_red), p))
+        self.grad_x = jit(lambda x_red, p: self.reduce_gradient(self.full_grad_x(self.expand_to_full_dofs(x_red), p)))
+
+        self.precond = SparseCholesky()
+
     def reduce_to_independent_dofs(self, x_full):
-        """Extracts independent DOFs (ui, up) from full DOF vector."""
-        return np.matmul(self.T.T, x_full - self.s_tilde)
+        """Extract reduced DOFs from full vector."""
+        return self.dofManagerMPC.get_unknown_values(x_full)
 
     def expand_to_full_dofs(self, x_reduced):
-        """Expands reduced DOF vector (ui, up) to full DOFs including uc."""
-        return np.matmul(self.T, x_reduced) + self.s_tilde
-    
-    def get_value(self, x):
-        return self.value(self.expand_to_full_dofs(x))
-    
-    def get_residual(self, x):
-        return self.gradient(self.expand_to_full_dofs(x))
-    
-    def hessian(self, x):
-        """Computes the condensed Hessian for the independent DOFs."""
-        x_full = self.expand_to_full_dofs(self.scaling * x)
-        H_full = self.hess(x_full, self.p)  # Full Hessian from original problem
-        H_reduced = np.matmul(self.T.T, np.matmul(H_full, self.T))  # Condensed Hessian
+        """Reconstruct full DOF vector using u = T ũ + s̃."""
+        return self.dofManagerMPC.create_field(x_reduced)
+
+    def reduce_gradient(self, grad_full):
+        """Project full gradient to reduced space."""
+        return self.dofManagerMPC.get_unknown_values(grad_full)
+
+    def value(self, x_reduced):
+        """Return energy functional in reduced space."""
+        return self.objective(x_reduced, self.p)
+
+    def gradient(self, x_reduced):
+        """Return reduced gradient."""
+        return self.grad_x(x_reduced, self.p)
+
+    def hessian(self, x_reduced):
+        """Compute reduced Hessian H̃ = Tᵀ H T."""
+        x_full = self.expand_to_full_dofs(self.scaling * x_reduced)
+        H_full = self.full_hess(x_full, self.p)
+        H_reduced = np.matmul(self.T.T, np.matmul(H_full, self.T))
         return H_reduced
-    
-    def update_precond(self, x):
-        """Updates preconditioner using the condensed Hessian."""
+
+    def update_precond(self, x_reduced):
+        """Update preconditioner from reduced Hessian."""
         print("Updating with condensed Hessian preconditioner.")
-        H_reduced = csc_matrix(self.hessian(x))  # Use reduced Hessian
-        self.precondStrategy.update(H_reduced)
+        H_reduced = csc_matrix(self.hessian(x_reduced))
+        self.precond.update(lambda attempt: H_reduced)
+
+    def apply_precond(self, vx):
+        return self.precond.apply(vx) if self.precond else vx
+
+    def multiply_by_approx_hessian(self, vx):
+        return self.precond.multiply_by_approximate(vx) if self.precond else vx
+
+    def check_stability(self, x_reduced):
+        if self.precond:
+            self.precond.check_stability(x_reduced, self.p)

@@ -58,39 +58,69 @@ class CompressionTest:
         def get_ubcs():
             V = np.zeros(self.mesh.coords.shape)
             return self.dofManager.get_bc_values(V)
-        
-        return self.dofManager.create_field(Uu, get_ubcs())
+        U = self.dofManager.create_field(Uu)
+        U.at[self.dofManager.isBc].set(get_ubcs())
+        return U
+        # return self.dofManager.create_field(Uu, get_ubcs())
     
+    def create_C_and_s(self):
+        """
+        Create constraint matrix C and shift vector s based on master-slave pairs (JAX-safe).
+        """
+        num_pairs = len(self.master_slave_pairs)
+        total_dofs = self.mesh.coords.shape[0] * self.dim
+
+        # Must initialize with jax.numpy (np here is jax.numpy in your imports)
+        C = np.zeros((num_pairs * self.dim, total_dofs))
+        s = np.zeros((num_pairs * self.dim,))
+
+        master_nodes = list(self.master_slave_pairs.keys())
+        slave_nodes = list(self.master_slave_pairs.values())
+
+        for i, (master, slave) in enumerate(zip(master_nodes, slave_nodes)):
+            for d in range(self.dim):
+                row_idx = i * self.dim + d
+                col_idx = master * self.dim + d
+                C = C.at[row_idx, col_idx].set(1.0)
+
+        # s remains zeros unless you want shifts
+        return C, s
+
     def reload_mesh(self):
         origMesh = ReadExodusMesh.read_exodus_mesh(self.input_mesh)
         self.mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(origMesh, order=2, createNodeSetsFromSideSets=True)
         coords = self.mesh.coords
+        self.dim = coords.shape[1]  # either 2 or 3 dimensions
         tol = 1e-8
 
-        # Creating nodesets for master and slave
+        # Create node sets
         self.mesh.nodeSets['master'] = np.flatnonzero(coords[:,0] < -0.5 + tol)
         self.mesh.nodeSets['slave'] = np.flatnonzero(coords[:,0] > 0.5 - tol)
 
-        # Get master and slave node coordinates
+        # Sort by y-coordinate
         master_coords = coords[self.mesh.nodeSets['master']]
         slave_coords = coords[self.mesh.nodeSets['slave']]
 
-        # Sort nodes by y-coordinate to ensure correct pairing
         master_sorted_idx = np.argsort(master_coords[:, 1])
         slave_sorted_idx = np.argsort(slave_coords[:, 1])
 
-        # Ensure one-to-one pairing by iterating through sorted nodes
         self.master_slave_pairs = {
-            int(self.mesh.nodeSets['master'][master_sorted_idx[i]]): 
-            int(self.mesh.nodeSets['slave'][slave_sorted_idx[i]])
+            int(self.mesh.nodeSets['slave'][slave_sorted_idx[i]]): 
+            int(self.mesh.nodeSets['master'][master_sorted_idx[i]])
             for i in range(min(len(master_sorted_idx), len(slave_sorted_idx)))
         }
 
         print("Master-Slave Pairs:", self.master_slave_pairs)
 
         funcSpace = FunctionSpace.construct_function_space(self.mesh, self.quadRule)
-        self.dofManager = DofManagerMPC(funcSpace, 2, self.EBCs, self.master_slave_pairs)
 
+        # USER CREATES C AND s HERE INSIDE TEST CASE
+        self.C, self.s = self.create_C_and_s()
+
+        # PASS IT INTO DofManagerMPC
+        self.dofManager = DofManagerMPC(funcSpace, self.dim, self.EBCs, self.master_slave_pairs, self.C, self.s)
+
+        # Top surface area
         surfaceXCoords = self.mesh.coords[self.mesh.nodeSets['top']][:,0]
         self.tractionArea = np.max(surfaceXCoords) - np.min(surfaceXCoords)
 
@@ -132,9 +162,12 @@ class CompressionTest:
 
         # Problem Set Up 
         Uu = self.dofManager.get_unknown_values(np.zeros(self.mesh.coords.shape))
+        print("Mesh coords: ", self.mesh.coords.shape)
+        print("Shape of Uu: ", Uu.shape)
+        # Uu = self.dofManager.get_unknown_values(np.zeros((self.mesh.coords.shape[0] * self.dim)))
         ivs = mechFuncs.compute_initial_state()
         p = Objective.Params(bc_data=0., state_data=ivs)
-        self.objective = Objective.ObjectiveMPC(energy_function, Uu, p, self.dofManager, precondStrategy=None)
+        self.objective = Objective.Objective(energy_function, Uu, p, precondStrategy=None)
 
         # Load over the steps
         force = 0.
