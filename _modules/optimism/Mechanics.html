@@ -14,7 +14,7 @@
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -250,13 +250,6 @@
     <span class="n">dispGrads</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">compute_field_gradient</span><span class="p">(</span><span class="n">functionSpace</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">modify_element_gradient</span><span class="p">)</span>
 
     <span class="n">statesNew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">states</span><span class="p">)</span>
-
-    <span class="c1"># # Store the same number of state variables for every material to make</span>
-    <span class="c1"># vmapping easy. See comment below in _compute_initial_state_multi_block</span>
-    <span class="n">numStateVariables</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="k">for</span> <span class="n">blockKey</span> <span class="ow">in</span> <span class="n">blockModels</span><span class="p">:</span>
-        <span class="n">numStateVariablesForBlock</span> <span class="o">=</span> <span class="n">blockModels</span><span class="p">[</span><span class="n">blockKey</span><span class="p">]</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">numStateVariables</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">numStateVariables</span><span class="p">,</span> <span class="n">numStateVariablesForBlock</span><span class="p">)</span>
     
     <span class="k">for</span> <span class="n">blockKey</span> <span class="ow">in</span> <span class="n">blockModels</span><span class="p">:</span>
         <span class="n">elemIds</span> <span class="o">=</span> <span class="n">functionSpace</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">blockKey</span><span class="p">]</span>
@@ -269,7 +262,6 @@
         <span class="n">stQuadPointRavel</span> <span class="o">=</span> <span class="n">blockStates</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">blockStates</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">blockStates</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">blockStatesNew</span> <span class="o">=</span> <span class="n">vmap</span><span class="p">(</span><span class="n">compute_state_new</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">))(</span><span class="n">dgQuadPointRavel</span><span class="p">,</span> <span class="n">stQuadPointRavel</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">blockStates</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
         <span class="n">statesNew</span> <span class="o">=</span> <span class="n">statesNew</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">elemIds</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:</span><span class="n">blockStatesNew</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">blockStatesNew</span><span class="p">)</span>
-        
 
     <span class="k">return</span> <span class="n">statesNew</span></div>
 
@@ -384,8 +376,34 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_initial_state</span><span class="p">():</span>
         <span class="k">return</span> <span class="n">_compute_initial_state_multi_block</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">materialModels</span><span class="p">)</span>
 
-    
-    <span class="k">return</span> <span class="n">MechanicsFunctions</span><span class="p">(</span><span class="n">compute_strain_energy</span><span class="p">,</span> <span class="n">jit</span><span class="p">(</span><span class="n">compute_updated_internal_variables</span><span class="p">),</span> <span class="n">jit</span><span class="p">(</span><span class="n">compute_element_stiffnesses</span><span class="p">),</span> <span class="n">jit</span><span class="p">(</span><span class="n">compute_output_energy_densities_and_stresses</span><span class="p">),</span> <span class="n">compute_initial_state</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+    <span class="k">def</span><span class="w"> </span><span class="nf">qoi_to_lagrangian_qoi</span><span class="p">(</span><span class="n">compute_material_qoi</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">L</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">gradU</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">compute_material_qoi</span><span class="p">(</span><span class="n">gradU</span><span class="p">,</span> <span class="n">Q</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">L</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">integrated_material_qoi</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="n">integrated_qoi</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">blockKey</span> <span class="ow">in</span> <span class="n">materialModels</span><span class="p">:</span>
+            <span class="n">elemIds</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">blockKey</span><span class="p">]</span>
+            <span class="n">block_qoi</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">integrate_over_block</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> 
+                                                  <span class="n">qoi_to_lagrangian_qoi</span><span class="p">(</span><span class="n">materialModels</span><span class="p">[</span><span class="n">blockKey</span><span class="p">]</span><span class="o">.</span><span class="n">compute_material_qoi</span><span class="p">),</span>
+                                                  <span class="n">elemIds</span><span class="p">,</span>
+                                                  <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">modify_element_gradient</span><span class="p">)</span>
+            <span class="n">integrated_qoi</span> <span class="o">+=</span> <span class="n">block_qoi</span>
+        <span class="k">return</span> <span class="n">integrated_qoi</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_output_material_qoi</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="n">material_qoi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Mesh</span><span class="o">.</span><span class="n">num_elements</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">quadratureRule</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">blockKey</span> <span class="ow">in</span> <span class="n">materialModels</span><span class="p">:</span>
+            <span class="n">elemIds</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="n">blockKey</span><span class="p">]</span>
+            <span class="n">block_qoi</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">evaluate_on_block</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">stateVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> 
+                                                        <span class="n">qoi_to_lagrangian_qoi</span><span class="p">(</span><span class="n">materialModels</span><span class="p">[</span><span class="n">blockKey</span><span class="p">]</span><span class="o">.</span><span class="n">compute_material_qoi</span><span class="p">),</span> 
+                                                        <span class="n">elemIds</span><span class="p">,</span> 
+                                                        <span class="n">modify_element_gradient</span><span class="o">=</span><span class="n">modify_element_gradient</span><span class="p">)</span>
+            <span class="n">material_qoi</span> <span class="o">=</span> <span class="n">material_qoi</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">elemIds</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">block_qoi</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">material_qoi</span>
+
+    <span class="k">return</span> <span class="n">MechanicsFunctions</span><span class="p">(</span><span class="n">compute_strain_energy</span><span class="p">,</span> <span class="n">jit</span><span class="p">(</span><span class="n">compute_updated_internal_variables</span><span class="p">),</span> <span class="n">jit</span><span class="p">(</span><span class="n">compute_element_stiffnesses</span><span class="p">),</span> <span class="n">jit</span><span class="p">(</span><span class="n">compute_output_energy_densities_and_stresses</span><span class="p">),</span> <span class="n">compute_initial_state</span><span class="p">,</span> <span class="n">integrated_material_qoi</span><span class="p">,</span> <span class="n">jit</span><span class="p">(</span><span class="n">compute_output_material_qoi</span><span class="p">))</span></div>
 
 
 
