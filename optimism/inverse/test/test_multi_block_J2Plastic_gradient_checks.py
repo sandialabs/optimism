@@ -14,7 +14,7 @@ from optimism import Objective
 from optimism import Mesh
 from optimism.material import J2Plastic as J2
 
-from FiniteDifferenceFixture import FiniteDifferenceFixture
+from .FiniteDifferenceFixture import FiniteDifferenceFixture
 
 from optimism.inverse import MechanicsInverse
 from optimism.inverse import AdjointFunctionSpace
