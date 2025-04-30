@@ -79,6 +79,73 @@ def create_ivs_update_inverse_functions(functionSpace, mode2D, materialModel, pr
                                      compute_partial_ivs_update_partial_coords
                                     )
 
+def create_ivs_update_inverse_functions_multi_block(functionSpace, mode2D, materialModels, pressureProjectionDegree=None):
+    fs = functionSpace
+    shapeOnRef = Interpolants.compute_shapes(fs.mesh.parentElement, fs.quadratureRule.xigauss)
+
+    if mode2D == 'plane strain':
+         grad_2D_to_3D = vmap(tensor_2D_to_3D)
+    elif mode2D == 'axisymmetric':
+        raise NotImplementedError
+
+    modify_element_gradient = grad_2D_to_3D
+    if pressureProjectionDegree is not None:
+        raise NotImplementedError
+
+    def compute_partial_ivs_update_partial_ivs_prev(U, stateVariables, dt=0.0):
+        dispGrads = _compute_field_gradient(fs.shapeGrads, fs.mesh.conns, U, modify_element_gradient)
+        stateUpdateGrads = np.zeros(stateVariables.shape + (stateVariables.shape[2],))
+        for blockKey in materialModels:
+            elemIds = functionSpace.mesh.blocks[blockKey]
+            blockDispGrads = dispGrads[elemIds]
+            blockStateVariables = stateVariables[elemIds]
+            update_gradient = jacfwd(materialModels[blockKey].compute_state_new, argnums=1)
+            grad_shape = blockStateVariables.shape + (blockStateVariables.shape[2],)
+            blockStateUpdateGrads = _compute_updated_internal_variables_gradient(blockDispGrads, blockStateVariables, dt,\
+                                                                                 update_gradient, grad_shape)
+            stateUpdateGrads = stateUpdateGrads.at[elemIds, :, :blockStateVariables.shape[2], :blockStateVariables.shape[2]].set(blockStateUpdateGrads)
+        return stateUpdateGrads
+
+    def compute_ivs_update_parameterized(U, stateVariables, coords, dt=0.0):
+        shapeGrads = vmap(FunctionSpace.map_element_shape_grads, (None, 0, None, None))(coords, fs.mesh.conns, fs.mesh.parentElement, shapeOnRef.gradients)
+        dispGrads = _compute_field_gradient(shapeGrads, fs.mesh.conns, U, modify_element_gradient)
+        statesNew = np.array(stateVariables)
+        for blockKey in materialModels:
+            elemIds = functionSpace.mesh.blocks[blockKey]
+            blockDispGrads = dispGrads[elemIds]
+            blockStateVariables = stateVariables[elemIds]
+            update_func = materialModels[blockKey].compute_state_new
+            output_shape = blockStateVariables.shape
+            blockStatesNew = _compute_updated_internal_variables_gradient(blockDispGrads, blockStateVariables, dt,\
+                                                                          update_func, output_shape)
+            statesNew = statesNew.at[elemIds, :, :blockStatesNew.shape[2]].set(blockStatesNew)
+        return statesNew
+
+    compute_partial_ivs_update_partial_coords = jit(lambda u, ivs, x, av, dt=0.0: 
+                                                    vjp(lambda z: compute_ivs_update_parameterized(u, ivs, z, dt), x)[1](av)[0])
+
+    def compute_ivs_update(U, stateVariables, dt=0.0):
+        dispGrads = _compute_field_gradient(fs.shapeGrads, fs.mesh.conns, U, modify_element_gradient)
+        statesNew = np.array(stateVariables)
+        for blockKey in materialModels:
+            elemIds = functionSpace.mesh.blocks[blockKey]
+            blockDispGrads = dispGrads[elemIds]
+            blockStateVariables = stateVariables[elemIds]
+            update_func = materialModels[blockKey].compute_state_new
+            output_shape = blockStateVariables.shape
+            blockStatesNew = _compute_updated_internal_variables_gradient(blockDispGrads, blockStateVariables, dt,\
+                                                                          update_func, output_shape)
+            statesNew = statesNew.at[elemIds, :, :blockStatesNew.shape[2]].set(blockStatesNew)
+        return statesNew
+
+    compute_partial_ivs_update_partial_disp = jit(lambda x, ivs, av, dt=0.0: 
+                                                  vjp(lambda z: compute_ivs_update(z, ivs, dt), x)[1](av)[0])
+
+    return IvsUpdateInverseFunctions(jit(compute_partial_ivs_update_partial_ivs_prev), 
+                                     compute_partial_ivs_update_partial_disp,
+                                     compute_partial_ivs_update_partial_coords
+                                    )
+
 def create_path_dependent_residual_inverse_functions(energyFunction):
 
     compute_partial_residual_partial_ivs_prev = jit(lambda u, q, iv, x, vx: 
