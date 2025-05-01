@@ -29,8 +29,8 @@ class MechanicsFunctions(eqx.Module):
     compute_element_stiffnesses: Callable
     compute_output_energy_densities_and_stresses: Callable
     compute_initial_state: Callable
-    integrated_material_qoi: Callable
-    compute_output_material_qoi: Callable
+    integrated_material_qoi: Callable     # scalar material point QoI integrated over the domain
+    compute_output_material_qoi: Callable # array of scalar material point QoI computed at each quadrature point
 
 
 class DynamicsFunctions(eqx.Module):
