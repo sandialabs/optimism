@@ -105,85 +105,84 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
 
         return EnergyFunctions(energy_function_coords, jax.jit(nodal_forces))
 
-    def total_work_increment(self, Uu, Uu_prev, ivs, ivs_prev, p, p_prev, coordinates, nodal_forces):
+    def compute_total_work(self, uSteps, pSteps, ivsSteps, coordinates, nodal_forces):
         index = (self.mesh.nodeSets['left'], 1) # arbitrarily choosing left side nodeset for reaction force
 
-        U = self.dofManager.create_field(Uu, p.bc_data)
-        force = np.array(nodal_forces(U, ivs, coordinates).at[index].get())
-        disp = U.at[index].get()
+        totalWork = 0.0
+        for step in range(1, self.steps+1):
+            Uu = uSteps[step]
+            p = pSteps[step]
+            ivs = ivsSteps[step] 
+            U = self.dofManager.create_field(Uu, p.bc_data)
+            force = np.array(nodal_forces(U, ivs, coordinates).at[index].get())
+            disp = U.at[index].get()
 
-        U_prev = self.dofManager.create_field(Uu_prev, p_prev.bc_data)
-        force_prev = np.array(nodal_forces(U_prev, ivs_prev, coordinates).at[index].get())
-        disp_prev = U_prev.at[index].get()
+            Uu_prev = uSteps[step-1]
+            p_prev = pSteps[step-1]
+            ivs_prev = ivsSteps[step-1] 
+            U_prev = self.dofManager.create_field(Uu_prev, p_prev.bc_data)
+            force_prev = np.array(nodal_forces(U_prev, ivs_prev, coordinates).at[index].get())
+            disp_prev = U_prev.at[index].get()
 
-        return 0.5*np.tensordot((force + force_prev),(disp - disp_prev), axes=1)
+            totalWork += 0.5*np.tensordot((force + force_prev),(disp - disp_prev), axes=1)
+
+        return totalWork
 
     def total_work_objective(self, storedState, parameters):
         parameters = parameters.reshape(self.mesh.coords.shape)
         energyFuncs = self.setup_energy_functions()
 
-        val = 0.0
-        for step in range(1, self.steps+1):
-            Uu = storedState[step][0]
-            Uu_prev = storedState[step-1][0]
-            p = storedState[step][1]
-            p_prev = storedState[step-1][1]
-            ivs = p.state_data
-            ivs_prev = p_prev.state_data
+        uSteps = np.stack([storedState[i][0] for i in range(0, self.steps+1)], axis=0)
+        ivsSteps = np.stack([storedState[i][1].state_data for i in range(0, self.steps+1)], axis=0)
+        pSteps = [storedState[i][1] for i in range(0, self.steps+1)]
 
-            val += self.total_work_increment(Uu, Uu_prev, ivs, ivs_prev, p, p_prev, parameters, energyFuncs.nodal_forces)
-
-        return val
+        return self.compute_total_work(uSteps, pSteps, ivsSteps, parameters, energyFuncs.nodal_forces) 
 
     def total_work_gradient(self, storedState, parameters):
         functionSpace = FunctionSpace.construct_function_space(self.mesh, self.quadRule)
         energyFuncs = self.setup_energy_functions()
         ivsUpdateInverseFuncs = MechanicsInverse.create_ivs_update_inverse_functions(functionSpace,
-                                                                                     "plane strain",
-                                                                                     self.materialModel)
-
+                                                                                    "plane strain",
+                                                                                    self.materialModel)
         residualInverseFuncs = MechanicsInverse.create_path_dependent_residual_inverse_functions(energyFuncs.energy_function_coords)
 
-        compute_df = jax.grad(self.total_work_increment, (0, 1, 2, 3, 6))
-
+        # derivatives of F
         parameters = parameters.reshape(self.mesh.coords.shape)
-        gradient = np.zeros(parameters.shape)
-        mu = np.zeros(storedState[0][1].state_data.shape) 
-        adjointLoad = np.zeros(storedState[0][0].shape)
+        uSteps = np.stack([storedState[i][0] for i in range(0, self.steps+1)], axis=0)
+        ivsSteps = np.stack([storedState[i][1].state_data for i in range(0, self.steps+1)], axis=0)
+        pSteps = [storedState[i][1] for i in range(0, self.steps+1)]
+        df_du, df_dc, gradient = jax.grad(self.compute_total_work, (0, 2, 3))(uSteps, pSteps, ivsSteps, parameters, energyFuncs.nodal_forces) 
+
+        mu = np.zeros(ivsSteps[0].shape) 
+        adjointLoad = np.zeros(uSteps[0].shape)
 
         for step in reversed(range(1, self.steps+1)):
-            Uu = storedState[step][0]
-            Uu_prev = storedState[step-1][0]
-            p = storedState[step][1]
-            p_prev = storedState[step-1][1]
-            ivs = p.state_data
-            ivs_prev = p_prev.state_data
+            Uu = uSteps[step]
+            p = pSteps[step]
+            U = self.dofManager.create_field(Uu, p.bc_data)
+            ivs_prev = ivsSteps[step-1]
 
-            dc_dcn = ivsUpdateInverseFuncs.ivs_update_jac_ivs_prev(self.dofManager.create_field(Uu, p.bc_data), ivs_prev)
+            dc_dcn = ivsUpdateInverseFuncs.ivs_update_jac_ivs_prev(U, ivs_prev)
 
-            df_du, df_dun, df_dc, df_dcn, df_dx = compute_df(Uu, Uu_prev, ivs, ivs_prev, p, p_prev, parameters, energyFuncs.nodal_forces)
-
-            mu += df_dc
-            adjointLoad -= df_du
-            adjointLoad -= self.dofManager.get_unknown_values(ivsUpdateInverseFuncs.ivs_update_jac_disp_vjp(self.dofManager.create_field(Uu, p.bc_data), ivs_prev, mu))
+            mu += df_dc[step]
+            adjointLoad -= df_du[step]
+            adjointLoad -= self.dofManager.get_unknown_values(ivsUpdateInverseFuncs.ivs_update_jac_disp_vjp(U, ivs_prev, mu))
 
             n = self.dofManager.get_unknown_size()
-            p_objective = Objective.Params(bc_data=p.bc_data, state_data=p_prev.state_data) # remember R is a function of ivs_prev
+            p_objective = Objective.Params(bc_data=p.bc_data, state_data=ivs_prev) # remember R is a function of ivs_prev
             self.objective.p = p_objective 
             self.objective.update_precond(Uu) # update preconditioner for use in cg (will converge in 1 iteration as long as the preconditioner is not approximate)
             dRdu = linalg.LinearOperator((n, n), lambda V: onp.asarray(self.objective.hessian_vec(Uu, V)))
             dRdu_decomp = linalg.LinearOperator((n, n), lambda V: onp.asarray(self.objective.apply_precond(V)))
             adjointVector = linalg.cg(dRdu, onp.array(adjointLoad, copy=False), rtol=1e-10, atol=0.0, M=dRdu_decomp)[0]
 
-            gradient += df_dx
             gradient += residualInverseFuncs.residual_jac_coords_vjp(Uu, p, ivs_prev, parameters, adjointVector)
-            gradient += ivsUpdateInverseFuncs.ivs_update_jac_coords_vjp(self.dofManager.create_field(Uu, p.bc_data), ivs_prev, parameters, mu)
+            gradient += ivsUpdateInverseFuncs.ivs_update_jac_coords_vjp(U, ivs_prev, parameters, mu)
 
             mu = np.einsum('ijk,ijkn->ijn', mu, dc_dcn)
             mu += residualInverseFuncs.residual_jac_ivs_prev_vjp(Uu, p, ivs_prev, parameters, adjointVector)
-            mu += df_dcn 
 
-            adjointLoad = -df_dun
+            adjointLoad = np.zeros(uSteps[0].shape)
 
         return gradient.ravel()
 
@@ -266,6 +265,7 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
             adjointLoad = np.zeros(storedState[0][0].shape)
 
         return gradient.ravel()
+
 
     def test_total_work_gradient_with_adjoint_solve(self):
         self.compute_objective_function = self.total_work_objective
