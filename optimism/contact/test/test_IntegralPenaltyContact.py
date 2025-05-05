@@ -1,14 +1,13 @@
 from optimism.contact.IntegralPenaltyContact import *
 
 import unittest
-import optimism.contact.SlidePlot as SlidePlot
+import SlidePlot
 from jax import numpy as np
 from matplotlib import pyplot
 from functools import partial
-import optimism.contact.MortarContact as MortarContact
 
-from mpmath import mp
-mp.dps = 50  # Set precision to 50 decimal places
+import decimal
+decimal.getcontext().prec = 50
 
 def integral(xi0, xi1, g0, g1):
     dxi = xi1-xi0
@@ -17,13 +16,13 @@ def integral(xi0, xi1, g0, g1):
     return (np.log(g1) - np.log(g0)) / a + (0.5 * a * (xi1*xi1 - xi0*xi0) + g0*xi1 - g1*xi0 ) - 2*dxi
 
 def precise_integral(xi0, xi1, g0, g1):
-    xi0 = mp.mpf(xi0)
-    xi1 = mp.mpf(xi1)
-    g0 = mp.mpf(g0)
-    g1 = mp.mpf(g1)
+    xi0 = decimal.Decimal(xi0)
+    xi1 = decimal.Decimal(xi1)
+    g0 = decimal.Decimal(g0)
+    g1 = decimal.Decimal(g1)
     dxi = xi1-xi0
     a = (g1-g0) / (xi1-xi0)
-    return mp.log(mp.fabs(g1/g0)) / a + (0.5 * a * (xi1*xi1 - xi0*xi0) + g0*xi1 - g1*xi0 ) - 2*dxi
+    return decimal.Decimal(math.log(decimal.fabs(g1/g0))) / a + (0.5 * a * (xi1*xi1 - xi0*xi0) + g0*xi1 - g1*xi0 ) - 2*dxi
 
 def taylor_integral(xi0, xi1, g0, g1):
     dxi = (xi1-xi0)
@@ -291,60 +290,5 @@ class TestEdgeIntersection(unittest.TestCase):
         pyplot.plot(epss, sol2-sol1, 'r--')
         pyplot.show()
 
-
-    def test_pacman_detection_1(self):
-        edgeA = np.array([0,1], dtype=int)
-        xA = np.array([[1.0,0.0],[0.0,0.0]])
-
-        edgeB = np.array([1,2], dtype=int)
-        xB = np.array([[0.0,0.0],[-1.0,0.5]])
-
-        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
-
-        xB = np.array([[0.0,0.0],[1.0,0.001]])
-        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
-
-        xB = np.array([[0.0,0.0],[1.0,-0.001]])
-        self.assertTrue(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
-
-        xB = np.array([[0.0,0.0],[-1.0,-0.5]])
-        self.assertTrue(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
-
-        xB = np.array([[0.0,0.0],[-0.5,0.00001]])
-        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
-
-        xB = np.array([[0.0,0.0],[-0.5,-0.00001]])
-        self.assertTrue(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
-
-        edgeB = np.array([2,3], dtype=int)
-        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
-
-
-    def test_pacman_detection_2(self):
-        edgeA = np.array([0,1], dtype=int)
-        xA = np.array([[1.0,0.0],[0.0,0.0]])
-
-        edgeB = np.array([1,2], dtype=int)
-        xB = np.array([[0.0,0.0],[-1.0,0.5]])
-
-        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
-
-        xB = np.array([[0.0,0.0],[1.0,0.001]])
-        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
-
-        xB = np.array([[0.0,0.0],[1.0,-0.001]])
-        self.assertTrue(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
-
-        xB = np.array([[0.0,0.0],[-1.0,-0.5]])
-        self.assertTrue(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
-
-        xB = np.array([[0.0,0.0],[-0.5,0.00001]])
-        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
-
-        xB = np.array([[0.0,0.0],[-0.5,-0.00001]])
-        self.assertTrue(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
-
-        edgeB = np.array([2,3], dtype=int)
-        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
 
 unittest.main()

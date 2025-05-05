@@ -158,15 +158,15 @@ def get_closest_neighbors(edgeSetA : jnp.array,
 
 
 def edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB):
-    case0 = edgeA[1] == edgeB[0]
-    case1 = edgeA[0] == edgeB[1]
-    x0 = jnp.where(case0, xA, xB)
-    x1 = jnp.where(case0, xB, xA)
+    adjacentCase0 = edgeA[1] == edgeB[0]
+    adjacentCase1 = edgeA[0] == edgeB[1]
+    x0 = jnp.where(adjacentCase0, xA, xB)
+    x1 = jnp.where(adjacentCase0, xB, xA)
     edge0_dir = x0[1]-x0[0]
     edge1_norm = compute_normal(x1)
     is_pacman = edge0_dir @ edge1_norm < 0.0
-    return ~is_pacman & (case0 | case1)
-
+    is_adjacent = adjacentCase0 | adjacentCase1
+    return is_adjacent & ~is_pacman
 
 @partial(jax.jit, static_argnums=(4,5))
 def get_closest_neighbors_for_self_contact(edgeSetA : jnp.array,
@@ -175,12 +175,10 @@ def get_closest_neighbors_for_self_contact(edgeSetA : jnp.array,
                                            disp : jnp.array,
                                            maxNeighbors : int,
                                            maxPenetrationDistance : float):
-    def edges_are_adjacent(edge1, edge2):
-        return (edge1[0] == edge2[0]) | \
-               (edge1[0] == edge2[1]) | \
-               (edge1[1] == edge2[0]) | \
-               (edge1[1] == edge2[1])
-    
+    def edge_is_self(edgeA, edgeB):
+        return (edgeA[0] == edgeB[0]) & \
+               (edgeA[1] == edgeB[1])
+
     def edge_A_is_penetrating_beyond_max_distance(xsA, xsB, minSquaredDistance):
         def edge_A_is_penetrating(xsA, xsB):
             normalB = compute_normal(xsB)
@@ -193,8 +191,10 @@ def get_closest_neighbors_for_self_contact(edgeSetA : jnp.array,
         xsA = coords[edgeA] + disp[edgeA]
         xsB = coords[edgeB] + disp[edgeB]
         minSquaredDistance = minimum_squared_distance(xsA, xsB)
-        excludeEdges = jnp.logical_or(edges_are_adjacent_non_pacman(edgeA, edgeB, xsA, xsB),
-                                      edge_A_is_penetrating_beyond_max_distance(xsA, xsB, minSquaredDistance))
+        excludeEdges = jnp.logical_or(
+            jnp.logical_or(edge_is_self(edgeA, edgeB),
+                           edges_are_adjacent_non_pacman(edgeA, edgeB, xsA, xsB)),
+                           edge_A_is_penetrating_beyond_max_distance(xsA, xsB, minSquaredDistance))
         return jax.lax.cond(excludeEdges, 
                             lambda e1, e2: jnp.inf, 
                             lambda e1, e2: minSquaredDistance, 
