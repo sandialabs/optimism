@@ -167,10 +167,6 @@ def assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighbo
         edgeEnergies = jax.vmap(compute_quantities_for_segment_pair, (None,0))(segB, neighborSegsA)
         return edgeEnergies
 
-    allEdgeEnergyies = jax.vmap(compute_nodal_gap_area)(segmentConnsB, neighborList)
+    allEdgeEnergies = jax.vmap(compute_nodal_gap_area)(segmentConnsB, neighborList)
 
-    return jnp.sum(allEdgeEnergyies)
-
-
-
-# utilities for setting up mortar contact data structures
+    return jnp.sum(allEdgeEnergies)
