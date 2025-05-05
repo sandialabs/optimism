@@ -1,7 +1,9 @@
 from optimism.contact.IntegralPenaltyContact import *
 from optimism.contact.test.SlidePlot import *
 
+from optimism.test.TestFixture import TestFixture
 import unittest
+
 from jax import numpy as np
 from matplotlib import pyplot
 from functools import partial
@@ -30,7 +32,7 @@ def taylor_integral(xi0, xi1, g0, g1):
     dg = g1 - g0
     return (1.0/gbar + gbar - 2) * dxi + 1./12. * dg * dg * dxi / (gbar*gbar*gbar)
 
-class TestEdgeIntersection(unittest.TestCase):
+class TestEdgeIntersection(TestFixture):
 
     def setUp(self):
         self.penalty_length = 0.1
@@ -291,4 +293,5 @@ class TestEdgeIntersection(unittest.TestCase):
         pyplot.show()
 
 
-unittest.main()
+if __name__ == '__main__':
+    unittest.main()
