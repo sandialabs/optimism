@@ -1,7 +1,7 @@
 from optimism.contact.IntegralPenaltyContact import *
 
 import unittest
-import SlidePlot
+from .SlidePlot import SlidePlot
 from jax import numpy as np
 from matplotlib import pyplot
 from functools import partial
