@@ -2,7 +2,7 @@ from matplotlib import pyplot
 from matplotlib.widgets import Slider
 import numpy as np
 
-class SlidePlot():
+class slide_plot():
     def __init__(self, fig, axs, time_range):
         self.axs = axs
         self.time_range = time_range

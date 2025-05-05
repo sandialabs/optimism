@@ -1,7 +1,7 @@
 from optimism.contact.IntegralPenaltyContact import *
+from optimism.contact.test.SlidePlot import *
 
 import unittest
-from optimism.contact.test import SlidePlot
 from jax import numpy as np
 from matplotlib import pyplot
 from functools import partial
@@ -242,7 +242,7 @@ class TestEdgeIntersection(unittest.TestCase):
         def force_at_time(step, e, n, d):
             return [S[step]],[fs[n,d][step]]
 
-        p = SlidePlot.SlidePlot(fig, axs, times)
+        p = slide_plot(fig, axs, times)
         p.plot(0, mesh0, 'ko-')
         p.plot(0, mesh1, 'ko-')
         p.plot(0, mesh2, 'ko-')
