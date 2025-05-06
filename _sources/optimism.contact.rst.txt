@@ -48,6 +48,15 @@ optimism.contact.Friction module
    :show-inheritance:
    :private-members:
 
+optimism.contact.IntegralPenaltyContact module
+----------------------------------------------
+
+.. automodule:: optimism.contact.IntegralPenaltyContact
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
 optimism.contact.Levelset module
 --------------------------------
 

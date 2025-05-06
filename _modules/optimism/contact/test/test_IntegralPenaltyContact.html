@@ -1,0 +1,463 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.contact.test.test_IntegralPenaltyContact &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.contact.test.test_IntegralPenaltyContact</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.contact.test.test_IntegralPenaltyContact</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">optimism.contact.IntegralPenaltyContact</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.contact.test.SlidePlot</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.test.TestFixture</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestFixture</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">unittest</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">jax</span><span class="w"> </span><span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">decimal</span>
+<span class="n">decimal</span><span class="o">.</span><span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">50</span>
+
+<div class="viewcode-block" id="integral">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.integral">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">integral</span><span class="p">(</span><span class="n">xi0</span><span class="p">,</span> <span class="n">xi1</span><span class="p">,</span> <span class="n">g0</span><span class="p">,</span> <span class="n">g1</span><span class="p">):</span>
+    <span class="n">dxi</span> <span class="o">=</span> <span class="n">xi1</span><span class="o">-</span><span class="n">xi0</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">g1</span><span class="o">-</span><span class="n">g0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">xi1</span><span class="o">-</span><span class="n">xi0</span><span class="p">)</span>
+    <span class="c1">#return np.log(np.fabs(g1/g0)) / a + (0.5 * a * (xi1*xi1 - xi0*xi0) + g0*xi1 - g1*xi0 ) - 2*dxi</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">g1</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">g0</span><span class="p">))</span> <span class="o">/</span> <span class="n">a</span> <span class="o">+</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="n">xi1</span><span class="o">*</span><span class="n">xi1</span> <span class="o">-</span> <span class="n">xi0</span><span class="o">*</span><span class="n">xi0</span><span class="p">)</span> <span class="o">+</span> <span class="n">g0</span><span class="o">*</span><span class="n">xi1</span> <span class="o">-</span> <span class="n">g1</span><span class="o">*</span><span class="n">xi0</span> <span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">dxi</span></div>
+
+
+<div class="viewcode-block" id="precise_integral">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.precise_integral">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">precise_integral</span><span class="p">(</span><span class="n">xi0</span><span class="p">,</span> <span class="n">xi1</span><span class="p">,</span> <span class="n">g0</span><span class="p">,</span> <span class="n">g1</span><span class="p">):</span>
+    <span class="n">xi0</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">xi0</span><span class="p">)</span>
+    <span class="n">xi1</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">xi1</span><span class="p">)</span>
+    <span class="n">g0</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">g0</span><span class="p">)</span>
+    <span class="n">g1</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">g1</span><span class="p">)</span>
+    <span class="n">dxi</span> <span class="o">=</span> <span class="n">xi1</span><span class="o">-</span><span class="n">xi0</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">g1</span><span class="o">-</span><span class="n">g0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">xi1</span><span class="o">-</span><span class="n">xi0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">decimal</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="n">g1</span><span class="o">/</span><span class="n">g0</span><span class="p">)))</span> <span class="o">/</span> <span class="n">a</span> <span class="o">+</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="n">xi1</span><span class="o">*</span><span class="n">xi1</span> <span class="o">-</span> <span class="n">xi0</span><span class="o">*</span><span class="n">xi0</span><span class="p">)</span> <span class="o">+</span> <span class="n">g0</span><span class="o">*</span><span class="n">xi1</span> <span class="o">-</span> <span class="n">g1</span><span class="o">*</span><span class="n">xi0</span> <span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">dxi</span></div>
+
+
+<div class="viewcode-block" id="taylor_integral">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.taylor_integral">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">taylor_integral</span><span class="p">(</span><span class="n">xi0</span><span class="p">,</span> <span class="n">xi1</span><span class="p">,</span> <span class="n">g0</span><span class="p">,</span> <span class="n">g1</span><span class="p">):</span>
+    <span class="n">dxi</span> <span class="o">=</span> <span class="p">(</span><span class="n">xi1</span><span class="o">-</span><span class="n">xi0</span><span class="p">)</span>
+    <span class="n">gbar</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">g0</span><span class="o">+</span><span class="n">g1</span><span class="p">)</span>
+    <span class="n">dg</span> <span class="o">=</span> <span class="n">g1</span> <span class="o">-</span> <span class="n">g0</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="n">gbar</span> <span class="o">+</span> <span class="n">gbar</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">dxi</span> <span class="o">+</span> <span class="mf">1.</span><span class="o">/</span><span class="mf">12.</span> <span class="o">*</span> <span class="n">dg</span> <span class="o">*</span> <span class="n">dg</span> <span class="o">*</span> <span class="n">dxi</span> <span class="o">/</span> <span class="p">(</span><span class="n">gbar</span><span class="o">*</span><span class="n">gbar</span><span class="o">*</span><span class="n">gbar</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="integrate_gap_numeric">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.integrate_gap_numeric">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">integrate_gap_numeric</span><span class="p">(</span><span class="n">xi</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="mi">10000</span>
+    <span class="n">xig</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.5</span><span class="o">/</span><span class="n">N</span><span class="p">,</span> <span class="mf">1.0</span><span class="o">-</span><span class="mf">0.5</span><span class="o">/</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+    <span class="n">dxi</span> <span class="o">=</span> <span class="n">xi</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">xi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">dxi</span> <span class="o">/</span> <span class="n">N</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">gap</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="n">g</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">g</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">p</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">:</span> 
+        <span class="n">v</span> <span class="o">=</span> <span class="n">gap</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">v</span> <span class="o">&lt;</span> <span class="n">delta</span><span class="p">,</span> <span class="n">v</span> <span class="o">/</span> <span class="n">delta</span> <span class="o">+</span> <span class="n">delta</span> <span class="o">/</span> <span class="n">v</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">p</span><span class="p">)(</span><span class="n">xig</span><span class="p">)</span> <span class="p">)</span> <span class="o">*</span> <span class="n">w</span></div>
+
+
+
+<div class="viewcode-block" id="TestEdgeIntersection">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestEdgeIntersection</span><span class="p">(</span><span class="n">TestFixture</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TestEdgeIntersection.setUp">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection.setUp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">penalty_length</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_smoothing</span> <span class="o">=</span> <span class="mf">0.2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="TestEdgeIntersection.utest_plot">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection.utest_plot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">utest_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1e-1</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mi">300</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">p</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">g</span> <span class="o">+</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">g</span> <span class="o">-</span> <span class="mi">2</span>
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">p</span><span class="p">(</span><span class="n">g</span><span class="p">))</span>
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+
+    <span class="c1"># negative value here means there is overlap, which is penalized to inf</span>
+    <span class="c1"># a positive gap value less that self.delta=0.5, means there is a contact interaction</span>
+    <span class="c1"># a larger gap value will be considered not in contact at all</span>
+
+<div class="viewcode-block" id="TestEdgeIntersection.test_integral_some_in_overlap">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection.test_integral_some_in_overlap">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_integral_some_in_overlap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="o">+</span><span class="mf">1e-12</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.7</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.3</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]),</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestEdgeIntersection.test_integral_both_in_contact">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection.test_integral_both_in_contact">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_integral_both_in_contact</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">])</span>
+        <span class="n">integral1</span> <span class="o">=</span> <span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+        <span class="n">integral2</span> <span class="o">=</span> <span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">g</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+        <span class="c1"># g[::-1] flips the order of the values in the array</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integral1</span><span class="p">,</span> <span class="n">integral2</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>
+
+        <span class="n">integral3</span> <span class="o">=</span> <span class="n">integrate_gap_numeric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integral1</span><span class="p">,</span> <span class="n">integral3</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+
+        <span class="n">integral4</span> <span class="o">=</span> <span class="n">integrate_gap_numeric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">g</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integral2</span><span class="p">,</span> <span class="n">integral4</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestEdgeIntersection.test_integral_both_equal_in_contact">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection.test_integral_both_equal_in_contact">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_integral_both_equal_in_contact</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">])</span>
+        <span class="n">integral1</span> <span class="o">=</span> <span class="n">integrate_gap_numeric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+        <span class="n">integral2</span> <span class="o">=</span> <span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integral1</span><span class="p">,</span> <span class="n">integral2</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">1e-8</span><span class="p">)</span>
+        <span class="n">integral3</span> <span class="o">=</span> <span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integral1</span><span class="p">,</span> <span class="n">integral3</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestEdgeIntersection.test_integral_both_out_of_contact">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection.test_integral_both_out_of_contact">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_integral_both_out_of_contact</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">])</span>
+        <span class="n">integral1</span> <span class="o">=</span> <span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+        <span class="n">integral2</span> <span class="o">=</span> <span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">g</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integral1</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integral2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>
+        <span class="n">integral3</span> <span class="o">=</span> <span class="n">integrate_gap_numeric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integral1</span><span class="p">,</span> <span class="n">integral3</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestEdgeIntersection.test_integral_both_equal_out_of_contact">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection.test_integral_both_equal_out_of_contact">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_integral_both_equal_out_of_contact</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">])</span>
+        <span class="n">integral1</span> <span class="o">=</span> <span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+        <span class="n">integral2</span> <span class="o">=</span> <span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">g</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integral1</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integral2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>
+        <span class="n">integral3</span> <span class="o">=</span> <span class="n">integrate_gap_numeric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integral1</span><span class="p">,</span> <span class="n">integral3</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestEdgeIntersection.test_integral_in_out_of_contact">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection.test_integral_in_out_of_contact">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_integral_in_out_of_contact</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">])</span>
+        <span class="n">integral1</span> <span class="o">=</span> <span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+        <span class="n">integral2</span> <span class="o">=</span> <span class="n">integrate_gap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">g</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integral1</span><span class="p">,</span> <span class="n">integral2</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>
+        <span class="n">integral3</span> <span class="o">=</span> <span class="n">integrate_gap_numeric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xi</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">integral1</span><span class="p">,</span> <span class="n">integral3</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TestEdgeIntersection.test_plot_smoothness">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection.test_plot_smoothness">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_plot_smoothness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">penalty_length</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_smoothing</span> <span class="o">=</span> <span class="mf">0.25</span>
+
+        <span class="n">normal_calc</span> <span class="o">=</span> <span class="n">compute_normal_from_a</span>
+
+        <span class="n">x0a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">])</span>
+        <span class="c1">#setup = &#39;flat&#39;, &#39;slant&#39;, &#39;perp&#39;, &#39;thinning&#39;, &#39;slant_up&#39;, &#39;accident&#39;, &#39;in_out&#39;</span>
+        <span class="n">setup</span> <span class="o">=</span> <span class="s1">&#39;perp&#39;</span>
+        <span class="k">if</span> <span class="n">setup</span><span class="o">==</span><span class="s1">&#39;slant&#39;</span> <span class="ow">or</span> <span class="n">setup</span><span class="o">==</span><span class="s1">&#39;thinning&#39;</span><span class="p">:</span>
+            <span class="n">x0b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">])</span> <span class="c1"># -0.025, 0.03, 0.12, 0.05</span>
+        <span class="k">elif</span> <span class="n">setup</span><span class="o">==</span><span class="s1">&#39;flat&#39;</span><span class="p">:</span>
+            <span class="n">x0b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">setup</span><span class="o">==</span><span class="s1">&#39;perp&#39;</span><span class="p">:</span>
+            <span class="n">x0b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">setup</span><span class="o">==</span><span class="s1">&#39;slant_up&#39;</span><span class="p">:</span>
+            <span class="n">x0b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.05</span><span class="o">-</span><span class="p">(</span><span class="mf">1e-5</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">penalty_length</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">setup</span><span class="o">==</span><span class="s1">&#39;accident&#39;</span><span class="p">:</span>
+            <span class="n">x0b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">setup</span><span class="o">==</span><span class="s1">&#39;in_out&#39;</span><span class="p">:</span>
+            <span class="n">x0b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">])</span>
+
+        <span class="n">edge0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x0a</span><span class="p">,</span> <span class="n">x0b</span><span class="p">])</span>
+
+        <span class="c1">#slides to the right</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">setup</span><span class="o">==</span><span class="s1">&#39;slant&#39;</span> <span class="ow">or</span> <span class="n">setup</span><span class="o">==</span><span class="s1">&#39;flat&#39;</span><span class="p">):</span>
+            <span class="n">velocities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span>
+        <span class="k">elif</span> <span class="n">setup</span><span class="o">==</span><span class="s1">&#39;perp&#39;</span><span class="p">:</span>
+            <span class="n">velocities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">]])</span>
+        <span class="k">elif</span> <span class="n">setup</span><span class="o">==</span><span class="s1">&#39;thinning&#39;</span><span class="p">:</span>
+            <span class="n">velocities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span>
+        <span class="k">elif</span> <span class="n">setup</span><span class="o">==</span><span class="s1">&#39;slant_up&#39;</span><span class="p">:</span>
+            <span class="n">velocities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="p">(</span><span class="mf">1e-4</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">penalty_length</span><span class="p">]])</span>
+        <span class="k">elif</span> <span class="n">setup</span><span class="o">==</span><span class="s1">&#39;accident&#39;</span><span class="p">:</span>
+            <span class="n">velocities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">]])</span>
+        <span class="k">elif</span> <span class="n">setup</span><span class="o">==</span><span class="s1">&#39;in_out&#39;</span><span class="p">:</span>
+            <span class="n">velocities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.01</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.01</span><span class="o">+</span><span class="mf">1e-6</span><span class="p">]])</span>
+
+        <span class="n">x1a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+        <span class="n">x1b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+        <span class="n">edge1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x1a</span><span class="p">,</span> <span class="n">x1b</span><span class="p">])</span>
+        <span class="n">edge2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span>
+        <span class="n">edge3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.4</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]])</span>
+
+        <span class="n">N</span> <span class="o">=</span> <span class="mi">4000</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">13.0</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">pyplot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">gridspec_kw</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;width_ratios&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="mf">2.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]})</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">edge_0</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">edge0_mod</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">S</span><span class="p">[</span><span class="n">step</span><span class="p">]</span>
+            <span class="n">edge0_mod</span> <span class="o">=</span> <span class="n">edge0_mod</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="n">velocities</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">edge0_mod</span> <span class="o">=</span> <span class="n">edge0_mod</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="n">velocities</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">edge0_mod</span> <span class="o">=</span> <span class="n">edge0_mod</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="n">velocities</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">edge0_mod</span> <span class="o">=</span> <span class="n">edge0_mod</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">s</span><span class="o">*</span><span class="n">velocities</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">edge0_mod</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">edge_1</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">edge_mod</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">edge_mod</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">edge_2</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">edge_mod</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">edge_mod</span>
+        
+        <span class="k">def</span><span class="w"> </span><span class="nf">edge_3</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">edge_mod</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">edge_mod</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">mesh0</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">edge0_mod</span><span class="o">=</span><span class="n">edge0</span><span class="p">):</span>
+            <span class="n">edge0_mod</span> <span class="o">=</span> <span class="n">edge_0</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">edge0_mod</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">edge0_mod</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge0_mod</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+        
+        <span class="k">def</span><span class="w"> </span><span class="nf">mesh1</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">edge1_mod</span><span class="o">=</span><span class="n">edge1</span><span class="p">):</span>
+            <span class="n">edge1_mod</span> <span class="o">=</span> <span class="n">edge_1</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">edge1_mod</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">edge1_mod</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge1_mod</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">mesh2</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">edge2_mod</span><span class="o">=</span><span class="n">edge2</span><span class="p">):</span>
+            <span class="n">edge2_mod</span> <span class="o">=</span> <span class="n">edge_2</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">edge2_mod</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">edge2_mod</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge2_mod</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+        
+        <span class="k">def</span><span class="w"> </span><span class="nf">mesh3</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">edge3_mod</span><span class="o">=</span><span class="n">edge3</span><span class="p">):</span>
+            <span class="n">edge3_mod</span> <span class="o">=</span> <span class="n">edge_3</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">edge3_mod</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">edge3_mod</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge3_mod</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">energy_pert</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">pert</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+            <span class="n">es</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">edge_0</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">edge0</span><span class="p">),</span> <span class="n">edge_1</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">edge1</span><span class="p">),</span> <span class="n">edge_2</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">edge2</span><span class="p">),</span> <span class="n">edge_3</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">edge3</span><span class="p">)])</span>
+            <span class="n">es</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">e</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">d</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pert</span><span class="p">)</span>
+            <span class="n">energy1</span> <span class="o">=</span> <span class="n">integrate_mortar_barrier</span><span class="p">(</span><span class="n">es</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">es</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">normal_calc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">penalty_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_smoothing</span><span class="p">)</span>
+            <span class="n">energy2</span> <span class="o">=</span> <span class="n">integrate_mortar_barrier</span><span class="p">(</span><span class="n">es</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">es</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">normal_calc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">penalty_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_smoothing</span><span class="p">)</span>
+            <span class="n">energy3</span> <span class="o">=</span> <span class="n">integrate_mortar_barrier</span><span class="p">(</span><span class="n">es</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">es</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">normal_calc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">penalty_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">edge_smoothing</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">energy1</span> <span class="o">+</span> <span class="n">energy2</span> <span class="o">+</span> <span class="n">energy3</span>
+
+        <span class="n">force</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">energy_pert</span><span class="p">,</span> <span class="n">argnums</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">energy</span><span class="p">(</span><span class="n">step</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">energy_pert</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+        <span class="n">energies</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">energy</span><span class="p">)(</span><span class="n">times</span><span class="p">)</span>
+
+        <span class="n">f000</span> <span class="o">=</span> <span class="o">-</span><span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">))(</span><span class="n">times</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">f001</span> <span class="o">=</span> <span class="o">-</span><span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">))(</span><span class="n">times</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">f010</span> <span class="o">=</span> <span class="o">-</span><span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">))(</span><span class="n">times</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">f011</span> <span class="o">=</span> <span class="o">-</span><span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">))(</span><span class="n">times</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">f000</span><span class="p">,</span><span class="n">f001</span><span class="p">],[</span><span class="n">f010</span><span class="p">,</span><span class="n">f011</span><span class="p">]])</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">arrows0</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">edge0_mod</span><span class="o">=</span><span class="n">edge0</span><span class="p">):</span>
+            <span class="n">edge0_mod</span> <span class="o">=</span> <span class="n">edge_0</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">edge0_mod</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">edge0_mod</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge0_mod</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="n">f000</span><span class="p">[</span><span class="n">step</span><span class="p">],</span><span class="n">f010</span><span class="p">[</span><span class="n">step</span><span class="p">]],</span> <span class="p">[</span><span class="n">f001</span><span class="p">[</span><span class="n">step</span><span class="p">],</span><span class="n">f011</span><span class="p">[</span><span class="n">step</span><span class="p">]]</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">energy_vs_time</span><span class="p">(</span><span class="n">step</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">S</span><span class="p">,</span><span class="n">energies</span>
+  
+        <span class="k">def</span><span class="w"> </span><span class="nf">energy_at_time</span><span class="p">(</span><span class="n">step</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">S</span><span class="p">[</span><span class="n">step</span><span class="p">]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">s</span><span class="p">],[</span><span class="n">energies</span><span class="p">[</span><span class="n">step</span><span class="p">]]</span>
+        
+        <span class="k">def</span><span class="w"> </span><span class="nf">force_vs_time</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">S</span><span class="p">,</span><span class="n">fs</span><span class="p">[</span><span class="n">n</span><span class="p">,</span><span class="n">d</span><span class="p">]</span>
+        
+        <span class="k">def</span><span class="w"> </span><span class="nf">force_at_time</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">S</span><span class="p">[</span><span class="n">step</span><span class="p">]],[</span><span class="n">fs</span><span class="p">[</span><span class="n">n</span><span class="p">,</span><span class="n">d</span><span class="p">][</span><span class="n">step</span><span class="p">]]</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">slide_plot</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span><span class="p">,</span> <span class="n">times</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mesh0</span><span class="p">,</span> <span class="s1">&#39;ko-&#39;</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mesh1</span><span class="p">,</span> <span class="s1">&#39;ko-&#39;</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mesh2</span><span class="p">,</span> <span class="s1">&#39;ko-&#39;</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mesh3</span><span class="p">,</span> <span class="s1">&#39;ko-&#39;</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">arrow</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">arrows0</span><span class="p">)</span>
+
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">])</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="o">-</span><span class="mf">0.81</span><span class="p">,</span> <span class="mf">0.81</span><span class="p">])</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mi">17</span><span class="p">))</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">energy_vs_time</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">energy_at_time</span><span class="p">,</span> <span class="s1">&#39;go&#39;</span><span class="p">)</span>
+
+        <span class="c1">#xlim = [2.0, 2.6]</span>
+        <span class="c1">#axs[1].set_xlim(xlim)</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;energy&#39;</span><span class="p">])</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span><span class="n">force_vs_time</span><span class="p">,</span><span class="n">e</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">d</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;r--&#39;</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span><span class="n">force_at_time</span><span class="p">,</span><span class="n">e</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">d</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;ro&#39;</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span><span class="n">force_vs_time</span><span class="p">,</span><span class="n">e</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">d</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span><span class="n">force_at_time</span><span class="p">,</span><span class="n">e</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">d</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;ro&#39;</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span><span class="n">force_vs_time</span><span class="p">,</span><span class="n">e</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">d</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;g--&#39;</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span><span class="n">force_at_time</span><span class="p">,</span><span class="n">e</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">d</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;go&#39;</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span><span class="n">force_vs_time</span><span class="p">,</span><span class="n">e</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">d</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;g&#39;</span><span class="p">)</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span><span class="n">force_at_time</span><span class="p">,</span><span class="n">e</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">d</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;go&#39;</span><span class="p">)</span>
+
+        <span class="c1">#axs[2].set_xlim(xlim)</span>
+        <span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;force_x r&#39;</span><span class="p">,</span> <span class="s1">&#39;_nolegend_&#39;</span><span class="p">,</span> <span class="s1">&#39;force_y r&#39;</span><span class="p">,</span> <span class="s1">&#39;_nolegend_&#39;</span><span class="p">,</span> <span class="s1">&#39;force_x l&#39;</span><span class="p">,</span> <span class="s1">&#39;_nolegend_&#39;</span><span class="p">,</span> <span class="s1">&#39;force_y l&#39;</span><span class="p">,</span> <span class="s1">&#39;_nolegend_&#39;</span><span class="p">])</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="TestEdgeIntersection.untest_roundoff">
+<a class="viewcode-back" href="../../../../optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection.untest_roundoff">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">untest_roundoff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">xi0</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="n">xi1</span> <span class="o">=</span> <span class="mf">0.100001</span>
+        <span class="n">g0</span> <span class="o">=</span> <span class="mf">0.001</span>   <span class="c1"># g is g/delta</span>
+        <span class="n">epss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1e-5</span><span class="o">*</span><span class="n">g0</span><span class="p">,</span> <span class="mf">2.0e-4</span><span class="o">*</span><span class="n">g0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+
+        <span class="n">sol1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">precise_integral</span><span class="p">(</span><span class="n">xi0</span><span class="p">,</span><span class="n">xi1</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="n">g0</span><span class="o">-</span><span class="n">eps</span><span class="p">),</span><span class="nb">float</span><span class="p">(</span><span class="n">g0</span><span class="o">+</span><span class="n">eps</span><span class="p">)))</span> <span class="k">for</span> <span class="n">eps</span> <span class="ow">in</span> <span class="n">epss</span><span class="p">])</span>
+        <span class="n">sol2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">taylor_integral</span><span class="p">(</span><span class="n">xi0</span><span class="p">,</span><span class="n">xi1</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="n">g0</span><span class="o">-</span><span class="n">eps</span><span class="p">),</span><span class="nb">float</span><span class="p">(</span><span class="n">g0</span><span class="o">+</span><span class="n">eps</span><span class="p">))</span> <span class="k">for</span> <span class="n">eps</span> <span class="ow">in</span> <span class="n">epss</span><span class="p">])</span>
+        <span class="n">sol3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">integral</span><span class="p">(</span><span class="n">xi0</span><span class="p">,</span><span class="n">xi1</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="n">g0</span><span class="o">-</span><span class="n">eps</span><span class="p">),</span><span class="nb">float</span><span class="p">(</span><span class="n">g0</span><span class="o">+</span><span class="n">eps</span><span class="p">))</span> <span class="k">for</span> <span class="n">eps</span> <span class="ow">in</span> <span class="n">epss</span><span class="p">])</span>
+
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">epss</span><span class="p">,</span> <span class="n">sol3</span><span class="o">-</span><span class="n">sol1</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">)</span>
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">epss</span><span class="p">,</span> <span class="n">sol2</span><span class="o">-</span><span class="n">sol1</span><span class="p">,</span> <span class="s1">&#39;r--&#39;</span><span class="p">)</span>
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+</div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

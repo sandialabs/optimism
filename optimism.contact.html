@@ -15,7 +15,7 @@
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=01f34227"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="_static/copybutton.js?v=f281be69"></script>
@@ -104,6 +104,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-optimism.contact.EdgeCpp">optimism.contact.EdgeCpp module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-optimism.contact.EdgeIntersection">optimism.contact.EdgeIntersection module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-optimism.contact.Friction">optimism.contact.Friction module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-optimism.contact.IntegralPenaltyContact">optimism.contact.IntegralPenaltyContact module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-optimism.contact.Levelset">optimism.contact.Levelset module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-optimism.contact.LevelsetConstraint">optimism.contact.LevelsetConstraint module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-optimism.contact.MortarContact">optimism.contact.MortarContact module</a></li>
@@ -190,10 +191,17 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="optimism.contact.test.html">optimism.contact.test package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="optimism.contact.test.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.contact.test.html#module-optimism.contact.test.SlidePlot">optimism.contact.test.SlidePlot module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.SlidePlot.slide_plot"><code class="docutils literal notranslate"><span class="pre">slide_plot</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.SlidePlot.slide_plot.arrow"><code class="docutils literal notranslate"><span class="pre">slide_plot.arrow()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.SlidePlot.slide_plot.plot"><code class="docutils literal notranslate"><span class="pre">slide_plot.plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.SlidePlot.slide_plot.show"><code class="docutils literal notranslate"><span class="pre">slide_plot.show()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="optimism.contact.test.html#module-optimism.contact.test.test_Contact">optimism.contact.test.test_Contact module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_Contact.TestContactFrictionData"><code class="docutils literal notranslate"><span class="pre">TestContactFrictionData</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_Contact.TestContactFrictionData._classSetupFailed"><code class="docutils literal notranslate"><span class="pre">TestContactFrictionData._classSetupFailed</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_Contact.TestContactFrictionData._class_cleanups"><code class="docutils literal notranslate"><span class="pre">TestContactFrictionData._class_cleanups</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_Contact.TestContactFrictionData.setUp"><code class="docutils literal notranslate"><span class="pre">TestContactFrictionData.setUp()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_Contact.TestContactFrictionData.test_friction_search_after_motion"><code class="docutils literal notranslate"><span class="pre">TestContactFrictionData.test_friction_search_after_motion()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_Contact.TestContactFrictionData.test_friction_search_static"><code class="docutils literal notranslate"><span class="pre">TestContactFrictionData.test_friction_search_static()</span></code></a></li>
@@ -204,8 +212,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="optimism.contact.test.html#module-optimism.contact.test.test_Cpp">optimism.contact.test.test_Cpp module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_Cpp.TestEdgeIntersection"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_Cpp.TestEdgeIntersection._classSetupFailed"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection._classSetupFailed</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_Cpp.TestEdgeIntersection._class_cleanups"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection._class_cleanups</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_Cpp.TestEdgeIntersection.plot_grid"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection.plot_grid()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_Cpp.TestEdgeIntersection.setUp"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection.setUp()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_Cpp.TestEdgeIntersection.test_cpp_dist_corner1"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection.test_cpp_dist_corner1()</span></code></a></li>
@@ -224,8 +230,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="optimism.contact.test.html#module-optimism.contact.test.test_EdgeIntersection">optimism.contact.test.test_EdgeIntersection module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection._classSetupFailed"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection._classSetupFailed</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection._class_cleanups"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection._class_cleanups</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.compute_ray_trace"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection.compute_ray_trace()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.get_edge"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection.get_edge()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_EdgeIntersection.TestEdgeIntersection.get_ray"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection.get_ray()</span></code></a></li>
@@ -243,10 +247,28 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="optimism.contact.test.html#module-optimism.contact.test.test_IntegralPenaltyContact">optimism.contact.test.test_IntegralPenaltyContact module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection.setUp"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection.setUp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection.test_integral_both_equal_in_contact"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection.test_integral_both_equal_in_contact()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection.test_integral_both_equal_out_of_contact"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection.test_integral_both_equal_out_of_contact()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection.test_integral_both_in_contact"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection.test_integral_both_in_contact()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection.test_integral_both_out_of_contact"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection.test_integral_both_out_of_contact()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection.test_integral_in_out_of_contact"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection.test_integral_in_out_of_contact()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection.test_integral_some_in_overlap"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection.test_integral_some_in_overlap()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection.test_plot_smoothness"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection.test_plot_smoothness()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection.untest_roundoff"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection.untest_roundoff()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.TestEdgeIntersection.utest_plot"><code class="docutils literal notranslate"><span class="pre">TestEdgeIntersection.utest_plot()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.integral"><code class="docutils literal notranslate"><span class="pre">integral()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.integrate_gap_numeric"><code class="docutils literal notranslate"><span class="pre">integrate_gap_numeric()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.precise_integral"><code class="docutils literal notranslate"><span class="pre">precise_integral()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_IntegralPenaltyContact.taylor_integral"><code class="docutils literal notranslate"><span class="pre">taylor_integral()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="optimism.contact.test.html#module-optimism.contact.test.test_LevelsetConstraint">optimism.contact.test.test_LevelsetConstraint module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint"><code class="docutils literal notranslate"><span class="pre">TestLevelsetContactConstraint</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint._classSetupFailed"><code class="docutils literal notranslate"><span class="pre">TestLevelsetContactConstraint._classSetupFailed</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint._class_cleanups"><code class="docutils literal notranslate"><span class="pre">TestLevelsetContactConstraint._class_cleanups</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint.setUp"><code class="docutils literal notranslate"><span class="pre">TestLevelsetContactConstraint.setUp()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint.test_compute_all_positive_constraints_for_far_away_levelset"><code class="docutils literal notranslate"><span class="pre">TestLevelsetContactConstraint.test_compute_all_positive_constraints_for_far_away_levelset()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_LevelsetConstraint.TestLevelsetContactConstraint.test_friction"><code class="docutils literal notranslate"><span class="pre">TestLevelsetContactConstraint.test_friction()</span></code></a></li>
@@ -258,8 +280,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="optimism.contact.test.html#module-optimism.contact.test.test_MortarGeom">optimism.contact.test.test_MortarGeom module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_MortarGeom.TestMortarGeom"><code class="docutils literal notranslate"><span class="pre">TestMortarGeom</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_MortarGeom.TestMortarGeom._classSetupFailed"><code class="docutils literal notranslate"><span class="pre">TestMortarGeom._classSetupFailed</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_MortarGeom.TestMortarGeom._class_cleanups"><code class="docutils literal notranslate"><span class="pre">TestMortarGeom._class_cleanups</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_MortarGeom.TestMortarGeom.setUp"><code class="docutils literal notranslate"><span class="pre">TestMortarGeom.setUp()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_MortarGeom.TestMortarGeom.testAreaIntegrals"><code class="docutils literal notranslate"><span class="pre">TestMortarGeom.testAreaIntegrals()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_MortarGeom.TestMortarGeom.testEdgesWithCommonPoint"><code class="docutils literal notranslate"><span class="pre">TestMortarGeom.testEdgesWithCommonPoint()</span></code></a></li>
@@ -275,24 +295,20 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="optimism.contact.test.html#module-optimism.contact.test.test_NeighborSearch">optimism.contact.test.test_NeighborSearch module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture"><code class="docutils literal notranslate"><span class="pre">SelfContactPenaltyFixture</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture._classSetupFailed"><code class="docutils literal notranslate"><span class="pre">SelfContactPenaltyFixture._classSetupFailed</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture._class_cleanups"><code class="docutils literal notranslate"><span class="pre">SelfContactPenaltyFixture._class_cleanups</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture.min_distance_squared"><code class="docutils literal notranslate"><span class="pre">SelfContactPenaltyFixture.min_distance_squared()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture.setUp"><code class="docutils literal notranslate"><span class="pre">SelfContactPenaltyFixture.setUp()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture.test_exclusion_of_current_and_adjacent_edges"><code class="docutils literal notranslate"><span class="pre">SelfContactPenaltyFixture.test_exclusion_of_current_and_adjacent_edges()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture.test_exclusion_of_current_edge"><code class="docutils literal notranslate"><span class="pre">SelfContactPenaltyFixture.test_exclusion_of_current_edge()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture.test_exclusion_of_edges_on_opposite_face"><code class="docutils literal notranslate"><span class="pre">SelfContactPenaltyFixture.test_exclusion_of_edges_on_opposite_face()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture.test_exclusion_of_edges_with_normals_in_same_direction"><code class="docutils literal notranslate"><span class="pre">SelfContactPenaltyFixture.test_exclusion_of_edges_with_normals_in_same_direction()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture.test_exclusion_of_edges_with_normals_perpendicular"><code class="docutils literal notranslate"><span class="pre">SelfContactPenaltyFixture.test_exclusion_of_edges_with_normals_perpendicular()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture.test_inclusion_of_edges_on_adjacent_face"><code class="docutils literal notranslate"><span class="pre">SelfContactPenaltyFixture.test_inclusion_of_edges_on_adjacent_face()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture.test_invalid_entries_have_minus_one_if_included"><code class="docutils literal notranslate"><span class="pre">SelfContactPenaltyFixture.test_invalid_entries_have_minus_one_if_included()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture.test_pacman_detection_1"><code class="docutils literal notranslate"><span class="pre">SelfContactPenaltyFixture.test_pacman_detection_1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NeighborSearch.SelfContactPenaltyFixture.test_pacman_detection_2"><code class="docutils literal notranslate"><span class="pre">SelfContactPenaltyFixture.test_pacman_detection_2()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="optimism.contact.test.html#module-optimism.contact.test.test_NewtonGlobalization">optimism.contact.test.test_NewtonGlobalization module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NewtonGlobalization.TestGMRESSolver"><code class="docutils literal notranslate"><span class="pre">TestGMRESSolver</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NewtonGlobalization.TestGMRESSolver._classSetupFailed"><code class="docutils literal notranslate"><span class="pre">TestGMRESSolver._classSetupFailed</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NewtonGlobalization.TestGMRESSolver._class_cleanups"><code class="docutils literal notranslate"><span class="pre">TestGMRESSolver._class_cleanups</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NewtonGlobalization.TestGMRESSolver.setUp"><code class="docutils literal notranslate"><span class="pre">TestGMRESSolver.setUp()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NewtonGlobalization.TestGMRESSolver.test_al_solver"><code class="docutils literal notranslate"><span class="pre">TestGMRESSolver.test_al_solver()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NewtonGlobalization.TestGMRESSolver.test_globalized_newton_step_nonconvex"><code class="docutils literal notranslate"><span class="pre">TestGMRESSolver.test_globalized_newton_step_nonconvex()</span></code></a></li>
@@ -301,8 +317,6 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver"><code class="docutils literal notranslate"><span class="pre">TestQuadraticSolver</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver._classSetupFailed"><code class="docutils literal notranslate"><span class="pre">TestQuadraticSolver._classSetupFailed</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver._class_cleanups"><code class="docutils literal notranslate"><span class="pre">TestQuadraticSolver._class_cleanups</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.check_quadratic"><code class="docutils literal notranslate"><span class="pre">TestQuadraticSolver.check_quadratic()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.setUp"><code class="docutils literal notranslate"><span class="pre">TestQuadraticSolver.setUp()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_NewtonGlobalization.TestQuadraticSolver.test_constant"><code class="docutils literal notranslate"><span class="pre">TestQuadraticSolver.test_constant()</span></code></a></li>
@@ -327,8 +341,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="optimism.contact.test.html#module-optimism.contact.test.test_Search">optimism.contact.test.test_Search module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_Search.TestDoubleMeshFixture"><code class="docutils literal notranslate"><span class="pre">TestDoubleMeshFixture</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_Search.TestDoubleMeshFixture._classSetupFailed"><code class="docutils literal notranslate"><span class="pre">TestDoubleMeshFixture._classSetupFailed</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_Search.TestDoubleMeshFixture._class_cleanups"><code class="docutils literal notranslate"><span class="pre">TestDoubleMeshFixture._class_cleanups</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_Search.TestDoubleMeshFixture.is_contact_edge"><code class="docutils literal notranslate"><span class="pre">TestDoubleMeshFixture.is_contact_edge()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_Search.TestDoubleMeshFixture.is_integration_edge"><code class="docutils literal notranslate"><span class="pre">TestDoubleMeshFixture.is_integration_edge()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_Search.TestDoubleMeshFixture.setUp"><code class="docutils literal notranslate"><span class="pre">TestDoubleMeshFixture.setUp()</span></code></a></li>
@@ -343,8 +355,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="optimism.contact.test.html#module-optimism.contact.test.test_TwoBodyContact">optimism.contact.test.test_TwoBodyContact module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture"><code class="docutils literal notranslate"><span class="pre">TwoBodyContactFixture</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture._classSetupFailed"><code class="docutils literal notranslate"><span class="pre">TwoBodyContactFixture._classSetupFailed</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture._class_cleanups"><code class="docutils literal notranslate"><span class="pre">TwoBodyContactFixture._class_cleanups</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.plot_solution"><code class="docutils literal notranslate"><span class="pre">TwoBodyContactFixture.plot_solution()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.setUp"><code class="docutils literal notranslate"><span class="pre">TwoBodyContactFixture.setUp()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyContact.TwoBodyContactFixture.test_combining_nodesets"><code class="docutils literal notranslate"><span class="pre">TwoBodyContactFixture.test_combining_nodesets()</span></code></a></li>
@@ -358,8 +368,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="optimism.contact.test.html#module-optimism.contact.test.test_TwoBodyMortarContact">optimism.contact.test.test_TwoBodyMortarContact module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyMortarContact.TwoBodyContactFixture"><code class="docutils literal notranslate"><span class="pre">TwoBodyContactFixture</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyMortarContact.TwoBodyContactFixture._classSetupFailed"><code class="docutils literal notranslate"><span class="pre">TwoBodyContactFixture._classSetupFailed</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyMortarContact.TwoBodyContactFixture._class_cleanups"><code class="docutils literal notranslate"><span class="pre">TwoBodyContactFixture._class_cleanups</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyMortarContact.TwoBodyContactFixture.plot_solution"><code class="docutils literal notranslate"><span class="pre">TwoBodyContactFixture.plot_solution()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyMortarContact.TwoBodyContactFixture.setUp"><code class="docutils literal notranslate"><span class="pre">TwoBodyContactFixture.setUp()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyMortarContact.TwoBodyContactFixture.test_contact_constraints"><code class="docutils literal notranslate"><span class="pre">TwoBodyContactFixture.test_contact_constraints()</span></code></a></li>
@@ -367,8 +375,6 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyMortarContact.TwoBodySelfContactFixture"><code class="docutils literal notranslate"><span class="pre">TwoBodySelfContactFixture</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyMortarContact.TwoBodySelfContactFixture._classSetupFailed"><code class="docutils literal notranslate"><span class="pre">TwoBodySelfContactFixture._classSetupFailed</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyMortarContact.TwoBodySelfContactFixture._class_cleanups"><code class="docutils literal notranslate"><span class="pre">TwoBodySelfContactFixture._class_cleanups</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyMortarContact.TwoBodySelfContactFixture.setUp"><code class="docutils literal notranslate"><span class="pre">TwoBodySelfContactFixture.setUp()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyMortarContact.TwoBodySelfContactFixture.test_mortar_integral_computes_expected_area"><code class="docutils literal notranslate"><span class="pre">TwoBodySelfContactFixture.test_mortar_integral_computes_expected_area()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.contact.test.html#optimism.contact.test.test_TwoBodyMortarContact.TwoBodySelfContactFixture.test_mortar_integral_computes_no_penetration"><code class="docutils literal notranslate"><span class="pre">TwoBodySelfContactFixture.test_mortar_integral_computes_no_penetration()</span></code></a></li>
@@ -555,6 +561,59 @@
 <dd></dd></dl>
 
 </section>
+<section id="module-optimism.contact.IntegralPenaltyContact">
+<span id="optimism-contact-integralpenaltycontact-module"></span><h2>optimism.contact.IntegralPenaltyContact module<a class="headerlink" href="#module-optimism.contact.IntegralPenaltyContact" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.IntegralPenaltyContact.assembly_mortar_integral">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.IntegralPenaltyContact.</span></span><span class="sig-name descname"><span class="pre">assembly_mortar_integral</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coords</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentConnsA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentConnsB</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neighborList</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxOverlapDist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/IntegralPenaltyContact.html#assembly_mortar_integral"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.IntegralPenaltyContact.assembly_mortar_integral" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.IntegralPenaltyContact.compute_intersection">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.IntegralPenaltyContact.</span></span><span class="sig-name descname"><span class="pre">compute_intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edgeA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edgeB</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smoothing</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/IntegralPenaltyContact.html#compute_intersection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.IntegralPenaltyContact.compute_intersection" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.IntegralPenaltyContact.compute_normal">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.IntegralPenaltyContact.</span></span><span class="sig-name descname"><span class="pre">compute_normal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edgeCoords</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/IntegralPenaltyContact.html#compute_normal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.IntegralPenaltyContact.compute_normal" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.IntegralPenaltyContact.compute_normal_from_a">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.IntegralPenaltyContact.</span></span><span class="sig-name descname"><span class="pre">compute_normal_from_a</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edgeA</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edgeB</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">array</span></span></span><a class="reference internal" href="_modules/optimism/contact/IntegralPenaltyContact.html#compute_normal_from_a"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.IntegralPenaltyContact.compute_normal_from_a" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.IntegralPenaltyContact.compute_normal_from_b">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.IntegralPenaltyContact.</span></span><span class="sig-name descname"><span class="pre">compute_normal_from_b</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edgeA</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edgeB</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">array</span></span></span><a class="reference internal" href="_modules/optimism/contact/IntegralPenaltyContact.html#compute_normal_from_b"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.IntegralPenaltyContact.compute_normal_from_b" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.IntegralPenaltyContact.integrate_gap">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.IntegralPenaltyContact.</span></span><span class="sig-name descname"><span class="pre">integrate_gap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/IntegralPenaltyContact.html#integrate_gap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.IntegralPenaltyContact.integrate_gap" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.IntegralPenaltyContact.integrate_mortar_barrier">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.IntegralPenaltyContact.</span></span><span class="sig-name descname"><span class="pre">integrate_mortar_barrier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edgeA</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edgeB</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_common_normal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">array</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">array</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_overlap_dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relativeSmoothingSize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/IntegralPenaltyContact.html#integrate_mortar_barrier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.IntegralPenaltyContact.integrate_mortar_barrier" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.IntegralPenaltyContact.integrate_normalized_gap">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.IntegralPenaltyContact.</span></span><span class="sig-name descname"><span class="pre">integrate_normalized_gap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/IntegralPenaltyContact.html#integrate_normalized_gap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.IntegralPenaltyContact.integrate_normalized_gap" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.IntegralPenaltyContact.smooth_heaviside_at_zero">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.IntegralPenaltyContact.</span></span><span class="sig-name descname"><span class="pre">smooth_heaviside_at_zero</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/IntegralPenaltyContact.html#smooth_heaviside_at_zero"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.IntegralPenaltyContact.smooth_heaviside_at_zero" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.IntegralPenaltyContact.smooth_linear">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.IntegralPenaltyContact.</span></span><span class="sig-name descname"><span class="pre">smooth_linear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/IntegralPenaltyContact.html#smooth_linear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.IntegralPenaltyContact.smooth_linear" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
 <section id="module-optimism.contact.Levelset">
 <span id="optimism-contact-levelset-module"></span><h2>optimism.contact.Levelset module<a class="headerlink" href="#module-optimism.contact.Levelset" title="Link to this heading"></a></h2>
 <dl class="py function">
@@ -651,6 +710,11 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="optimism.contact.MortarContact.compute_normal_from_a">
 <span class="sig-prename descclassname"><span class="pre">optimism.contact.MortarContact.</span></span><span class="sig-name descname"><span class="pre">compute_normal_from_a</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edgeA</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edgeB</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">array</span></span></span><a class="reference internal" href="_modules/optimism/contact/MortarContact.html#compute_normal_from_a"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.MortarContact.compute_normal_from_a" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="optimism.contact.MortarContact.edges_are_adjacent_non_pacman">
+<span class="sig-prename descclassname"><span class="pre">optimism.contact.MortarContact.</span></span><span class="sig-name descname"><span class="pre">edges_are_adjacent_non_pacman</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edgeA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edgeB</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xB</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimism/contact/MortarContact.html#edges_are_adjacent_non_pacman"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optimism.contact.MortarContact.edges_are_adjacent_non_pacman" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
