@@ -34,9 +34,65 @@ class SelfContactPenaltyFixture(MeshFixture):
         xs1 = coords[edge1] + self.disp[edge1]
         xs2 = coords[edge2] + self.disp[edge2]
         return MortarContact.minimum_squared_distance(xs1, xs2)
+    
+
+    def test_pacman_detection_1(self):
+        edgeA = np.array([0,1], dtype=int)
+        xA = np.array([[1.0,0.0],[0.0,0.0]])
+
+        edgeB = np.array([1,2], dtype=int)
+        xB = np.array([[0.0,0.0],[-1.0,0.5]])
+
+        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
+
+        xB = np.array([[0.0,0.0],[1.0,0.001]])
+        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
+
+        xB = np.array([[0.0,0.0],[1.0,-0.001]])
+        self.assertTrue(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
+
+        xB = np.array([[0.0,0.0],[-1.0,-0.5]])
+        self.assertTrue(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
+
+        xB = np.array([[0.0,0.0],[-0.5,0.00001]])
+        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
+
+        xB = np.array([[0.0,0.0],[-0.5,-0.00001]])
+        self.assertTrue(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
+
+        edgeB = np.array([2,3], dtype=int)
+        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeA, edgeB, xA, xB))
 
 
-    def test_exclusion_of_current_and_adjacent_edges(self):
+    def test_pacman_detection_2(self):
+        edgeA = np.array([0,1], dtype=int)
+        xA = np.array([[1.0,0.0],[0.0,0.0]])
+
+        edgeB = np.array([1,2], dtype=int)
+        xB = np.array([[0.0,0.0],[-1.0,0.5]])
+
+        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
+
+        xB = np.array([[0.0,0.0],[1.0,0.001]])
+        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
+
+        xB = np.array([[0.0,0.0],[1.0,-0.001]])
+        self.assertTrue(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
+
+        xB = np.array([[0.0,0.0],[-1.0,-0.5]])
+        self.assertTrue(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
+
+        xB = np.array([[0.0,0.0],[-0.5,0.00001]])
+        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
+
+        xB = np.array([[0.0,0.0],[-0.5,-0.00001]])
+        self.assertTrue(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
+
+        edgeB = np.array([2,3], dtype=int)
+        self.assertFalse(MortarContact.edges_are_adjacent_non_pacman(edgeB, edgeA, xB, xA))
+
+
+    def test_exclusion_of_current_edge(self):
         coordsSegA = np.array([[0, 1], [1, 3], [3, 5], [12, 10]])
         coordsSegB = np.array([[1, 3]]) 
 
@@ -64,48 +120,14 @@ class SelfContactPenaltyFixture(MeshFixture):
         self.assertArrayEqual(neighborList, goldNeighbors)
     
 
-    def test_exclusion_of_edges_with_normals_in_same_direction(self):
-        coordsSegA = np.array([[12, 10], [5, 7]])
-        coordsSegB = np.array([[1, 3]]) 
-
-        numNeighbors = 1
-        neighborList = MortarContact.get_closest_neighbors_for_self_contact(coordsSegA, coordsSegB, self.mesh, self.disp, numNeighbors, self.maxPenetrationDistance)
-
-        # Edge 1 is closer so should be preferred
-        minDistEdge0 = self.min_distance_squared(coordsSegA[0], coordsSegB[0], self.mesh.coords)
-        minDistEdge1 = self.min_distance_squared(coordsSegA[1], coordsSegB[0], self.mesh.coords)
-        self.assertTrue(minDistEdge1 < minDistEdge0)
-
-        # Edge 0 is returned since edge 1 is invalid
-        goldNeighbors = np.array([[0]])
-        self.assertArrayEqual(neighborList, goldNeighbors)
-    
-
-    def test_exclusion_of_edges_with_normals_perpendicular(self):
-        coordsSegA = np.array([[12, 10], [7, 6]])
-        coordsSegB = np.array([[3, 5]]) 
-
-        numNeighbors = 1
-        neighborList = MortarContact.get_closest_neighbors_for_self_contact(coordsSegA, coordsSegB, self.mesh, self.disp, numNeighbors, self.maxPenetrationDistance)
-
-        # Edge 1 is closer so should be preferred
-        minDistEdge0 = self.min_distance_squared(coordsSegA[0], coordsSegB[0], self.mesh.coords)
-        minDistEdge1 = self.min_distance_squared(coordsSegA[1], coordsSegB[0], self.mesh.coords)
-        self.assertTrue(minDistEdge1 < minDistEdge0)
-
-        # Edge 0 is returned since edge 1 is invalid
-        goldNeighbors = np.array([[0]])
-        self.assertArrayEqual(neighborList, goldNeighbors)
-
-
     def test_inclusion_of_edges_on_adjacent_face(self):
         coordsSegA = np.array([[0, 1], [1, 3], [3, 5], [12, 10], [10, 8], [5, 7], [2, 0]])
         coordsSegB = np.array([[1, 3]]) 
 
-        numNeighbors = 2
+        numNeighbors = 3
         neighborList = MortarContact.get_closest_neighbors_for_self_contact(coordsSegA, coordsSegB, self.mesh, self.disp, numNeighbors, self.maxPenetrationDistance)
 
-        goldNeighbors = np.array([[4, 3]])
+        goldNeighbors = np.array([[5, 4, 3]])
         self.assertArrayEqual(neighborList, goldNeighbors)
     
 
