@@ -142,7 +142,7 @@ def assembly_mortar_integral(coords, disp, segmentConnsA, segmentConnsB, neighbo
 
             invalidIndex = indexA == -1
 
-            coordsSegB = jnp.where(invalidIndex, coordsSegA, coordsSegB)
+            coordsSegB = jnp.where(invalidIndex, coordsSegA, coordsSegB) # don't compute for invalid neighbor segment
 
             contactEnergy = jax.lax.cond(invalidIndex,
                                          lambda : 0.0,
