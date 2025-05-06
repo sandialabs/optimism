@@ -59,11 +59,6 @@ def compute_intersection(edgeA, edgeB, normal, smoothing):
     return xi_minmax_in_a, gaps_a
 
 
-def smooth_heaviside_at_zero(x, eps):
-    r = x/eps
-    return jnp.where(x < eps, -2*r*r*r+3*r*r, 1.0)
-
-
 def integrate_normalized_gap(xi, g):
     dxi = xi[1] - xi[0]
     g0_large = g[0] >= 1.0
@@ -109,6 +104,11 @@ def integrate_normalized_gap(xi, g):
 # integral_x0^x1 delta / g + g / delta - 2 {where g < delta} dxi
 def integrate_gap(xi, g, delta):
     return integrate_normalized_gap(xi, g / delta)
+
+
+def smooth_heaviside_at_zero(x, eps):
+    r = x/eps
+    return jnp.where(x < eps, -2*r*r*r+3*r*r, 1.0)
 
 
 def integrate_mortar_barrier(edgeA : jnp.array,
