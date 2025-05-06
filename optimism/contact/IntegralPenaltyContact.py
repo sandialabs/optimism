@@ -110,21 +110,6 @@ def integrate_normalized_gap(xi, g):
 def integrate_gap(xi, g, delta):
     return integrate_normalized_gap(xi, g / delta)
 
-def integrate_gap_numeric(xi, g, delta):
-    N = 10000
-    xig = jnp.linspace(0.5/N, 1.0-0.5/N, N)
-    dxi = xi[1] - xi[0]
-    w = dxi / N
-
-    def gap(x) :
-        return g[0] + x * (g[1] - g[0])
-    
-    def p(x) : 
-        v = gap(x)
-        return jnp.where(v < delta, v / delta + delta / v - 2, 0.0)
-
-    return jnp.sum( jax.vmap(p)(xig) ) * w
-
 
 def integrate_mortar_barrier(edgeA : jnp.array,
                              edgeB : jnp.array,

@@ -32,6 +32,22 @@ def taylor_integral(xi0, xi1, g0, g1):
     dg = g1 - g0
     return (1.0/gbar + gbar - 2) * dxi + 1./12. * dg * dg * dxi / (gbar*gbar*gbar)
 
+def integrate_gap_numeric(xi, g, delta):
+    N = 10000
+    xig = np.linspace(0.5/N, 1.0-0.5/N, N)
+    dxi = xi[1] - xi[0]
+    w = dxi / N
+
+    def gap(x) :
+        return g[0] + x * (g[1] - g[0])
+    
+    def p(x) : 
+        v = gap(x)
+        return np.where(v < delta, v / delta + delta / v - 2, 0.0)
+
+    return np.sum( jax.vmap(p)(xig) ) * w
+
+
 class TestEdgeIntersection(TestFixture):
 
     def setUp(self):
