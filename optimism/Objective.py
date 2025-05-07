@@ -1,35 +1,89 @@
+from optimism.FunctionSpace import DofManager
 from optimism.JaxConfig import *
 from optimism.SparseCholesky import SparseCholesky
-import numpy as onp
 from scipy.sparse import diags as sparse_diags
 from scipy.sparse import csc_matrix
+from typing import Optional
+import equinox as eqx
+import numpy as onp
+
 
 # static vs dynamics
 # differentiable vs undifferentiable
-Params = namedtuple('Params',
-                    ['bc_data',
-                     'state_data',
-                     'design_data',
-                     'app_data',
-                     'time',
-                     'dynamic_data'],
-                     defaults=(None,None,None,None,None,None))
+# TODO fix some of these type hints for better clarity. 
+# maybe this will help formalize what's what when
+class Params(eqx.Module):
+    bc_data: any
+    state_data: any
+    design_data: any
+    app_data: any
+    time: any
+    dynamic_data: any
+    # Need the eqx.field(static=True) since DofManager
+    # is composed of mainly og numpy arrays which leads
+    # to the error
+    #jax.errors.NonConcreteBooleanIndexError: Array boolean indices must be concrete; got ShapedArray(bool[x,x])
+    dof_manager: DofManager = eqx.field(static=True)
+
+    def __init__(
+        self, 
+        bc_data = None, 
+        state_data = None, 
+        design_data = None, 
+        app_data = None, 
+        time = None, 
+        dynamic_data = None, 
+        dof_manager: Optional[DofManager] = None
+    ): 
+        self.bc_data = bc_data
+        self.state_data = state_data
+        self.design_data = design_data
+        self.app_data = app_data
+        self.time = time
+        self.dynamic_data = dynamic_data
+        self.dof_manager = dof_manager
+
+    def __getitem__(self, index):
+        if index == 0:
+            return self.bc_data
+        elif index == 1:
+            return self.state_data
+        elif index == 2:
+            return self.design_data
+        elif index == 3:
+            return self.app_data
+        elif index == 4:
+            return self.time
+        elif index == 5:
+            return self.dynamic_data
+        elif index == 6:
+            return self.dof_manager
+        else:
+            raise ValueError(f'Bad index value {index}')
 
 
+# written for backwards compatability
+# we can just use the eqx.tree_at syntax in simulations
+# or we could write a single method bound to Params for this...
 def param_index_update(p, index, newParam):
-    if index==0:
-        return Params(newParam, p[1], p[2], p[3], p[4], p[5])
-    if index==1:
-        return Params(p[0], newParam, p[2], p[3], p[4], p[5])
-    if index==2:
-        return Params(p[0], p[1], newParam, p[3], p[4], p[5])
-    if index==3:
-        return Params(p[0], p[1], p[2], newParam, p[4], p[5])
-    if index==4:
-        return Params(p[0], p[1], p[2], p[3], newParam, p[5])
-    if index==5:
-        return Params(p[0], p[1], p[2], p[3], p[4], newParam)
-    print('invalid index passed to param_index_update = ', index)
+    if index == 0:
+        p = eqx.tree_at(lambda x: x.bc_data, p, newParam)
+    elif index == 1:
+        p = eqx.tree_at(lambda x: x.state_data, p, newParam)
+    elif index == 2:
+        p = eqx.tree_at(lambda x: x.design_data, p, newParam)
+    elif index == 3:
+        p = eqx.tree_at(lambda x: x.app_data, p, newParam)
+    elif index == 4:
+        p = eqx.tree_at(lambda x: x.time, p, newParam)
+    elif index == 5:
+        p = eqx.tree_at(lambda x: x.dynamic_data, p, newParam)
+    elif index == 6:
+        p = eqx.tree_at(lambda x: x.dof_manager, p, newParam)
+    else:
+        raise ValueError(f'Bad index value {index}')
+
+    return p
 
 
 class PrecondStrategy:
