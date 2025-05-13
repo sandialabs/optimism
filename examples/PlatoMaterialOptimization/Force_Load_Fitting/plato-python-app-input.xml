@@ -1,8 +1,0 @@
-<PythonApp>
-  <Module>MaterialPropertiesOptimization</Module>
-  <Class>MaterialPropertiesOptimization</Class>
-  <Value>get_objective</Value>
-  <Gradient>get_gradient</Gradient>
-  <Reset>import_parameters</Reset>
-</PythonApp>
-
