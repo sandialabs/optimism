@@ -27,7 +27,7 @@ PROPS_refRelax = 16
 # define fixed properties
 constGlass = [
     0.01,            # rate constant
-    18959,           # wtf is this?
+    18959,           # activiation energy, J/mol
     8.3145,          # gas constants
     109603,          # g1 fitting parameter in Tg (unitless)
     722.20,          # g2 fitting parameter in Tg (unitless)
@@ -38,7 +38,7 @@ constGlass = [
     1.059,           # fitting parameter for Young's modulus (unitless)
     3.321,           # fitting parameter for Young's modulus (unitless)
     5.248,           # fitting parameter for Young's modulus (unitless)
-    0.1              # wtf is this?
+    0.1              # reference relaxation time
 ]
 
 NUM_PRONY_TERMS = -1
