@@ -31,7 +31,7 @@ if plotComparison:
     plt.plot(U3, F3, marker='x')
     plt.xlabel('Displacement (mm)')
     plt.ylabel('Force (N)')
-    plt.legend(["Initial", "Target", "Optimized"], loc=0, frameon=True)
+    plt.legend(["Initial", "Target"], loc=0, frameon=True)
  
 # plt.show()
 plt.savefig('force_displacement.png')

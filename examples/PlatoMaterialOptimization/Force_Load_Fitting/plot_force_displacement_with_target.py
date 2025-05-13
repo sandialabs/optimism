@@ -9,40 +9,13 @@ F = norm_y*np.abs(loadDisp['force'])
 U = norm_x*np.abs(loadDisp['displacement'])
 plt.plot(U, F, marker='o')
 
-# loadDisp = np.load('disp_control_response_050.npz')
-# F = norm_y*np.abs(loadDisp['force'])
-# U = norm_x*np.abs(loadDisp['displacement'])
-# plt.plot(U, F, marker='1')
-
 loadDisp = np.load('disp_control_response.npz')
 F = norm_y*np.abs(loadDisp['force'])
 U = norm_x*np.abs(loadDisp['displacement'])
 plt.plot(U, F, marker='2')
 
-# loadDisp = np.load('disp_control_response_030.npz')
-# F = norm_y*np.abs(loadDisp['force'])
-# U = norm_x*np.abs(loadDisp['displacement'])
-# plt.plot(U, F, marker='3')
-
-# loadDisp = np.load('disp_control_response_040.npz')
-# F = norm_y*np.abs(loadDisp['force'])
-# U = norm_x*np.abs(loadDisp['displacement'])
-# plt.plot(U, F, marker='4')
-
-# loadDisp = np.load('disp_control_response_050.npz')
-# F = norm_y*np.abs(loadDisp['force'])
-# U = norm_x*np.abs(loadDisp['displacement'])
-# plt.plot(U, F, marker='1')
-
-# loadDisp = np.load('disp_control_response_100.npz')
-# F = norm_y*np.abs(loadDisp['force'])
-# U = norm_x*np.abs(loadDisp['displacement'])
-# plt.plot(U, F, marker='x')
-
 compareOptimized = True
 if compareOptimized:
-    
-
     F2 = norm_y*np.abs(loadDisp['targetForces'])
     U2 = norm_x*np.abs(loadDisp['targetDisplacements'])
     plt.scatter(U2, F2, marker='x', c='r', s=80)
@@ -54,4 +27,4 @@ else:
 plt.xlabel('Displacement (mm)')
 plt.ylabel('Force (N)')
  
-plt.savefig('force_displacement_limitTest.png')
+plt.savefig('force_displacement.png')
