@@ -7,32 +7,48 @@ from optimism import Mesh
 from optimism.TensorMath import tensor_2D_to_3D
 from optimism import QuadratureRule
 from optimism import Interpolants
-import jax
+from typing import Callable
 
-MechanicsFunctions = namedtuple('MechanicsFunctions',
-                                ['compute_strain_energy',
-                                 'compute_updated_internal_variables',
-                                 'compute_element_stiffnesses',
-                                 'compute_output_energy_densities_and_stresses',
-                                 'compute_initial_state',
-                                 'integrated_material_qoi',
-                                 'compute_output_material_qoi'])
+import equinox as eqx
 
 
-DynamicsFunctions = namedtuple('DynamicsFunctions',
-                               ['compute_algorithmic_energy',
-                                'compute_updated_internal_variables',
-                                'compute_element_hessians',
-                                'compute_output_energy_densities_and_stresses',
-                                'compute_output_kinetic_energy',
-                                'compute_output_strain_energy',
-                                'compute_initial_state',
-                                'compute_element_masses', # not used for time integration, provided for convenience (spectral analysis, eg)
-                                'predict',
-                                'correct'])
+# TODO
+# eventually let's move to some kind of class hierarchy like below
+# that we can derive off of with shared behavior
+#
+# normal python inheritance rules apply to equinox Modules
+# class BaseFunctions(eqx.Module):
+#     compute_output_energy_densities_and_stresses: Callable
+#     compute_initial_state: Callable
 
 
-NewmarkParameters = namedtuple('NewmarkParameters', ['gamma', 'beta'], defaults=[0.5, 0.25])
+# TODO further type below so Callable refelcts the actual called arguments and returns
+class MechanicsFunctions(eqx.Module):
+    compute_strain_energy: Callable
+    compute_updated_internal_variables: Callable
+    compute_element_stiffnesses: Callable
+    compute_output_energy_densities_and_stresses: Callable
+    compute_initial_state: Callable
+    integrated_material_qoi: Callable
+    compute_output_material_qoi: Callable
+
+
+class DynamicsFunctions(eqx.Module):
+    compute_algorithmic_energy: Callable
+    compute_updated_internal_variables: Callable
+    compute_element_hessians: Callable
+    compute_output_energy_densities_and_stresses: Callable
+    compute_output_kinetic_energy: Callable
+    compute_output_strain_energy: Callable
+    compute_initial_state: Callable
+    compute_element_masses: Callable # not used for time integration, provided for convenience (spectral analysis, eg)
+    predict: Callable
+    correct: Callable
+
+
+class NewmarkParameters(eqx.Module):
+    gamma: float = 0.5
+    beta: float = 0.25
 
 
 def plane_strain_gradient_transformation(elemDispGrads, elemShapes, elemVols, elemNodalDisps, elemNodalCoords):
@@ -217,7 +233,7 @@ def _compute_updated_internal_variables_multi_block(functionSpace, U, states, dt
 # TODO add props
 def _compute_initial_state_multi_block(fs, blockModels):
 
-    numQuadPoints = QuadratureRule.len(fs.quadratureRule)
+    numQuadPoints = len(fs.quadratureRule)
     # Store the same number of state variables for every material to make
     # vmapping easy.
     #
@@ -242,18 +258,17 @@ def _compute_initial_state_multi_block(fs, blockModels):
     return initialState
 
 
-# TODO add props
-def _compute_element_stiffnesses_multi_block(U, stateVariables, functionSpace, blockModels, modify_element_gradient):
+def _compute_element_stiffnesses_multi_block(U, stateVariables, dt, functionSpace, blockModels, modify_element_gradient):
     fs = functionSpace
-    nen = Interpolants.num_nodes(functionSpace.mesh.parentElement)
+    nen = functionSpace.mesh.parentElement.num_nodes
     elementHessians = np.zeros((Mesh.num_elements(functionSpace.mesh), nen, 2, nen, 2))
     for blockKey in blockModels:
         materialModel = blockModels[blockKey]
         L = strain_energy_density_to_lagrangian_density(materialModel.compute_energy_density)
         elemIds = functionSpace.mesh.blocks[blockKey]
         f =  vmap(compute_element_stiffness_from_global_fields,
-                  (None, None, 0, 0, 0, 0, 0, None, None))
-        blockHessians = f(U, fs.mesh.coords, stateVariables[elemIds], fs.mesh.conns[elemIds],
+                  (None, None, 0, None, 0, 0, 0, 0, None, None))
+        blockHessians = f(U, fs.mesh.coords, stateVariables[elemIds], dt, fs.mesh.conns[elemIds],
                           fs.shapes[elemIds], fs.shapeGrads[elemIds], fs.vols[elemIds],
                           L, modify_element_gradient)
         elementHessians = elementHessians.at[elemIds].set(blockHessians)
@@ -294,12 +309,12 @@ def create_multi_block_mechanics_functions(functionSpace, mode2D, materialModels
 
     
     def compute_element_stiffnesses(U, stateVariables, dt=0.0):
-        return _compute_element_stiffnesses_multi_block(U, stateVariables, functionSpace, materialModels, modify_element_gradient)
+        return _compute_element_stiffnesses_multi_block(U, stateVariables, dt, functionSpace, materialModels, modify_element_gradient)
 
 
     def compute_output_energy_densities_and_stresses(U, stateVariables, dt=0.0):
-        energy_densities = np.zeros((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule)))
-        stresses = np.zeros((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule), 3, 3))
+        energy_densities = np.zeros((Mesh.num_elements(fs.mesh), len(fs.quadratureRule)))
+        stresses = np.zeros((Mesh.num_elements(fs.mesh), len(fs.quadratureRule), 3, 3))
         for blockKey in materialModels:
             compute_output_energy_density = materialModels[blockKey].compute_energy_density
             output_lagrangian = strain_energy_density_to_lagrangian_density(compute_output_energy_density)
@@ -365,7 +380,7 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel,
 
     
     def compute_initial_state():
-        shape = Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule), 1
+        shape = Mesh.num_elements(fs.mesh), len(fs.quadratureRule), 1
         return np.tile(materialModel.compute_initial_state(), shape)
 
     def lagrangian_qoi(U, gradU, Q, props, X, dt):
@@ -489,19 +504,19 @@ def create_dynamics_functions(functionSpace, mode2D, materialModel, newmarkParam
         return FunctionSpace.evaluate_on_block(fs, U, stateVariables, dt, output_constitutive, slice(None), modify_element_gradient=modify_element_gradient)
 
     def compute_kinetic_energy(V):
-        stateVariables = np.zeros((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule)))
+        stateVariables = np.zeros((Mesh.num_elements(fs.mesh), len(fs.quadratureRule)))
         return _compute_kinetic_energy(functionSpace, V, stateVariables, materialModel.density)
 
     def compute_output_strain_energy(U, stateVariables, dt):
         return _compute_strain_energy(functionSpace, U, stateVariables, dt, materialModel.compute_energy_density, modify_element_gradient)
 
     def compute_initial_state():
-        shape = Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule), 1
+        shape = Mesh.num_elements(fs.mesh), len(fs.quadratureRule), 1
         return np.tile(materialModel.compute_initial_state(), shape)
 
     def compute_element_masses():
         V = np.zeros_like(fs.mesh.coords)
-        stateVariables = np.zeros((Mesh.num_elements(fs.mesh), QuadratureRule.len(fs.quadratureRule)))
+        stateVariables = np.zeros((Mesh.num_elements(fs.mesh), len(fs.quadratureRule)))
         return _compute_element_masses(functionSpace, V, stateVariables, materialModel.density, modify_element_gradient)
 
     def predict(U, V, A, dt):

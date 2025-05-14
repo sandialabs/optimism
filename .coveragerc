@@ -1,0 +1,7 @@
+[run]
+omit = optimism/test/*
+       optimism/contact/test/*
+       optimism/inverse/test/*
+       optimism/material/test/*
+       optimism/phasefield/test/*
+       optimism/treigen/test/*

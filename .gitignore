@@ -28,6 +28,7 @@ spack.lock
 *.npz
 *.vtk
 
-cubit*
-spack-build*
-ROL*
+# docs stuff
+build/
+docs/source/modules.rst
+docs/source/optimism.*

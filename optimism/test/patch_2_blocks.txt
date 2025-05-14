@@ -1,0 +1,191 @@
+netcdf patch_2_blocks {
+dimensions:
+	len_name = 256 ;
+	time_step = UNLIMITED ; // (0 currently)
+	num_dim = 2 ;
+	num_nodes = 45 ;
+	num_elem = 16 ;
+	num_el_blk = 2 ;
+	num_node_sets = 4 ;
+	num_side_sets = 2 ;
+	num_el_in_blk1 = 8 ;
+	num_nod_per_el1 = 6 ;
+	num_el_in_blk2 = 8 ;
+	num_nod_per_el2 = 6 ;
+	num_side_ss1 = 2 ;
+	num_df_ss1 = 6 ;
+	num_side_ss2 = 4 ;
+	num_df_ss2 = 12 ;
+	num_qa_rec = 2 ;
+	four = 4 ;
+	len_string = 33 ;
+	num_nod_ns1 = 5 ;
+	num_nod_ns2 = 9 ;
+	num_nod_ns3 = 5 ;
+	num_nod_ns4 = 9 ;
+variables:
+	double time_whole(time_step) ;
+	int eb_status(num_el_blk) ;
+	int eb_prop1(num_el_blk) ;
+		eb_prop1:name = "ID" ;
+	int ns_status(num_node_sets) ;
+	int ns_prop1(num_node_sets) ;
+		ns_prop1:name = "ID" ;
+	int ss_status(num_side_sets) ;
+	int ss_prop1(num_side_sets) ;
+		ss_prop1:name = "ID" ;
+	double coordx(num_nodes) ;
+	double coordy(num_nodes) ;
+	char eb_names(num_el_blk, len_name) ;
+		eb_names:_FillValue = "" ;
+	char ns_names(num_node_sets, len_name) ;
+		ns_names:_FillValue = "" ;
+	char ss_names(num_side_sets, len_name) ;
+		ss_names:_FillValue = "" ;
+	char coor_names(num_dim, len_name) ;
+		coor_names:_FillValue = "" ;
+	int connect1(num_el_in_blk1, num_nod_per_el1) ;
+		connect1:elem_type = "TRI6" ;
+	int connect2(num_el_in_blk2, num_nod_per_el2) ;
+		connect2:elem_type = "TRI6" ;
+	int elem_ss1(num_side_ss1) ;
+	int side_ss1(num_side_ss1) ;
+	double dist_fact_ss1(num_df_ss1) ;
+	int elem_ss2(num_side_ss2) ;
+	int side_ss2(num_side_ss2) ;
+	double dist_fact_ss2(num_df_ss2) ;
+	char qa_records(num_qa_rec, four, len_string) ;
+	int elem_map(num_elem) ;
+	int elem_num_map(num_elem) ;
+	int node_num_map(num_nodes) ;
+	int node_ns1(num_nod_ns1) ;
+	double dist_fact_ns1(num_nod_ns1) ;
+	int node_ns2(num_nod_ns2) ;
+	double dist_fact_ns2(num_nod_ns2) ;
+	int node_ns3(num_nod_ns3) ;
+	double dist_fact_ns3(num_nod_ns3) ;
+	int node_ns4(num_nod_ns4) ;
+	double dist_fact_ns4(num_nod_ns4) ;
+
+// global attributes:
+		:api_version = 8.25f ;
+		:version = 8.25f ;
+		:floating_point_word_size = 8 ;
+		:file_size = 1 ;
+		:maximum_name_length = 32 ;
+		:int64_status = 0 ;
+		:title = "cubit(l2/optimism_dev/optimism/optimism/test/patch_2_blocks.exo): 12/04/2024: 11" ;
+data:
+
+ eb_status = 1, 1 ;
+
+ eb_prop1 = 1, 2 ;
+
+ ns_status = 1, 1, 1, 1 ;
+
+ ns_prop1 = 1, 2, 3, 4 ;
+
+ ss_status = 1, 1 ;
+
+ ss_prop1 = 1, 2 ;
+
+ coordx = 0, -0.231415557451398, 0, -0.115707778725699, -0.115707778725699, 
+    0, -0.25, 0, -0.125, 0, -0.125, -0.5, -0.5, -0.25, -0.5, -0.375, -0.375, 
+    -0.125, -0.240707778725699, -0.5, -0.375, -0.375, -0.5, 
+    -0.240707778725699, -0.365707778725699, 0.231415557451398, 
+    0.115707778725699, 0.115707778725699, 0.25, 0.125, 0.125, 0.5, 0.5, 0.25, 
+    0.5, 0.375, 0.375, 0.125, 0.240707778725699, 0.240707778725699, 
+    0.365707778725699, 0.375, 0.5, 0.5, 0.375 ;
+
+ coordy = 0.25, 0.0185844425486017, 0, 0.134292221274301, 
+    0.00929222127430085, 0.125, -0.25, -0.25, -0.25, -0.125, -0.125, 0.25, 0, 
+    0.25, 0.125, 0.125, 0.25, 0.25, 0.134292221274301, -0.25, -0.25, -0.125, 
+    -0.125, -0.115707778725699, 0.00929222127430085, -0.0185844425486018, 
+    -0.134292221274301, -0.0092922212743009, 0.25, 0.25, 0.125, -0.25, 0, 
+    -0.25, -0.125, -0.125, -0.25, -0.25, -0.134292221274301, 
+    0.115707778725699, -0.0092922212743009, 0.125, 0.25, 0.125, 0.25 ;
+
+ eb_names =
+  "left_half",
+  "right_half" ;
+
+ ns_names =
+  "left",
+  "bottom",
+  "right",
+  "top" ;
+
+ ss_names =
+  "right",
+  "top" ;
+
+ coor_names =
+  "x",
+  "y" ;
+
+ connect1 =
+  1, 2, 3, 4, 5, 6,
+  7, 8, 3, 9, 10, 11,
+  12, 13, 14, 15, 16, 17,
+  1, 14, 2, 18, 19, 4,
+  20, 7, 13, 21, 22, 23,
+  7, 2, 13, 24, 25, 22,
+  2, 14, 13, 19, 16, 25,
+  2, 7, 3, 24, 11, 5 ;
+
+ connect2 =
+  8, 26, 3, 27, 28, 10,
+  29, 1, 3, 30, 6, 31,
+  32, 33, 34, 35, 36, 37,
+  8, 34, 26, 38, 39, 27,
+  29, 26, 33, 40, 41, 42,
+  29, 33, 43, 42, 44, 45,
+  26, 34, 33, 39, 36, 41,
+  26, 29, 3, 40, 31, 28 ;
+
+ elem_ss1 = 11, 14 ;
+
+ side_ss1 = 1, 2 ;
+
+ dist_fact_ss1 = 1, 1, 1, 1, 1, 1 ;
+
+ elem_ss2 = 4, 3, 14, 10 ;
+
+ side_ss2 = 1, 3, 3, 1 ;
+
+ dist_fact_ss2 = 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ;
+
+ qa_records =
+  "CUBIT",
+  "15.8",
+  "06/22/2021",
+  "12:52:26",
+  "CUBIT",
+  "17.02.0",
+  "12/04/2024",
+  "11:57:45" ;
+
+ elem_map = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ;
+
+ elem_num_map = 100, 2, 103, 4, 101, 6, 102, 8, 9, 10, 11, 12, 13, 14, 15, 104 ;
+
+ node_num_map = 1, 15, 7, 24, 25, 22, 13, 2, 32, 23, 26, 5, 12, 11, 33, 27, 
+    21, 20, 28, 6, 34, 29, 35, 30, 31, 14, 36, 37, 10, 17, 38, 3, 9, 8, 44, 
+    39, 19, 18, 40, 41, 42, 43, 4, 45, 16 ;
+
+ node_ns1 = 12, 15, 13, 23, 20 ;
+
+ dist_fact_ns1 = 1, 1, 1, 1, 1 ;
+
+ node_ns2 = 20, 8, 32, 21, 7, 9, 38, 34, 37 ;
+
+ dist_fact_ns2 = 1, 1, 1, 1, 1, 1, 1, 1, 1 ;
+
+ node_ns3 = 32, 35, 33, 44, 43 ;
+
+ dist_fact_ns3 = 1, 1, 1, 1, 1 ;
+
+ node_ns4 = 1, 12, 43, 18, 14, 17, 45, 29, 30 ;
+
+ dist_fact_ns4 = 1, 1, 1, 1, 1, 1, 1, 1, 1 ;
+}
