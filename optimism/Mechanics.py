@@ -84,31 +84,80 @@ def axisymmetric_element_gradient_transformation(elemDispGrads, elemShapes, elem
 element_hess_func = hessian(FunctionSpace.integrate_element_from_local_field)
 
 
-def compute_element_stiffness_from_global_fields(U, coords, elInternals, dt, elConn, elShapes, elShapeGrads, elVols, lagrangian_density, modify_element_gradient):
+def compute_element_stiffness_from_global_fields(U, coords, elInternals, props, dt, elConn, elShapes, elShapeGrads, elVols, lagrangian_density, modify_element_gradient):
     elDisp = U[elConn,:]
     elCoords = coords[elConn,:]
-    return element_hess_func(elDisp, elCoords, elInternals, dt, elShapes, elShapeGrads,
+    return element_hess_func(elDisp, elCoords, elInternals, props, dt, elShapes, elShapeGrads,
                              elVols, lagrangian_density, modify_element_gradient)
 
 
-def _compute_element_stiffnesses(U, internals, dt, functionSpace, compute_energy_density, modify_element_gradient):
+# TODO once we map thingst o equinox classes, make these methods bound to the class
+# TODO use jax.lax.cond below to make this jit safe
+# aprently this is unjittable
+def vmapPropValue(propArray):
+    numAxes = len(propArray.shape)
+    if numAxes > 1:
+        return 0
+    else:
+        return None
+    # return 0
+    # jit safe
+    # return jax.lax.cond(numAxes > 1, lambda _: (0,), lambda _: (None,), numAxes) # do I need the numAxes on the end?
+
+
+def fixed_props_to_element_props(props, num_el):
+    num_axes = len(props.shape)
+    # below is not jittable either
+    # new_props = jax.lax.cond(
+    #     num_axes > 1, 
+    #     lambda x: (x,),
+    #     lambda x: (np.repeat(x.reshape((-1, 1)), num_el, axis=1),),
+    #     props
+    # )
+    if num_axes > 1:
+        new_props = props
+    else:
+        new_props = np.repeat(props.reshape((-1, 1)), num_el, axis=1)
+    return new_props
+
+
+def tile_props(props, n_el, n_q):
+    num_axes = len(props.shape)
+    if num_axes > 1:
+        tile_axes = (1, n_q, 1)
+        new_props = np.tile(props, tile_axes)
+        new_props = new_props.reshape((new_props.shape[0] * new_props.shape[1], new_props.shape[2]))
+    else:
+        new_props = props
+    return new_props
+
+# Note this is for the case where properties are constant across a block
+def _compute_element_stiffnesses(U, internals, props, dt, functionSpace, compute_energy_density, modify_element_gradient):
     L = strain_energy_density_to_lagrangian_density(compute_energy_density)
+    vmapValue = vmapPropValue(props)
     f =  vmap(compute_element_stiffness_from_global_fields,
-              (None, None, 0, None, 0, 0, 0, 0, None, None))
+              (None, None, 0, vmapValue, None, 0, 0, 0, 0, None, None))
     fs = functionSpace
-    return f(U, fs.mesh.coords, internals, dt, fs.mesh.conns, fs.shapes, fs.shapeGrads, fs.vols,
+    return f(U, fs.mesh.coords, internals, props, dt, fs.mesh.conns, fs.shapes, fs.shapeGrads, fs.vols,
              L, modify_element_gradient)
 
 
-def _compute_strain_energy(functionSpace, UField, stateField, dt,
+# TODO we need a _compute_element_stifnesses method for when properties are variable over a block
+# Lucas this is where you can try out writing your own
+# Note that the 'None' in the fourth slot should now be 0
+# other than that I think everything is the same
+
+
+# TODO we'll also need a method here that calls FunctionSpace.integrate_block
+def _compute_strain_energy(functionSpace, UField, stateField, props, dt,
                            compute_energy_density,
                            modify_element_gradient):
     L = strain_energy_density_to_lagrangian_density(compute_energy_density)
-    return FunctionSpace.integrate_over_block(functionSpace, UField, stateField, dt, L,
+    return FunctionSpace.integrate_over_block(functionSpace, UField, stateField, props, dt, L,
                                               slice(None),
                                               modify_element_gradient=modify_element_gradient)
 
-
+# TODO add props
 def _compute_strain_energy_multi_block(functionSpace, UField, stateField, dt, blockModels,
                                        modify_element_gradient):
     energy = 0.0
@@ -125,14 +174,34 @@ def _compute_strain_energy_multi_block(functionSpace, UField, stateField, dt, bl
     return energy
 
 
-def _compute_updated_internal_variables(functionSpace, U, states, dt, compute_state_new, modify_element_gradient):
+# TODO fix this, props wrong size
+def _compute_updated_internal_variables(functionSpace, U, states, props, dt, compute_state_new, modify_element_gradient):
+    # U -> (n_nodes, n_dims) -> Nodal field
+    # state -> (n_els, n_quadrature_points, n_states) -> Quadrature field
     dispGrads = FunctionSpace.compute_field_gradient(functionSpace, U, modify_element_gradient)
+    # dispGrads -> (n_els, n_quadrature_points, n_dims, n_dims) -> Quadrature field
     dgQuadPointRavel = dispGrads.reshape(dispGrads.shape[0]*dispGrads.shape[1],*dispGrads.shape[2:])
+    # dgQuadPointRavel -> (n_els * n_quadrature_points, n_dims, n_dims) -> Quadrature field
     stQuadPointRavel = states.reshape(states.shape[0]*states.shape[1],*states.shape[2:])
-    statesNew = vmap(compute_state_new, (0, 0, None))(dgQuadPointRavel, stQuadPointRavel, dt)
+    # new stuff below
+    # really what we need to do is switch on whether props are already element based
+    # so we have to check the sizes to see if it's (np,) which would be the case of
+    # fixed properties for elements in teh block or (ne, np) which is the case for
+    # element bound properties. Then based on this we either have 
+    # repeat (np,) to be (ne, np) or do nothing and then
+    # repeat so things are (ne, nq, np) then flatten to be (ne * nq, np)
+    prop_vmap_axes = vmapPropValue(props) # -> 0 - vmap over all quadrature points for properties or None - don't vmap over quadrature points for properties
+    new_props = tile_props(props, dispGrads.shape[0], dispGrads.shape[1]) # -> (n_els * n_quadrature_pts, n_props) or (n_props,)
+    statesNew = vmap(compute_state_new, (0, 0, prop_vmap_axes, None))(dgQuadPointRavel, stQuadPointRavel, new_props, dt)
+    # what lucas did below
+    #    props_edited = np.transpose(props)
+    #    props_edited_a = np.repeat(props_edited,3,axis=1)
+    #    props_edited_b = np.reshape(props_edited_a,(np.shape(props)[1],np.shape(props)[0],3))
+    #    statesNew = vmap(compute_state_new, (0, 0, vmapPropValue(props), None))(dgQuadPointRavel, stQuadPointRavel, props_edited_b, dt)
     return statesNew.reshape(states.shape)
+    # return states
 
-
+# TODO add props
 def _compute_updated_internal_variables_multi_block(functionSpace, U, states, dt, blockModels, modify_element_gradient):
     dispGrads = FunctionSpace.compute_field_gradient(functionSpace, U, modify_element_gradient)
 
@@ -153,6 +222,7 @@ def _compute_updated_internal_variables_multi_block(functionSpace, U, states, dt
     return statesNew
 
 
+# TODO add props
 def _compute_initial_state_multi_block(fs, blockModels):
 
     numQuadPoints = len(fs.quadratureRule)
@@ -198,8 +268,8 @@ def _compute_element_stiffnesses_multi_block(U, stateVariables, dt, functionSpac
 
 
 def strain_energy_density_to_lagrangian_density(strain_energy_density):
-    def L(U, gradU, Q, X, dt):
-        return strain_energy_density(gradU, Q, dt)
+    def L(U, gradU, Q, props, X, dt):
+        return strain_energy_density(gradU, Q, props, dt)
     return L
 
 
@@ -306,53 +376,55 @@ def create_mechanics_functions(functionSpace, mode2D, materialModel,
             return grad_2D_to_3D(elemGrads, elemShapes, elemVols, elemNodalDisps, elemNodalCoords)
     
     
-    def compute_strain_energy(U, stateVariables, dt=0.0):
-        return _compute_strain_energy(fs, U, stateVariables, dt, materialModel.compute_energy_density, modify_element_gradient)
+    def compute_strain_energy(U, stateVariables, props, dt=0.0):
+        return _compute_strain_energy(fs, U, stateVariables, props, dt, materialModel.compute_energy_density, modify_element_gradient)
 
         
-    def compute_updated_internal_variables(U, stateVariables, dt=0.0):
-        return _compute_updated_internal_variables(fs, U, stateVariables, dt, materialModel.compute_state_new, modify_element_gradient)
+    # TODO add props
+    def compute_updated_internal_variables(U, stateVariables, props, dt=0.0):
+        return _compute_updated_internal_variables(fs, U, stateVariables, props, dt, materialModel.compute_state_new, modify_element_gradient)
 
     
-    def compute_element_stiffnesses(U, stateVariables, dt=0.0):
-        return _compute_element_stiffnesses(U, stateVariables, dt, fs, materialModel.compute_energy_density, modify_element_gradient)
+    def compute_element_stiffnesses(U, stateVariables, props, dt=0.0):
+        return _compute_element_stiffnesses(U, stateVariables, props, dt, fs, materialModel.compute_energy_density, modify_element_gradient)
 
 
     output_lagrangian = strain_energy_density_to_lagrangian_density(materialModel.compute_energy_density)
     output_constitutive = value_and_grad(output_lagrangian, 1)
 
     
-    def compute_output_energy_densities_and_stresses(U, stateVariables, dt=0.0):
-        return FunctionSpace.evaluate_on_block(fs, U, stateVariables, dt, output_constitutive, slice(None), modify_element_gradient=modify_element_gradient)
+    def compute_output_energy_densities_and_stresses(U, stateVariables, props, dt=0.0):
+        return FunctionSpace.evaluate_on_block(fs, U, stateVariables, props, dt, output_constitutive, slice(None), modify_element_gradient=modify_element_gradient)
 
     
     def compute_initial_state():
         shape = Mesh.num_elements(fs.mesh), len(fs.quadratureRule), 1
         return np.tile(materialModel.compute_initial_state(), shape)
 
-    def lagrangian_qoi(U, gradU, Q, X, dt):
-        return materialModel.compute_material_qoi(gradU, Q, dt)
+    def lagrangian_qoi(U, gradU, Q, props, X, dt):
+        return materialModel.compute_material_qoi(gradU, Q, props, dt)
 
-    def integrated_material_qoi(U, stateVariables, dt=0.0):
+    def integrated_material_qoi(U, stateVariables, props, dt=0.0):
 
-        return FunctionSpace.integrate_over_block(fs, U, stateVariables, dt, 
+        return FunctionSpace.integrate_over_block(fs, U, stateVariables, props, dt, 
                                                   lagrangian_qoi,
                                                   slice(None),
                                                   modify_element_gradient=modify_element_gradient)
 
-    def compute_output_material_qoi(U, stateVariables, dt=0.0):
-        return FunctionSpace.evaluate_on_block(fs, U, stateVariables, dt, lagrangian_qoi, slice(None), modify_element_gradient=modify_element_gradient)
+    def compute_output_material_qoi(U, stateVariables, props, dt=0.0):
+        return FunctionSpace.evaluate_on_block(fs, U, stateVariables, props, dt, lagrangian_qoi, slice(None), modify_element_gradient=modify_element_gradient)
 
     return MechanicsFunctions(compute_strain_energy, jit(compute_updated_internal_variables), jit(compute_element_stiffnesses), jit(compute_output_energy_densities_and_stresses), compute_initial_state, integrated_material_qoi, jit(compute_output_material_qoi))
 
 
+# TODO need to update this for props. Eigen won't work otherwise
 def _compute_kinetic_energy(functionSpace, V, internals, density):
     def lagrangian_density(U, gradU, Q, X, dt):
         return kinetic_energy_density(U, density)
     unused = 0.0
     return FunctionSpace.integrate_over_block(functionSpace, V, internals, unused, lagrangian_density, slice(None))
 
-
+# TODO need to update this for props. Eigen won't work otherwise
 def _compute_element_masses(functionSpace, U, internals, density, modify_element_gradient):
     def lagrangian_density(V, gradV, Q, X, dt):
         return kinetic_energy_density(V, density)
@@ -487,6 +559,7 @@ def create_dynamics_functions(functionSpace, mode2D, materialModel, newmarkParam
                              jit(correct))
 
 
+# TODO need to update this for props. Eigen won't work otherwise
 def compute_traction_potential_energy(fs, U, quadRule, edges, load):
     """Compute potential energy of surface tractions.
 

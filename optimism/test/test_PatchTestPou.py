@@ -251,4 +251,8 @@ class PatchTestQuadraticElements(MeshFixture.MeshFixture):
 
 
 if __name__ == '__main__':
+<<<<<<< HEAD:test/test_PatchTestPou.py
     unittest.main()
+=======
+    unittest.main()
+>>>>>>> main:optimism/test/test_PatchTestPou.py
