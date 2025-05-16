@@ -26,7 +26,6 @@ def create_material_model_functions(properties):
         elif properties['version'] == 'coupled':
             energy_density = _neohookean_3D_energy_density
 
-    # TODO add props as input after internalVars
     def strain_energy(dispGrad, internalVars, props, dt):
         del dt
         return energy_density(dispGrad, internalVars, props)
