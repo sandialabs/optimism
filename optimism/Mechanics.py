@@ -168,13 +168,6 @@ def _compute_updated_internal_variables(functionSpace, U, states, props, dt, com
     dgQuadPointRavel = dispGrads.reshape(dispGrads.shape[0]*dispGrads.shape[1],*dispGrads.shape[2:])
     # dgQuadPointRavel -> (n_els * n_quadrature_points, n_dims, n_dims) -> Quadrature field
     stQuadPointRavel = states.reshape(states.shape[0]*states.shape[1],*states.shape[2:])
-    # new stuff below
-    # really what we need to do is switch on whether props are already element based
-    # so we have to check the sizes to see if it's (np,) which would be the case of
-    # fixed properties for elements in teh block or (ne, np) which is the case for
-    # element bound properties. Then based on this we either have 
-    # repeat (np,) to be (ne, np) or do nothing and then
-    # repeat so things are (ne, nq, np) then flatten to be (ne * nq, np)
     prop_vmap_axes = vmapPropValue(props) # -> 0 - vmap over all quadrature points for properties or None - don't vmap over quadrature points for properties
     new_props = tile_props(props, dispGrads.shape[0], dispGrads.shape[1]) # -> (n_els * n_quadrature_pts, n_props) or (n_props,)
     statesNew = vmap(compute_state_new, (0, 0, prop_vmap_axes, None))(dgQuadPointRavel, stQuadPointRavel, new_props, dt)
