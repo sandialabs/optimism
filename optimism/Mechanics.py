@@ -135,13 +135,6 @@ def _compute_element_stiffnesses(U, internals, props, dt, functionSpace, compute
              L, modify_element_gradient)
 
 
-# TODO we need a _compute_element_stifnesses method for when properties are variable over a block
-# Lucas this is where you can try out writing your own
-# Note that the 'None' in the fourth slot should now be 0
-# other than that I think everything is the same
-
-
-# TODO we'll also need a method here that calls FunctionSpace.integrate_block
 def _compute_strain_energy(functionSpace, UField, stateField, props, dt,
                            compute_energy_density,
                            modify_element_gradient):
