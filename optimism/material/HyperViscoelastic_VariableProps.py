@@ -118,7 +118,6 @@ def _make_properties(props_variable, const_props):
     E = (const_props[PROPS_Ec]*np.exp(const_props[PROPS_b] * (p - const_props[PROPS_pgel]))) + const_props[PROPS_Ed]
     v = (3*const_props[PROPS_K_eq] - E)/(6*const_props[PROPS_K_eq])
     G = E/(2*(1 + v))
-    # return np.array([const_props[PROPS_K_eq], 0.1*G, 100*G, const_props[PROPS_TAU]])
     return np.array([const_props[PROPS_K_eq], 0.1 * G, 100 * G, relaxTime])
 
 
