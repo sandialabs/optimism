@@ -143,7 +143,6 @@ def _compute_strain_energy(functionSpace, UField, stateField, props, dt,
                                               slice(None),
                                               modify_element_gradient=modify_element_gradient)
 
-# TODO add props
 def _compute_strain_energy_multi_block(functionSpace, UField, stateField, dt, blockModels,
                                        modify_element_gradient):
     energy = 0.0
