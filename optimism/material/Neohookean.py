@@ -10,7 +10,7 @@ PROPS_KAPPA  = 3
 PROPS_LAMBDA = 4
 
 
-def create_materiral_model_functions(properties):
+def create_material_properties(properties):
     props = _make_properties(properties['elastic modulus'],
                              properties['poisson ratio'])
     return np.array(props)
