@@ -107,13 +107,6 @@ def vmapPropValue(propArray):
 
 def fixed_props_to_element_props(props, num_el):
     num_axes = len(props.shape)
-    # below is not jittable either
-    # new_props = jax.lax.cond(
-    #     num_axes > 1, 
-    #     lambda x: (x,),
-    #     lambda x: (np.repeat(x.reshape((-1, 1)), num_el, axis=1),),
-    #     props
-    # )
     if num_axes > 1:
         new_props = props
     else:
