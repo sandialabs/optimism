@@ -40,7 +40,7 @@ class RateSensitivityFixture(TestFixture):
                  "yield strength": Y0}
         
         hardening = Hardening.create_hardening_model(props)
-        
+
         # viscous overstress will increase flow stress above initial yield
         eqps = 2.0
         eqpsOld = 1.0
@@ -80,12 +80,13 @@ class RateSentivityInsideJ2(TestFixture):
                  "reference plastic strain rate": epsDot0}
 
         material = J2Plastic.create_material_model_functions(props)
+        props = J2Plastic.create_material_properties(props)
 
         key = jax.random.PRNGKey(0)
         dispGrad = jax.random.uniform(key, (3, 3))
         internalState = material.compute_initial_state()
         dt = 1.0
-        W = material.compute_energy_density(dispGrad, internalState, dt)
+        W = material.compute_energy_density(dispGrad, internalState, props, dt)
         self.assertGreater(W, 0.0)
 
 
