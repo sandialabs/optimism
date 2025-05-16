@@ -104,11 +104,6 @@ def _make_properties(props_variable, const_props):
     else:
         temperature = thetaGlass
 
-    # TODO remove me
-    # temperature = thetaGlass
-    # jax.debug.print("{x}", x=const_props[PROPS_R])
-    # jax.debug.print("{x}", x=thetaGlass)
-    # jax.debug.print("{x}", x=temperature)
 
     # calculate WLF 
     WLF = -(const_props[PROPS_C1]*(temperature - thetaGlass))/(const_props[PROPS_C2] + (temperature - thetaGlass))
