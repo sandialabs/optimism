@@ -30,7 +30,6 @@ def create_material_model_functions(properties):
         del dt
         return energy_density(dispGrad, internalVars, props)
 
-    # TODO add props as input
     def compute_state_new(dispGrad, internalVars, props, dt):
         del dt
         return _compute_state_new(dispGrad, internalVars, props)
