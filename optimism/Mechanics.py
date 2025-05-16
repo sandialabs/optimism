@@ -171,11 +171,6 @@ def _compute_updated_internal_variables(functionSpace, U, states, props, dt, com
     prop_vmap_axes = vmapPropValue(props) # -> 0 - vmap over all quadrature points for properties or None - don't vmap over quadrature points for properties
     new_props = tile_props(props, dispGrads.shape[0], dispGrads.shape[1]) # -> (n_els * n_quadrature_pts, n_props) or (n_props,)
     statesNew = vmap(compute_state_new, (0, 0, prop_vmap_axes, None))(dgQuadPointRavel, stQuadPointRavel, new_props, dt)
-    # what lucas did below
-    #    props_edited = np.transpose(props)
-    #    props_edited_a = np.repeat(props_edited,3,axis=1)
-    #    props_edited_b = np.reshape(props_edited_a,(np.shape(props)[1],np.shape(props)[0],3))
-    #    statesNew = vmap(compute_state_new, (0, 0, vmapPropValue(props), None))(dgQuadPointRavel, stQuadPointRavel, props_edited_b, dt)
     return statesNew.reshape(states.shape)
     # return states
 
