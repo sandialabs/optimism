@@ -172,7 +172,6 @@ def _compute_updated_internal_variables(functionSpace, U, states, props, dt, com
     new_props = tile_props(props, dispGrads.shape[0], dispGrads.shape[1]) # -> (n_els * n_quadrature_pts, n_props) or (n_props,)
     statesNew = vmap(compute_state_new, (0, 0, prop_vmap_axes, None))(dgQuadPointRavel, stQuadPointRavel, new_props, dt)
     return statesNew.reshape(states.shape)
-    # return states
 
 # TODO add props
 def _compute_updated_internal_variables_multi_block(functionSpace, U, states, dt, blockModels, modify_element_gradient):
