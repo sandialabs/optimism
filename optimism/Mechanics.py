@@ -143,16 +143,19 @@ def _compute_strain_energy(functionSpace, UField, stateField, props, dt,
                                               slice(None),
                                               modify_element_gradient=modify_element_gradient)
 
-def _compute_strain_energy_multi_block(functionSpace, UField, stateField, dt, blockModels,
+
+# TODO add props
+def _compute_strain_energy_multi_block(functionSpace, UField, stateField, props, dt, blockModels,
                                        modify_element_gradient):
     energy = 0.0
     for blockKey in blockModels:
         materialModel = blockModels[blockKey]
         elemIds = functionSpace.mesh.blocks[blockKey]
-        
+        block_props = props[blockKey]
+
         L = strain_energy_density_to_lagrangian_density(materialModel.compute_energy_density)
         
-        blockEnergy = FunctionSpace.integrate_over_block(functionSpace, UField, stateField, dt, L,
+        blockEnergy = FunctionSpace.integrate_over_block(functionSpace, UField, stateField, block_props, dt, L,
                                                          elemIds, modify_element_gradient=modify_element_gradient)
         
         energy += blockEnergy
@@ -174,7 +177,7 @@ def _compute_updated_internal_variables(functionSpace, U, states, props, dt, com
     return statesNew.reshape(states.shape)
 
 # TODO add props
-def _compute_updated_internal_variables_multi_block(functionSpace, U, states, dt, blockModels, modify_element_gradient):
+def _compute_updated_internal_variables_multi_block(functionSpace, U, states, props, dt, blockModels, modify_element_gradient):
     dispGrads = FunctionSpace.compute_field_gradient(functionSpace, U, modify_element_gradient)
 
     statesNew = np.array(states)
@@ -190,6 +193,7 @@ def _compute_updated_internal_variables_multi_block(functionSpace, U, states, dt
         elemIds = functionSpace.mesh.blocks[blockKey]
         blockDispGrads = dispGrads[elemIds]
         blockStates = states[elemIds]
+        blockProps = props[blockKey]
         
         compute_state_new = blockModels[blockKey].compute_state_new
         
@@ -202,7 +206,6 @@ def _compute_updated_internal_variables_multi_block(functionSpace, U, states, dt
     return statesNew
 
 
-# TODO add props
 def _compute_initial_state_multi_block(fs, blockModels):
 
     numQuadPoints = len(fs.quadratureRule)
@@ -230,17 +233,18 @@ def _compute_initial_state_multi_block(fs, blockModels):
     return initialState
 
 
-def _compute_element_stiffnesses_multi_block(U, stateVariables, dt, functionSpace, blockModels, modify_element_gradient):
+def _compute_element_stiffnesses_multi_block(U, stateVariables, props, dt, functionSpace, blockModels, modify_element_gradient):
     fs = functionSpace
     nen = functionSpace.mesh.parentElement.num_nodes
     elementHessians = np.zeros((Mesh.num_elements(functionSpace.mesh), nen, 2, nen, 2))
     for blockKey in blockModels:
         materialModel = blockModels[blockKey]
+        blockProps = props[blockKey]
         L = strain_energy_density_to_lagrangian_density(materialModel.compute_energy_density)
         elemIds = functionSpace.mesh.blocks[blockKey]
         f =  vmap(compute_element_stiffness_from_global_fields,
                   (None, None, 0, None, 0, 0, 0, 0, None, None))
-        blockHessians = f(U, fs.mesh.coords, stateVariables[elemIds], dt, fs.mesh.conns[elemIds],
+        blockHessians = f(U, fs.mesh.coords, stateVariables[elemIds], blockProps, dt, fs.mesh.conns[elemIds],
                           fs.shapes[elemIds], fs.shapeGrads[elemIds], fs.vols[elemIds],
                           L, modify_element_gradient)
         elementHessians = elementHessians.at[elemIds].set(blockHessians)
@@ -272,27 +276,28 @@ def create_multi_block_mechanics_functions(functionSpace, mode2D, materialModels
             return grad_2D_to_3D(elemGrads, elemVols)
     
     
-    def compute_strain_energy(U, stateVariables, dt=0.0):
-        return _compute_strain_energy_multi_block(fs, U, stateVariables, dt, materialModels, modify_element_gradient)
+    def compute_strain_energy(U, stateVariables, props, dt=0.0):
+        return _compute_strain_energy_multi_block(fs, U, stateVariables, props, dt, materialModels, modify_element_gradient)
 
         
-    def compute_updated_internal_variables(U, stateVariables, dt=0.0):
-        return _compute_updated_internal_variables_multi_block(fs, U, stateVariables, dt, materialModels, modify_element_gradient)
+    def compute_updated_internal_variables(U, stateVariables, props, dt=0.0):
+        return _compute_updated_internal_variables_multi_block(fs, U, stateVariables, props, dt, materialModels, modify_element_gradient)
 
     
-    def compute_element_stiffnesses(U, stateVariables, dt=0.0):
-        return _compute_element_stiffnesses_multi_block(U, stateVariables, dt, functionSpace, materialModels, modify_element_gradient)
+    def compute_element_stiffnesses(U, stateVariables, props, dt=0.0):
+        return _compute_element_stiffnesses_multi_block(U, stateVariables, props, dt, functionSpace, materialModels, modify_element_gradient)
 
 
-    def compute_output_energy_densities_and_stresses(U, stateVariables, dt=0.0):
+    def compute_output_energy_densities_and_stresses(U, stateVariables, props, dt=0.0):
         energy_densities = np.zeros((Mesh.num_elements(fs.mesh), len(fs.quadratureRule)))
         stresses = np.zeros((Mesh.num_elements(fs.mesh), len(fs.quadratureRule), 3, 3))
         for blockKey in materialModels:
+            blockProps = props[blockKey]
             compute_output_energy_density = materialModels[blockKey].compute_energy_density
             output_lagrangian = strain_energy_density_to_lagrangian_density(compute_output_energy_density)
             output_constitutive = value_and_grad(output_lagrangian, 1)
             elemIds = fs.mesh.blocks[blockKey]
-            blockEnergyDensities, blockStresses = FunctionSpace.evaluate_on_block(fs, U, stateVariables, dt, output_constitutive, elemIds, modify_element_gradient=modify_element_gradient)
+            blockEnergyDensities, blockStresses = FunctionSpace.evaluate_on_block(fs, U, stateVariables, blockProps, dt, output_constitutive, elemIds, modify_element_gradient=modify_element_gradient)
             energy_densities = energy_densities.at[elemIds].set(blockEnergyDensities)
             stresses = stresses.at[elemIds].set(blockStresses)
         return energy_densities, stresses
