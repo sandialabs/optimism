@@ -10,6 +10,7 @@ from optimism import Interpolants
 from typing import Callable
 
 import equinox as eqx
+import jax
 
 
 # TODO
@@ -100,18 +101,22 @@ def vmapPropValue(propArray):
         return 0
     else:
         return None
-    # return 0
-    # jit safe
-    # return jax.lax.cond(numAxes > 1, lambda _: (0,), lambda _: (None,), numAxes) # do I need the numAxes on the end?
+    # below doesn't work since the pytrees are technically different types
+    # vmap_axes =  jax.lax.cond(
+    #     numAxes > 1,
+    #     lambda _: (0,),
+    #     lambda _: (None,),
+    #     numAxes
+    # )
+    # return vmap_axes[0]
 
-
-def fixed_props_to_element_props(props, num_el):
-    num_axes = len(props.shape)
-    if num_axes > 1:
-        new_props = props
-    else:
-        new_props = np.repeat(props.reshape((-1, 1)), num_el, axis=1)
-    return new_props
+# def fixed_props_to_element_props(props, num_el):
+#     num_axes = len(props.shape)
+#     if num_axes > 1:
+#         new_props = props
+#     else:
+#         new_props = np.repeat(props.reshape((-1, 1)), num_el, axis=1)
+#     return new_props
 
 
 def tile_props(props, n_el, n_q):
@@ -122,6 +127,23 @@ def tile_props(props, n_el, n_q):
         new_props = new_props.reshape((new_props.shape[0] * new_props.shape[1], new_props.shape[2]))
     else:
         new_props = props
+
+    # can't do below since they're different types
+    # def true_func(props):
+    #     tile_axes = (1, n_q, 1)
+    #     new_props = np.tile(props, tile_axes)
+    #     new_props = new_props.reshape((new_props.shape[0] * new_props.shape[1], new_props.shape[2]))
+    #     return new_props
+
+    # def false_func(props):
+    #     return props
+    
+    # new_props = jax.lax.cond(
+    #     num_axes > 1,
+    #     lambda p: true_func(p),
+    #     lambda p: false_func(p),
+    #     props
+    # )
     return new_props
 
 # Note this is for the case where properties are constant across a block
