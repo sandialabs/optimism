@@ -96,6 +96,17 @@
 <span class="n">Properties</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Properties&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="s1">&#39;nu&#39;</span><span class="p">,</span> <span class="s1">&#39;mu&#39;</span><span class="p">,</span> <span class="s1">&#39;kappa&#39;</span><span class="p">,</span> <span class="s1">&#39;Gc&#39;</span><span class="p">,</span> <span class="s1">&#39;l&#39;</span><span class="p">])</span>
 
 
+<div class="viewcode-block" id="create_material_properties">
+<a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldThreshold.create_material_properties">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_material_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
+    <span class="n">props</span> <span class="o">=</span> <span class="n">make_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">[</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">],</span>
+                            <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;poisson ratio&#39;</span><span class="p">],</span>
+                            <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;critical energy release rate&#39;</span><span class="p">],</span>
+                            <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;regularization length&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">props</span><span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="create_material_model_functions">
 <a class="viewcode-back" href="../../../optimism.phasefield.html#optimism.phasefield.PhaseFieldThreshold.create_material_model_functions">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">create_material_model_functions</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
@@ -108,10 +119,10 @@
 <span class="sd">      &#39;kinematics&#39;:            string</span>
 <span class="sd">          Value &#39;large deformations&#39; or &#39;small deformations&#39;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">props</span> <span class="o">=</span> <span class="n">make_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">[</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">],</span>
-                            <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;poisson ratio&#39;</span><span class="p">],</span>
-                            <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;critical energy release rate&#39;</span><span class="p">],</span>
-                            <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;regularization length&#39;</span><span class="p">])</span>
+    <span class="c1"># props = make_properties(properties[&#39;elastic modulus&#39;],</span>
+    <span class="c1">#                         properties[&#39;poisson ratio&#39;],</span>
+    <span class="c1">#                         properties[&#39;critical energy release rate&#39;],</span>
+    <span class="c1">#                         properties[&#39;regularization length&#39;])</span>
 
     <span class="n">finiteDeformations</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">if</span> <span class="s1">&#39;kinematics&#39;</span> <span class="ow">in</span> <span class="n">properties</span><span class="p">:</span>
@@ -126,23 +137,23 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">compute_strain</span> <span class="o">=</span> <span class="n">compute_linear_strain</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">compute_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="k">del</span> <span class="n">internalVars</span>
         <span class="k">del</span> <span class="n">dt</span>
         <span class="n">strain</span> <span class="o">=</span> <span class="n">compute_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">energy_density</span><span class="p">(</span><span class="n">strain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">compute_output_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">compute_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_output_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">compute_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">compute_strain_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_strain_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="k">del</span> <span class="n">phaseGrad</span>
         <span class="k">del</span> <span class="n">internalVars</span>
         <span class="k">del</span> <span class="n">dt</span>
         <span class="n">strain</span> <span class="o">=</span> <span class="n">compute_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">strain_energy_density</span><span class="p">(</span><span class="n">strain</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">compute_phase_potential_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_phase_potential_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="k">del</span> <span class="n">dispGrad</span>
         <span class="k">del</span> <span class="n">internalVars</span>
         <span class="k">del</span> <span class="n">dt</span>
@@ -151,7 +162,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_initial_state</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,)):</span>
         <span class="k">return</span> <span class="n">initial_state</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phaseGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="k">del</span> <span class="n">phaseGrad</span>
         <span class="k">del</span> <span class="n">internalVars</span>
         <span class="k">del</span> <span class="n">dt</span>

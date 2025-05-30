@@ -105,7 +105,7 @@
          <span class="s1">&#39;kinematics&#39;</span><span class="p">:</span> <span class="s1">&#39;large deformations&#39;</span><span class="p">}</span>
 
 <span class="n">materialModel</span> <span class="o">=</span> <span class="n">material</span><span class="o">.</span><span class="n">create_material_model_functions</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
-
+<span class="n">props</span> <span class="o">=</span> <span class="n">material</span><span class="o">.</span><span class="n">create_material_properties</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
 <span class="n">subProblemSettings</span> <span class="o">=</span> <span class="n">EqSolver</span><span class="o">.</span><span class="n">get_settings</span><span class="p">()</span>
 <span class="n">alSettings</span> <span class="o">=</span> <span class="n">AlSolver</span><span class="o">.</span><span class="n">get_settings</span><span class="p">()</span>
 
@@ -153,7 +153,7 @@
 <a class="viewcode-back" href="../../../../optimism.phasefield.test.html#optimism.phasefield.test.test_PhaseFieldThresholdPatch.TestSingleMeshFixture.test_sparse_hessian_at_zero_phase">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">test_sparse_hessian_at_zero_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">elementStiffnesses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span><span class="o">.</span>\
-            <span class="n">compute_element_stiffnesses</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">)</span>
+            <span class="n">compute_element_stiffnesses</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
 
         <span class="n">KSparse</span> <span class="o">=</span> <span class="n">SparseMatrixAssembler</span><span class="o">.</span><span class="n">assemble_sparse_stiffness_matrix</span><span class="p">(</span><span class="n">elementStiffnesses</span><span class="p">,</span>
                                                                          <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">,</span>
@@ -164,7 +164,7 @@
         
         <span class="k">def</span><span class="w"> </span><span class="nf">objective_func</span><span class="p">(</span><span class="n">Uu</span><span class="p">):</span>
             <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span><span class="o">.</span><span class="n">compute_internal_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span><span class="o">.</span><span class="n">compute_internal_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
 
         <span class="n">compute_dense_hessian</span> <span class="o">=</span> <span class="n">hessian</span><span class="p">(</span><span class="n">objective_func</span><span class="p">)</span>
         <span class="n">KDense</span> <span class="o">=</span> <span class="n">compute_dense_hessian</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">get_unknown_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">))</span>
@@ -179,7 +179,7 @@
         <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="o">.</span><span class="n">at</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nx</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Ny</span><span class="p">))</span>
 
         <span class="n">elementStiffnesses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span><span class="o">.</span>\
-            <span class="n">compute_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">)</span>
+            <span class="n">compute_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
 
         <span class="n">KSparse</span> <span class="o">=</span> <span class="n">SparseMatrixAssembler</span><span class="o">.</span><span class="n">assemble_sparse_stiffness_matrix</span><span class="p">(</span><span class="n">elementStiffnesses</span><span class="p">,</span>
                                                                          <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">,</span>
@@ -190,7 +190,7 @@
         
         <span class="k">def</span><span class="w"> </span><span class="nf">objective_func</span><span class="p">(</span><span class="n">Uu</span><span class="p">):</span>
             <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span><span class="o">.</span><span class="n">compute_internal_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span><span class="o">.</span><span class="n">compute_internal_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
 
         <span class="n">compute_dense_hessian</span> <span class="o">=</span> <span class="n">hessian</span><span class="p">(</span><span class="n">objective_func</span><span class="p">)</span>
         <span class="n">KDense</span> <span class="o">=</span> <span class="n">compute_dense_hessian</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">get_unknown_values</span><span class="p">(</span><span class="n">U</span><span class="p">))</span>
@@ -209,7 +209,7 @@
         <span class="n">kappa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">lam</span><span class="p">)</span>
 
         <span class="n">elementStiffnesses</span> <span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span><span class="o">.</span>\
-            <span class="n">compute_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">)</span>
+            <span class="n">compute_element_stiffnesses</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
 
         <span class="n">KSparse</span> <span class="o">=</span> <span class="n">SparseMatrixAssembler</span><span class="o">.</span><span class="n">assemble_sparse_stiffness_matrix</span><span class="p">(</span><span class="n">elementStiffnesses</span><span class="p">,</span>
                                                                          <span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">conns</span><span class="p">,</span>
@@ -228,7 +228,7 @@
         
         <span class="k">def</span><span class="w"> </span><span class="nf">objective_function</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
             <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span><span class="o">.</span><span class="n">compute_internal_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span><span class="o">.</span><span class="n">compute_internal_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">constraint_function</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
             <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="p">)</span>    
@@ -253,7 +253,7 @@
         
         <span class="k">def</span><span class="w"> </span><span class="nf">objective_function</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
             <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ubc</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span><span class="o">.</span><span class="n">compute_internal_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bvpFunctions</span><span class="o">.</span><span class="n">compute_internal_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateVars</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">constraint_function</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">Uu</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">phaseIds</span><span class="p">]</span>

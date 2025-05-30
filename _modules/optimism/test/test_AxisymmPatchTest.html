@@ -112,7 +112,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">fs</span> <span class="o">=</span> <span class="n">FunctionSpace</span><span class="o">.</span><span class="n">construct_function_space</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="n">quadRule</span><span class="p">,</span> <span class="n">mode2D</span><span class="o">=</span><span class="s1">&#39;axisymmetric&#39;</span><span class="p">)</span>
 
         <span class="n">materialModel</span> <span class="o">=</span> <span class="n">MatModel</span><span class="o">.</span><span class="n">create_material_model_functions</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
-        
+        <span class="bp">self</span><span class="o">.</span><span class="n">props</span> <span class="o">=</span> <span class="n">MatModel</span><span class="o">.</span><span class="n">create_material_properties</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
         <span class="n">mcxFuncs</span> <span class="o">=</span> \
             <span class="n">Mechanics</span><span class="o">.</span><span class="n">create_mechanics_functions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span>
                                                  <span class="s2">&quot;axisymmetric&quot;</span><span class="p">,</span>
@@ -151,7 +151,7 @@
         <span class="nd">@jit</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">Uu</span><span class="p">):</span>
             <span class="n">U</span> <span class="o">=</span> <span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">)</span>
         
         <span class="n">Uu</span><span class="p">,</span> <span class="n">solverSuccess</span> <span class="o">=</span> <span class="n">newton_solve</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">dofManager</span><span class="o">.</span><span class="n">get_unknown_values</span><span class="p">(</span><span class="n">V</span><span class="p">))</span>
 

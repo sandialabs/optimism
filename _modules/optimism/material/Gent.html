@@ -83,22 +83,29 @@
 <span class="n">PROPS_JM</span>    <span class="o">=</span> <span class="mi">2</span>
 
 
-<div class="viewcode-block" id="create_material_functions">
-<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.Gent.create_material_functions">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">create_material_functions</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
+<div class="viewcode-block" id="create_material_properties">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.Gent.create_material_properties">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_material_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
     <span class="n">props</span> <span class="o">=</span> <span class="n">_make_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">[</span><span class="s1">&#39;bulk modulus&#39;</span><span class="p">],</span>
                              <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;shear modulus&#39;</span><span class="p">],</span>
                              <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;Jm parameter&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">props</span><span class="p">)</span></div>
 
+
+
+<div class="viewcode-block" id="create_material_functions">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.Gent.create_material_functions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_material_functions</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
     <span class="n">energy_density</span> <span class="o">=</span> <span class="n">_gent_3D_energy_density</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">strain_energy</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">strain_energy</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="k">del</span> <span class="n">internalVars</span>
         <span class="k">del</span> <span class="n">dt</span>
         <span class="k">return</span> <span class="n">energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
     
-    <span class="k">def</span><span class="w"> </span><span class="nf">compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="k">del</span> <span class="n">dispGrad</span>
+        <span class="k">del</span> <span class="n">props</span>
         <span class="k">del</span> <span class="n">dt</span>
         <span class="k">return</span> <span class="n">internalVars</span>
 

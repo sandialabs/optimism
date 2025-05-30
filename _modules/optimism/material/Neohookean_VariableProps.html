@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>optimism.material.Neohookean &mdash; optimism 0.1.0 documentation</title>
+  <title>optimism.material.Neohookean_VariableProps &mdash; optimism 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -63,7 +63,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">optimism.material.Neohookean</li>
+      <li class="breadcrumb-item active">optimism.material.Neohookean_VariableProps</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -72,9 +72,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for optimism.material.Neohookean</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-
+  <h1>Source code for optimism.material.Neohookean_VariableProps</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">onp</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">optimism.material.MaterialModel</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaterialModel</span>
 
 <span class="c1"># props</span>
@@ -84,37 +85,83 @@
 <span class="n">PROPS_KAPPA</span>  <span class="o">=</span> <span class="mi">3</span>
 <span class="n">PROPS_LAMBDA</span> <span class="o">=</span> <span class="mi">4</span>
 
+<span class="c1"># constant props</span>
+<span class="n">CONST_PROPS_EC</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">CONST_PROPS_K</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">CONST_PROPS_B</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">CONST_PROPS_PGEL</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">CONST_PROPS_ED</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">CONST_PROPS_ER</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">CONST_PROPS_R</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">CONST_PROPS_G1</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">CONST_PROPS_G2</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">CONST_PROPS_XI</span> <span class="o">=</span> <span class="mi">9</span>
+<span class="n">CONST_PROPS_C1</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">CONST_PROPS_C2</span> <span class="o">=</span> <span class="mi">11</span>
+<span class="n">CONST_PROPS_RMTEMP</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">CONST_PROPS_TAU</span> <span class="o">=</span> <span class="mi">13</span>
+<span class="n">CONST_PROPS_NU</span> <span class="o">=</span> <span class="mi">14</span>
 
-<div class="viewcode-block" id="create_material_properties">
-<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.Neohookean.create_material_properties">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">create_material_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
-    <span class="n">props</span> <span class="o">=</span> <span class="n">_make_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">[</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">],</span>
-                             <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;poisson ratio&#39;</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">props</span><span class="p">)</span></div>
+<span class="c1"># a dict is fine for now, but we&#39;ll eventually want to </span>
+<span class="c1"># move this into a np.array</span>
+<span class="c1"># dicts are slower to index then arrays which</span>
+<span class="c1"># for small things might not seem like a big slowdown</span>
+<span class="c1"># but can add up when the the thing is called millions of times</span>
 
+<span class="c1"># TODO make these inputs to the material model</span>
+<span class="c1"># we probably want to come up with a way</span>
+<span class="c1"># to specify required properties and</span>
+<span class="c1"># then pick and choose which ones to make variable</span>
+<span class="c1"># this is fine for now though since really for this</span>
+<span class="c1"># model it and class of materials we&#39;re interested in</span>
+<span class="c1"># it only makes sense to change the modulus</span>
+<span class="n">constProps</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="mf">1.059</span><span class="p">,</span> <span class="c1"># MPa</span>
+    <span class="mf">0.01</span><span class="p">,</span> <span class="c1"># cm^2/(mW*s)</span>
+    <span class="mf">5.248</span><span class="p">,</span> <span class="c1"># unitless</span>
+    <span class="mf">0.12</span><span class="p">,</span> <span class="c1"># unitless</span>
+    <span class="mf">3.321</span><span class="p">,</span> 
+    <span class="mi">18959</span><span class="p">,</span> 
+    <span class="mf">8.314</span><span class="p">,</span> 
+    <span class="mi">109603</span><span class="p">,</span> <span class="c1"># unitless</span>
+    <span class="mf">722.2</span><span class="p">,</span> <span class="c1"># unitless</span>
+    <span class="mf">3.73</span><span class="p">,</span><span class="c1"># unitless</span>
+    <span class="mi">61000</span><span class="p">,</span> <span class="c1"># unitless</span>
+    <span class="mf">511.792</span><span class="p">,</span> <span class="c1"># K</span>
+    <span class="mi">100</span><span class="p">,</span> <span class="c1"># C</span>
+    <span class="mf">0.001</span><span class="p">,</span> <span class="c1"># s</span>
+    <span class="mf">0.48</span> <span class="c1"># Poisson&#39;s ratio</span>
+<span class="p">]</span>
 
-
+<span class="c1"># TODO need to clean up const_props handling</span>
+<span class="c1"># probably best way to go is to read in a dict</span>
+<span class="c1"># and convert to an array on construction</span>
 <div class="viewcode-block" id="create_material_model_functions">
-<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.Neohookean.create_material_model_functions">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">create_material_model_functions</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.Neohookean_VariableProps.create_material_model_functions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_material_model_functions</span><span class="p">(</span><span class="n">const_props</span><span class="p">,</span> <span class="n">version</span> <span class="o">=</span> <span class="s1">&#39;adagio&#39;</span><span class="p">):</span>
+    <span class="c1"># TODO convert const_props from dict to list/np.array here</span>
+    
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;right here....&#39;</span><span class="p">)</span>
 
-    <span class="n">energy_density</span> <span class="o">=</span> <span class="n">_adagio_neohookean</span>
-    <span class="c1">#energy_density = _neohookean_3D_energy_density</span>
-    <span class="k">if</span> <span class="s1">&#39;version&#39;</span> <span class="ow">in</span> <span class="n">properties</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;adagio&#39;</span><span class="p">:</span>
-            <span class="n">energy_density</span> <span class="o">=</span> <span class="n">_adagio_neohookean</span>
-        <span class="k">elif</span> <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;coupled&#39;</span><span class="p">:</span>
-            <span class="n">energy_density</span> <span class="o">=</span> <span class="n">_neohookean_3D_energy_density</span>
+    <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="s1">&#39;adagio&#39;</span><span class="p">:</span>
+        <span class="n">energy_density</span> <span class="o">=</span> <span class="n">_adagio_neohookean</span>
+    <span class="k">elif</span> <span class="n">version</span> <span class="o">==</span> <span class="s1">&#39;coupled&#39;</span><span class="p">:</span>
+        <span class="n">energy_density</span> <span class="o">=</span> <span class="n">_neohookean_3D_energy_density</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Supported versions are </span><span class="se">\&#39;</span><span class="s1">adagio</span><span class="se">\&#39;</span><span class="s1"> and </span><span class="se">\&#39;</span><span class="s1">couple</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">strain_energy</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="k">del</span> <span class="n">dt</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="n">_make_properties</span><span class="p">(</span><span class="n">props</span><span class="p">,</span> <span class="n">const_props</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="k">del</span> <span class="n">dt</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="n">_make_properties</span><span class="p">(</span><span class="n">props</span><span class="p">,</span> <span class="n">const_props</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
 
-    <span class="n">density</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;density&#39;</span><span class="p">)</span>
+    <span class="n">density</span> <span class="o">=</span> <span class="n">const_props</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;density&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">MaterialModel</span><span class="p">(</span><span class="n">compute_energy_density</span> <span class="o">=</span> <span class="n">strain_energy</span><span class="p">,</span>
                          <span class="n">compute_initial_state</span> <span class="o">=</span> <span class="n">make_initial_state</span><span class="p">,</span>
@@ -124,8 +171,22 @@
 
 
 <div class="viewcode-block" id="_make_properties">
-<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.Neohookean._make_properties">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">_make_properties</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">nu</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.Neohookean_VariableProps._make_properties">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_properties</span><span class="p">(</span><span class="n">props</span><span class="p">,</span> <span class="n">const_props</span><span class="p">):</span>
+    <span class="n">dens</span> <span class="o">=</span> <span class="n">props</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># THIS IS NOT RIGHT</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mf">580.</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">dens</span><span class="p">)</span>
+    <span class="n">light_dose</span> <span class="o">=</span> <span class="mf">600.</span> <span class="o">-</span> <span class="n">a</span>
+    <span class="c1"># THIS IS NOT RIGHT</span>
+
+    <span class="c1"># p = 1 - np.exp(-constProps[CONST_PROPS_K]*props[0])</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">constProps</span><span class="p">[</span><span class="n">CONST_PROPS_K</span><span class="p">]</span><span class="o">*</span><span class="n">light_dose</span><span class="p">)</span>
+
+    <span class="n">E</span> <span class="o">=</span> <span class="p">(</span><span class="n">constProps</span><span class="p">[</span><span class="n">CONST_PROPS_EC</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">constProps</span><span class="p">[</span><span class="n">CONST_PROPS_B</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="n">constProps</span><span class="p">[</span><span class="n">CONST_PROPS_PGEL</span><span class="p">])))</span> <span class="o">+</span> <span class="n">constProps</span><span class="p">[</span><span class="n">CONST_PROPS_ED</span><span class="p">]</span>
+    <span class="c1"># we also want Poisson&#39;s ratio to be a &quot;constant prop&quot;</span>
+    <span class="c1"># otherwise that&#39;s additional &quot;dead&quot; properties Ryan has to deal with</span>
+    <span class="n">nu</span> <span class="o">=</span> <span class="n">constProps</span><span class="p">[</span><span class="n">CONST_PROPS_NU</span><span class="p">]</span>
     <span class="n">mu</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">E</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">nu</span><span class="p">)</span>
     <span class="n">kappa</span> <span class="o">=</span> <span class="n">E</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">nu</span><span class="p">)</span>
     <span class="n">lamda</span> <span class="o">=</span> <span class="n">E</span><span class="o">*</span><span class="n">nu</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">nu</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">nu</span><span class="p">)</span>
@@ -134,7 +195,7 @@
 
 
 <div class="viewcode-block" id="_neohookean_3D_energy_density">
-<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.Neohookean._neohookean_3D_energy_density">[docs]</a>
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.Neohookean_VariableProps._neohookean_3D_energy_density">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">_neohookean_3D_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
     <span class="n">F</span> <span class="o">=</span> <span class="n">dispGrad</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
@@ -151,7 +212,7 @@
 
 
 <div class="viewcode-block" id="_adagio_neohookean">
-<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.Neohookean._adagio_neohookean">[docs]</a>
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.Neohookean_VariableProps._adagio_neohookean">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">_adagio_neohookean</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
     <span class="n">F</span> <span class="o">=</span> <span class="n">dispGrad</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
@@ -165,14 +226,14 @@
 
 
 <div class="viewcode-block" id="make_initial_state">
-<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.Neohookean.make_initial_state">[docs]</a>
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.Neohookean_VariableProps.make_initial_state">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">make_initial_state</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span></div>
 
 
 
 <div class="viewcode-block" id="_compute_state_new">
-<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.Neohookean._compute_state_new">[docs]</a>
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.Neohookean_VariableProps._compute_state_new">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">_compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
     <span class="k">del</span> <span class="n">dispGrad</span>
     <span class="k">del</span> <span class="n">props</span>

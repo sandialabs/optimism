@@ -122,7 +122,7 @@
                  <span class="s2">&quot;yield strength&quot;</span><span class="p">:</span> <span class="n">Y0</span><span class="p">}</span>
         
         <span class="n">hardening</span> <span class="o">=</span> <span class="n">Hardening</span><span class="o">.</span><span class="n">create_hardening_model</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
-        
+
         <span class="c1"># viscous overstress will increase flow stress above initial yield</span>
         <span class="n">eqps</span> <span class="o">=</span> <span class="mf">2.0</span>
         <span class="n">eqpsOld</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -168,12 +168,13 @@
                  <span class="s2">&quot;reference plastic strain rate&quot;</span><span class="p">:</span> <span class="n">epsDot0</span><span class="p">}</span>
 
         <span class="n">material</span> <span class="o">=</span> <span class="n">J2Plastic</span><span class="o">.</span><span class="n">create_material_model_functions</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="n">J2Plastic</span><span class="o">.</span><span class="n">create_material_properties</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
 
         <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">dispGrad</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
         <span class="n">internalState</span> <span class="o">=</span> <span class="n">material</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span>
         <span class="n">dt</span> <span class="o">=</span> <span class="mf">1.0</span>
-        <span class="n">W</span> <span class="o">=</span> <span class="n">material</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalState</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="n">W</span> <span class="o">=</span> <span class="n">material</span><span class="o">.</span><span class="n">compute_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalState</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assertGreater</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span></div>
 </div>
 

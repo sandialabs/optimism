@@ -102,12 +102,20 @@
 <span class="c1"># tolerance on EPQS change</span>
 <span class="n">_TOLERANCE</span> <span class="o">=</span> <span class="mf">1e-10</span>
 
-<div class="viewcode-block" id="create_material_model_functions">
-<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic.create_material_model_functions">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">create_material_model_functions</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
+<span class="c1"># TODO currently doesn&#39;t have hardening props included</span>
+<div class="viewcode-block" id="create_material_properties">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic.create_material_properties">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_material_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
     <span class="n">props</span> <span class="o">=</span> <span class="n">make_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">[</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">],</span>
                             <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;poisson ratio&#39;</span><span class="p">],</span>
                             <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;yield strength&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">props</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_material_model_functions">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.J2Plastic.create_material_model_functions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_material_model_functions</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
+
     <span class="c1"># parse kinematics</span>
     <span class="n">finiteDeformations</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">sethHill</span> <span class="o">=</span> <span class="kc">False</span>
@@ -133,7 +141,7 @@
     <span class="n">hardeningModel</span> <span class="o">=</span> <span class="n">Hardening</span><span class="o">.</span><span class="n">create_hardening_model</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
 
     
-    <span class="k">def</span><span class="w"> </span><span class="nf">energy_density_function</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">energy_density_function</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="n">elasticTrialStrain</span> <span class="o">=</span> <span class="n">compute_elastic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_energy_density</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">)</span>
 
@@ -148,12 +156,12 @@
             <span class="n">compute_state_new_func</span> <span class="o">=</span> <span class="n">compute_state_new_small_deformations</span>
             <span class="n">compute_initial_state</span> <span class="o">=</span> <span class="n">make_initial_state_small_deformations</span>
         
-    <span class="k">def</span><span class="w"> </span><span class="nf">compute_state_new_function</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_state_new_function</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">compute_state_new_func</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">)</span>
 
     <span class="n">density</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;density&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">compute_material_qoi</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_material_qoi</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="n">elasticTrialStrain</span> <span class="o">=</span> <span class="n">compute_elastic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_compute_dissipation</span><span class="p">(</span><span class="n">elasticTrialStrain</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">hardeningModel</span><span class="p">)</span>
 

@@ -96,13 +96,14 @@
                       <span class="s2">&quot;poisson ratio&quot;</span><span class="p">:</span> <span class="n">nu</span><span class="p">,</span>
                       <span class="s2">&quot;strain measure&quot;</span><span class="p">:</span> <span class="s2">&quot;logarithmic&quot;</span><span class="p">}</span>
         <span class="n">material</span> <span class="o">=</span> <span class="n">LinearElastic</span><span class="o">.</span><span class="n">create_material_model_functions</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="n">LinearElastic</span><span class="o">.</span><span class="n">create_material_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
         <span class="n">engineering_strain_rate</span> <span class="o">=</span> <span class="mf">1e-3</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">strain_history</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">engineering_strain_rate</span><span class="o">*</span><span class="n">t</span>
 
         <span class="n">maxTime</span> <span class="o">=</span> <span class="mf">1000.0</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="n">MaterialUniaxialSimulator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">material</span><span class="p">,</span> <span class="n">strain_history</span><span class="p">,</span> <span class="n">maxTime</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">MaterialUniaxialSimulator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">material</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">strain_history</span><span class="p">,</span> <span class="n">maxTime</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">stress</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">stressHistory</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assertGreater</span><span class="p">(</span><span class="n">stress</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">)</span> <span class="c1"># axial stress is nonnegative</span>

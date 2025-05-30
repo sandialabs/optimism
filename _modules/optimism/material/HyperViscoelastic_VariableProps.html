@@ -1,0 +1,321 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>optimism.material.HyperViscoelastic_VariableProps &mdash; optimism 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            optimism
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">optimism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../optimism.html">optimism package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">optimism</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optimism.material.HyperViscoelastic_VariableProps</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for optimism.material.HyperViscoelastic_VariableProps</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">jax</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jax.numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jax.scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorMath</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.material.MaterialModel</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaterialModel</span>
+
+
+<span class="c1"># define the index of key parameters</span>
+<span class="n">PROPS_K_eq</span>     <span class="o">=</span> <span class="mi">0</span>
+<span class="n">PROPS_G_eq</span>     <span class="o">=</span> <span class="mi">1</span>
+<span class="n">PROPS_G_neq</span>    <span class="o">=</span> <span class="mi">2</span>
+<span class="n">PROPS_TAU</span>      <span class="o">=</span> <span class="mi">3</span>
+<span class="n">PROPS_Krate</span>    <span class="o">=</span> <span class="mi">4</span>
+<span class="n">PROPS_Er</span>       <span class="o">=</span> <span class="mi">5</span>
+<span class="n">PROPS_R</span>        <span class="o">=</span> <span class="mi">6</span>
+<span class="n">PROPS_g1</span>       <span class="o">=</span> <span class="mi">7</span>
+<span class="n">PROPS_g2</span>       <span class="o">=</span> <span class="mi">8</span>
+<span class="n">PROPS_eta</span>      <span class="o">=</span> <span class="mi">9</span>
+<span class="n">PROPS_C1</span>       <span class="o">=</span> <span class="mi">10</span>
+<span class="n">PROPS_C2</span>       <span class="o">=</span> <span class="mi">11</span>
+<span class="n">PROPS_pgel</span>     <span class="o">=</span> <span class="mi">12</span>
+<span class="n">PROPS_Ec</span>       <span class="o">=</span> <span class="mi">13</span>
+<span class="n">PROPS_Ed</span>       <span class="o">=</span> <span class="mi">14</span>
+<span class="n">PROPS_b</span>        <span class="o">=</span> <span class="mi">15</span>
+<span class="n">PROPS_refRelax</span> <span class="o">=</span> <span class="mi">16</span>
+
+<span class="c1"># define fixed properties</span>
+<span class="n">constGlass</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="mf">0.01</span><span class="p">,</span>            <span class="c1"># rate constant</span>
+    <span class="mi">18959</span><span class="p">,</span>           <span class="c1"># activiation energy, J/mol</span>
+    <span class="mf">8.3145</span><span class="p">,</span>          <span class="c1"># gas constants</span>
+    <span class="mi">109603</span><span class="p">,</span>          <span class="c1"># g1 fitting parameter in Tg (unitless)</span>
+    <span class="mf">722.20</span><span class="p">,</span>          <span class="c1"># g2 fitting parameter in Tg (unitless)</span>
+    <span class="mf">3.73</span><span class="p">,</span>            <span class="c1"># \xi fitting parameter in Tg (unitless)</span>
+    <span class="mf">8.86</span><span class="p">,</span> <span class="c1">#61000,    # WLF coefficient (unitless)</span>
+    <span class="mf">101.6</span><span class="p">,</span> <span class="c1">#511.792, # WLF coefficient (unitless)</span>
+    <span class="mf">0.12</span><span class="p">,</span>            <span class="c1"># gel point (unitless)</span>
+    <span class="mf">1.059</span><span class="p">,</span>           <span class="c1"># fitting parameter for Young&#39;s modulus (unitless)</span>
+    <span class="mf">3.321</span><span class="p">,</span>           <span class="c1"># fitting parameter for Young&#39;s modulus (unitless)</span>
+    <span class="mf">5.248</span><span class="p">,</span>           <span class="c1"># fitting parameter for Young&#39;s modulus (unitless)</span>
+    <span class="mf">0.1</span>              <span class="c1"># reference relaxation time</span>
+<span class="p">]</span>
+
+<span class="n">NUM_PRONY_TERMS</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+<span class="n">VISCOUS_DISTORTION</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+
+<span class="c1"># per block</span>
+<div class="viewcode-block" id="create_material_model_functions">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.HyperViscoelastic_VariableProps.create_material_model_functions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_material_model_functions</span><span class="p">(</span><span class="n">CONST_PROPS</span><span class="p">):</span>
+    <span class="n">density</span> <span class="o">=</span> <span class="n">CONST_PROPS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;density&#39;</span><span class="p">)</span>
+    <span class="n">const_props</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">CONST_PROPS</span><span class="p">[</span><span class="s1">&#39;equilibrium bulk modulus&#39;</span><span class="p">],</span>
+        <span class="n">CONST_PROPS</span><span class="p">[</span><span class="s1">&#39;equilibrium shear modulus&#39;</span><span class="p">],</span>
+        <span class="n">CONST_PROPS</span><span class="p">[</span><span class="s1">&#39;non equilibrium shear modulus&#39;</span><span class="p">],</span>
+        <span class="n">CONST_PROPS</span><span class="p">[</span><span class="s1">&#39;relaxation time&#39;</span><span class="p">]</span>
+    <span class="p">]</span>
+    <span class="n">const_props</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">constGlass</span><span class="p">)</span>
+
+    <span class="c1">#the props here are the props from the element, operating on quad-point</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">variable_props</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="n">_make_properties</span><span class="p">(</span><span class="n">variable_props</span><span class="p">,</span> <span class="n">const_props</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_initial_state</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,)):</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">state</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">variable_props</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="n">_make_properties</span><span class="p">(</span><span class="n">variable_props</span><span class="p">,</span> <span class="n">const_props</span><span class="p">)</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">_compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">state</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_material_qoi</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">variable_props</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="n">props</span> <span class="o">=</span> <span class="n">_make_properties</span><span class="p">(</span><span class="n">variable_props</span><span class="p">,</span> <span class="n">const_props</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_compute_dissipation</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">MaterialModel</span><span class="p">(</span><span class="n">compute_energy_density</span> <span class="o">=</span> <span class="n">energy_density</span><span class="p">,</span>
+                         <span class="n">compute_initial_state</span> <span class="o">=</span> <span class="n">compute_initial_state</span><span class="p">,</span>
+                         <span class="n">compute_state_new</span> <span class="o">=</span> <span class="n">compute_state_new</span><span class="p">,</span>
+                         <span class="n">compute_material_qoi</span> <span class="o">=</span> <span class="n">compute_material_qoi</span><span class="p">,</span>
+                         <span class="n">density</span> <span class="o">=</span> <span class="n">density</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="_make_properties">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.HyperViscoelastic_VariableProps._make_properties">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_properties</span><span class="p">(</span><span class="n">props_variable</span><span class="p">,</span> <span class="n">const_props</span><span class="p">):</span>
+    
+
+    <span class="c1"># extract density value</span>
+    <span class="n">dens</span> <span class="o">=</span> <span class="n">props_variable</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="c1"># scale density to light dosage</span>
+    <span class="n">scaledProp</span> <span class="o">=</span> <span class="p">(</span><span class="mi">980</span> <span class="o">*</span> <span class="n">dens</span><span class="p">)</span> <span class="o">+</span> <span class="mi">20</span>
+
+    <span class="c1"># calculate the degree of cure based on light dosage</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">const_props</span><span class="p">[</span><span class="n">PROPS_Krate</span><span class="p">]</span> <span class="o">*</span> <span class="n">scaledProp</span><span class="p">)</span>
+
+    <span class="c1"># calculate glass transition</span>
+    <span class="n">thetaGlass</span> <span class="o">=</span> <span class="n">const_props</span><span class="p">[</span><span class="n">PROPS_Er</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">const_props</span><span class="p">[</span><span class="n">PROPS_R</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">const_props</span><span class="p">[</span><span class="n">PROPS_g1</span><span class="p">]</span><span class="o">*</span><span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">p</span><span class="p">)</span><span class="o">**</span><span class="n">const_props</span><span class="p">[</span><span class="n">PROPS_eta</span><span class="p">]))</span> <span class="o">+</span> <span class="n">const_props</span><span class="p">[</span><span class="n">PROPS_g2</span><span class="p">])</span>
+    
+    <span class="c1"># need current temperature</span>
+    <span class="c1"># TODO look at the props_variable and determine if we need this</span>
+    <span class="k">if</span> <span class="n">props_variable</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># assert False, &#39;Not hooked up yet&#39;</span>
+        <span class="n">temperature</span> <span class="o">=</span> <span class="n">props_variable</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">temperature</span> <span class="o">=</span> <span class="n">thetaGlass</span>
+
+
+    <span class="c1"># calculate WLF </span>
+    <span class="n">WLF</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">const_props</span><span class="p">[</span><span class="n">PROPS_C1</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">temperature</span> <span class="o">-</span> <span class="n">thetaGlass</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="n">const_props</span><span class="p">[</span><span class="n">PROPS_C2</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">temperature</span> <span class="o">-</span> <span class="n">thetaGlass</span><span class="p">))</span>
+    
+    <span class="c1"># calculate shift factor</span>
+    <span class="n">shiftFactor</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="n">WLF</span>
+    
+    <span class="c1"># calculate relaxation time</span>
+    <span class="n">relaxTime</span> <span class="o">=</span> <span class="n">const_props</span><span class="p">[</span><span class="n">PROPS_refRelax</span><span class="p">]</span><span class="o">*</span><span class="n">shiftFactor</span>
+
+    <span class="c1"># Calculate the variable shear </span>
+    <span class="n">E</span> <span class="o">=</span> <span class="p">(</span><span class="n">const_props</span><span class="p">[</span><span class="n">PROPS_Ec</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">const_props</span><span class="p">[</span><span class="n">PROPS_b</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="n">const_props</span><span class="p">[</span><span class="n">PROPS_pgel</span><span class="p">])))</span> <span class="o">+</span> <span class="n">const_props</span><span class="p">[</span><span class="n">PROPS_Ed</span><span class="p">]</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">const_props</span><span class="p">[</span><span class="n">PROPS_K_eq</span><span class="p">]</span> <span class="o">-</span> <span class="n">E</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">6</span><span class="o">*</span><span class="n">const_props</span><span class="p">[</span><span class="n">PROPS_K_eq</span><span class="p">])</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">E</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">v</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">const_props</span><span class="p">[</span><span class="n">PROPS_K_eq</span><span class="p">],</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">G</span><span class="p">,</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">G</span><span class="p">,</span> <span class="n">relaxTime</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="_energy_density">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.HyperViscoelastic_VariableProps._energy_density">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+    <span class="n">W_eq</span>  <span class="o">=</span> <span class="n">_eq_strain_energy</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
+
+    <span class="n">Ee_trial</span> <span class="o">=</span> <span class="n">_compute_elastic_logarithmic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+    <span class="n">delta_Ev</span> <span class="o">=</span> <span class="n">_compute_state_increment</span><span class="p">(</span><span class="n">Ee_trial</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
+    <span class="n">Ee</span> <span class="o">=</span> <span class="n">Ee_trial</span> <span class="o">-</span> <span class="n">delta_Ev</span> 
+    
+    <span class="n">W_neq</span> <span class="o">=</span> <span class="n">_neq_strain_energy</span><span class="p">(</span><span class="n">Ee</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
+    <span class="n">Psi</span> <span class="o">=</span> <span class="n">_incremental_dissipated_energy</span><span class="p">(</span><span class="n">Ee</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">W_eq</span> <span class="o">+</span> <span class="n">W_neq</span> <span class="o">+</span> <span class="n">Psi</span></div>
+
+
+<div class="viewcode-block" id="_eq_strain_energy">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.HyperViscoelastic_VariableProps._eq_strain_energy">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_eq_strain_energy</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+    <span class="n">K</span><span class="p">,</span> <span class="n">G</span> <span class="o">=</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_K_eq</span><span class="p">],</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_G_eq</span><span class="p">]</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="n">dispGrad</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">F</span><span class="p">)</span>
+    <span class="n">J23</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span>
+    <span class="n">I1Bar</span> <span class="o">=</span> <span class="n">J23</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">F</span><span class="p">,</span><span class="n">F</span><span class="p">)</span>
+    <span class="n">Wvol</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">K</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">J</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">J</span><span class="p">))</span>
+    <span class="n">Wdev</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">G</span> <span class="o">*</span> <span class="p">(</span><span class="n">I1Bar</span> <span class="o">-</span> <span class="mf">3.0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Wdev</span> <span class="o">+</span> <span class="n">Wvol</span></div>
+
+
+<div class="viewcode-block" id="_neq_strain_energy">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.HyperViscoelastic_VariableProps._neq_strain_energy">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_neq_strain_energy</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+    <span class="n">G_neq</span> <span class="o">=</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_G_neq</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">G_neq</span> <span class="o">*</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">norm_of_deviator_squared</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="_incremental_dissipated_energy">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.HyperViscoelastic_VariableProps._incremental_dissipated_energy">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_incremental_dissipated_energy</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+    <span class="n">G_neq</span> <span class="o">=</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_G_neq</span><span class="p">]</span>
+    <span class="n">tau</span>   <span class="o">=</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_TAU</span><span class="p">]</span>
+    <span class="n">eta</span>   <span class="o">=</span> <span class="n">G_neq</span> <span class="o">*</span> <span class="n">tau</span>
+
+    <span class="n">Me</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">G_neq</span> <span class="o">*</span> <span class="n">elasticStrain</span>
+    <span class="n">M_bar</span> <span class="o">=</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">norm_of_deviator_squared</span><span class="p">(</span><span class="n">Me</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">M_bar</span> <span class="o">/</span> <span class="n">eta</span></div>
+
+
+<div class="viewcode-block" id="_compute_dissipation">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.HyperViscoelastic_VariableProps._compute_dissipation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_dissipation</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+    <span class="n">Ee_trial</span> <span class="o">=</span> <span class="n">_compute_elastic_logarithmic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+    <span class="n">delta_Ev</span> <span class="o">=</span> <span class="n">_compute_state_increment</span><span class="p">(</span><span class="n">Ee_trial</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
+    <span class="n">Ee</span> <span class="o">=</span> <span class="n">Ee_trial</span> <span class="o">-</span> <span class="n">delta_Ev</span> 
+    
+    <span class="k">return</span> <span class="n">_incremental_dissipated_energy</span><span class="p">(</span><span class="n">Ee</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="_compute_state_new">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.HyperViscoelastic_VariableProps._compute_state_new">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+    <span class="n">Ee_trial</span> <span class="o">=</span> <span class="n">_compute_elastic_logarithmic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">)</span>
+    <span class="n">delta_Ev</span> <span class="o">=</span> <span class="n">_compute_state_increment</span><span class="p">(</span><span class="n">Ee_trial</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
+
+    <span class="n">Fv_old</span> <span class="o">=</span> <span class="n">stateOld</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">Fv_new</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">expm</span><span class="p">(</span><span class="n">delta_Ev</span><span class="p">)</span><span class="nd">@Fv_old</span>
+    <span class="k">return</span> <span class="n">Fv_new</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="_compute_state_increment">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.HyperViscoelastic_VariableProps._compute_state_increment">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_state_increment</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">):</span>
+    <span class="n">tau</span> <span class="o">=</span> <span class="n">props</span><span class="p">[</span><span class="n">PROPS_TAU</span><span class="p">]</span>
+    <span class="n">integration_factor</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">/</span> <span class="n">tau</span><span class="p">)</span>
+    <span class="n">Ee_dev</span> <span class="o">=</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">dev</span><span class="p">(</span><span class="n">elasticStrain</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">integration_factor</span> <span class="o">*</span> <span class="n">Ee_dev</span> <span class="o">/</span> <span class="n">tau</span> <span class="c1"># dt * D</span></div>
+
+
+<div class="viewcode-block" id="_compute_elastic_logarithmic_strain">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.HyperViscoelastic_VariableProps._compute_elastic_logarithmic_strain">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_elastic_logarithmic_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">stateOld</span><span class="p">):</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="n">dispGrad</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">Fv_old</span> <span class="o">=</span> <span class="n">stateOld</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+    <span class="n">Fe_trial</span> <span class="o">=</span> <span class="n">F</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">Fv_old</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">TensorMath</span><span class="o">.</span><span class="n">log_sqrt_symm</span><span class="p">(</span><span class="n">Fe_trial</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">Fe_trial</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Brandon Talamini, Mike Tupek.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

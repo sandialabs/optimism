@@ -73,10 +73,9 @@
            <div itemprop="articleBody">
              
   <h1>Source code for optimism.WarmStart</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">cg</span><span class="p">,</span> <span class="n">LinearOperator</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">cg</span><span class="p">,</span> <span class="n">LinearOperator</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">optimism.JaxConfig</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">optimism.Objective</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">Objective</span>
     
 <div class="viewcode-block" id="warm_start_increment">
 <a class="viewcode-back" href="../../optimism.html#optimism.WarmStart.warm_start_increment">[docs]</a>
@@ -91,7 +90,7 @@
         <span class="k">raise</span><span class="p">(</span><span class="s1">&#39;invalid warm start parameter gradient direction&#39;</span><span class="p">)</span>
         
     <span class="n">sz</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">size</span>
-    <span class="n">op</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">objective</span><span class="o">.</span><span class="n">hessian_vec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+    <span class="n">op</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">objective</span><span class="o">.</span><span class="n">hessian_vec</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span>
     
     <span class="n">Lop</span> <span class="o">=</span> <span class="n">LinearOperator</span><span class="p">((</span><span class="n">sz</span><span class="p">,</span><span class="n">sz</span><span class="p">),</span>
                          <span class="n">matvec</span> <span class="o">=</span> <span class="n">op</span><span class="p">)</span>

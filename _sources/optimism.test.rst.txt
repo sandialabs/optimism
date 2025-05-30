@@ -274,6 +274,15 @@ optimism.test.test\_VTKWriter module
    :show-inheritance:
    :private-members:
 
+optimism.test.test\_VariableProps module
+----------------------------------------
+
+.. automodule:: optimism.test.test_VariableProps
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
 optimism.test.test\_VolumeAverageJ module
 -----------------------------------------
 

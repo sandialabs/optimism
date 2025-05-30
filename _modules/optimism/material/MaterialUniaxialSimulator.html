@@ -106,12 +106,13 @@
 
 <div class="viewcode-block" id="run">
 <a class="viewcode-back" href="../../../optimism.material.html#optimism.material.MaterialUniaxialSimulator.run">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">materialModel</span><span class="p">,</span> <span class="n">strain_history</span><span class="p">,</span> <span class="n">maxTime</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">materialModel</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">strain_history</span><span class="p">,</span> <span class="n">maxTime</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Generates the uniaxial response of a given material</span>
 <span class="sd">    Args</span>
 <span class="sd">    ----</span>
 <span class="sd">    materialModel: MaterialModel object</span>
 <span class="sd">        Material to subject to uniaxial stress test</span>
+<span class="sd">    props: jax array of properties</span>
 <span class="sd">    strain_history: callable (float) -&gt; float</span>
 <span class="sd">        The tensile strain as a function of time</span>
 <span class="sd">    maxTime: float</span>
@@ -132,14 +133,14 @@
         
     <span class="k">def</span><span class="w"> </span><span class="nf">obj_func</span><span class="p">(</span><span class="n">freeStrains</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
         <span class="n">strain</span> <span class="o">=</span> <span class="n">makeStrainTensor_</span><span class="p">(</span><span class="n">freeStrains</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">energy_density</span><span class="p">(</span><span class="n">strain</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">energy_density</span><span class="p">(</span><span class="n">strain</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
 
     <span class="n">uniaxialTolerance</span><span class="o">=</span><span class="n">tol</span>
     <span class="n">solverSettings</span> <span class="o">=</span> <span class="n">EqSolver</span><span class="o">.</span><span class="n">get_settings</span><span class="p">(</span><span class="n">tol</span><span class="o">=</span><span class="n">uniaxialTolerance</span><span class="p">)</span>
     <span class="n">internalVariables</span> <span class="o">=</span>  <span class="n">materialModel</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span>
     <span class="n">freeStrains</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
         
-    <span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="n">uniaxialStrainHistory</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">internalVariables</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Params</span><span class="p">(</span><span class="n">uniaxialStrainHistory</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="n">prop_data</span><span class="o">=</span><span class="n">props</span><span class="p">)</span>
     <span class="n">o</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">Objective</span><span class="p">(</span><span class="n">obj_func</span><span class="p">,</span> <span class="n">freeStrains</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
 
     <span class="n">strainHistory</span> <span class="o">=</span> <span class="p">[]</span>
@@ -153,8 +154,8 @@
 
         <span class="n">freeStrains</span><span class="p">,</span> <span class="n">solverSuccess</span> <span class="o">=</span> <span class="n">EqSolver</span><span class="o">.</span><span class="n">nonlinear_equation_solve</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">freeStrains</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">solverSettings</span><span class="p">,</span> <span class="n">useWarmStart</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">strain</span> <span class="o">=</span> <span class="n">makeStrainTensor_</span><span class="p">(</span><span class="n">freeStrains</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
-        <span class="n">internalVariables</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="n">strain</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
-        <span class="n">energyDensity</span><span class="p">,</span><span class="n">stress</span> <span class="o">=</span> <span class="n">converged_energy_density_and_stress</span><span class="p">(</span><span class="n">strain</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="n">internalVariables</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="n">strain</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+        <span class="n">energyDensity</span><span class="p">,</span><span class="n">stress</span> <span class="o">=</span> <span class="n">converged_energy_density_and_stress</span><span class="p">(</span><span class="n">strain</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">Objective</span><span class="o">.</span><span class="n">param_index_update</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">internalVariables</span><span class="p">)</span>
         <span class="n">o</span><span class="o">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
 

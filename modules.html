@@ -106,12 +106,14 @@
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.Gent">optimism.material.Gent module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.Hardening">optimism.material.Hardening module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.HyperViscoelastic">optimism.material.HyperViscoelastic module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.HyperViscoelastic_VariableProps">optimism.material.HyperViscoelastic_VariableProps module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.J2Plastic">optimism.material.J2Plastic module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.LinearElastic">optimism.material.LinearElastic module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.MaterialModel">optimism.material.MaterialModel module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.MaterialUniaxialSimulator">optimism.material.MaterialUniaxialSimulator module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.MultiBranchHyperViscoelastic">optimism.material.MultiBranchHyperViscoelastic module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.Neohookean">optimism.material.Neohookean module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material.Neohookean_VariableProps">optimism.material.Neohookean_VariableProps module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.material.html#module-optimism.material">Module contents</a></li>
 </ul>
 </li>
@@ -160,6 +162,7 @@
 <li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_Traction">optimism.test.test_Traction module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_TrustRegionSPG">optimism.test.test_TrustRegionSPG module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_VTKWriter">optimism.test.test_VTKWriter module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_VariableProps">optimism.test.test_VariableProps module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test.test_VolumeAverageJ">optimism.test.test_VolumeAverageJ module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.test.html#module-optimism.test">Module contents</a></li>
 </ul>
@@ -366,6 +369,7 @@
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.construct_weighted_function_space"><code class="docutils literal notranslate"><span class="pre">construct_weighted_function_space()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.default_modify_element_gradient"><code class="docutils literal notranslate"><span class="pre">default_modify_element_gradient()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.evaluate_on_block"><code class="docutils literal notranslate"><span class="pre">evaluate_on_block()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.evaluate_on_block_heterogeneous_props"><code class="docutils literal notranslate"><span class="pre">evaluate_on_block_heterogeneous_props()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.evaluate_on_element"><code class="docutils literal notranslate"><span class="pre">evaluate_on_element()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.get_nodal_values_on_edge"><code class="docutils literal notranslate"><span class="pre">get_nodal_values_on_edge()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.integrate_element"><code class="docutils literal notranslate"><span class="pre">integrate_element()</span></code></a></li>
@@ -379,6 +383,7 @@
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.interpolate_to_points"><code class="docutils literal notranslate"><span class="pre">interpolate_to_points()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.map_element_shape_grads"><code class="docutils literal notranslate"><span class="pre">map_element_shape_grads()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.project_quadrature_field_to_element_field"><code class="docutils literal notranslate"><span class="pre">project_quadrature_field_to_element_field()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.FunctionSpace.vmapPropValue"><code class="docutils literal notranslate"><span class="pre">vmapPropValue()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="optimism.html#optimism-incompletecholesky-module">optimism.IncompleteCholesky module</a></li>
@@ -532,6 +537,8 @@
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.parse_2D_to_3D_gradient_transformation"><code class="docutils literal notranslate"><span class="pre">parse_2D_to_3D_gradient_transformation()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.plane_strain_gradient_transformation"><code class="docutils literal notranslate"><span class="pre">plane_strain_gradient_transformation()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.strain_energy_density_to_lagrangian_density"><code class="docutils literal notranslate"><span class="pre">strain_energy_density_to_lagrangian_density()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.tile_props"><code class="docutils literal notranslate"><span class="pre">tile_props()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.vmapPropValue"><code class="docutils literal notranslate"><span class="pre">vmapPropValue()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="optimism.html#optimism.Mechanics.volume_average_J_gradient_transformation"><code class="docutils literal notranslate"><span class="pre">volume_average_J_gradient_transformation()</span></code></a></li>
 </ul>
 </li>
@@ -656,6 +663,7 @@
 <li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Params.bc_data"><code class="docutils literal notranslate"><span class="pre">Params.bc_data</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Params.design_data"><code class="docutils literal notranslate"><span class="pre">Params.design_data</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Params.dynamic_data"><code class="docutils literal notranslate"><span class="pre">Params.dynamic_data</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Params.prop_data"><code class="docutils literal notranslate"><span class="pre">Params.prop_data</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Params.state_data"><code class="docutils literal notranslate"><span class="pre">Params.state_data</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="optimism.html#optimism.Objective.Params.time"><code class="docutils literal notranslate"><span class="pre">Params.time</span></code></a></li>
 </ul>

@@ -85,12 +85,18 @@
 <span class="n">PROPS_KAPPA</span> <span class="o">=</span> <span class="mi">3</span>
 
 
+<div class="viewcode-block" id="create_material_properties">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.LinearElastic.create_material_properties">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_material_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
+    <span class="n">props</span> <span class="o">=</span> <span class="n">_make_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">[</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">],</span>
+                             <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;poisson ratio&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">props</span><span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="create_material_model_functions">
 <a class="viewcode-back" href="../../../optimism.material.html#optimism.material.LinearElastic.create_material_model_functions">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">create_material_model_functions</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
-    <span class="n">props</span> <span class="o">=</span> <span class="n">_make_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">[</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">],</span>
-                             <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;poisson ratio&#39;</span><span class="p">])</span>
-
     <span class="k">if</span> <span class="s1">&#39;strain measure&#39;</span> <span class="ow">in</span> <span class="n">properties</span><span class="p">:</span>
         <span class="n">strainMeasure</span> <span class="o">=</span> <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;strain measure&#39;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
@@ -105,7 +111,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unrecognized strain measure&#39;</span><span class="p">)</span>
     
-    <span class="k">def</span><span class="w"> </span><span class="nf">strain_energy</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">strain_energy</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="k">del</span> <span class="n">internalVars</span>
         <span class="k">del</span> <span class="n">dt</span>
         <span class="n">strain</span> <span class="o">=</span> <span class="n">_strain</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">)</span>
@@ -150,8 +156,9 @@
 
 <div class="viewcode-block" id="compute_state_new">
 <a class="viewcode-back" href="../../../optimism.material.html#optimism.material.LinearElastic.compute_state_new">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">internalVars</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
     <span class="k">del</span> <span class="n">dispGrad</span>
+    <span class="k">del</span> <span class="n">props</span>
     <span class="k">del</span> <span class="n">dt</span>
     <span class="k">return</span> <span class="n">internalVars</span></div>
 

@@ -39,6 +39,15 @@ optimism.material.HyperViscoelastic module
    :show-inheritance:
    :private-members:
 
+optimism.material.HyperViscoelastic\_VariableProps module
+---------------------------------------------------------
+
+.. automodule:: optimism.material.HyperViscoelastic_VariableProps
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
 optimism.material.J2Plastic module
 ----------------------------------
 
@@ -88,6 +97,15 @@ optimism.material.Neohookean module
 -----------------------------------
 
 .. automodule:: optimism.material.Neohookean
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
+optimism.material.Neohookean\_VariableProps module
+--------------------------------------------------
+
+.. automodule:: optimism.material.Neohookean_VariableProps
    :members:
    :undoc-members:
    :show-inheritance:

@@ -112,12 +112,12 @@
         <span class="n">props</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;elastic modulus&#39;</span><span class="p">:</span> <span class="n">E</span><span class="p">,</span>
                  <span class="s1">&#39;poisson ratio&#39;</span><span class="p">:</span> <span class="n">nu</span><span class="p">}</span>
         <span class="n">materialModel</span> <span class="o">=</span> <span class="n">MaterialModel</span><span class="o">.</span><span class="n">create_material_model_functions</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">props</span> <span class="o">=</span> <span class="n">MaterialModel</span><span class="o">.</span><span class="n">create_material_properties</span><span class="p">(</span><span class="n">props</span><span class="p">)</span>
         <span class="n">mechFuncs</span> <span class="o">=</span> <span class="n">Mechanics</span><span class="o">.</span><span class="n">create_mechanics_functions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="s2">&quot;plane strain&quot;</span><span class="p">,</span> <span class="n">materialModel</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">internals</span> <span class="o">=</span> <span class="n">mechFuncs</span><span class="o">.</span><span class="n">compute_initial_state</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">elementStiffnesses</span> <span class="o">=</span> <span class="n">mechFuncs</span><span class="o">.</span><span class="n">compute_element_stiffnesses</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elementStiffnesses</span> <span class="o">=</span> <span class="n">mechFuncs</span><span class="o">.</span><span class="n">compute_element_stiffnesses</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compute_energy</span> <span class="o">=</span> <span class="n">mechFuncs</span><span class="o">.</span><span class="n">compute_strain_energy</span></div>
 
 
@@ -204,7 +204,7 @@
         
         <span class="k">def</span><span class="w"> </span><span class="nf">compute_energy_again</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="p">):</span>
             <span class="n">U</span> <span class="o">=</span> <span class="n">dofManager</span><span class="o">.</span><span class="n">create_field</span><span class="p">(</span><span class="n">Uu</span><span class="p">,</span> <span class="n">Ubc</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_energy</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">props</span><span class="p">)</span>
 
         
         <span class="n">K</span> <span class="o">=</span> <span class="n">assemble_sparse_stiffness_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elementStiffnesses</span><span class="p">,</span>
