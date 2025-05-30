@@ -10,12 +10,10 @@ from optimism import Mesh
 from optimism import AlSolver
 from optimism import EquationSolver as EqSolver
 from optimism import FunctionSpace
-from optimism import Interpolants
 from optimism import Objective
 from optimism.ConstrainedObjective import ConstrainedObjective
 from optimism import QuadratureRule
 from optimism import SparseMatrixAssembler
-from optimism import TensorMath
 
 
 E = 1.0
@@ -37,7 +35,7 @@ props = {'elastic modulus': E,
          'regularization length': ell}
 
 materialModel = material.create_material_model_functions(props)
-
+props = material.create_material_properties(props)
 subProblemSettings = EqSolver.get_settings()
 alSettings = AlSolver.get_settings()
 
@@ -78,7 +76,7 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
 
     def test_sparse_hessian_at_zero_phase(self):
         elementStiffnesses = self.bvpFunctions.\
-            compute_element_stiffnesses(self.U, self.stateVars)
+            compute_element_stiffnesses(self.U, self.stateVars, props)
 
         KSparse = SparseMatrixAssembler.assemble_sparse_stiffness_matrix(elementStiffnesses,
                                                                          self.mesh.conns,
@@ -89,7 +87,7 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
         
         def objective_func(Uu):
             U = self.dofManager.create_field(Uu, Ubc)
-            return self.bvpFunctions.compute_internal_energy(U, self.stateVars)
+            return self.bvpFunctions.compute_internal_energy(U, self.stateVars, props)
 
         compute_dense_hessian = hessian(objective_func)
         KDense = compute_dense_hessian(self.dofManager.get_unknown_values(self.U))
@@ -101,7 +99,7 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
         U = self.U.at[:,2].set(np.linspace(0.1, 0.9, self.Nx*self.Ny))
         
         elementStiffnesses = self.bvpFunctions.\
-            compute_element_stiffnesses(U, self.stateVars)
+            compute_element_stiffnesses(U, self.stateVars, props)
 
         KSparse = SparseMatrixAssembler.assemble_sparse_stiffness_matrix(elementStiffnesses,
                                                                          self.mesh.conns,
@@ -112,7 +110,7 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
         
         def objective_func(Uu):
             U = self.dofManager.create_field(Uu, Ubc)
-            return self.bvpFunctions.compute_internal_energy(U, self.stateVars)
+            return self.bvpFunctions.compute_internal_energy(U, self.stateVars, props)
 
         compute_dense_hessian = hessian(objective_func)
         KDense = compute_dense_hessian(self.dofManager.get_unknown_values(U))
@@ -128,7 +126,7 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
         kappa = np.ones_like(lam)
 
         elementStiffnesses =self.bvpFunctions.\
-            compute_element_stiffnesses(U, self.stateVars)
+            compute_element_stiffnesses(U, self.stateVars, props)
 
 
         KSparse = SparseMatrixAssembler.assemble_sparse_stiffness_matrix(elementStiffnesses,
@@ -148,7 +146,7 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
         
         def objective_function(Uu, p):
             U = self.dofManager.create_field(Uu, Ubc)
-            return self.bvpFunctions.compute_internal_energy(U, self.stateVars)
+            return self.bvpFunctions.compute_internal_energy(U, self.stateVars, props)
 
         def constraint_function(Uu, p):
             return Uu[self.phaseIds]
@@ -198,7 +196,7 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
         
         def objective_function(Uu, p):
             U = self.dofManager.create_field(Uu, self.Ubc)
-            return self.bvpFunctions.compute_internal_energy(U, self.stateVars)
+            return self.bvpFunctions.compute_internal_energy(U, self.stateVars, props)
 
         def constraint_function(Uu, p):
             return Uu[self.phaseIds]
