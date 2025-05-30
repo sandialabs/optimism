@@ -39,6 +39,7 @@ class TractionPatch(MeshFixture.MeshFixture):
         self.fs = FunctionSpace.construct_function_space(self.mesh, self.quadRule)
 
         materialModel = MatModel.create_material_model_functions(props)
+        self.props = MatModel.create_material_properties(props)
 
         mcxFuncs = Mechanics.create_mechanics_functions(
             self.fs, "plane strain", materialModel)
@@ -48,7 +49,7 @@ class TractionPatch(MeshFixture.MeshFixture):
         
         dummyInternals = materialModel.compute_initial_state()
         dispGrad3D = np.zeros((3,3)).at[0:2,0:2].set(self.targetDispGrad)
-        self.targetStress = jax.grad(materialModel.compute_energy_density)(dispGrad3D, dummyInternals, dt=0.0)
+        self.targetStress = jax.grad(materialModel.compute_energy_density)(dispGrad3D, dummyInternals, self.props, dt=0.0)
 
     
     def test_neumann_patch_test_with_quadratic_elements(self):
@@ -64,7 +65,7 @@ class TractionPatch(MeshFixture.MeshFixture):
         
         def objective(Uu):
             U = dofManager.create_field(Uu, Ubc)
-            internalPotential = self.compute_energy(U, self.internals)
+            internalPotential = self.compute_energy(U, self.internals, self.props)
             loadPotential = Mechanics.compute_traction_potential_energy(self.fs, U, self.edgeQuadRule, self.mesh.sideSets['right'], traction_func)
             loadPotential += Mechanics.compute_traction_potential_energy(self.fs, U, self.edgeQuadRule, self.mesh.sideSets['top'], traction_func)
             return internalPotential + loadPotential
