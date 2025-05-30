@@ -33,12 +33,12 @@ class SparsePatchFixture(MeshFixture.MeshFixture):
         props = {'elastic modulus': E,
                  'poisson ratio': nu}
         materialModel = MaterialModel.create_material_model_functions(props)
-
+        self.props = MaterialModel.create_material_properties(props)
         mechFuncs = Mechanics.create_mechanics_functions(self.fs, "plane strain", materialModel)
 
         self.internals = mechFuncs.compute_initial_state()
 
-        self.elementStiffnesses = mechFuncs.compute_element_stiffnesses(np.zeros_like(self.U), self.internals)
+        self.elementStiffnesses = mechFuncs.compute_element_stiffnesses(np.zeros_like(self.U), self.internals, self.props)
         self.compute_energy = mechFuncs.compute_strain_energy
 
 
@@ -116,7 +116,7 @@ class SparsePatchFixture(MeshFixture.MeshFixture):
         
         def compute_energy_again(Uu, Ubc):
             U = dofManager.create_field(Uu, Ubc)
-            return self.compute_energy(U, self.internals)
+            return self.compute_energy(U, self.internals, self.props)
 
         
         K = assemble_sparse_stiffness_matrix(self.elementStiffnesses,
