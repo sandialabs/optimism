@@ -100,7 +100,7 @@ class J2MaterialPointUpdateGradsFixture(TestFixture):
         dispGrad = jax.random.uniform(key, (3, 3))
         initial_state = self.compute_initial_state()
 
-        state = self.compute_state_new(dispGrad, initial_state, dt)
+        state = self.compute_state_new(dispGrad, initial_state, self.properties, dt)
         dc_dugrad, dc_dc_n = self.compute_state_new_derivs(dispGrad, initial_state, self.properties, dt)
 
         # Compute data for gold values (assuming small strain and linear kinematics)
@@ -179,7 +179,7 @@ class J2GlobalMeshUpdateGradsFixture(MeshFixture):
         Uu = 0.0*self.dofManager.get_unknown_values(self.U) 
 
         update_internal_variables_derivs = jax.jacfwd(update_internal_vars_test, (0,1))
-        dc_du, dc_dc_n = update_internal_variables_derivs(Uu, self.ivs_prev, self.properties)
+        dc_du, dc_dc_n = update_internal_variables_derivs(Uu, self.ivs_prev)
 
         nElems = Mesh.num_elements(self.mesh)
         nQpsPerElem = len(self.quadRule)
@@ -250,7 +250,7 @@ class J2GlobalMeshUpdateGradsFixture(MeshFixture):
                                                                                      self.materialModel)
 
         U = self.dofManager.create_field(self.Uu, self.Ubc)
-        dc_dc_n = ivsUpdateInverseFuncs.ivs_update_jac_ivs_prev(U, self.ivs_prev)
+        dc_dc_n = ivsUpdateInverseFuncs.ivs_update_jac_ivs_prev(U, self.ivs_prev, self.properties)
 
         nElems = Mesh.num_elements(self.mesh)
         nQpsPerElem = len(self.quadRule)
