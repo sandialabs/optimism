@@ -323,15 +323,16 @@ def create_multi_block_mechanics_functions(functionSpace, mode2D, materialModels
         return _compute_initial_state_multi_block(fs, materialModels)
 
     def qoi_to_lagrangian_qoi(compute_material_qoi):
-        def L(U, gradU, Q, X, dt):
-            return compute_material_qoi(gradU, Q, dt)
+        def L(U, gradU, Q, props, X, dt):
+            return compute_material_qoi(gradU, Q, props, dt)
         return L
 
-    def integrated_material_qoi(U, stateVariables, dt=0.0):
+    def integrated_material_qoi(U, stateVariables, props, dt=0.0):
         integrated_qoi = 0.0
         for blockKey in materialModels:
             elemIds = fs.mesh.blocks[blockKey]
-            block_qoi = FunctionSpace.integrate_over_block(fs, U, stateVariables, dt, 
+            blockProps = props[blockKey]
+            block_qoi = FunctionSpace.integrate_over_block(fs, U, stateVariables, blockProps, dt, 
                                                   qoi_to_lagrangian_qoi(materialModels[blockKey].compute_material_qoi),
                                                   elemIds,
                                                   modify_element_gradient=modify_element_gradient)

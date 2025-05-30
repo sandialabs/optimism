@@ -48,6 +48,10 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
         }
         j2_model = J2.create_material_model_functions(props)
         self.materialModels = {'block0': j2_model, 'block1': j2_model}
+        self.props = {
+            'block0': J2.create_material_properties(props),
+            'block1': J2.create_material_properties(props)
+        }
 
         self.quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
 
@@ -70,12 +74,13 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
 
         Ubc_inc = Ubc / self.steps
         ivs = mechFuncs.compute_initial_state()
-        p = Objective.Params(bc_data=np.zeros(Ubc.shape), state_data=ivs)
+        p = Objective.Params(bc_data=np.zeros(Ubc.shape), state_data=ivs, prop_data=self.props)
 
         def compute_energy(Uu, p):
             U = self.dofManager.create_field(Uu, p.bc_data)
             internalVariables = p.state_data
-            return mechFuncs.compute_strain_energy(U, internalVariables)
+            props = p.prop_data
+            return mechFuncs.compute_strain_energy(U, internalVariables, props)
 
         Uu = 0.0*self.dofManager.get_unknown_values(self.U) 
         self.objective = Objective.Objective(compute_energy, Uu, p)
@@ -87,7 +92,7 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
             p = Objective.param_index_update(p, 0, step*Ubc_inc)
             Uu, solverSuccess = EqSolver.nonlinear_equation_solve(self.objective, Uu, p, EqSolver.get_settings(), useWarmStart=False)
             U = self.dofManager.create_field(Uu, p.bc_data)
-            ivs = mechFuncs.compute_updated_internal_variables(U, p.state_data)
+            ivs = mechFuncs.compute_updated_internal_variables(U, p.state_data, p.prop_data)
             p = Objective.param_index_update(p, 1, ivs)
             storedState.append((Uu, p))
 
@@ -96,20 +101,20 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
     def setup_energy_functions(self):
         shapeOnRef = Interpolants.compute_shapes(self.mesh.parentElement, self.quadRule.xigauss)
 
-        def energy_function_all_dofs(U, ivs, coords):
+        def energy_function_all_dofs(U, ivs, props, coords):
             adjoint_func_space = AdjointFunctionSpace.construct_function_space_for_adjoint(coords, shapeOnRef, self.mesh, self.quadRule)
             mech_funcs = Mechanics.create_multi_block_mechanics_functions(adjoint_func_space, mode2D='plane strain', materialModels=self.materialModels)
-            return mech_funcs.compute_strain_energy(U, ivs)
+            return mech_funcs.compute_strain_energy(U, ivs, props)
 
         def energy_function_coords(Uu, p, ivs, coords):
             U = self.dofManager.create_field(Uu, p.bc_data)
-            return energy_function_all_dofs(U, ivs, coords)
+            return energy_function_all_dofs(U, ivs, p.prop_data, coords)
 
         def dissipation(Uu, p, ivs, coords):
             adjoint_func_space = AdjointFunctionSpace.construct_function_space_for_adjoint(coords, shapeOnRef, self.mesh, self.quadRule)
             mech_funcs = Mechanics.create_multi_block_mechanics_functions(adjoint_func_space, mode2D='plane strain', materialModels=self.materialModels)
             U = self.dofManager.create_field(Uu, p.bc_data)
-            return mech_funcs.integrated_material_qoi(U, ivs)
+            return mech_funcs.integrated_material_qoi(U, ivs, p.prop_data)
 
         return EnergyFunctions(energy_function_coords, jax.jit(dissipation))
 
@@ -157,14 +162,14 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
             U = self.dofManager.create_field(Uu, p.bc_data)
             ivs_prev = ivsSteps[step-1]
 
-            dc_dcn = ivsUpdateInverseFuncs.ivs_update_jac_ivs_prev(U, ivs_prev)
+            dc_dcn = ivsUpdateInverseFuncs.ivs_update_jac_ivs_prev(U, ivs_prev, p.prop_data)
 
             mu += df_dc[step]
             adjointLoad -= df_du[step]
-            adjointLoad -= self.dofManager.get_unknown_values(ivsUpdateInverseFuncs.ivs_update_jac_disp_vjp(U, ivs_prev, mu))
+            adjointLoad -= self.dofManager.get_unknown_values(ivsUpdateInverseFuncs.ivs_update_jac_disp_vjp(U, ivs_prev, self.props, mu))
 
             n = self.dofManager.get_unknown_size()
-            p_objective = Objective.Params(bc_data=p.bc_data, state_data=ivs_prev) # remember R is a function of ivs_prev
+            p_objective = Objective.Params(bc_data=p.bc_data, state_data=ivs_prev, prop_data=self.props) # remember R is a function of ivs_prev
             self.objective.p = p_objective 
             self.objective.update_precond(Uu) # update preconditioner for use in cg (will converge in 1 iteration as long as the preconditioner is not approximate)
             dRdu = linalg.LinearOperator((n, n), lambda V: onp.asarray(self.objective.hessian_vec(Uu, V)))
@@ -172,7 +177,7 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
             adjointVector = linalg.cg(dRdu, onp.array(adjointLoad, copy=False), rtol=1e-10, atol=0.0, M=dRdu_decomp)[0]
 
             gradient += residualInverseFuncs.residual_jac_coords_vjp(Uu, p, ivs_prev, parameters, adjointVector)
-            gradient += ivsUpdateInverseFuncs.ivs_update_jac_coords_vjp(U, ivs_prev, parameters, mu)
+            gradient += ivsUpdateInverseFuncs.ivs_update_jac_coords_vjp(U, ivs_prev, self.props, parameters, mu)
 
             mu = np.einsum('ijk,ijkn->ijn', mu, dc_dcn)
             mu += residualInverseFuncs.residual_jac_ivs_prev_vjp(Uu, p, ivs_prev, parameters, adjointVector)
