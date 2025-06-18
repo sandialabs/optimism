@@ -1,6 +1,6 @@
 
 from optimism import ReadExodusMesh
-import MeshFixture
+from . import MeshFixture
 import pathlib
 
 # is MeshFixture the proper one? is one necessary? 
