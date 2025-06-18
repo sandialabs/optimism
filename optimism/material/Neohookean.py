@@ -10,9 +10,13 @@ PROPS_KAPPA  = 3
 PROPS_LAMBDA = 4
 
 
-def create_material_model_functions(properties):
+def create_material_properties(properties):
     props = _make_properties(properties['elastic modulus'],
                              properties['poisson ratio'])
+    return np.array(props)
+
+
+def create_material_model_functions(properties):
 
     energy_density = _adagio_neohookean
     #energy_density = _neohookean_3D_energy_density
@@ -21,12 +25,12 @@ def create_material_model_functions(properties):
             energy_density = _adagio_neohookean
         elif properties['version'] == 'coupled':
             energy_density = _neohookean_3D_energy_density
-            
-    def strain_energy(dispGrad, internalVars, dt):
+
+    def strain_energy(dispGrad, internalVars, props, dt):
         del dt
         return energy_density(dispGrad, internalVars, props)
 
-    def compute_state_new(dispGrad, internalVars, dt):
+    def compute_state_new(dispGrad, internalVars, props, dt):
         del dt
         return _compute_state_new(dispGrad, internalVars, props)
 

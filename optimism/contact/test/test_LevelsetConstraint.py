@@ -19,8 +19,9 @@ props = {'elastic modulus': 1.0,
           'poisson ratio': 0.25}
 
 materialModel = LinearElastic.create_material_model_functions(props)
-
+props = LinearElastic.create_material_properties(props)
 materialModels = {'block': materialModel}
+props = {'block': props}
 
 settings = EqSolver.get_settings()
 alSettings = AlSolver.get_settings()
@@ -62,7 +63,7 @@ class TestLevelsetContactConstraint(MeshFixture):
         stateVars = self.mechFuncs.compute_initial_state()
         
         self.energy_func = lambda Uu,p : \
-            self.mechFuncs.compute_strain_energy(self.dofManager.create_field(Uu, self.Ubc), stateVars)
+            self.mechFuncs.compute_strain_energy(self.dofManager.create_field(Uu, self.Ubc), stateVars, props)
         
         self.constraint_func = lambda levelset, Uu: LevelsetConstraint. \
             compute_levelset_constraints(levelset,

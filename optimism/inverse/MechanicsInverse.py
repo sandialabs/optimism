@@ -3,6 +3,7 @@ from collections import namedtuple
 from optimism.JaxConfig import *
 from optimism import FunctionSpace
 from optimism import Interpolants
+from optimism.Mechanics import tile_props, vmapPropValue
 from optimism.TensorMath import tensor_2D_to_3D
 
 IvsUpdateInverseFunctions = namedtuple('IvsUpdateInverseFunctions',
@@ -36,21 +37,24 @@ def _compute_element_field_gradient(U, elemShapeGrads, elemConnectivity, modify_
 def _compute_field_gradient(shapeGrads, conns, nodalField, modify_element_gradient):
     return vmap(_compute_element_field_gradient, (None,0,0,None))(nodalField, shapeGrads, conns, modify_element_gradient)
 
-def _compute_updated_internal_variables_gradient(dispGrads, states, dt, compute_state_new, output_shape):
+def _compute_updated_internal_variables_gradient(dispGrads, states, props, dt, compute_state_new, output_shape):
     dgQuadPointRavel = dispGrads.reshape(dispGrads.shape[0]*dispGrads.shape[1],*dispGrads.shape[2:])
     stQuadPointRavel = states.reshape(states.shape[0]*states.shape[1],*states.shape[2:])
-    statesNew = vmap(compute_state_new, (0, 0, None))(dgQuadPointRavel, stQuadPointRavel, dt)
+    prop_vmap_axes = vmapPropValue(props) # -> 0 - vmap over all quadrature points for properties or None - don't vmap over quadrature points for properties
+    new_props = tile_props(props, dispGrads.shape[0], dispGrads.shape[1]) # -> (n_els * n_quadrature_pts, n_props) or (n_props,)
+    statesNew = vmap(compute_state_new, (0, 0, prop_vmap_axes, None))(dgQuadPointRavel, stQuadPointRavel, new_props, dt)
     return statesNew.reshape(output_shape)
 
-def _compute_multi_block_updated_internal_variables_gradient(fs, materialModels, dispGrads, states, dt):
+def _compute_multi_block_updated_internal_variables_gradient(fs, materialModels, dispGrads, states, props, dt):
     statesNew = np.array(states)
     for blockKey in materialModels:
         elemIds = fs.mesh.blocks[blockKey]
         blockDispGrads = dispGrads[elemIds]
         blockStateVariables = states[elemIds]
+        blockProps = props[blockKey]
         update_func = materialModels[blockKey].compute_state_new
         output_shape = blockStateVariables.shape
-        blockStatesNew = _compute_updated_internal_variables_gradient(blockDispGrads, blockStateVariables, dt,\
+        blockStatesNew = _compute_updated_internal_variables_gradient(blockDispGrads, blockStateVariables, blockProps, dt,\
                                                                       update_func, output_shape)
         statesNew = statesNew.at[elemIds, :, :blockStatesNew.shape[2]].set(blockStatesNew)
     return statesNew
@@ -63,33 +67,33 @@ def create_ivs_update_inverse_functions(functionSpace, mode2D, materialModel, pr
     modify_element_gradient = _get_2D_formulation(mode2D)
     _check_pressure_projection(pressureProjectionDegree)
 
-    def compute_partial_ivs_update_partial_ivs_prev(U, stateVariables, dt=0.0):
+    def compute_partial_ivs_update_partial_ivs_prev(U, stateVariables, props, dt=0.0):
         dispGrads = _compute_field_gradient(fs.shapeGrads, fs.mesh.conns, U, modify_element_gradient)
         update_gradient = jacfwd(materialModel.compute_state_new, argnums=1)
         grad_shape = stateVariables.shape + (stateVariables.shape[2],)
-        return _compute_updated_internal_variables_gradient(dispGrads, stateVariables, dt,\
+        return _compute_updated_internal_variables_gradient(dispGrads, stateVariables, props, dt,\
                                                             update_gradient, grad_shape)
 
-    def compute_ivs_update_parameterized(U, stateVariables, coords, dt=0.0):
+    def compute_ivs_update_parameterized(U, stateVariables, props, coords, dt=0.0):
         shapeGrads = vmap(FunctionSpace.map_element_shape_grads, (None, 0, None, None))(coords, fs.mesh.conns, fs.mesh.parentElement, shapeOnRef.gradients)
         dispGrads = _compute_field_gradient(shapeGrads, fs.mesh.conns, U, modify_element_gradient)
         update_func = materialModel.compute_state_new
         output_shape = stateVariables.shape
-        return _compute_updated_internal_variables_gradient(dispGrads, stateVariables, dt,\
+        return _compute_updated_internal_variables_gradient(dispGrads, stateVariables, props, dt,\
                                                             update_func, output_shape)
 
-    compute_partial_ivs_update_partial_coords = jit(lambda u, ivs, x, av, dt=0.0: 
-                                                    vjp(lambda z: compute_ivs_update_parameterized(u, ivs, z, dt), x)[1](av)[0])
+    compute_partial_ivs_update_partial_coords = jit(lambda u, ivs, props, x, av, dt=0.0: 
+                                                    vjp(lambda z: compute_ivs_update_parameterized(u, ivs, props, z, dt), x)[1](av)[0])
 
-    def compute_ivs_update(U, stateVariables, dt=0.0):
+    def compute_ivs_update(U, stateVariables, props, dt=0.0):
         dispGrads = _compute_field_gradient(fs.shapeGrads, fs.mesh.conns, U, modify_element_gradient)
         update_func = materialModel.compute_state_new
         output_shape = stateVariables.shape
-        return _compute_updated_internal_variables_gradient(dispGrads, stateVariables, dt,\
+        return _compute_updated_internal_variables_gradient(dispGrads, stateVariables, props, dt,\
                                                             update_func, output_shape)
 
-    compute_partial_ivs_update_partial_disp = jit(lambda x, ivs, av, dt=0.0: 
-                                                  vjp(lambda z: compute_ivs_update(z, ivs, dt), x)[1](av)[0])
+    compute_partial_ivs_update_partial_disp = jit(lambda x, ivs, props, av, dt=0.0: 
+                                                  vjp(lambda z: compute_ivs_update(z, ivs, props, dt), x)[1](av)[0])
 
     return IvsUpdateInverseFunctions(jit(compute_partial_ivs_update_partial_ivs_prev), 
                                      compute_partial_ivs_update_partial_disp,
@@ -103,7 +107,7 @@ def create_ivs_update_inverse_functions_multi_block(functionSpace, mode2D, mater
     modify_element_gradient = _get_2D_formulation(mode2D)
     _check_pressure_projection(pressureProjectionDegree)
 
-    def compute_partial_ivs_update_partial_ivs_prev(U, stateVariables, dt=0.0):
+    def compute_partial_ivs_update_partial_ivs_prev(U, stateVariables, props, dt=0.0):
         dispGrads = _compute_field_gradient(fs.shapeGrads, fs.mesh.conns, U, modify_element_gradient)
         stateUpdateGrads = np.zeros(stateVariables.shape + (stateVariables.shape[2],))
 
@@ -111,27 +115,28 @@ def create_ivs_update_inverse_functions_multi_block(functionSpace, mode2D, mater
             elemIds = functionSpace.mesh.blocks[blockKey]
             blockDispGrads = dispGrads[elemIds]
             blockStateVariables = stateVariables[elemIds]
+            blockProps = props[blockKey]
             update_gradient = jacfwd(materialModels[blockKey].compute_state_new, argnums=1)
             grad_shape = blockStateVariables.shape + (blockStateVariables.shape[2],)
-            blockStateUpdateGrads = _compute_updated_internal_variables_gradient(blockDispGrads, blockStateVariables, dt,\
+            blockStateUpdateGrads = _compute_updated_internal_variables_gradient(blockDispGrads, blockStateVariables, blockProps, dt,\
                                                                                  update_gradient, grad_shape)
             stateUpdateGrads = stateUpdateGrads.at[elemIds, :, :blockStateVariables.shape[2], :blockStateVariables.shape[2]].set(blockStateUpdateGrads)
         return stateUpdateGrads
 
-    def compute_ivs_update_parameterized(U, stateVariables, coords, dt=0.0):
+    def compute_ivs_update_parameterized(U, stateVariables, props, coords, dt=0.0):
         shapeGrads = vmap(FunctionSpace.map_element_shape_grads, (None, 0, None, None))(coords, fs.mesh.conns, fs.mesh.parentElement, shapeOnRef.gradients)
         dispGrads = _compute_field_gradient(shapeGrads, fs.mesh.conns, U, modify_element_gradient)
-        return _compute_multi_block_updated_internal_variables_gradient(fs, materialModels, dispGrads, stateVariables, dt)
+        return _compute_multi_block_updated_internal_variables_gradient(fs, materialModels, dispGrads, stateVariables, props, dt)
 
-    compute_partial_ivs_update_partial_coords = jit(lambda u, ivs, x, av, dt=0.0: 
-                                                    vjp(lambda z: compute_ivs_update_parameterized(u, ivs, z, dt), x)[1](av)[0])
+    compute_partial_ivs_update_partial_coords = jit(lambda u, ivs, props, x, av, dt=0.0: 
+                                                    vjp(lambda z: compute_ivs_update_parameterized(u, ivs, props, z, dt), x)[1](av)[0])
 
-    def compute_ivs_update(U, stateVariables, dt=0.0):
+    def compute_ivs_update(U, stateVariables, props, dt=0.0):
         dispGrads = _compute_field_gradient(fs.shapeGrads, fs.mesh.conns, U, modify_element_gradient)
-        return _compute_multi_block_updated_internal_variables_gradient(fs, materialModels, dispGrads, stateVariables, dt)
+        return _compute_multi_block_updated_internal_variables_gradient(fs, materialModels, dispGrads, stateVariables, props, dt)
 
-    compute_partial_ivs_update_partial_disp = jit(lambda x, ivs, av, dt=0.0: 
-                                                  vjp(lambda z: compute_ivs_update(z, ivs, dt), x)[1](av)[0])
+    compute_partial_ivs_update_partial_disp = jit(lambda x, ivs, props, av, dt=0.0: 
+                                                  vjp(lambda z: compute_ivs_update(z, ivs, props, dt), x)[1](av)[0])
 
     return IvsUpdateInverseFunctions(jit(compute_partial_ivs_update_partial_ivs_prev), 
                                      compute_partial_ivs_update_partial_disp,

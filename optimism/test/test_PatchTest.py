@@ -40,7 +40,7 @@ class LinearPatchTestLinearElements(MeshFixture.MeshFixture):
         self.fs = FunctionSpace.construct_function_space(self.mesh, quadRule)
 
         materialModel = MatModel.create_material_model_functions(props)
-        
+        self.props = MatModel.create_material_properties(props)
         mcxFuncs = \
             Mechanics.create_mechanics_functions(self.fs,
                                                  "plane strain",
@@ -59,7 +59,7 @@ class LinearPatchTestLinearElements(MeshFixture.MeshFixture):
         @jax.jit
         def objective(Uu):
             U = dofManager.create_field(Uu, Ubc)
-            return self.compute_energy(U, self.internals)
+            return self.compute_energy(U, self.internals, self.props)
         
         with Timer(name="NewtonSolve"):
             Uu, solverSuccess = newton_solve(objective, dofManager.get_unknown_values(self.U))
@@ -92,7 +92,7 @@ class LinearPatchTestLinearElements(MeshFixture.MeshFixture):
         @jax.jit
         def objective(Uu):
             U = dofManager.create_field(Uu, Ubc)
-            internalPotential = self.compute_energy(U, self.internals)
+            internalPotential = self.compute_energy(U, self.internals, self.props)
             loadPotential = Mechanics.compute_traction_potential_energy(self.fs, U, quadRule, self.mesh.sideSets['right'], traction_func)
             loadPotential += Mechanics.compute_traction_potential_energy(self.fs, U, quadRule, self.mesh.sideSets['top'], traction_func)
             return internalPotential + loadPotential
@@ -133,6 +133,7 @@ class LinearPatchTestQuadraticElements(MeshFixture.MeshFixture):
         self.fs = FunctionSpace.construct_function_space(self.mesh, self.quadRule)
 
         materialModel = MatModel.create_material_model_functions(props)
+        self.props = MatModel.create_material_properties(props)
 
         mcxFuncs = \
             Mechanics.create_mechanics_functions(self.fs,
@@ -152,7 +153,7 @@ class LinearPatchTestQuadraticElements(MeshFixture.MeshFixture):
         @jax.jit
         def objective(Uu):
             U = dofManager.create_field(Uu, Ubc)
-            return self.compute_energy(U, self.internals)
+            return self.compute_energy(U, self.internals, self.props)
         
         with Timer(name="NewtonSolve"):
             Uu, solverSuccess = newton_solve(objective, dofManager.get_unknown_values(self.UTarget))
@@ -186,7 +187,7 @@ class LinearPatchTestQuadraticElements(MeshFixture.MeshFixture):
         @jax.jit
         def objective(Uu):
             U = dofManager.create_field(Uu, Ubc)
-            return self.compute_energy(U, self.internals)
+            return self.compute_energy(U, self.internals, self.props)
         
         with Timer(name="NewtonSolve"):
             Uu, solverSuccess = newton_solve(objective, dofManager.get_unknown_values(self.UTarget))
@@ -229,6 +230,7 @@ class QuadraticPatchTestQuadraticElements(MeshFixture.MeshFixture):
         self.fs = FunctionSpace.construct_function_space(self.mesh, self.quadRule)
 
         materialModel = MatModel.create_material_model_functions(props)
+        self.props = MatModel.create_material_properties(props)
 
         self.b = -(2*kappa + 8*mu/3.0) * np.array([alpha, beta])
 
@@ -245,12 +247,12 @@ class QuadraticPatchTestQuadraticElements(MeshFixture.MeshFixture):
         
         def constant_body_force_potential(U, internals, b):
             dtUnused = 0.0
-            f = lambda u, du, q, x, dt: -np.dot(b, u)
-            return FunctionSpace.integrate_over_block(self.fs, U, internals, dtUnused, f, slice(None))
+            f = lambda u, du, q, p, x, dt: -np.dot(b, u)
+            return FunctionSpace.integrate_over_block(self.fs, U, internals, self.props, dtUnused, f, slice(None))
 
         def objective(Uu):
             U = self.dofManager.create_field(Uu, Ubc)
-            return self.compute_energy(U, self.internals) + constant_body_force_potential(U, self.internals, self.b)
+            return self.compute_energy(U, self.internals, self.props) + constant_body_force_potential(U, self.internals, self.b)
         
         with Timer(name="NewtonSolve"):
             Uu, solverSuccess = newton_solve(objective, 0.0*self.dofManager.get_unknown_values(self.UTarget))

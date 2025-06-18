@@ -27,10 +27,15 @@ FLOW_STRESS     = 1
 # tolerance on EPQS change
 _TOLERANCE = 1e-10
 
-def create_material_model_functions(properties):
+# TODO currently doesn't have hardening props included
+def create_material_properties(properties):
     props = make_properties(properties['elastic modulus'],
                             properties['poisson ratio'],
                             properties['yield strength'])
+    return np.array(props)
+
+def create_material_model_functions(properties):
+
     # parse kinematics
     finiteDeformations = True
     sethHill = False
@@ -56,7 +61,7 @@ def create_material_model_functions(properties):
     hardeningModel = Hardening.create_hardening_model(properties)
 
     
-    def energy_density_function(dispGrad, state, dt):
+    def energy_density_function(dispGrad, state, props, dt):
         elasticTrialStrain = compute_elastic_strain(dispGrad, state)
         return _energy_density(elasticTrialStrain, state, dt, props, hardeningModel)
 
@@ -71,12 +76,12 @@ def create_material_model_functions(properties):
             compute_state_new_func = compute_state_new_small_deformations
             compute_initial_state = make_initial_state_small_deformations
         
-    def compute_state_new_function(dispGrad, state, dt):
+    def compute_state_new_function(dispGrad, state, props, dt):
         return compute_state_new_func(dispGrad, state, dt, props, hardeningModel)
 
     density = properties.get('density')
 
-    def compute_material_qoi(dispGrad, state, dt):
+    def compute_material_qoi(dispGrad, state, props, dt):
         elasticTrialStrain = compute_elastic_strain(dispGrad, state)
         return _compute_dissipation(elasticTrialStrain, state, dt, props, hardeningModel)
 

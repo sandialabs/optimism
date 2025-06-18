@@ -20,7 +20,7 @@ class TestGentMaterial(TestFixture.TestFixture):
                       "Jm parameter": self.Jm}
         
         self.material = Gent.create_material_functions(properties)
-        
+        self.props = Gent.create_material_properties(properties)
         self.internalVariables = self.material.compute_initial_state()
 
         self.dt = 0.0
@@ -28,7 +28,7 @@ class TestGentMaterial(TestFixture.TestFixture):
     
     def test_zero_point(self):
         dispGrad = np.zeros((3, 3))
-        W = self.material.compute_energy_density(dispGrad, self.internalVariables, self.dt)
+        W = self.material.compute_energy_density(dispGrad, self.internalVariables, self.props, self.dt)
         self.assertLessEqual(W, np.linalg.norm(dispGrad)*1e-10)
 
 
@@ -38,17 +38,17 @@ class TestGentMaterial(TestFixture.TestFixture):
         dispGrad = jax.random.uniform(key, (3, 3))
         
 
-        W = self.material.compute_energy_density(dispGrad, self.internalVariables, self.dt)
+        W = self.material.compute_energy_density(dispGrad, self.internalVariables, self.props, self.dt)
         for i in range(10):
             Q = Rotation.random(random_state=i).as_matrix()
             dispGradTransformed = Q@(dispGrad + np.identity(3)) - np.identity(3)
-            WStar = self.material.compute_energy_density(dispGradTransformed, self.internalVariables, self.dt)
+            WStar = self.material.compute_energy_density(dispGradTransformed, self.internalVariables, self.props, self.dt)
             self.assertAlmostEqual(W, WStar, 12)
         
     
     def test_correspondence_with_linear_elasticity(self):
         zero = np.zeros((3, 3))
-        C = jax.hessian(self.material.compute_energy_density)(zero, self.internalVariables, self.dt)
+        C = jax.hessian(self.material.compute_energy_density)(zero, self.internalVariables, self.props, self.dt)
         
         lam = self.kappa - 2/3*self.mu
         
@@ -76,12 +76,12 @@ class TestGentMaterial(TestFixture.TestFixture):
         # Check that energy is indeed infinite
         # (actually nan, since it produces a negative argument to a logarithm)
         F = np.diag(np.array([stretch, 1/np.sqrt(stretch), 1/np.sqrt(stretch)]))
-        W = self.material.compute_energy_density(F - np.identity(3), self.internalVariables, self.dt)
+        W = self.material.compute_energy_density(F - np.identity(3), self.internalVariables, self.props, self.dt)
         self.assertTrue(np.isnan(W))
         
         stretch = lockStretch*(1 - 1e-6)
         F = np.diag(np.array([stretch, 1/np.sqrt(stretch), 1/np.sqrt(stretch)]))
-        W = self.material.compute_energy_density(F - np.identity(3), self.internalVariables, self.dt)
+        W = self.material.compute_energy_density(F - np.identity(3), self.internalVariables, self.props, self.dt)
         self.assertFalse(np.isnan(W))
 
 if __name__ == "__main__":

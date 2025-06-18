@@ -10,10 +10,13 @@ PROPS_MU    = 2
 PROPS_KAPPA = 3
 
 
-def create_material_model_functions(properties):
+def create_material_properties(properties):
     props = _make_properties(properties['elastic modulus'],
                              properties['poisson ratio'])
+    return np.array(props)
 
+
+def create_material_model_functions(properties):
     if 'strain measure' in properties:
         strainMeasure = properties['strain measure']
     else:
@@ -28,7 +31,7 @@ def create_material_model_functions(properties):
     else:
         raise ValueError('Unrecognized strain measure')
     
-    def strain_energy(dispGrad, internalVars, dt):
+    def strain_energy(dispGrad, internalVars, props, dt):
         del internalVars
         del dt
         strain = _strain(dispGrad)
@@ -61,8 +64,9 @@ def make_initial_state():
     return np.array([])
 
 
-def compute_state_new(dispGrad, internalVars, dt):
+def compute_state_new(dispGrad, internalVars, props, dt):
     del dispGrad
+    del props
     del dt
     return internalVars
 

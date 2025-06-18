@@ -33,7 +33,7 @@ class AxisymmPatchTest(MeshFixture.MeshFixture):
         self.fs = FunctionSpace.construct_function_space(self.mesh, quadRule, mode2D='axisymmetric')
 
         materialModel = MatModel.create_material_model_functions(props)
-        
+        self.props = MatModel.create_material_properties(props)
         mcxFuncs = \
             Mechanics.create_mechanics_functions(self.fs,
                                                  "axisymmetric",
@@ -66,7 +66,7 @@ class AxisymmPatchTest(MeshFixture.MeshFixture):
         @jit
         def objective(Uu):
             U = dofManager.create_field(Uu, Ubc)
-            return self.compute_energy(U, self.internals)
+            return self.compute_energy(U, self.internals, self.props)
         
         Uu, solverSuccess = newton_solve(objective, dofManager.get_unknown_values(V))
 

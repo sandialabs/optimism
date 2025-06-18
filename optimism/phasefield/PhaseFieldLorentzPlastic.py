@@ -25,6 +25,16 @@ STATE_PLASTIC_DISTORTION = STATE_PLASTIC_STRAIN
 NUM_STATE_VARS = 10
 
 
+def create_material_properties(properties):
+    props = make_properties(properties['elastic modulus'],
+                            properties['poisson ratio'],
+                            properties['critical energy release rate'],
+                            properties['critical strain energy density'],
+                            properties['regularization length'],
+                            properties['yield strength'])
+    return np.array(props)
+
+
 def create_material_model_functions(properties):
     """
     properties:
@@ -36,12 +46,6 @@ def create_material_model_functions(properties):
       'yield strength'
       'hardening modulus'
     """
-    props = make_properties(properties['elastic modulus'],
-                            properties['poisson ratio'],
-                            properties['critical energy release rate'],
-                            properties['critical strain energy density'],
-                            properties['regularization length'],
-                            properties['yield strength'])
 
     compute_elastic_strain = _compute_elastic_linear_strain
     # parse kinematics
@@ -60,19 +64,19 @@ def create_material_model_functions(properties):
 
     hardeningModel = Hardening.create_hardening_model(properties)
     
-    def compute_energy_density(dispGrad, phase, phaseGrad, internalVars, dt):
+    def compute_energy_density(dispGrad, phase, phaseGrad, internalVars, props, dt):
         elasticTrialStrain = compute_elastic_strain(dispGrad, internalVars)
         return energy_density_generic(elasticTrialStrain, phase, phaseGrad, internalVars, dt, props, hardeningModel, doUpdate=True)
 
-    def compute_output_energy_density(dispGrad, phase, phaseGrad, internalVars, dt):
+    def compute_output_energy_density(dispGrad, phase, phaseGrad, internalVars, props, dt):
         elasticStrain = compute_elastic_strain(dispGrad, internalVars)
         return energy_density_generic(elasticStrain, phase, phaseGrad, internalVars, dt, props, hardeningModel, doUpdate=False)
 
-    def compute_strain_energy_density(dispGrad, phase, phaseGrad, internalVars, dt):
+    def compute_strain_energy_density(dispGrad, phase, phaseGrad, internalVars, props, dt):
         elasticStrain = compute_elastic_strain(dispGrad, internalVars)
         return strain_energy_density(elasticStrain, phase, dt, props)
 
-    def compute_phase_potential_density(dispGrad, phase, phaseGrad, internalVars, dt):
+    def compute_phase_potential_density(dispGrad, phase, phaseGrad, internalVars, props, dt):
         return phase_potential_density(phase, phaseGrad, dt, props)
     
     if finiteDeformations:
@@ -85,7 +89,7 @@ def create_material_model_functions(properties):
     def compute_initial_state(shape=(1,)):
         return compute_initial_state_func(shape)
         
-    def compute_state_new(dispGrad, phase, phaseGrad, internalVars, dt):
+    def compute_state_new(dispGrad, phase, phaseGrad, internalVars, props, dt):
         return compute_state_new_func(dispGrad, phase, phaseGrad, internalVars, dt, props, hardeningModel)
     
     return MaterialModel(compute_energy_density,

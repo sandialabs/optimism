@@ -8,20 +8,24 @@ PROPS_MU    = 1
 PROPS_JM    = 2
 
 
-def create_material_functions(properties):
+def create_material_properties(properties):
     props = _make_properties(properties['bulk modulus'],
                              properties['shear modulus'],
                              properties['Jm parameter'])
+    return np.array(props)
 
+
+def create_material_functions(properties):
     energy_density = _gent_3D_energy_density
 
-    def strain_energy(dispGrad, internalVars, dt):
+    def strain_energy(dispGrad, internalVars, props, dt):
         del internalVars
         del dt
         return energy_density(dispGrad, props)
     
-    def compute_state_new(dispGrad, internalVars, dt):
+    def compute_state_new(dispGrad, internalVars, props, dt):
         del dispGrad
+        del props
         del dt
         return internalVars
 

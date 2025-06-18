@@ -71,7 +71,7 @@ class J2MaterialPointUpdateGradsFixture(TestFixture):
                       'hardening modulus': H}
 
         materialModel = J2.create_material_model_functions(self.props)
-
+        self.properties = J2.create_material_properties(self.props)
         self.compute_state_new = jax.jit(materialModel.compute_state_new)
         self.compute_initial_state = materialModel.compute_initial_state
 
@@ -81,7 +81,7 @@ class J2MaterialPointUpdateGradsFixture(TestFixture):
         dt = 1.0
 
         initial_state = self.compute_initial_state()
-        dc_dugrad, dc_dc_n = self.compute_state_new_derivs(np.zeros((3,3)), initial_state, dt)
+        dc_dugrad, dc_dc_n = self.compute_state_new_derivs(np.zeros((3,3)), initial_state, self.properties, dt)
 
         # Check derivative sizes
         self.assertEqual(dc_dugrad.shape, (10,3,3))
@@ -100,8 +100,8 @@ class J2MaterialPointUpdateGradsFixture(TestFixture):
         dispGrad = jax.random.uniform(key, (3, 3))
         initial_state = self.compute_initial_state()
 
-        state = self.compute_state_new(dispGrad, initial_state, dt)
-        dc_dugrad, dc_dc_n = self.compute_state_new_derivs(dispGrad, initial_state, dt)
+        state = self.compute_state_new(dispGrad, initial_state, self.properties, dt)
+        dc_dugrad, dc_dc_n = self.compute_state_new_derivs(dispGrad, initial_state, self.properties, dt)
 
         # Compute data for gold values (assuming small strain and linear kinematics)
         dc_dugrad_gold, dc_dc_n_gold = small_strain_linear_hardening_analytic_gradients(dispGrad, state, initial_state, self.props)
@@ -143,6 +143,7 @@ class J2GlobalMeshUpdateGradsFixture(MeshFixture):
                  'hardening modulus': H}
 
         cls.materialModel = J2.create_material_model_functions(cls.props)
+        cls.properties = J2.create_material_properties(cls.props)
         cls.quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
         cls.fs = FunctionSpace.construct_function_space(cls.mesh, cls.quadRule)
         cls.mechFuncs = Mechanics.create_mechanics_functions(cls.fs,
@@ -161,18 +162,18 @@ class J2GlobalMeshUpdateGradsFixture(MeshFixture):
         def compute_energy(Uu, p):
             U = cls.dofManager.create_field(Uu, cls.Ubc)
             internalVariables = p[1]
-            return cls.mechFuncs.compute_strain_energy(U, internalVariables)
+            return cls.mechFuncs.compute_strain_energy(U, internalVariables, cls.properties)
 
         objective = Objective.Objective(compute_energy, UuGuess, p)
         cls.Uu, solverSuccess = EqSolver.nonlinear_equation_solve(objective, UuGuess, p, EqSolver.get_settings(), useWarmStart=False)
         U = cls.dofManager.create_field(cls.Uu, cls.Ubc)
-        cls.ivs = cls.mechFuncs.compute_updated_internal_variables(U, cls.ivs_prev)
+        cls.ivs = cls.mechFuncs.compute_updated_internal_variables(U, cls.ivs_prev, cls.properties)
 
     def test_state_derivs_at_elastic_step(self):
 
         def update_internal_vars_test(Uu, ivs_prev):
             U = self.dofManager.create_field(Uu)
-            ivs = self.mechFuncs.compute_updated_internal_variables(U, ivs_prev)
+            ivs = self.mechFuncs.compute_updated_internal_variables(U, ivs_prev, self.properties)
             return ivs
 
         Uu = 0.0*self.dofManager.get_unknown_values(self.U) 
@@ -196,7 +197,7 @@ class J2GlobalMeshUpdateGradsFixture(MeshFixture):
     def test_state_derivs_at_plastic_step(self):
 
         def update_internal_vars_test(U, ivs_prev):
-            ivs = self.mechFuncs.compute_updated_internal_variables(U, ivs_prev)
+            ivs = self.mechFuncs.compute_updated_internal_variables(U, ivs_prev, self.properties)
             return ivs
 
         update_internal_variables_derivs = jax.jacfwd(update_internal_vars_test, (0,1))
@@ -249,7 +250,7 @@ class J2GlobalMeshUpdateGradsFixture(MeshFixture):
                                                                                      self.materialModel)
 
         U = self.dofManager.create_field(self.Uu, self.Ubc)
-        dc_dc_n = ivsUpdateInverseFuncs.ivs_update_jac_ivs_prev(U, self.ivs_prev)
+        dc_dc_n = ivsUpdateInverseFuncs.ivs_update_jac_ivs_prev(U, self.ivs_prev, self.properties)
 
         nElems = Mesh.num_elements(self.mesh)
         nQpsPerElem = len(self.quadRule)

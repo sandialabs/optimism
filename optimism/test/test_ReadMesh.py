@@ -88,6 +88,7 @@ class TestMeshReadPatchTest(TestFixture.TestFixture):
         props = {'elastic modulus': self.E,
                  'poisson ratio': self.nu}
         materialModel = MaterialModel.create_material_model_functions(props)
+        self.props = MaterialModel.create_material_properties(props)
 
         mechBvp = Mechanics.create_mechanics_functions(self.fs,
                                                        "plane strain",
@@ -118,7 +119,7 @@ class TestMeshReadPatchTest(TestFixture.TestFixture):
         @jit
         def objective(Uu):
             U = dofManager.create_field(Uu, Ubc)
-            return self.compute_strain_energy(U, self.internalVariables)
+            return self.compute_strain_energy(U, self.internalVariables, self.props)
         
         grad_func = jit(grad(objective))
         
@@ -152,7 +153,7 @@ class TestMeshReadPatchTest(TestFixture.TestFixture):
         @jit
         def objective(Uu):
             U = dofManager.create_field(Uu, Ubc)
-            internalPotential = self.compute_strain_energy(U, self.internalVariables)
+            internalPotential = self.compute_strain_energy(U, self.internalVariables, self.props)
             loadPotential = compute_traction_potential_energy(self.mesh, U, quadRule, self.mesh.sideSets['right'], right_traction_func)
             loadPotential += compute_traction_potential_energy(self.mesh, U, quadRule, self.mesh.sideSets['top'], top_traction_func)
             return internalPotential + loadPotential

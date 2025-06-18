@@ -29,12 +29,13 @@ internalVariableHistory: array
 """
 
 
-def run(materialModel, strain_history, maxTime, steps=10, tol=1e-3):
+def run(materialModel, props, strain_history, maxTime, steps=10, tol=1e-3):
     """ Generates the uniaxial response of a given material
     Args
     ----
     materialModel: MaterialModel object
         Material to subject to uniaxial stress test
+    props: jax array of properties
     strain_history: callable (float) -> float
         The tensile strain as a function of time
     maxTime: float
@@ -55,14 +56,14 @@ def run(materialModel, strain_history, maxTime, steps=10, tol=1e-3):
         
     def obj_func(freeStrains, p):
         strain = makeStrainTensor_(freeStrains, p)
-        return energy_density(strain, p[1], dt)
+        return energy_density(strain, p[1], props, dt)
 
     uniaxialTolerance=tol
     solverSettings = EqSolver.get_settings(tol=uniaxialTolerance)
     internalVariables =  materialModel.compute_initial_state()
     freeStrains = np.zeros(2)
         
-    p = Objective.Params(uniaxialStrainHistory[0], internalVariables)
+    p = Objective.Params(uniaxialStrainHistory[0], internalVariables, prop_data=props)
     o = Objective.Objective(obj_func, freeStrains, p)
 
     strainHistory = []
@@ -76,8 +77,8 @@ def run(materialModel, strain_history, maxTime, steps=10, tol=1e-3):
 
         freeStrains, solverSuccess = EqSolver.nonlinear_equation_solve(o, freeStrains, p, solverSettings, useWarmStart=True)
         strain = makeStrainTensor_(freeStrains, p)
-        internalVariables = update(strain, internalVariables, dt)
-        energyDensity,stress = converged_energy_density_and_stress(strain, internalVariables, dt)
+        internalVariables = update(strain, internalVariables, props, dt)
+        energyDensity,stress = converged_energy_density_and_stress(strain, internalVariables, props, dt)
         p = Objective.param_index_update(p, 1, internalVariables)
         o.p = p
 

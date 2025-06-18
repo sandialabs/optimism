@@ -17,13 +17,14 @@ class MaterialUniaxialSimulatorFixture(TestFixture):
                       "poisson ratio": nu,
                       "strain measure": "logarithmic"}
         material = LinearElastic.create_material_model_functions(properties)
+        props = LinearElastic.create_material_properties(properties)
         engineering_strain_rate = 1e-3
 
         def strain_history(t):
             return engineering_strain_rate*t
 
         maxTime = 1000.0
-        response = MaterialUniaxialSimulator.run(material, strain_history, maxTime, steps=20)
+        response = MaterialUniaxialSimulator.run(material, props, strain_history, maxTime, steps=20)
 
         for stress in response.stressHistory[1:]:
             self.assertGreater(stress[0,0], 0.0) # axial stress is nonnegative

@@ -47,6 +47,7 @@ class DynamicsFixture(MeshFixture.MeshFixture):
                  'poisson ratio': nu,
                  'density': rho}
         materialModel = LinearElastic.create_material_model_functions(props)
+        self.props = LinearElastic.create_material_properties(props)
         newmarkParams = Mechanics.NewmarkParameters(gamma=0.5, beta=0.25)
 
         self.dynamicsFunctions = Mechanics.create_dynamics_functions(self.fs,
@@ -71,7 +72,7 @@ class DynamicsFixture(MeshFixture.MeshFixture):
         A = jax.random.uniform(subkey, self.mesh.coords.shape)
         dt = 0.1
         UPre, _ = self.dynamicsFunctions.predict(U, V, A, dt)
-        action = self.dynamicsFunctions.compute_algorithmic_energy(U, UPre, self.internalVariables, dt)
+        action = self.dynamicsFunctions.compute_algorithmic_energy(U, UPre, self.internalVariables, self.props, dt)
         self.assertGreater(np.abs(action), 0.0)
         
     def test_hessian_matrix_is_symmetric(self):
@@ -83,7 +84,7 @@ class DynamicsFixture(MeshFixture.MeshFixture):
         A = jax.random.uniform(subkey, U.shape)
         dt = 0.1
         UPre, _ = self.dynamicsFunctions.predict(U, V, A, dt)
-        elementHessians = self.dynamicsFunctions.compute_element_hessians(U, UPre, self.internalVariables, dt)
+        elementHessians = self.dynamicsFunctions.compute_element_hessians(U, UPre, self.internalVariables, self.props, dt)
         K = SparseMatrixAssembler.assemble_sparse_stiffness_matrix(elementHessians,
                                                                    self.mesh.conns,
                                                                    self.dofManager)
@@ -113,7 +114,8 @@ class DynamicsFixture(MeshFixture.MeshFixture):
                              None,
                              None,
                              np.array([t, tOld]),
-                             Uu)
+                             Uu,
+                             self.props)
 
         
         def objective_function(Uu, p):
@@ -122,7 +124,8 @@ class DynamicsFixture(MeshFixture.MeshFixture):
             UPre = self.create_field(UuPre, p)
             internalVariables = p[1]
             dt = p.time[0] - p.time[1]
-            return self.dynamicsFunctions.compute_algorithmic_energy(U, UPre, internalVariables, dt)
+            props = p.prop_data
+            return self.dynamicsFunctions.compute_algorithmic_energy(U, UPre, internalVariables, props, dt)
         
         objective = Objective.Objective(objective_function, Uu, p)
 
@@ -146,14 +149,16 @@ class DynamicsFixture(MeshFixture.MeshFixture):
                              None,
                              None,
                              np.array([t, tOld]),
-                             Uu)
+                             Uu,
+                             self.props)
 
         def objective_function(Uu, p):
             U = self.create_field(Uu, p)
             UuPre = p.dynamic_data
             UPre = self.create_field(UuPre, p)
             internalVariables = p[1]
-            return self.dynamicsFunctions.compute_algorithmic_energy(U, UPre, internalVariables, dt) \
+            props = p.prop_data
+            return self.dynamicsFunctions.compute_algorithmic_energy(U, UPre, internalVariables, props, dt) \
                 + self.constant_body_force_potential(Uu, p)
     
         objective = Objective.Objective(objective_function, Uu, p)
@@ -224,8 +229,8 @@ class DynamicsFixture(MeshFixture.MeshFixture):
         internalVariables = p[1]
         dtUnused = 0.0
         b = np.array([1.0, 0.0])
-        f = lambda u, du, q, x, dt: -np.dot(b, u)
-        return FunctionSpace.integrate_over_block(self.fs, U, internalVariables, dtUnused,
+        f = lambda u, du, q, p, x, dt: -np.dot(b, u)
+        return FunctionSpace.integrate_over_block(self.fs, U, internalVariables, self.props, dtUnused,
                                                   f, self.mesh.blocks['block'])
 
 class DynamicPatchTest(MeshFixture.MeshFixture):
@@ -252,6 +257,7 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
         # density chosen to make kinetic energy and strain energy comparable
         # Want bugs in either to show up appreciably in error
         materialModel = Neohookean.create_material_model_functions(props)
+        self.props = Neohookean.create_material_properties(props)
 
         newmarkParams = Mechanics.NewmarkParameters()
 
@@ -273,7 +279,8 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
             U = dofManager.create_field(Uu, Ubc)
             UPre = p.dynamic_data
             internalVariables = p[1]
-            return self.dynamics.compute_algorithmic_energy(U, UPre, internalVariables, dt)
+            props = p.prop_data
+            return self.dynamics.compute_algorithmic_energy(U, UPre, internalVariables, props, dt)
 
         # initial conditions
         V = self.V.copy()
@@ -281,7 +288,7 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
         U = np.zeros_like(V)
         Uu = dofManager.get_unknown_values(U)
         internals = self.dynamics.compute_initial_state()
-        p = Objective.Params(None, internals, None, None, np.array([0.0, -dt]), U)
+        p = Objective.Params(None, internals, None, None, np.array([0.0, -dt]), U, self.props)
         objective = Objective.Objective(energy, Uu, p)
 
         for i in range(1, 4):
@@ -308,7 +315,7 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
             U = dofManager.create_field(Uu, dofManager.get_bc_values(V*t))
             UCorrection = U - UPrediction
             V, A = self.dynamics.correct(UCorrection, V, A, dt)
-            internals = self.dynamics.compute_updated_internal_variables(U, internals, dt)
+            internals = self.dynamics.compute_updated_internal_variables(U, internals, self.props, dt)
             objective.p = Objective.param_index_update(objective.p, 1, internals)
 
             UExact = np.dot(self.mesh.coords, t*self.targetDispGradRate.T)
@@ -328,7 +335,7 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
                 dispGrad3D = np.zeros((3,3)).at[:2, :2].set(dispGrad)
                 q = np.array([0.0])
                 dt = 0.0
-                P = self.compute_stress(dispGrad3D, q, dt)[:2, :2]
+                P = self.compute_stress(dispGrad3D, q, p.prop_data, dt)[:2, :2]
                 return np.dot(P, N)
             
             dt = t - p.time[1]
@@ -337,7 +344,7 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
             internalVariables = p[1]
             loadPotential = Mechanics.compute_traction_potential_energy(
                 self.fs, U, self.qr1d, self.fs.mesh.sideSets["all_boundary"], traction)
-            return self.dynamics.compute_algorithmic_energy(U, UPre, internalVariables, dt) + loadPotential
+            return self.dynamics.compute_algorithmic_energy(U, UPre, internalVariables, self.props, dt) + loadPotential
 
         dt = 1.0
 
@@ -347,7 +354,7 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
         A = np.zeros_like(self.V)
         internals = self.dynamics.compute_initial_state()
         Uu = dofManager.get_unknown_values(U)
-        p = Objective.Params(None, internals, None, None, np.array([0.0, -dt]), U)
+        p = Objective.Params(None, internals, None, None, np.array([0.0, -dt]), U, self.props)
         objective = Objective.Objective(energy, Uu, p)
 
         for i in range(1, 4):
@@ -374,7 +381,7 @@ class DynamicPatchTest(MeshFixture.MeshFixture):
             U = dofManager.create_field(Uu)
             UCorrection = U - UPrediction
             V, A = self.dynamics.correct(UCorrection, V, A, dt)
-            internals = self.dynamics.compute_updated_internal_variables(U, internals, dt)
+            internals = self.dynamics.compute_updated_internal_variables(U, internals, self.props, dt)
             objective.p = Objective.param_index_update(objective.p, 1, internals)
 
             UExact = np.dot(self.mesh.coords, t*self.targetDispGradRate.T)

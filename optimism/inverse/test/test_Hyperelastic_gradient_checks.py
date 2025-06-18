@@ -41,7 +41,7 @@ class NeoHookeanGlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
             'version': 'coupled'
         }
         self.materialModel = Neohookean.create_material_model_functions(props)
-
+        self.props = Neohookean.create_material_properties(props)
         self.quadRule = QuadratureRule.create_quadrature_rule_on_triangle(degree=1)
                 
         self.EBCs = [FunctionSpace.EssentialBC(nodeSet='all_boundary', component=0),
@@ -64,12 +64,13 @@ class NeoHookeanGlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
 
         Ubc_inc = Ubc / self.steps
         ivs = mechFuncs.compute_initial_state()
-        p = Objective.Params(bc_data=np.zeros(Ubc.shape), state_data=ivs)
+        p = Objective.Params(bc_data=np.zeros(Ubc.shape), state_data=ivs, prop_data=self.props)
 
         def compute_energy(Uu, p):
             U = self.dofManager.create_field(Uu, p.bc_data)
             internalVariables = p.state_data
-            return mechFuncs.compute_strain_energy(U, internalVariables)
+            props = p.prop_data
+            return mechFuncs.compute_strain_energy(U, internalVariables, props)
 
         Uu = 0.0*self.dofManager.get_unknown_values(self.U) 
         self.objective = Objective.Objective(compute_energy, Uu, p)
@@ -91,7 +92,8 @@ class NeoHookeanGlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
             adjoint_func_space = AdjointFunctionSpace.construct_function_space_for_adjoint(coords, shapeOnRef, self.mesh, self.quadRule)
             mech_funcs = Mechanics.create_mechanics_functions(adjoint_func_space, mode2D='plane strain', materialModel=self.materialModel)
             ivs = p.state_data
-            return mech_funcs.compute_strain_energy(U, ivs)
+            props = p.prop_data
+            return mech_funcs.compute_strain_energy(U, ivs, props)
 
         def energy_function_coords(Uu, p, coords):
             U = self.dofManager.create_field(Uu, p.bc_data)

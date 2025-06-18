@@ -124,6 +124,7 @@ class TestMeshReadPatchTest(TestFixture.TestFixture):
         props = {'elastic modulus': self.E,
                  'poisson ratio': self.nu}
         materialModel = MaterialModel.create_material_model_functions(props)
+        self.props = MaterialModel.create_material_properties(props)
 
         mechBvp = Mechanics.create_mechanics_functions(self.fs,
                                                        "plane strain",
@@ -154,7 +155,7 @@ class TestMeshReadPatchTest(TestFixture.TestFixture):
         @jit
         def objective(Uu):
             U = dofManager.create_field(Uu, Ubc)
-            return self.compute_strain_energy(U, self.internalVariables)
+            return self.compute_strain_energy(U, self.internalVariables, self.props)
         
         grad_func = jit(grad(objective))
         

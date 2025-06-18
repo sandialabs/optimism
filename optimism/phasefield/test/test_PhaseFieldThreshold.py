@@ -1,16 +1,9 @@
-from matplotlib import pyplot as plt
 from jax import random
 from scipy.spatial.transform import Rotation as R
 
 from optimism.JaxConfig import *
-from optimism import EquationSolver as EqSolver
-from optimism import Objective
 from optimism.test import TestFixture
-from optimism.test.MeshFixture import MeshFixture
 from optimism.phasefield import PhaseFieldThreshold as Model
-from optimism import SparseMatrixAssembler
-from optimism import TensorMath
-from optimism import Mesh
 
 
 plotting=False
@@ -29,6 +22,7 @@ class PhaseFieldThresholdModelFixture(TestFixture.TestFixture):
                  'regularization length': self.l,
                  'kinematics': 'large deformations'}
         self.model = Model.create_material_model_functions(props)
+        self.props = Model.create_material_properties(props)
         self.flux_func = grad(self.model.compute_energy_density, (0,1,2))
         self.internalVariables = self.model.compute_initial_state()
         self.dt = 0.0 # unused - material has no rate dependence
@@ -39,10 +33,10 @@ class PhaseFieldThresholdModelFixture(TestFixture.TestFixture):
         phase = 0.
         phaseGrad = np.zeros(3)
 
-        energy = self.model.compute_energy_density(dispGrad, phase, phaseGrad, self.internalVariables, self.dt)
+        energy = self.model.compute_energy_density(dispGrad, phase, phaseGrad, self.internalVariables, self.props, self.dt)
         self.assertNear(energy, 0.0, 12)
 
-        stress, phaseForce, phaseGradForce = self.flux_func(dispGrad, phase, phaseGrad, self.internalVariables, self.dt)
+        stress, phaseForce, phaseGradForce = self.flux_func(dispGrad, phase, phaseGrad, self.internalVariables, self.props, self.dt)
         self.assertArrayNear(stress, np.zeros((3,3)), 12)
         self.assertNear(phaseForce, 3.0/8.0*self.Gc/self.l, 12)
         self.assertArrayNear(phaseGradForce, np.zeros(3), 12)
@@ -56,14 +50,14 @@ class PhaseFieldThresholdModelFixture(TestFixture.TestFixture):
         key,subkey = random.split(key)
         phaseGrad = random.uniform(subkey, (3,))
         dt = 0.0
-        energy = self.model.compute_energy_density(dispGrad, phase, phaseGrad, self.internalVariables, self.dt)
+        energy = self.model.compute_energy_density(dispGrad, phase, phaseGrad, self.internalVariables, self.props, self.dt)
         
         Q = R.random(random_state=1234).as_matrix()
         dispGradStar = Q@(dispGrad + np.identity(3)) - np.identity(3)
         phaseStar = phase
         phaseGradStar = Q@phaseGrad
         internalVariablesStar = self.internalVariables
-        energyStar = self.model.compute_energy_density(dispGradStar, phaseStar, phaseGradStar, internalVariablesStar, self.dt)
+        energyStar = self.model.compute_energy_density(dispGradStar, phaseStar, phaseGradStar, internalVariablesStar, self.props, self.dt)
         self.assertNear(energy, energyStar, 12)
 
 
@@ -74,13 +68,13 @@ class PhaseFieldThresholdModelFixture(TestFixture.TestFixture):
         phase = 0.15
         phaseGrad = np.zeros(3)
 
-        energy = self.model.compute_energy_density(dispGrad, phase, phaseGrad, self.internalVariables, self.dt)
+        energy = self.model.compute_energy_density(dispGrad, phase, phaseGrad, self.internalVariables, self.props, self.dt)
 
         g = (1.0 - phase)**2
         energyExact = g*0.5*self.E*strain**2 + 3/8*self.Gc/self.l*phase
         self.assertNear(energy, energyExact, 12)
 
-        piolaStress,_,_ = self.flux_func(dispGrad, phase, phaseGrad, self.internalVariables, self.dt)
+        piolaStress,_,_ = self.flux_func(dispGrad, phase, phaseGrad, self.internalVariables, self.props, self.dt)
         kStress = piolaStress@(dispGrad + np.identity(3)).T
         kStressExact = np.zeros((3,3)).at[0,0].set(g*self.E*strain)
         self.assertArrayNear(kStress, kStressExact, 12)
