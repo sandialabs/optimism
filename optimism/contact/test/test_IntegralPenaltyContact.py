@@ -185,7 +185,7 @@ class TestEdgeIntersection(TestFixture):
         N = 4000
         S = np.linspace(0.0, 13.0, N)
 
-        fig, axs = pyplot.subplots(1, 3, gridspec_kw={'width_ratios' : [2.,1.,1.]})
+        # fig, axs = pyplot.subplots(1, 3, gridspec_kw={'width_ratios' : [2.,1.,1.]})
 
         def edge_0(step, edge0_mod):
             s = S[step]
