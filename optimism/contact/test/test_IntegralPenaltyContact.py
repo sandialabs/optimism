@@ -260,37 +260,37 @@ class TestEdgeIntersection(TestFixture):
         def force_at_time(step, e, n, d):
             return [S[step]],[fs[n,d][step]]
 
-        p = slide_plot(fig, axs, times)
-        p.plot(0, mesh0, 'ko-')
-        p.plot(0, mesh1, 'ko-')
-        p.plot(0, mesh2, 'ko-')
-        p.plot(0, mesh3, 'ko-')
-        p.arrow(0, arrows0)
+        # p = slide_plot(fig, axs, times)
+        # p.plot(0, mesh0, 'ko-')
+        # p.plot(0, mesh1, 'ko-')
+        # p.plot(0, mesh2, 'ko-')
+        # p.plot(0, mesh3, 'ko-')
+        # p.arrow(0, arrows0)
 
-        axs[0].set_aspect('equal')
-        axs[0].set_xlim([-1.0, 3.0])
-        axs[0].set_ylim([-0.81, 0.81])
-        axs[0].set_yticks(np.linspace(-0.8, 0.8, 17))
+        # axs[0].set_aspect('equal')
+        # axs[0].set_xlim([-1.0, 3.0])
+        # axs[0].set_ylim([-0.81, 0.81])
+        # axs[0].set_yticks(np.linspace(-0.8, 0.8, 17))
 
-        p.plot(1, energy_vs_time, 'k')
-        p.plot(1, energy_at_time, 'go')
+        # p.plot(1, energy_vs_time, 'k')
+        # p.plot(1, energy_at_time, 'go')
 
-        #xlim = [2.0, 2.6]
-        #axs[1].set_xlim(xlim)
-        axs[1].legend(['energy'])
+        # #xlim = [2.0, 2.6]
+        # #axs[1].set_xlim(xlim)
+        # axs[1].legend(['energy'])
 
-        p.plot(2, partial(force_vs_time,e=0,n=0,d=0), 'r--')
-        p.plot(2, partial(force_at_time,e=0,n=0,d=0), 'ro')
-        p.plot(2, partial(force_vs_time,e=0,n=0,d=1), 'r')
-        p.plot(2, partial(force_at_time,e=0,n=0,d=1), 'ro')
-        p.plot(2, partial(force_vs_time,e=0,n=1,d=0), 'g--')
-        p.plot(2, partial(force_at_time,e=0,n=1,d=0), 'go')
-        p.plot(2, partial(force_vs_time,e=0,n=1,d=1), 'g')
-        p.plot(2, partial(force_at_time,e=0,n=1,d=1), 'go')
+        # p.plot(2, partial(force_vs_time,e=0,n=0,d=0), 'r--')
+        # p.plot(2, partial(force_at_time,e=0,n=0,d=0), 'ro')
+        # p.plot(2, partial(force_vs_time,e=0,n=0,d=1), 'r')
+        # p.plot(2, partial(force_at_time,e=0,n=0,d=1), 'ro')
+        # p.plot(2, partial(force_vs_time,e=0,n=1,d=0), 'g--')
+        # p.plot(2, partial(force_at_time,e=0,n=1,d=0), 'go')
+        # p.plot(2, partial(force_vs_time,e=0,n=1,d=1), 'g')
+        # p.plot(2, partial(force_at_time,e=0,n=1,d=1), 'go')
 
-        #axs[2].set_xlim(xlim)
-        axs[2].legend(['force_x r', '_nolegend_', 'force_y r', '_nolegend_', 'force_x l', '_nolegend_', 'force_y l', '_nolegend_'])
-        p.show()
+        # #axs[2].set_xlim(xlim)
+        # axs[2].legend(['force_x r', '_nolegend_', 'force_y r', '_nolegend_', 'force_x l', '_nolegend_', 'force_y l', '_nolegend_'])
+        # p.show()
 
 
     def untest_roundoff(self):
