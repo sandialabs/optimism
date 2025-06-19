@@ -12,23 +12,26 @@ NUM_PRONY_TERMS = -1
 
 VISCOUS_DISTORTION = slice(0, 9)
 
+def create_material_properties(properties):
+    props = _make_properties(properties)
+    return np.array(props)
+
 def create_material_model_functions(properties):
     
     density = properties.get('density')
-    props = _make_properties(properties)
 
-    def energy_density(dispGrad, state, dt):
+    def energy_density(dispGrad, state, props, dt):
         return _energy_density(dispGrad, state, dt, props)
 
     def compute_initial_state(shape=(1,)):
         state = np.identity(3).ravel()
         return state
 
-    def compute_state_new(dispGrad, state, dt):
+    def compute_state_new(dispGrad, state, props, dt):
         state = _compute_state_new(dispGrad, state, dt, props)
         return state
 
-    def compute_material_qoi(dispGrad, state, dt):
+    def compute_material_qoi(dispGrad, state, props, dt):
         return _compute_dissipated_energy(dispGrad, state, dt, props)
 
     return MaterialModel(compute_energy_density = energy_density,
