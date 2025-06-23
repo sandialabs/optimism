@@ -29,7 +29,7 @@ class HyperViscoModelFixture(TestFixture):
         self.taus = np.array([tau_1, tau_2, tau_3])
         self.etas = self.G_neqs * self.taus
 
-        self.props = {
+        props = {
             'equilibrium bulk modulus'       : K_eq,
             'equilibrium shear modulus'      : G_eq,
             'non equilibrium shear modulus 1': G_neq_1,
@@ -39,8 +39,9 @@ class HyperViscoModelFixture(TestFixture):
             'non equilibrium shear modulus 3': G_neq_3,
             'relaxation time 3'              : tau_3,
         } 
+        materialModel = HyperVisco.create_material_model_functions(props)
+        self.props = HyperVisco.create_material_properties(props)
 
-        materialModel = HyperVisco.create_material_model_functions(self.props)
         self.energy_density = jax.jit(materialModel.compute_energy_density)
         self.compute_state_new = jax.jit(materialModel.compute_state_new)
         self.compute_initial_state = materialModel.compute_initial_state
@@ -68,10 +69,10 @@ class HyperViscoUniaxialStrain(HyperViscoModelFixture):
         # numerical solution
         for n, F in enumerate(Fs):
             dispGrad = F - np.eye(3)
-            energies = energies.at[n].set(self.energy_density(dispGrad, state_old, dt))
-            state_new = self.compute_state_new(dispGrad, state_old, dt)
+            energies = energies.at[n].set(self.energy_density(dispGrad, state_old, self.props, dt))
+            state_new = self.compute_state_new(dispGrad, state_old, self.props, dt)
             states = states.at[n, :].set(state_new)
-            dissipated_energies = dissipated_energies.at[n].set(self.compute_material_qoi(dispGrad, state_old, dt))
+            dissipated_energies = dissipated_energies.at[n].set(self.compute_material_qoi(dispGrad, state_old, self.props, dt))
             state_old = state_new
 
         dissipated_energies_analytic = np.zeros(len(Fs))
