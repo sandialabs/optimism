@@ -93,14 +93,20 @@
 <span class="n">NUM_PRONY_TERMS</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="n">VISCOUS_DISTORTION_SIZE</span> <span class="o">=</span> <span class="mi">9</span>
 
+<div class="viewcode-block" id="create_material_properties">
+<a class="viewcode-back" href="../../../optimism.material.html#optimism.material.MultiBranchHyperViscoelastic.create_material_properties">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_material_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
+    <span class="n">props</span> <span class="o">=</span> <span class="n">_make_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">props</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="create_material_model_functions">
 <a class="viewcode-back" href="../../../optimism.material.html#optimism.material.MultiBranchHyperViscoelastic.create_material_model_functions">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">create_material_model_functions</span><span class="p">(</span><span class="n">properties</span><span class="p">):</span>
     
     <span class="n">density</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;density&#39;</span><span class="p">)</span>
-    <span class="n">props</span> <span class="o">=</span> <span class="n">_make_properties</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_energy_density</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_initial_state</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,)):</span>
@@ -109,11 +115,11 @@
           <span class="n">state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">state</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()))</span>
         <span class="k">return</span> <span class="n">state</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="n">state</span> <span class="o">=</span> <span class="n">_compute_state_new</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">state</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">compute_material_qoi</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_material_qoi</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_compute_dissipated_energy</span><span class="p">(</span><span class="n">dispGrad</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">props</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">MaterialModel</span><span class="p">(</span><span class="n">compute_energy_density</span> <span class="o">=</span> <span class="n">energy_density</span><span class="p">,</span>
