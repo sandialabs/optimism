@@ -48,8 +48,8 @@ class UniformScalarField(Field):
     element_axis = None
     quadpoint_axis = None
 
-    def interpolate(cls, field, shape, conn):
-        return U
+    def interpolate(self, field, shape, conn):
+        return field
     
     def compute_shape_functions(self, points):
         return DummyShapeFunctions()
@@ -58,6 +58,9 @@ class UniformScalarField(Field):
 class QuadratureField(Field):
     element_axis = 0
     quadpoint_axis = 0
+
+    def __init__(self, dim):
+        self.dim = dim
 
     def interpolate(self, Q, shape, conn):
         return Q
@@ -79,7 +82,6 @@ class FunctionSpace2:
         return compute_element_values(f, self._mesh.conns, *fields)
     
     def _evaluate_on_element(self, f, el_conn, *fields):
-
         f_args = [z[0].interpolate(z[1], z[2].values, el_conn) for z in zip(self._spaces, fields, self._shapes)]
         f_batch = jax.vmap(f, tuple(space.quadpoint_axis for space in self._spaces))
         return f_batch(*f_args)
@@ -88,12 +90,13 @@ class FunctionSpace2:
 if __name__ == "__main__":
     p = 1
     dim = 2
+    internal_var_dim = 1
 
     mesh = Mesh.construct_structured_mesh(2, 2, [0.0, 1.0], [0.0, 2.0], p)
     quad_rule = QuadratureRule.create_quadrature_rule_on_triangle(2)
     
     u_space = FEField(p, dim)
-    internal_variable_space = QuadratureField()
+    internal_variable_space = QuadratureField(internal_var_dim)
     time_space = UniformScalarField()
     spaces = [u_space, internal_variable_space, time_space]
 
@@ -111,6 +114,8 @@ if __name__ == "__main__":
     
     interpolated_values = time_space.interpolate(t, None, None)
     print(f"{interpolated_values=}")
+
+    print(f"f() = {f(np.array([1.0, 0.0]), Q[0, 0], 1.0)}")
 
     val = fs.evaluate(f, U, Q, t)
     print(f"func vals shape = {val.shape}")
