@@ -1,4 +1,6 @@
 import abc
+import dataclasses
+import functools
 import jax
 import jax.numpy as np
 
@@ -11,7 +13,11 @@ class Field(abc.ABC):
     pass
 
     @abc.abstractmethod
-    def interpolate(self, U, shape, conn):
+    def interpolate(self, shape, U, conn):
+        pass
+
+    @abc.abstractmethod
+    def interpolate_gradient(self, dshape, U, conn):
         pass
 
     @property
@@ -23,6 +29,7 @@ class Field(abc.ABC):
     def compute_shape_functions(self, points):
         pass
 
+
 class FEField(Field):
     element_axis = None
     quadpoint_axis = 0
@@ -32,11 +39,11 @@ class FEField(Field):
         self.dim = dim
         self.element, self.element1d = Interpolants.make_parent_elements(order)
 
-    def interpolate(self, field, shape, conn):
+    def interpolate(self, shape, field, conn):
         e_vector = field[conn]
         return shape@e_vector
 
-    def interpolate_gradient(self, field, dshape, conn):
+    def interpolate_gradient(self, dshape, field, conn):
         return jax.vmap(lambda ev, dshp: np.tensordot(ev, dshp, (0, 0)), (None, 0))(field[conn], dshape)
 
     def compute_shape_functions(self, points):
@@ -52,8 +59,11 @@ class UniformScalarField(Field):
     element_axis = None
     quadpoint_axis = None
 
-    def interpolate(self, field, shape, conn):
+    def interpolate(self, shape, field, conn):
         return field
+    
+    def interpolate_gradient(self, dshape, field, conn):
+        raise NotImplementedError
     
     def compute_shape_functions(self, points):
         return DummyShapeFunctions()
@@ -66,18 +76,42 @@ class QuadratureField(Field):
     def __init__(self, dim):
         self.dim = dim
 
-    def interpolate(self, Q, shape, conn):
+    def interpolate(self, shape, Q, conn):
         return Q
+    
+    def interpolate_gradient(self, dshape, Q, conn):
+        raise NotImplementedError
     
     def compute_shape_functions(self, points):
         return DummyShapeFunctions()
 
+@dataclasses.dataclass
+class Value:
+    field: int
+
+
+@dataclasses.dataclass
+class Gradient:
+    field: int
+
+
 class FunctionSpace2:
-    def __init__(self, spaces, mesh, quadrature_rule):
+    def __init__(self, spaces, qfunction_signature, mesh, quadrature_rule):
         self._spaces = spaces
         self._mesh = mesh
         self._quadrature_rule = quadrature_rule
         self._shapes = [space.compute_shape_functions(quadrature_rule.xigauss) for space in spaces]
+        self._interpolators = []
+        self._input_fields = []
+        for input in qfunction_signature:
+            self._input_fields.append(input.field)
+            if type(input) is Value:
+                self._interpolators.append(functools.partial(self._spaces[input.field].interpolate, self._shapes[input.field].values))
+            elif type(input) is Gradient:
+                self._interpolators.append(functools.partial(self._spaces[input.field].interpolate_gradient, self._shapes[input.field].gradients))
+            else:
+                raise IndexError
+
 
     def evaluate(self, f, *fields):
         f_vmap_axis = None
@@ -86,14 +120,13 @@ class FunctionSpace2:
         return compute_values(f, self._mesh.conns, *fields)
     
     def _evaluate_on_element(self, f, el_conn, *fields):
-        f_args = [z[0].interpolate(z[1], z[2].values, el_conn) for z in zip(self._spaces, fields, self._shapes)]
-        f_args += [self._spaces[0].interpolate_gradient(fields[0], self._shapes[0].gradients, el_conn)]
-        f_batch = jax.vmap(f, tuple(space.quadpoint_axis for space in self._spaces) + (0,))
+        f_args = [interp(fields[field_id], el_conn) for (interp, field_id) in zip(self._interpolators, self._input_fields)]
+        f_batch = jax.vmap(f, tuple(self._spaces[input].quadpoint_axis for input in self._input_fields))
         return f_batch(*f_args)
 
 
 if __name__ == "__main__":
-    p = 1
+    p = 2
     dim = 2
     internal_var_dim = 1
 
@@ -105,17 +138,19 @@ if __name__ == "__main__":
     time_space = UniformScalarField()
     spaces = [u_space, internal_variable_space, time_space]
 
-    fs = FunctionSpace2([u_space, internal_variable_space, time_space], mesh, quad_rule)
+    inputs = (Value(0), Value(1), Value(2), Gradient(0))
+
+    fs = FunctionSpace2([u_space, internal_variable_space, time_space], inputs, mesh, quad_rule)
 
     def f(u, Q, t):
         return np.dot(u, u)*Q[0]*t
-    
-    U = jax.vmap(lambda X: np.array([X[0], 0.0]))(mesh.coords)
-    print(f"{U=}")
-    Q = 2.0*np.ones((Mesh.num_elements(mesh), len(quad_rule), 1))
-    t = 1.0
 
     # print(f"f() = {f(np.array([1.0, 0.0]), Q[0, 0], 1.0)}")
+
+    U = mesh.coords
+    U = U.at[:, 1].set(0.0)
+    Q = 2.0*np.ones((Mesh.num_elements(mesh), len(quad_rule), 1))
+    t = 1.0
 
     # val = fs.evaluate(f, U, Q, t)
     # print(f"func vals shape = {val.shape}")
@@ -126,8 +161,14 @@ if __name__ == "__main__":
     # writer.write()
 
     def g(u, Q, t, du):
-        jax.debug.print("du={du}", du=du)
-        return np.tensordot(du, du)
+        return np.dot(u, u)*Q[0]*t*np.tensordot(du, du)
+    
+    test = fs._interpolators[0](U, mesh.conns[0])
+    print(f"{test=}")
+
+    print(fs._interpolators[1])
+    test2 = fs._interpolators[1](Q, mesh.conns[0])
+    print(f"{test2=}")
     
     val = fs.evaluate(g, U, Q, t)
     print(f"{val=}")
