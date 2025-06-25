@@ -25,6 +25,11 @@ class Field(abc.ABC):
     def element_axis(self):
         pass
 
+    @property
+    @abc.abstractmethod
+    def quadpoint_axis(self):
+        pass
+
     @abc.abstractmethod
     def compute_shape_functions(self, points):
         pass
