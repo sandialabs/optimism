@@ -35,14 +35,15 @@ class Field(abc.ABC):
         pass
 
 
-class FEField(Field):
+class PkField(Field):
+    """Standard Lagrange polynomial finite element fields."""
     element_axis = None
     quadpoint_axis = 0
 
-    def __init__(self, order, dim):
-        self.order = order
+    def __init__(self, k, dim):
+        self.order = k
         self.dim = dim
-        self.element, self.element1d = Interpolants.make_parent_elements(order)
+        self.element, self.element1d = Interpolants.make_parent_elements(k)
 
     def interpolate(self, shape, field, conn):
         e_vector = field[conn]
@@ -60,7 +61,8 @@ class DummyShapeFunctions:
     gradients = None
 
 
-class UniformScalarField(Field):
+class UniformField(Field):
+    """A unique value for the whole mesh (things like time)."""
     element_axis = None
     quadpoint_axis = None
 
@@ -68,13 +70,15 @@ class UniformScalarField(Field):
         return field
     
     def interpolate_gradient(self, dshape, field, conn):
-        raise NotImplementedError
+        grad_shape = field.shape + dshape.shape[-1]
+        return np.zeros(grad_shape)
     
     def compute_shape_functions(self, points):
         return DummyShapeFunctions()
 
 
 class QuadratureField(Field):
+    """Arrays defined directly at quadrature points (things like internal variables)."""
     element_axis = 0
     quadpoint_axis = 0
 
@@ -92,7 +96,7 @@ class QuadratureField(Field):
 
 
 class ParametricElementField(Field):
-    """Holds things like quadrature weights and shape function values."""
+    """Things like quadrature weights and shape function values."""
     element_axis = None
     quadpoint_axis = 0
 
@@ -115,23 +119,28 @@ class Gradient:
     field: int
 
 
-class FunctionSpace2:
+def pushforward(du_dxi, dX_dxi):
+    return du_dxi@np.linalg.inv(dX_dxi)
+
+
+def _make_interpolation_function(input, spaces, shapes):
+    """Helper function to choose correct field space interpolation function for each input."""
+    if type(input) is Value:
+        return functools.partial(spaces[input.field].interpolate, shapes[input.field].values)
+    elif type(input) is Gradient:
+        return functools.partial(spaces[input.field].interpolate_gradient, shapes[input.field].gradients)
+    else:
+        raise IndexError(f"Field space {input.field} exceeds number of field spaces, which is {len(spaces)}.")
+
+
+class FieldEvaluator:
     def __init__(self, spaces, qfunction_signature, mesh, quadrature_rule):
         self._spaces = spaces
         self._mesh = mesh
         self._quadrature_rule = quadrature_rule
         self._shapes = [space.compute_shape_functions(quadrature_rule.xigauss) for space in spaces]
-        self._interpolators = []
-        self._input_fields = []
-        for input in qfunction_signature:
-            self._input_fields.append(input.field)
-            if type(input) is Value:
-                self._interpolators.append(functools.partial(self._spaces[input.field].interpolate, self._shapes[input.field].values))
-            elif type(input) is Gradient:
-                self._interpolators.append(functools.partial(self._spaces[input.field].interpolate_gradient, self._shapes[input.field].gradients))
-            else:
-                raise IndexError
-
+        self._input_fields = tuple(input.field for input in qfunction_signature)
+        self._interpolators = tuple(_make_interpolation_function(input, self._spaces, self._shapes) for input in qfunction_signature)
 
     def evaluate(self, f, *fields):
         f_vmap_axis = None
@@ -153,14 +162,14 @@ if __name__ == "__main__":
     mesh = Mesh.construct_structured_mesh(2, 2, [0.0, 1.0], [0.0, 2.0], p)
     quad_rule = QuadratureRule.create_quadrature_rule_on_triangle(2)
     
-    u_space = FEField(p, dim)
+    u_space = PkField(p, dim)
     internal_variable_space = QuadratureField(internal_var_dim)
-    time_space = UniformScalarField()
+    time_space = UniformField()
     spaces = [u_space, internal_variable_space, time_space]
 
     inputs = (Value(0), Value(1), Value(2), Gradient(0))
 
-    fs = FunctionSpace2([u_space, internal_variable_space, time_space], inputs, mesh, quad_rule)
+    fs = FieldEvaluator([u_space, internal_variable_space, time_space], inputs, mesh, quad_rule)
 
     def f(u, Q, t):
         return np.dot(u, u)*Q[0]*t
@@ -213,7 +222,7 @@ if __name__ == "__main__":
     spaces = [u_space, u_space, quad_weight_space]
     qfunction_signature = [Gradient(0), Gradient(1), Value(2)]
 
-    fs2 = FunctionSpace2(spaces, qfunction_signature, mesh, quad_rule)
+    fs2 = FieldEvaluator(spaces, qfunction_signature, mesh, quad_rule)
     energies = fs2.evaluate(h, mesh.coords, U, quad_rule.wgauss)
     print(f"{energies=}")
 
