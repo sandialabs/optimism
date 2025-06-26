@@ -85,7 +85,22 @@ class QuadratureField(Field):
         return Q
     
     def interpolate_gradient(self, dshape, Q, conn):
-        raise NotImplementedError
+        raise NotImplementedError(f"Gradients not supported for {type(self).__name__}")
+    
+    def compute_shape_functions(self, points):
+        return DummyShapeFunctions()
+
+
+class ParametricElementField(Field):
+    """Holds things like quadrature weights and shape function values."""
+    element_axis = None
+    quadpoint_axis = 0
+
+    def interpolate(self, shape, field, conn):
+        return field
+    
+    def interpolate_gradient(self, dshape, U, conn):
+        raise NotImplementedError(f"Gradients not supported for {type(self).__name__}")
     
     def compute_shape_functions(self, points):
         return DummyShapeFunctions()
@@ -177,3 +192,34 @@ if __name__ == "__main__":
     
     val = fs.evaluate(g, U, Q, t)
     print(f"{val=}")
+
+    def h(dX_dxi, du_dxi, w):
+        E = 1.0
+        nu = 0.0
+        mu = 0.5*E/(1 + nu)
+        lam = E*nu/(1 + nu)/(1 - 2*nu)
+        dxi_dX = np.linalg.inv(dX_dxi)
+        du_dX = du_dxi@dxi_dX
+        dV = np.linalg.det(dX_dxi)*w
+        strain = 0.5*(du_dX + du_dX.T)
+        energy_density = mu*np.tensordot(strain, strain) + 0.5*lam*np.trace(strain)**2
+        return energy_density*dV
+    
+    def area(dX_dxi, du_dxi, w):
+        return np.linalg.det(dX_dxi)*w
+    
+    quad_weight_space = ParametricElementField()
+
+    spaces = [u_space, u_space, quad_weight_space]
+    qfunction_signature = [Gradient(0), Gradient(1), Value(2)]
+
+    fs2 = FunctionSpace2(spaces, qfunction_signature, mesh, quad_rule)
+    energies = fs2.evaluate(h, mesh.coords, U, quad_rule.wgauss)
+    print(f"{energies=}")
+
+    def potential(X, U):
+        return np.sum(fs2.evaluate(h, X, U, quad_rule.wgauss))
+    
+    compute_force = jax.grad(potential, 1)
+    R = compute_force(mesh.coords, U)
+    print(f"{R=}")
