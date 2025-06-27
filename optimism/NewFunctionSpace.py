@@ -125,12 +125,14 @@ def pushforward(du_dxi, dX_dxi):
 
 def _make_interpolation_function(input, spaces, shapes):
     """Helper function to choose correct field space interpolation function for each input."""
+    if input.field >= len(spaces):
+        raise IndexError(f"Field space {input.field} exceeds number of field spaces, which is {len(spaces) - 1}.")
     if type(input) is Value:
         return functools.partial(spaces[input.field].interpolate, shapes[input.field].values)
     elif type(input) is Gradient:
         return functools.partial(spaces[input.field].interpolate_gradient, shapes[input.field].gradients)
     else:
-        raise IndexError(f"Field space {input.field} exceeds number of field spaces, which is {len(spaces)}.")
+        raise TypeError("Type of object in qfunction signature is invalid.")
 
 
 class FieldEvaluator:
