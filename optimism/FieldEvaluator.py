@@ -73,8 +73,28 @@ class UniformField(Field):
         return field
     
     def interpolate_gradient(self, shape, field, conn):
-        grad_shape = field.shape + shape.gradients.shape[-1]
-        return np.zeros(grad_shape)
+        raise NotImplementedError(f"Gradients not supported for {type(self).__name__}")
+    
+    def compute_shape_functions(self, points):
+        return Interpolants.ShapeFunctions(np.array([]), np.array([]))
+    
+    def map_shape_functions(self, shapes, jacs):
+        return super().map_shape_functions(shapes, jacs)
+
+
+class QuadratureField(Field):
+    """Arrays defined directly at quadrature points (things like internal variables)."""
+    element_axis = 0
+    quadpoint_axis = 0
+
+    def __init__(self, dim):
+        self.dim = dim
+
+    def interpolate(self, shape, field, conn):
+        return field
+    
+    def interpolate_gradient(self, shape, field, conn):
+        raise NotImplementedError(f"Gradients not supported for {type(self).__name__}")
     
     def compute_shape_functions(self, points):
         return Interpolants.ShapeFunctions(np.array([]), np.array([]))
@@ -109,7 +129,7 @@ def _choose_interpolation_function(input, spaces):
 
 class FieldEvaluator:
     def __init__(self, spaces, qfunction_signature, mesh, quadrature_rule):
-        # the coord space should live on the Mesh eventually, or be metadata of the coords themselves
+        # the coord space should live on the Mesh
         self._coord_space = PkField(mesh.parentElement.degree, mesh.coords.shape[1])
         self._coord_shapes = self._coord_space.compute_shape_functions(quadrature_rule.xigauss)
 
@@ -183,3 +203,20 @@ if __name__ == "__main__":
     
     A = fs.integrate(area, mesh.coords, U, time)
     print(f"{A=}")
+
+    
+    # Example 2, intepolate positions to quadrature points
+    inputs = [Value(0), Gradient(0)]
+    fs = FieldEvaluator([u_space], inputs, mesh, quad_rule)
+
+    def position(X, dXdX):
+        return X
+    
+    qp_coords = fs.evaluate(position, mesh.coords, mesh.coords)
+    print(f"{qp_coords=}")
+
+    def area2(X, dXdX):
+        dim = dXdX.shape[0]
+        return np.trace(dXdX)/dim
+    A2 = fs.integrate(area2, mesh.coords, mesh.coords)
+    print(f"area = {A2}")
