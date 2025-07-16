@@ -54,5 +54,9 @@ class TestBasics:
         
         area = field_evaluator.integrate(f, self.mesh.coords, self.mesh.coords)
         assert pytest.approx(area) == 6
-
-
+    
+    def test_conn(self):
+        p = 1
+        disp_space = PkField(p, self.dim, self.mesh)
+        conns = disp_space._make_connectivity()
+        print(f"{conns=}")

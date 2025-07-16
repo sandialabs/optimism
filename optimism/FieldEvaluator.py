@@ -44,10 +44,12 @@ class PkField(Field):
     element_axis = None
     quadpoint_axis = 0
 
-    def __init__(self, k, dim):
+    def __init__(self, k, dim, mesh):
         self.order = k
         self.dim = dim
         self.element, self.element1d = Interpolants.make_parent_elements(k)
+        self.mesh = mesh
+        self.conns = self._make_connectivity()
 
     def interpolate(self, shape, field, conn):
         e_vector = field[conn]
@@ -62,6 +64,53 @@ class PkField(Field):
     def map_shape_functions(self, shapes, jacs):
         shape_grads = jax.vmap(lambda dshp, J: dshp@np.linalg.inv(J))(shapes.gradients, jacs)
         return Interpolants.ShapeFunctions(shapes.values, shape_grads)
+    
+    def _make_connectivity(self):
+        mesh_conns = self.mesh.conns
+        if self.order == 1:
+            return mesh_conns
+        
+        conns = np.zeros((mesh_conns.shape[0], self.element.coordinates.shape[0]), dtype=int)
+
+        # step 1/3: vertex nodes
+        conns = conns.at[:, self.element.vertexNodes].set(mesh_conns)
+        nodeOrdinalOffset = mesh_conns.max() + 1 # offset for later node numbering
+
+        # step 2/3: mid-edge nodes (excluding vertices)
+        _, edges = Mesh.create_edges(mesh_conns)
+
+        nNodesPerEdge = self.element1d.interiorNodes.size
+        for e, edge in enumerate(edges):
+            edgeNodeOrdinals = nodeOrdinalOffset + np.arange(e*nNodesPerEdge,(e+1)*nNodesPerEdge)
+            
+            elemLeft = edge[0]
+            sideLeft = edge[1]
+            edgeMasterNodes = self.element.faceNodes[sideLeft][self.element1d.interiorNodes]
+            conns = conns.at[elemLeft, edgeMasterNodes].set(edgeNodeOrdinals)
+
+            elemRight = edge[2]
+            if elemRight >= 0:
+                sideRight = edge[3]
+                edgeMasterNodes = self.element.faceNodes[sideRight][self.element1d.interiorNodes]
+                conns = conns.at[elemRight, edgeMasterNodes].set(np.flip(edgeNodeOrdinals))
+
+        nEdges = edges.shape[0]
+        nodeOrdinalOffset += nEdges*nNodesPerEdge # for offset of interior node numbering
+
+        # step 3/3: interior nodes
+        nInNodesPerTri = self.element.interiorNodes.shape[0]
+        if nInNodesPerTri > 0:
+
+            def add_element_interior_nodes(conn, newNodeOrdinals):
+                return conn.at[self.element.interiorNodes].set(newNodeOrdinals)
+
+            nTri = conns.shape[0]
+            newNodeOrdinals = np.arange(nTri*nInNodesPerTri).reshape(nTri,nInNodesPerTri) \
+                + nodeOrdinalOffset
+            
+            conns = jax.vmap(add_element_interior_nodes)(conns, newNodeOrdinals)
+        return conns
+
 
 
 class UniformField(Field):
@@ -169,3 +218,14 @@ class FieldEvaluator:
         coords_vmap_axis = None
         compute_values = jax.vmap(self._integrate_over_element, (f_vmap_axis, conns_vmap_axis, coords_vmap_axis) + tuple(space.element_axis for space in self._spaces))
         return np.sum(compute_values(f, self._mesh.conns, coords, *fields))
+
+if __name__ == "__main__":
+    p = 3
+    dim = 2
+    p_coords = 1
+    mesh = Mesh.construct_structured_mesh(2, 2, [0.0, 3.0], [0.0, 2.0], p_coords)
+    disp_space = PkField(p, dim, mesh)
+    conns = disp_space._make_connectivity()
+    print(f"{conns=}")
+    print(f"{mesh.conns=}")
+    print(f"{mesh.coords=}")
