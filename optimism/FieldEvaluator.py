@@ -43,6 +43,11 @@ class PkField(Field):
     quadpoint_axis = 0
 
     def __init__(self, k, dim, mesh):
+        # temporarily restrict to first order meshes.
+        # The logic here will work with higher-order meshes (and even curved 
+        # meshes), but building the connectivity table for higher-order
+        # fields requires knowing the simplex connectivity.
+        assert mesh.parentElement.degree == 1
         self.order = k
         self.dim = dim
         self.element, self.element1d = Interpolants.make_parent_elements(k)
@@ -176,7 +181,7 @@ def _choose_interpolation_function(input, spaces):
 
 class FieldEvaluator:
     def __init__(self, spaces, qfunction_signature, mesh, quadrature_rule):
-        # the coord space should live on the Mesh
+        # the coord space should live on the Mesh eventually
         self._coord_space = PkField(mesh.parentElement.degree, mesh.coords.shape[1], mesh)
         self._coord_shapes = self._coord_space.compute_shape_functions(quadrature_rule.xigauss)
 

@@ -5,11 +5,11 @@ from optimism import Mesh
 from optimism.FieldEvaluator import *
 
 class TestBasics:
-    p = 1
+    coord_degree = 1
     dim = 2
     length = 3.0
     width = 2.0
-    mesh = Mesh.construct_structured_mesh(2, 2, [0.0, length], [0.0, width], p)
+    mesh = Mesh.construct_structured_mesh(2, 2, [0.0, length], [0.0, width], coord_degree)
     quad_rule = QuadratureRule.create_quadrature_rule_on_triangle(2)
 
     def test_gradient_evaluation(self):
@@ -33,7 +33,7 @@ class TestBasics:
             assert pytest.approx(H) == target_disp_grad
 
     def test_trivial_integral(self):
-        spaces = [PkField(self.p, self.dim, self.mesh)]
+        spaces = [PkField(self.coord_degree, self.dim, self.mesh)]
         inputs = [Value(0)]
         field_evaluator = FieldEvaluator(spaces, inputs, self.mesh, self.quad_rule)
         U = np.zeros_like(self.mesh.coords)
@@ -44,7 +44,7 @@ class TestBasics:
     
     def test_integral_with_one_nodal_field(self):
         "Computes area in a non-trivial way, checking consistency of gradient and integral operators."
-        spaces = [PkField(self.p, self.dim, self.mesh)]
+        spaces = [PkField(self.coord_degree, self.dim, self.mesh)]
         POSITION = 0
         # We're taking the gradient of position, which is just the identity tensor
         inputs = [Gradient(POSITION)]
