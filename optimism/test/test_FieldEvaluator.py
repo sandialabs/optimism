@@ -5,15 +5,17 @@ from optimism import Mesh
 from optimism.FieldEvaluator import *
 
 class TestBasics:
-    p = 2
+    p = 1
     dim = 2
-    mesh = Mesh.construct_structured_mesh(2, 2, [0.0, 3.0], [0.0, 2.0], p)
+    length = 3.0
+    width = 2.0
+    mesh = Mesh.construct_structured_mesh(2, 2, [0.0, length], [0.0, width], p)
     quad_rule = QuadratureRule.create_quadrature_rule_on_triangle(2)
 
     def test_gradient_evaluation(self):
         "Check the gradient of an affine field"
-        p = 2
-        spaces = [PkField(p, self.dim)]
+        p = 1
+        spaces = [PkField(p, self.dim, self.mesh)]
         inputs = [Gradient(0)]
         field_evaluator = FieldEvaluator(spaces, inputs, self.mesh, self.quad_rule)
 
@@ -31,29 +33,30 @@ class TestBasics:
             assert pytest.approx(H) == target_disp_grad
 
     def test_trivial_integral(self):
-        spaces = [PkField(self.p, self.dim)]
+        spaces = [PkField(self.p, self.dim, self.mesh)]
         inputs = [Value(0)]
         field_evaluator = FieldEvaluator(spaces, inputs, self.mesh, self.quad_rule)
         U = np.zeros_like(self.mesh.coords)
         def f(u):
             return 1.0
         area = field_evaluator.integrate(f, self.mesh.coords, U)
-        assert pytest.approx(area) == 6
+        assert pytest.approx(area) == self.length*self.width
     
     def test_integral_with_one_nodal_field(self):
         "Computes area in a non-trivial way, checking consistency of gradient and integral operators."
-        spaces = [PkField(self.p, self.dim)]
+        spaces = [PkField(self.p, self.dim, self.mesh)]
         POSITION = 0
         # We're taking the gradient of position, which is just the identity tensor
         inputs = [Gradient(POSITION)]
         field_evaluator = FieldEvaluator(spaces, inputs, self.mesh, self.quad_rule)
 
         def f(dXdX):
-            # dXdX == identity
+            # note dXdX == identity, so
+            # trace(dXdX)/dim = 1
             return np.trace(dXdX)/self.dim
         
         area = field_evaluator.integrate(f, self.mesh.coords, self.mesh.coords)
-        assert pytest.approx(area) == 6
+        assert pytest.approx(area) == self.length*self.width
     
     def test_conn(self):
         p = 1

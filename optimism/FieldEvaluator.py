@@ -10,8 +10,6 @@ from optimism import QuadratureRule
 from optimism import VTKWriter
 
 class Field(abc.ABC):
-    pass
-
     @abc.abstractmethod
     def interpolate(self, shape, U, conn, jac):
         pass
@@ -179,7 +177,7 @@ def _choose_interpolation_function(input, spaces):
 class FieldEvaluator:
     def __init__(self, spaces, qfunction_signature, mesh, quadrature_rule):
         # the coord space should live on the Mesh
-        self._coord_space = PkField(mesh.parentElement.degree, mesh.coords.shape[1])
+        self._coord_space = PkField(mesh.parentElement.degree, mesh.coords.shape[1], mesh)
         self._coord_shapes = self._coord_space.compute_shape_functions(quadrature_rule.xigauss)
 
         self._spaces = spaces
@@ -196,6 +194,9 @@ class FieldEvaluator:
         compute_values = jax.vmap(self._evaluate_on_element, (f_vmap_axis, conns_vmap_axis, coords_vmap_axis) + tuple(space.element_axis for space in self._spaces))
         return compute_values(f, self._mesh.conns, coords, *fields)
     
+    def integrate(self, f, coords, *fields):
+        return np.sum(self.evaluate(f, coords, *fields))
+    
     def _evaluate_on_element(self, f, el_conn, coords, *fields):
         jacs = self._coord_space.interpolate_gradient(self._coord_shapes, coords, el_conn)
         shapes = [space.map_shape_functions(shape, jacs) for (space, shape) in zip(self._spaces, self._shapes)]
@@ -211,13 +212,7 @@ class FieldEvaluator:
         f_batch = jax.vmap(f, tuple(self._spaces[input].quadpoint_axis for input in self._input_fields))
         f_vals = f_batch(*f_args)
         return np.dot(f_vals, dVs)
-    
-    def integrate(self, f, coords, *fields):
-        f_vmap_axis = None
-        conns_vmap_axis = 0
-        coords_vmap_axis = None
-        compute_values = jax.vmap(self._integrate_over_element, (f_vmap_axis, conns_vmap_axis, coords_vmap_axis) + tuple(space.element_axis for space in self._spaces))
-        return np.sum(compute_values(f, self._mesh.conns, coords, *fields))
+
 
 if __name__ == "__main__":
     p = 3
