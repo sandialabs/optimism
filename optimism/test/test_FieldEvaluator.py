@@ -57,23 +57,20 @@ class TestBasics:
         
         area = field_evaluator.integrate(f, self.mesh.coords, self.mesh.coords)
         assert pytest.approx(area) == self.length*self.width
-    
-    def test_conn(self):
-        p = 1
-        disp_space = PkField(p, self.mesh)
-        conns = disp_space._make_connectivity()
-        print(f"{conns=}")
 
     def test_helmholtz(self):
-        space = PkField(1, self.mesh)
-        inputs = [Value(0), Gradient(0)]
+        spaces = [PkField(1, self.mesh), QuadratureField()]
+        inputs = [Value(0), Gradient(0), Value(1)]
+        field_evaluator = FieldEvaluator(spaces, inputs, self.mesh, self.quad_rule)
         
-        def f(u, dudX):
-            return 0.5*(u*u + np.dot(dudX, dudX))
+        def f(u, dudX, q):
+            return 0.5*q[0]*(u*u + np.dot(dudX, dudX))
         
         target_disp_grad = np.array([[0.1, 0.01],
                                      [0.05, 0.3]])
         U = np.einsum('aj, ij', self.mesh.coords, target_disp_grad + np.identity(2)) - self.mesh.coords
-        field_evaluator = FieldEvaluator([space], inputs, self.mesh, self.quad_rule)
-        energy = field_evaluator.integrate(f, self.mesh.coords, U)
+        
+        Q = 2*np.ones((Mesh.num_elements(self.mesh), len(self.quad_rule), 1))
+        
+        energy = field_evaluator.integrate(f, self.mesh.coords, U, Q)
         print(f"{energy=}")
