@@ -8,8 +8,8 @@ class TestBasics:
     coord_degree = 1
     dim = 2
     length = 3.0
-    width = 2.0
-    mesh = Mesh.construct_structured_mesh(2, 2, [0.0, length], [0.0, width], coord_degree)
+    height = 2.0
+    mesh = Mesh.construct_structured_mesh(2, 2, [0.0, length], [0.0, height], coord_degree)
     quad_rule = QuadratureRule.create_quadrature_rule_on_triangle(2)
 
     def test_gradient_evaluation(self):
@@ -40,7 +40,7 @@ class TestBasics:
         def f(u):
             return 1.0
         area = field_evaluator.integrate(f, self.mesh.coords, U)
-        assert pytest.approx(area) == self.length*self.width
+        assert pytest.approx(area) == self.length*self.height
     
     def test_integral_with_one_nodal_field(self):
         "Computes area in a non-trivial way, checking consistency of gradient and integral operators."
@@ -56,21 +56,22 @@ class TestBasics:
             return np.trace(dXdX)/self.dim
         
         area = field_evaluator.integrate(f, self.mesh.coords, self.mesh.coords)
-        assert pytest.approx(area) == self.length*self.width
+        assert pytest.approx(area) == self.length*self.height
 
     def test_helmholtz(self):
         spaces = [PkField(1, self.mesh), QuadratureField()]
+        
         inputs = [Value(0), Gradient(0), Value(1)]
         field_evaluator = FieldEvaluator(spaces, inputs, self.mesh, self.quad_rule)
         
         def f(u, dudX, q):
             return 0.5*q[0]*(u*u + np.dot(dudX, dudX))
         
-        target_disp_grad = np.array([[0.1, 0.01],
-                                     [0.05, 0.3]])
-        U = np.einsum('aj, ij', self.mesh.coords, target_disp_grad + np.identity(2)) - self.mesh.coords
+        target_grad = np.array([0.1, 0.01])
+        U = self.mesh.coords@target_grad + 2.0
         
         Q = 2*np.ones((Mesh.num_elements(self.mesh), len(self.quad_rule), 1))
         
         energy = field_evaluator.integrate(f, self.mesh.coords, U, Q)
-        print(f"{energy=}")
+        assert energy == pytest.approx(28.0994)
+
