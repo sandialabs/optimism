@@ -15,7 +15,7 @@ class TestBasics:
     def test_gradient_evaluation(self):
         "Check the gradient of an affine field"
         p = 1
-        spaces = [PkField(p, self.dim, self.mesh)]
+        spaces = [PkField(p, self.mesh)]
         inputs = [Gradient(0)]
         field_evaluator = FieldEvaluator(spaces, inputs, self.mesh, self.quad_rule)
 
@@ -33,7 +33,7 @@ class TestBasics:
             assert pytest.approx(H) == target_disp_grad
 
     def test_trivial_integral(self):
-        spaces = [PkField(self.coord_degree, self.dim, self.mesh)]
+        spaces = [PkField(self.coord_degree, self.mesh)]
         inputs = [Value(0)]
         field_evaluator = FieldEvaluator(spaces, inputs, self.mesh, self.quad_rule)
         U = np.zeros_like(self.mesh.coords)
@@ -44,7 +44,7 @@ class TestBasics:
     
     def test_integral_with_one_nodal_field(self):
         "Computes area in a non-trivial way, checking consistency of gradient and integral operators."
-        spaces = [PkField(self.coord_degree, self.dim, self.mesh)]
+        spaces = [PkField(self.coord_degree, self.mesh)]
         POSITION = 0
         # We're taking the gradient of position, which is just the identity tensor
         inputs = [Gradient(POSITION)]
@@ -60,6 +60,20 @@ class TestBasics:
     
     def test_conn(self):
         p = 1
-        disp_space = PkField(p, self.dim, self.mesh)
+        disp_space = PkField(p, self.mesh)
         conns = disp_space._make_connectivity()
         print(f"{conns=}")
+
+    def test_helmholtz(self):
+        space = PkField(1, self.mesh)
+        inputs = [Value(0), Gradient(0)]
+        
+        def f(u, dudX):
+            return 0.5*(u*u + np.dot(dudX, dudX))
+        
+        target_disp_grad = np.array([[0.1, 0.01],
+                                     [0.05, 0.3]])
+        U = np.einsum('aj, ij', self.mesh.coords, target_disp_grad + np.identity(2)) - self.mesh.coords
+        field_evaluator = FieldEvaluator([space], inputs, self.mesh, self.quad_rule)
+        energy = field_evaluator.integrate(f, self.mesh.coords, U)
+        print(f"{energy=}")
