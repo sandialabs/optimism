@@ -59,7 +59,7 @@ class TestBasics:
         assert pytest.approx(area) == self.length*self.height
 
     def test_helmholtz(self):
-        spaces = [PkField(1, self.mesh), QuadratureField()]
+        spaces = [PkField(2, self.mesh), QuadratureField()]
         
         inputs = [Value(0), Gradient(0), Value(1)]
         field_evaluator = FieldEvaluator(spaces, inputs, self.mesh, self.quad_rule)
@@ -68,7 +68,8 @@ class TestBasics:
             return 0.5*q[0]*(u*u + np.dot(dudX, dudX))
         
         target_grad = np.array([0.1, 0.01])
-        U = self.mesh.coords@target_grad + 2.0
+        high_order_mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(self.mesh, 2)
+        U = high_order_mesh.coords@target_grad + 2.0
         
         Q = 2*np.ones((Mesh.num_elements(self.mesh), len(self.quad_rule), 1))
         

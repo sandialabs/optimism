@@ -11,16 +11,11 @@ from optimism import VTKWriter
 
 class Field(abc.ABC):
     @abc.abstractmethod
-    def interpolate(self, shape, U, conn, jac):
+    def interpolate(self, shape, U, el_id):
         pass
 
     @abc.abstractmethod
-    def interpolate_gradient(self, dshape, U, conn, jac):
-        pass
-
-    @property
-    @abc.abstractmethod
-    def element_axis(self):
+    def interpolate_gradient(self, dshape, U, el_id):
         pass
 
     @property
@@ -39,7 +34,6 @@ class Field(abc.ABC):
 
 class PkField(Field):
     """Standard Lagrange polynomial finite element fields."""
-    element_axis = None
     quadpoint_axis = 0
 
     def __init__(self, k, mesh):
@@ -53,12 +47,12 @@ class PkField(Field):
         self.mesh = mesh
         self.conns = self._make_connectivity()
 
-    def interpolate(self, shape, field, conn):
-        e_vector = field[conn]
+    def interpolate(self, shape, field, el_id):
+        e_vector = field[self.conns[el_id]]
         return shape.values@e_vector
 
-    def interpolate_gradient(self, shape, field, conn):
-        return jax.vmap(lambda ev, dshp: np.tensordot(ev, dshp, (0, 0)), (None, 0))(field[conn], shape.gradients)
+    def interpolate_gradient(self, shape, field, el_id):
+        return jax.vmap(lambda ev, dshp: np.tensordot(ev, dshp, (0, 0)), (None, 0))(field[self.conns[el_id]], shape.gradients)
 
     def compute_shape_functions(self, points):
         return Interpolants.compute_shapes(self.element, points)
@@ -117,13 +111,12 @@ class PkField(Field):
 
 class UniformField(Field):
     """A unique value for the whole mesh (things like time)."""
-    element_axis = None
     quadpoint_axis = None
 
-    def interpolate(self, shape, field, conn):
-        return field
+    def interpolate(self, shape, U, el_id):
+        return U
     
-    def interpolate_gradient(self, shape, field, conn):
+    def interpolate_gradient(self, shape, U, el_id):
         raise NotImplementedError(f"Gradients not supported for {type(self).__name__}")
     
     def compute_shape_functions(self, points):
@@ -135,13 +128,12 @@ class UniformField(Field):
 
 class QuadratureField(Field):
     """Arrays defined directly at quadrature points (things like internal variables)."""
-    element_axis = 0
     quadpoint_axis = 0
 
-    def interpolate(self, shape, field, conn):
-        return field
+    def interpolate(self, shape, field, el_id):
+        return field[el_id]
     
-    def interpolate_gradient(self, shape, field, conn):
+    def interpolate_gradient(self, shape, field, el_id):
         raise NotImplementedError(f"Gradients not supported for {type(self).__name__}")
     
     def compute_shape_functions(self, points):
@@ -190,18 +182,17 @@ class FieldEvaluator:
 
     def evaluate(self, f, coords, *fields):
         f_vmap_axis = None
-        conns_vmap_axis = 0
-        coords_vmap_axis = None
-        compute_values = jax.vmap(self._evaluate_on_element, (f_vmap_axis, conns_vmap_axis, coords_vmap_axis) + tuple(space.element_axis for space in self._spaces))
-        return compute_values(f, self._mesh.conns, coords, *fields)
+        elems_in_block = np.arange(Mesh.num_elements(self._mesh))
+        compute_values = jax.vmap(self._evaluate_on_element, (f_vmap_axis, 0, None) + tuple(None for field in fields))
+        return compute_values(f, elems_in_block, coords, *fields)
     
     def integrate(self, f, coords, *fields):
         return np.sum(self.evaluate(f, coords, *fields))
     
-    def _evaluate_on_element(self, f, el_conn, coords, *fields):
-        jacs = self._coord_space.interpolate_gradient(self._coord_shapes, coords, el_conn)
+    def _evaluate_on_element(self, f, el_id, coords, *fields):
+        jacs = self._coord_space.interpolate_gradient(self._coord_shapes, coords, el_id)
         shapes = [space.map_shape_functions(shape, jacs) for (space, shape) in zip(self._spaces, self._shapes)]
-        f_args = [interp(shapes[field_id], fields[field_id], el_conn) for (interp, field_id) in zip(self._interpolators, self._input_fields)]
+        f_args = [interp(shapes[field_id], fields[field_id], el_id) for (interp, field_id) in zip(self._interpolators, self._input_fields)]
         f_batch = jax.vmap(f, tuple(self._spaces[input].quadpoint_axis for input in self._input_fields))
         return f_batch(*f_args)
     
