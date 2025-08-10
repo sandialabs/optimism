@@ -10,7 +10,7 @@ class TestBasics:
     length = 3.0
     height = 2.0
     mesh = Mesh.construct_structured_mesh(2, 2, [0.0, length], [0.0, height], coord_degree)
-    quad_rule = QuadratureRule.create_quadrature_rule_on_triangle(2)
+    quad_rule = QuadratureRule.create_quadrature_rule_on_triangle(4)
 
     def test_gradient_evaluation(self):
         "Check the gradient of an affine field"
@@ -68,11 +68,10 @@ class TestBasics:
             return 0.5*q[0]*(u*u + np.dot(dudX, dudX))
         
         target_grad = np.array([0.1, 0.01])
-        high_order_mesh = Mesh.create_higher_order_mesh_from_simplex_mesh(self.mesh, 2)
-        U = high_order_mesh.coords@target_grad + 2.0
+        U = spaces[0].coords@target_grad + 2.0
         
         Q = 2*np.ones((Mesh.num_elements(self.mesh), len(self.quad_rule), 1))
         
         energy = field_evaluator.integrate(f, self.mesh.coords, U, Q)
+        print(f"{energy:.12e}")
         assert energy == pytest.approx(28.0994)
-

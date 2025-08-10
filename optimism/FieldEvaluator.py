@@ -45,7 +45,7 @@ class PkField(Field):
         self.order = k
         self.element, self.element1d = Interpolants.make_parent_elements(k)
         self.mesh = mesh
-        self.conns = self._make_connectivity()
+        self.conns, self.coords = self._make_connectivity()
 
     def interpolate(self, shape, field, el_id):
         e_vector = field[self.conns[el_id]]
@@ -62,18 +62,20 @@ class PkField(Field):
         return Interpolants.ShapeFunctions(shapes.values, shape_grads)
     
     def _make_connectivity(self):
-        mesh_conns = self.mesh.conns
         if self.order == 1:
-            return mesh_conns
+            return self.mesh.conns, self.mesh.coords
         
-        conns = np.zeros((mesh_conns.shape[0], self.element.coordinates.shape[0]), dtype=int)
+        conns = np.zeros((Mesh.num_elements(self.mesh), self.element.coordinates.shape[0]), dtype=int)
 
         # step 1/3: vertex nodes
-        conns = conns.at[:, self.element.vertexNodes].set(mesh_conns)
-        nodeOrdinalOffset = mesh_conns.max() + 1 # offset for later node numbering
+        conns = conns.at[:, self.element.vertexNodes].set(self.mesh.conns)
+        nodeOrdinalOffset = self.mesh.conns.max() + 1 # offset for later node numbering
 
         # step 2/3: mid-edge nodes (excluding vertices)
-        _, edges = Mesh.create_edges(mesh_conns)
+        edgeConns, edges = Mesh.create_edges(self.mesh.conns)
+        A = np.column_stack((1.0 - self.element1d.coordinates[self.element1d.interiorNodes],
+                             self.element1d.coordinates[self.element1d.interiorNodes]))
+        edgeCoords = jax.vmap(lambda edgeConn: np.dot(A, self.mesh.coords[edgeConn, :]))(edgeConns)
 
         nNodesPerEdge = self.element1d.interiorNodes.size
         for e, edge in enumerate(edges):
@@ -96,6 +98,11 @@ class PkField(Field):
         # step 3/3: interior nodes
         nInNodesPerTri = self.element.interiorNodes.shape[0]
         if nInNodesPerTri > 0:
+            N0 = self.element.coordinates[self.element.interiorNodes, 0]
+            N1 = self.element.coordinates[self.element.interiorNodes, 1]
+            N2 = 1.0 - N0 - N1
+            A = np.column_stack((N0, N1, N2))
+            interiorCoords = jax.vmap(lambda triConn: np.dot(A, self.mesh.coords[triConn]))(self.mesh.conns)
 
             def add_element_interior_nodes(conn, newNodeOrdinals):
                 return conn.at[self.element.interiorNodes].set(newNodeOrdinals)
@@ -105,7 +112,11 @@ class PkField(Field):
                 + nodeOrdinalOffset
             
             conns = jax.vmap(add_element_interior_nodes)(conns, newNodeOrdinals)
-        return conns
+        else:
+            interiorCoords = np.zeros((0, 2))
+            
+        coords = np.vstack((self.mesh.coords, edgeCoords.reshape(-1,2), interiorCoords.reshape(-1,2)))
+        return conns, coords
 
 
 
@@ -187,7 +198,10 @@ class FieldEvaluator:
         return compute_values(f, elems_in_block, coords, *fields)
     
     def integrate(self, f, coords, *fields):
-        return np.sum(self.evaluate(f, coords, *fields))
+        f_vmap_axis = None
+        elems_in_block = np.arange(Mesh.num_elements(self._mesh))
+        integrate = jax.vmap(self._integrate_over_element, (f_vmap_axis, 0, None) + tuple(None for field in fields))
+        return np.sum(integrate(f, elems_in_block, coords, *fields))
     
     def _evaluate_on_element(self, f, el_id, coords, *fields):
         jacs = self._coord_space.interpolate_gradient(self._coord_shapes, coords, el_id)
@@ -196,23 +210,12 @@ class FieldEvaluator:
         f_batch = jax.vmap(f, tuple(self._spaces[input].quadpoint_axis for input in self._input_fields))
         return f_batch(*f_args)
     
-    def _integrate_over_element(self, f, el_conn, coords, *fields):
-        jacs = self._coord_space.interpolate_gradient(self._coord_shapes, coords, el_conn)
+    def _integrate_over_element(self, f, el_id, coords, *fields):
+        jacs = self._coord_space.interpolate_gradient(self._coord_shapes, coords, el_id)
         shapes = [space.map_shape_functions(shape, jacs) for (space, shape) in zip(self._spaces, self._shapes)]
         dVs = jax.vmap(lambda J, w: np.linalg.det(J)*w)(jacs, self._quadrature_rule.wgauss)
-        f_args = [interp(shapes[field_id], fields[field_id], el_conn) for (interp, field_id) in zip(self._interpolators, self._input_fields)]
+        f_args = [interp(shapes[field_id], fields[field_id], el_id) for (interp, field_id) in zip(self._interpolators, self._input_fields)]
         f_batch = jax.vmap(f, tuple(self._spaces[input].quadpoint_axis for input in self._input_fields))
         f_vals = f_batch(*f_args)
         return np.dot(f_vals, dVs)
 
-
-if __name__ == "__main__":
-    p = 3
-    dim = 2
-    p_coords = 1
-    mesh = Mesh.construct_structured_mesh(2, 2, [0.0, 3.0], [0.0, 2.0], p_coords)
-    disp_space = PkField(p, dim, mesh)
-    conns = disp_space._make_connectivity()
-    print(f"{conns=}")
-    print(f"{mesh.conns=}")
-    print(f"{mesh.coords=}")
