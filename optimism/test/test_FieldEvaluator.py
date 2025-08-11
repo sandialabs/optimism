@@ -83,3 +83,25 @@ class TestBasics:
         with pytest.raises(AssertionError):
             field_evaluator = FieldEvaluator(spaces, inputs, self.mesh, self.quad_rule)
 
+    def test_jit_and_grad(self):
+        k = 2
+        spaces = PkField(k, self.mesh),
+        inputs = Gradient(0),
+        field_evaluator = FieldEvaluator(spaces, inputs, self.mesh, self.quad_rule)
+
+        def f(dudX):
+            return 0.5*np.dot(dudX, dudX)
+
+        @jax.jit
+        def energy(U):
+            return field_evaluator.integrate(f, self.mesh.coords, U)
+
+        target_grad = np.array([0.1, 0.01])
+        V = spaces[0].coords@target_grad
+
+        e = energy(V)
+        assert e == pytest.approx(0.5*np.dot(target_grad, target_grad)*self.length*self.height)
+
+        force = jax.jit(jax.grad(energy))
+        F = force(V)
+        assert sum(F) == pytest.approx(0.0)
