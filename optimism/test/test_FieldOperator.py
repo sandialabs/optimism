@@ -4,7 +4,7 @@ import jax.numpy as np
 from optimism import Mesh
 from optimism.FieldOperator import *
 
-class TestBasics:
+class TestFieldOperator:
     coord_degree = 1
     dim = 2
     length = 3.0
