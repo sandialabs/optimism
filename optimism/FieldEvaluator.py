@@ -36,7 +36,8 @@ class PkField(Field):
     """Standard Lagrange polynomial finite element fields."""
     quadpoint_axis = 0
 
-    def __init__(self, k, mesh):
+    def __init__(self, k: int, mesh: Mesh.Mesh) -> None:
+        assert k > 0, "Polynomial degree must be positive"
         # temporarily restrict to first order meshes.
         # Building the connectivity table for higher-order fields requires knowing the
         # simplex connectivity. The mesh object must be updated to store that.
@@ -190,6 +191,8 @@ def _choose_interpolation_function(input, spaces):
 
 class FieldEvaluator:
     def __init__(self, spaces: tuple[Field], qfunction_signature: tuple[FieldInterpolation], mesh: Mesh.Mesh, quadrature_rule: QuadratureRule.QuadratureRule) -> None:
+        for input in qfunction_signature:
+            assert 0 <= input.field < len(spaces), """Field index in qfunction signature outside valid range."""
         # the coord space should live on the Mesh eventually
         self._coord_space = PkField(mesh.parentElement.degree, mesh)
         self._coord_shapes = self._coord_space.compute_shape_functions(quadrature_rule.xigauss)
