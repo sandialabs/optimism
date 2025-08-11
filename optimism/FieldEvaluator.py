@@ -38,14 +38,13 @@ class PkField(Field):
 
     def __init__(self, k, mesh):
         # temporarily restrict to first order meshes.
-        # The logic here will work with higher-order meshes (and even curved 
-        # meshes), but building the connectivity table for higher-order
-        # fields requires knowing the simplex connectivity.
+        # Building the connectivity table for higher-order fields requires knowing the
+        # simplex connectivity. The mesh object must be updated to store that.
         assert mesh.parentElement.degree == 1
         self.order = k
         self.element, self.element1d = Interpolants.make_parent_elements(k)
         self.mesh = mesh
-        self.conns, self.coords = self._make_connectivity()
+        self.conns, self.coords = self._make_connectivity_and_coordinates()
 
     def interpolate(self, shape, field, el_id):
         e_vector = field[self.conns[el_id]]
@@ -61,7 +60,7 @@ class PkField(Field):
         shape_grads = jax.vmap(lambda dshp, J: dshp@np.linalg.inv(J))(shapes.gradients, jacs)
         return Interpolants.ShapeFunctions(shapes.values, shape_grads)
     
-    def _make_connectivity(self):
+    def _make_connectivity_and_coordinates(self):
         if self.order == 1:
             return self.mesh.conns, self.mesh.coords
         
@@ -70,6 +69,10 @@ class PkField(Field):
         # step 1/3: vertex nodes
         conns = conns.at[:, self.element.vertexNodes].set(self.mesh.conns)
         nodeOrdinalOffset = self.mesh.conns.max() + 1 # offset for later node numbering
+
+        # The non-vertex nodes are placed using linear interpolation. When we add meshes that
+        # have higher-order coordinate spaces, we must remember to update this part with
+        # the higher-order interpolation.
 
         # step 2/3: mid-edge nodes (excluding vertices)
         edgeConns, edges = Mesh.create_edges(self.mesh.conns)
@@ -155,15 +158,22 @@ class QuadratureField(Field):
 
 
 @dataclasses.dataclass
-class Value:
+class FieldInterpolation:
+    """Abstract base class for specific types of field interpolations.
+
+    This class should not be instantiated, only derived from.
+    """
+    field: int
+
+
+class Value(FieldInterpolation):
     """Sentinel to indicate you want to interpolate the value of the field."""
-    field: int
+    pass
 
 
-@dataclasses.dataclass
-class Gradient:
+class Gradient(FieldInterpolation):
     """Sentinel to indicate you want to interpolate the gradient of the field."""
-    field: int
+    pass
 
 
 def _choose_interpolation_function(input, spaces):
@@ -179,7 +189,7 @@ def _choose_interpolation_function(input, spaces):
 
 
 class FieldEvaluator:
-    def __init__(self, spaces, qfunction_signature, mesh, quadrature_rule):
+    def __init__(self, spaces: tuple[Field], qfunction_signature: tuple[FieldInterpolation], mesh: Mesh.Mesh, quadrature_rule: QuadratureRule.QuadratureRule) -> None:
         # the coord space should live on the Mesh eventually
         self._coord_space = PkField(mesh.parentElement.degree, mesh)
         self._coord_shapes = self._coord_space.compute_shape_functions(quadrature_rule.xigauss)
@@ -218,4 +228,3 @@ class FieldEvaluator:
         f_batch = jax.vmap(f, tuple(self._spaces[input].quadpoint_axis for input in self._input_fields))
         f_vals = f_batch(*f_args)
         return np.dot(f_vals, dVs)
-
