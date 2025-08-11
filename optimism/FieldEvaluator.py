@@ -204,17 +204,15 @@ class FieldEvaluator:
         self._input_fields = tuple(input.field for input in qfunction_signature)
         self._interpolators = tuple(_choose_interpolation_function(input, self._spaces) for input in qfunction_signature)
 
-    def evaluate(self, f, coords, *fields):
+    def evaluate(self, f, coords, block, *fields):
         f_vmap_axis = None
-        elems_in_block = np.arange(Mesh.num_elements(self._mesh))
         compute_values = jax.vmap(self._evaluate_on_element, (f_vmap_axis, 0, None) + tuple(None for field in fields))
-        return compute_values(f, elems_in_block, coords, *fields)
+        return compute_values(f, block, coords, *fields)
     
-    def integrate(self, f, coords, *fields):
+    def integrate(self, f, coords, block, *fields):
         f_vmap_axis = None
-        elems_in_block = np.arange(Mesh.num_elements(self._mesh))
         integrate = jax.vmap(self._integrate_over_element, (f_vmap_axis, 0, None) + tuple(None for field in fields))
-        return np.sum(integrate(f, elems_in_block, coords, *fields))
+        return np.sum(integrate(f, block, coords, *fields))
     
     def _evaluate_on_element(self, f, el_id, coords, *fields):
         jacs = self._coord_space.interpolate_gradient(self._coord_shapes, coords, el_id)

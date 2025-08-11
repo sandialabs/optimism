@@ -26,8 +26,8 @@ class TestBasics:
 
         def f(dudX):
             return dudX
-        
-        disp_grads = field_evaluator.evaluate(f, self.mesh.coords, U)
+
+        disp_grads = field_evaluator.evaluate(f, self.mesh.coords, self.mesh.blocks['block_0'], U)
 
         for H in disp_grads.reshape(-1, 2, 2):
             assert pytest.approx(H) == target_disp_grad
@@ -39,7 +39,7 @@ class TestBasics:
         U = np.zeros_like(self.mesh.coords)
         def f(u):
             return 1.0
-        area = field_evaluator.integrate(f, self.mesh.coords, U)
+        area = field_evaluator.integrate(f, self.mesh.coords, self.mesh.blocks['block_0'], U)
         assert pytest.approx(area) == self.length*self.height
     
     def test_integral_with_one_nodal_field(self):
@@ -55,7 +55,7 @@ class TestBasics:
             # trace(dXdX)/dim = 1
             return np.trace(dXdX)/self.dim
         
-        area = field_evaluator.integrate(f, self.mesh.coords, self.mesh.coords)
+        area = field_evaluator.integrate(f, self.mesh.coords, self.mesh.blocks['block_0'], self.mesh.coords)
         assert pytest.approx(area) == self.length*self.height
 
     def test_helmholtz(self):
@@ -73,7 +73,7 @@ class TestBasics:
         
         Q = 2*np.ones((Mesh.num_elements(self.mesh), len(self.quad_rule), 1))
         
-        energy = field_evaluator.integrate(f, self.mesh.coords, U, Q)
+        energy = field_evaluator.integrate(f, self.mesh.coords, self.mesh.blocks['block_0'], U, Q)
         print(f"{energy:.12e}")
         assert energy == pytest.approx(28.0994)
 
@@ -94,7 +94,7 @@ class TestBasics:
 
         @jax.jit
         def energy(U):
-            return field_evaluator.integrate(f, self.mesh.coords, U)
+            return field_evaluator.integrate(f, self.mesh.coords, self.mesh.blocks['block_0'], U)
 
         target_grad = np.array([0.1, 0.01])
         V = spaces[0].coords@target_grad
