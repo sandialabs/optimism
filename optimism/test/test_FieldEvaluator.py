@@ -14,14 +14,13 @@ class TestBasics:
 
     def test_gradient_evaluation(self):
         "Check the gradient of an affine field"
-        p = 1
-        spaces = PkField(p, self.mesh),
-        inputs = Gradient(0),
-        field_evaluator = FieldEvaluator(spaces, inputs, self.mesh, self.quad_rule)
+        k = 1
+        spaces = PkField(k, self.mesh),
+        integrand_signature = Gradient(0),
+        field_evaluator = FieldEvaluator(spaces, integrand_signature, self.mesh, self.quad_rule)
 
         target_disp_grad = np.array([[0.1, 0.01],
                                      [0.05, 0.3]])
-        #coords_linear = self.mesh.coords[self.mesh.simplexNodesOrdinals, :]
         U = np.einsum('aj, ij', self.mesh.coords, target_disp_grad + np.identity(2)) - self.mesh.coords
 
         def f(dudX):
@@ -34,8 +33,8 @@ class TestBasics:
 
     def test_trivial_integral(self):
         spaces = PkField(self.coord_degree, self.mesh),
-        inputs = Value(0),
-        field_evaluator = FieldEvaluator(spaces, inputs, self.mesh, self.quad_rule)
+        integrand_signature = Value(0),
+        field_evaluator = FieldEvaluator(spaces, integrand_signature, self.mesh, self.quad_rule)
         U = np.zeros_like(self.mesh.coords)
         def f(u):
             return 1.0
@@ -43,12 +42,12 @@ class TestBasics:
         assert pytest.approx(area) == self.length*self.height
     
     def test_integral_with_one_nodal_field(self):
-        "Computes area in a non-trivial way, checking consistency of gradient and integral operators."
-        spaces = PkField(self.coord_degree, self.mesh),
+        "Computes area in a non-trivial way, checking consistency of gradient interpolation."
+        integrand_signature = PkField(self.coord_degree, self.mesh),
         POSITION = 0
         # We're taking the gradient of position, which is just the identity tensor
         inputs = Gradient(POSITION),
-        field_evaluator = FieldEvaluator(spaces, inputs, self.mesh, self.quad_rule)
+        field_evaluator = FieldEvaluator(integrand_signature, inputs, self.mesh, self.quad_rule)
 
         def f(dXdX):
             # note dXdX == identity, so
@@ -59,10 +58,11 @@ class TestBasics:
         assert pytest.approx(area) == self.length*self.height
 
     def test_helmholtz(self):
+        "Tests interpolation, gradient, and simple use of a QuadratureField"
         spaces = PkField(2, self.mesh), QuadratureField()
         
-        inputs = Value(0), Gradient(0), Value(1)
-        field_evaluator = FieldEvaluator(spaces, inputs, self.mesh, self.quad_rule)
+        integrand_signature = Value(0), Gradient(0), Value(1)
+        field_evaluator = FieldEvaluator(spaces, integrand_signature, self.mesh, self.quad_rule)
         
         def f(u, dudX, q):
             return 0.5*q[0]*(u*u + np.dot(dudX, dudX))
@@ -79,15 +79,15 @@ class TestBasics:
 
     def test_nonexistent_field_id_gets_error(self):
         spaces = PkField(self.coord_degree, self.mesh),
-        inputs = Gradient(1), # there is no field 1
+        integrand_signature = Gradient(1), # there is no field 1
         with pytest.raises(AssertionError):
-            field_evaluator = FieldEvaluator(spaces, inputs, self.mesh, self.quad_rule)
+            field_evaluator = FieldEvaluator(spaces, integrand_signature, self.mesh, self.quad_rule)
 
     def test_jit_and_grad(self):
         k = 2
         spaces = PkField(k, self.mesh),
-        inputs = Gradient(0),
-        field_evaluator = FieldEvaluator(spaces, inputs, self.mesh, self.quad_rule)
+        integrand_signature = Gradient(0),
+        field_evaluator = FieldEvaluator(spaces, integrand_signature, self.mesh, self.quad_rule)
 
         def f(dudX):
             return 0.5*np.dot(dudX, dudX)
