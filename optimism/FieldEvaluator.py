@@ -1,13 +1,12 @@
 import abc
 import dataclasses
-import functools
+
 import jax
 import jax.numpy as np
 
 from optimism import Interpolants
 from optimism import Mesh
 from optimism import QuadratureRule
-from optimism import VTKWriter
 
 class Field(abc.ABC):
     @abc.abstractmethod
@@ -235,7 +234,7 @@ class FieldEvaluator:
     
     def integrate(self, f, coords, block, *fields):
         """Integrate a function over a mesh block.
-        
+
         Args:
           f: Integrand function.
           coords: Spatial coordinates of the mesh, used for parametric mapping
