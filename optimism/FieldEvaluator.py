@@ -190,26 +190,65 @@ def _choose_interpolation_function(input, spaces):
 
 
 class FieldEvaluator:
-    def __init__(self, spaces: tuple[Field], qfunction_signature: tuple[FieldInterpolation], mesh: Mesh.Mesh, quadrature_rule: QuadratureRule.QuadratureRule) -> None:
+    def __init__(self, input_spaces: tuple[Field], qfunction_signature: tuple[FieldInterpolation],
+                 mesh: Mesh.Mesh, quadrature_rule: QuadratureRule.QuadratureRule) -> None:
+        """Entity that can evaluate and integrate functions at points in a mesh.
+        
+        Args:
+          spaces: Collection of ``Field`` objects describing the inputs
+          qfunction_signature:
+          mesh: Finite mesh over which to evaluate/integrate
+          quad_rule: Quadrature rule to define evaluation points and integration weights
+        """
         for input in qfunction_signature:
-            assert 0 <= input.field < len(spaces), """Field index in qfunction signature outside valid range."""
+            assert 0 <= input.field < len(input_spaces), """Field index in qfunction signature outside valid range."""
         # the coord space should live on the Mesh eventually
         self._coord_space = PkField(mesh.parentElement.degree, mesh)
         self._coord_shapes = self._coord_space.compute_shape_functions(quadrature_rule.xigauss)
 
-        self._spaces = spaces
+        self._spaces = input_spaces
         self._mesh = mesh
         self._quadrature_rule = quadrature_rule
-        self._shapes = [space.compute_shape_functions(quadrature_rule.xigauss) for space in spaces]
+        self._shapes = [space.compute_shape_functions(quadrature_rule.xigauss) for space in input_spaces]
         self._input_fields = tuple(input.field for input in qfunction_signature)
         self._interpolators = tuple(_choose_interpolation_function(input, self._spaces) for input in qfunction_signature)
 
     def evaluate(self, f, coords, block, *fields):
+        """Evaluate a function at quadrature points.
+
+        Args:
+          f: Integrand function.
+          coords: Spatial coordinates of the mesh, used for parametric mapping
+            of gradients. Can be different values than given in the
+            constructor, but the shape must be the same.
+          block: Element ids identifying the domain of integration.
+            *fields: Input fields to the functional. Must match the
+            specifications of the ``inputs`` agrument to the constructor. For
+            performance reasons, this is not checked.
+        
+        Returns:
+          A ``QuadratureField`` with the value of ``f`` at every quadrature point in the mesh.
+        """
         f_vmap_axis = None
         compute_values = jax.vmap(self._evaluate_on_element, (f_vmap_axis, 0, None) + tuple(None for field in fields))
         return compute_values(f, block, coords, *fields)
     
     def integrate(self, f, coords, block, *fields):
+        """Integrate a function over a mesh block.
+        
+        Args:
+          f: Integrand function.
+          coords: Spatial coordinates of the mesh, used for parametric mapping
+            of gradients. Can be different values than given in the
+            constructor, but the shape must be the same.
+          block: Element ids identifying the domain of integration.
+            *fields: Input fields to the functional. Must match the
+            specifications of the ``inputs`` agrument to the constructor. For
+            performance reasons, this is not checked.
+        
+        Returns:
+          The integral of ``f`` over the domain.
+        """
         f_vmap_axis = None
         integrate = jax.vmap(self._integrate_over_element, (f_vmap_axis, 0, None) + tuple(None for field in fields))
         return np.sum(integrate(f, block, coords, *fields))
