@@ -1,8 +1,11 @@
 import abc
+from collections.abc import Callable
 import dataclasses
 
 import jax
 import jax.numpy as np
+from jax import Array
+from jaxtyping import Int, Float
 
 from optimism import Interpolants
 from optimism import Mesh
@@ -212,7 +215,7 @@ class FieldEvaluator:
         self._input_fields = tuple(input.field for input in qfunction_signature)
         self._interpolators = tuple(_choose_interpolation_function(input, self._spaces) for input in qfunction_signature)
 
-    def evaluate(self, f, coords, block, *fields):
+    def evaluate(self, f: Callable, coords: Float[Array, "nnode ndim"], block: Int[Array, "nelem"], *fields: Array) -> Array:
         """Evaluate a function at quadrature points.
 
         Args:
@@ -232,7 +235,7 @@ class FieldEvaluator:
         compute_values = jax.vmap(self._evaluate_on_element, (f_vmap_axis, 0, None) + tuple(None for field in fields))
         return compute_values(f, block, coords, *fields)
     
-    def integrate(self, f, coords, block, *fields):
+    def integrate(self, f, coords, block, *fields) -> Array:
         """Integrate a function over a mesh block.
 
         Args:
