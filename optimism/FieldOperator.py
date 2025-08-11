@@ -191,7 +191,7 @@ def _choose_interpolation_function(input, spaces):
         raise TypeError("Type of object in qfunction signature is invalid.")
 
 
-class FieldEvaluator:
+class FieldOperator:
     def __init__(self, input_spaces: tuple[Field], qfunction_signature: tuple[FieldInterpolation],
                  mesh: Mesh.Mesh, quadrature_rule: QuadratureRule.QuadratureRule) -> None:
         """Entity that can evaluate and integrate functions at points in a mesh.
@@ -215,7 +215,8 @@ class FieldEvaluator:
         self._input_fields = tuple(input.field for input in qfunction_signature)
         self._interpolators = tuple(_choose_interpolation_function(input, self._spaces) for input in qfunction_signature)
 
-    def evaluate(self, f: Callable, coords: Float[Array, "nnode ndim"], block: Int[Array, "nelem"], *fields: Array) -> Array:
+    def evaluate(self, f: Callable, coords: Float[Array, "nnode ndim"], 
+                 block: Int[Array, "nelem"], *fields: Array) -> Array:
         """Evaluate a function at quadrature points.
 
         Args:
@@ -235,7 +236,8 @@ class FieldEvaluator:
         compute_values = jax.vmap(self._evaluate_on_element, (f_vmap_axis, 0, None) + tuple(None for field in fields))
         return compute_values(f, block, coords, *fields)
     
-    def integrate(self, f, coords, block, *fields) -> Array:
+    def integrate(self, f: Callable, coords: Float[Array, "nnode ndim"],
+                  block: Int[Array, "nelem"], *fields: Array) -> Array:
         """Integrate a function over a mesh block.
 
         Args:
