@@ -14,7 +14,7 @@
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=01f34227"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../../_static/copybutton.js?v=f281be69"></script>
@@ -175,15 +175,29 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_make_properties</span><span class="p">(</span><span class="n">props</span><span class="p">,</span> <span class="n">const_props</span><span class="p">):</span>
     <span class="n">dens</span> <span class="o">=</span> <span class="n">props</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="c1"># THIS IS NOT RIGHT</span>
-    <span class="n">a</span> <span class="o">=</span> <span class="mf">580.</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">dens</span><span class="p">)</span>
-    <span class="n">light_dose</span> <span class="o">=</span> <span class="mf">600.</span> <span class="o">-</span> <span class="n">a</span>
-    <span class="c1"># THIS IS NOT RIGHT</span>
+    <span class="c1"># # THIS IS NOT RIGHT</span>
+    <span class="c1"># a = 580. * (1 - dens)</span>
+    <span class="c1"># light_dose = 600. - a</span>
+    <span class="c1"># # THIS IS NOT RIGHT</span>
 
-    <span class="c1"># p = 1 - np.exp(-constProps[CONST_PROPS_K]*props[0])</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">constProps</span><span class="p">[</span><span class="n">CONST_PROPS_K</span><span class="p">]</span><span class="o">*</span><span class="n">light_dose</span><span class="p">)</span>
+    <span class="c1"># # p = 1 - np.exp(-constProps[CONST_PROPS_K]*props[0])</span>
+    <span class="c1"># p = 1 - np.exp(-constProps[CONST_PROPS_K]*light_dose)</span>
 
-    <span class="n">E</span> <span class="o">=</span> <span class="p">(</span><span class="n">constProps</span><span class="p">[</span><span class="n">CONST_PROPS_EC</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">constProps</span><span class="p">[</span><span class="n">CONST_PROPS_B</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="n">constProps</span><span class="p">[</span><span class="n">CONST_PROPS_PGEL</span><span class="p">])))</span> <span class="o">+</span> <span class="n">constProps</span><span class="p">[</span><span class="n">CONST_PROPS_ED</span><span class="p">]</span>
+    <span class="c1"># E = (constProps[CONST_PROPS_EC] * np.exp(constProps[CONST_PROPS_B] * (p - constProps[CONST_PROPS_PGEL]))) + constProps[CONST_PROPS_ED]</span>
+
+    <span class="c1"># Approximate conversion from density to light intensity to Elastic modulus</span>
+    <span class="c1"># firstly, density needs to be converted to light intensity percent, </span>
+    <span class="c1"># ranging from 20-100%.</span>
+    <span class="n">light_Intensity</span> <span class="o">=</span> <span class="mi">80</span><span class="o">*</span><span class="n">dens</span> <span class="o">+</span> <span class="mi">20</span>
+    
+    <span class="c1"># next, we can calculate the Elastic modulus based on light intensity. </span>
+    <span class="c1"># It should be noted, that here we use 5 second exposure, max intensity</span>
+    <span class="c1"># of 18.5 mW/cm^2</span>
+    <span class="c1"># The curve fit was made using MatCal, fitted to a hyperbolic tangent </span>
+    <span class="c1"># curve with a minimization fitness of 0.000193</span>
+    <span class="c1"># 12 hour cure at 120 C</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="mf">196.0684</span> <span class="o">*</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1056</span> <span class="o">*</span> <span class="p">(</span><span class="n">light_Intensity</span> <span class="o">-</span> <span class="mf">54.5464</span><span class="p">)))</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1056</span> <span class="o">*</span> <span class="p">(</span><span class="n">light_Intensity</span> <span class="o">-</span> <span class="mf">54.5464</span><span class="p">))))</span> <span class="o">+</span> <span class="mf">228.178</span>
+   
     <span class="c1"># we also want Poisson&#39;s ratio to be a &quot;constant prop&quot;</span>
     <span class="c1"># otherwise that&#39;s additional &quot;dead&quot; properties Ryan has to deal with</span>
     <span class="n">nu</span> <span class="o">=</span> <span class="n">constProps</span><span class="p">[</span><span class="n">CONST_PROPS_NU</span><span class="p">]</span>
