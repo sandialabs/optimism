@@ -10,63 +10,7 @@ PROPS_MU     = 2
 PROPS_KAPPA  = 3
 PROPS_LAMBDA = 4
 
-# constant props
-CONST_PROPS_EC = 0
-CONST_PROPS_K = 1
-CONST_PROPS_B = 2
-CONST_PROPS_PGEL = 3
-CONST_PROPS_ED = 4
-CONST_PROPS_ER = 5
-CONST_PROPS_R = 6
-CONST_PROPS_G1 = 7
-CONST_PROPS_G2 = 8
-CONST_PROPS_XI = 9
-CONST_PROPS_C1 = 10
-CONST_PROPS_C2 = 11
-CONST_PROPS_RMTEMP = 12
-CONST_PROPS_TAU = 13
-CONST_PROPS_NU = 14
-
-# a dict is fine for now, but we'll eventually want to 
-# move this into a np.array
-# dicts are slower to index then arrays which
-# for small things might not seem like a big slowdown
-# but can add up when the the thing is called millions of times
-
-# TODO make these inputs to the material model
-# we probably want to come up with a way
-# to specify required properties and
-# then pick and choose which ones to make variable
-# this is fine for now though since really for this
-# model it and class of materials we're interested in
-# it only makes sense to change the modulus
-constProps = [
-    1.059, # MPa
-    0.01, # cm^2/(mW*s)
-    5.248, # unitless
-    0.12, # unitless
-    3.321, 
-    18959, 
-    8.314, 
-    109603, # unitless
-    722.2, # unitless
-    3.73,# unitless
-    61000, # unitless
-    511.792, # K
-    100, # C
-    0.001, # s
-    0.48 # Poisson's ratio
-]
-
-# TODO need to clean up const_props handling
-# probably best way to go is to read in a dict
-# and convert to an array on construction
 def create_material_model_functions(const_props, version = 'adagio'):
-    # TODO convert const_props from dict to list/np.array here
-    
-    for n in range(20):
-        print('right here....')
-
     if version == 'adagio':
         energy_density = _adagio_neohookean
     elif version == 'coupled':
@@ -93,34 +37,22 @@ def create_material_model_functions(const_props, version = 'adagio'):
 
 
 def _make_properties(props, const_props):
-    dens = props[0]
+    designVal = props[0] # design variable value between 0 and 1
 
-    # # THIS IS NOT RIGHT
-    # a = 580. * (1 - dens)
-    # light_dose = 600. - a
-    # # THIS IS NOT RIGHT
+    # Linearly map design variable to light intensity percentage (same as grayscale percentage)
+    # Range is 20%-100% 
+    light_Intensity = 80*designVal + 20
 
-    # # p = 1 - np.exp(-constProps[CONST_PROPS_K]*props[0])
-    # p = 1 - np.exp(-constProps[CONST_PROPS_K]*light_dose)
-
-    # E = (constProps[CONST_PROPS_EC] * np.exp(constProps[CONST_PROPS_B] * (p - constProps[CONST_PROPS_PGEL]))) + constProps[CONST_PROPS_ED]
-
-    # Approximate conversion from density to light intensity to Elastic modulus
-    # firstly, density needs to be converted to light intensity percent, 
-    # ranging from 20-100%.
-    light_Intensity = 80*dens + 20
-    
-    # next, we can calculate the Elastic modulus based on light intensity. 
-    # It should be noted, that here we use 5 second exposure, max intensity
-    # of 18.5 mW/cm^2
-    # The curve fit was made using MatCal, fitted to a hyperbolic tangent 
-    # curve with a minimization fitness of 0.000193
-    # 12 hour cure at 120 C
+    # Fit of Young's modulus as a function of light intensity percentage
+    # Young's modulus values were obtained from experimental uniaxial tensile tests
+    # For these samples we use 5 second exposure with maximum intensity of 18.5 mW/cm^2
+    # and 12 hour cure at 120 C
+    # Young's modulus values were fit to a hyperbolic tangent using MatCal
+    # Fit has a minimization fitness of 0.000193
     E = 196.0684 * ((1 - np.exp(-0.1056 * (light_Intensity - 54.5464)))/(1 + np.exp(-0.1056 * (light_Intensity - 54.5464)))) + 228.178
    
-    # we also want Poisson's ratio to be a "constant prop"
-    # otherwise that's additional "dead" properties Ryan has to deal with
-    nu = constProps[CONST_PROPS_NU]
+    # Specify Poisson's ratio as a "constant prop"
+    nu = const_props.get('poisson ratio')
     mu = 0.5*E/(1.0 + nu)
     kappa = E / 3.0 / (1.0 - 2.0*nu)
     lamda = E*nu/(1 + nu)/(1 - 2*nu)
