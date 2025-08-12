@@ -17,7 +17,7 @@ class Field(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def interpolate_gradient(self, dshape, U, el_id):
+    def interpolate_gradient(self, shape, U, el_id):
         pass
 
     @property
@@ -125,6 +125,46 @@ class PkField(Field):
         return conns, coords
 
 
+class DG_PkField(Field):
+    quadpoint_axis = 0
+
+    def __init__(self, k: int, mesh: Mesh.Mesh) -> None:
+        assert k >= 0, "Polynomial degree must be >= 0"
+        assert mesh.parentElement.degree == 1
+        self.order = k
+        self.element, self.element1d = Interpolants.make_parent_elements(k)
+        self.mesh = mesh
+        self.conns, self.coords = self._make_connectivity_and_coordinates()
+        self.field_shape = Mesh.num_elements(mesh), self.element.num_nodes
+
+    def _make_connectivity_and_coordinates(self):
+        nnodes = Mesh.num_elements(self.mesh)*self.element.num_nodes
+        conns = np.arange(nnodes).reshape(-1, self.element.num_nodes)
+
+        def set_elem_coords(simplex_element_conn):
+            Xs = self.mesh.coords[simplex_element_conn]
+            J = np.column_stack((Xs[0] - Xs[2], Xs[1] - Xs[2]))
+            Jxi = self.element.coordinates@J.T
+            b = Xs[0] - Jxi[0]
+            return self.element.coordinates@J.T + b
+
+        coords = jax.vmap(set_elem_coords)(self.mesh.conns)
+        return conns, coords
+
+    def compute_shape_functions(self, points):
+        return Interpolants.compute_shapes(self.element, points)
+
+    def interpolate(self, shape, U, el_id):
+        e_vector = U[el_id]
+        return shape.values@e_vector
+
+    def interpolate_gradient(self, shape, U, el_id):
+        return jax.vmap(lambda ev, dshp: np.tensordot(ev, dshp, (0, 0)), (None, 0))(U[el_id], shape.gradients)
+
+    def map_shape_functions(self, shapes, jacs):
+        shape_grads = jax.vmap(lambda dshp, J: dshp@np.linalg.inv(J))(shapes.gradients, jacs)
+        return Interpolants.ShapeFunctions(shapes.values, shape_grads)
+
 
 class UniformField(Field):
     """A unique value for the whole mesh (things like time)."""
@@ -192,13 +232,13 @@ def _choose_interpolation_function(input, spaces):
 
 
 class FieldOperator:
-    def __init__(self, input_spaces: tuple[Field], qfunction_signature: tuple[FieldInterpolation],
+    def __init__(self, input_spaces: tuple[Field, ...], qfunction_signature: tuple[FieldInterpolation, ...],
                  mesh: Mesh.Mesh, quadrature_rule: QuadratureRule.QuadratureRule) -> None:
         """Entity that can evaluate and integrate functions at points in a mesh.
         
         Args:
           spaces: Collection of ``Field`` objects describing the inputs
-          qfunction_signature:
+          qfunction_signature: Tells the ``FieldOperator`` what quantitites to interpolate to the quadrature points.
           mesh: Finite mesh over which to evaluate/integrate
           quad_rule: Quadrature rule to define evaluation points and integration weights
         """
@@ -216,7 +256,7 @@ class FieldOperator:
         self._interpolators = tuple(_choose_interpolation_function(input, self._spaces) for input in qfunction_signature)
 
     def evaluate(self, f: Callable, coords: Float[Array, "nnode ndim"], 
-                 block: Int[Array, "nelem"], *fields: Array) -> Array:
+                 block: Int[Array, "nelem"], *fields: Array | tuple[Array, ...]) -> Array:
         """Evaluate a function at quadrature points.
 
         Args:
@@ -237,7 +277,7 @@ class FieldOperator:
         return compute_values(f, block, coords, *fields)
     
     def integrate(self, f: Callable, coords: Float[Array, "nnode ndim"],
-                  block: Int[Array, "nelem"], *fields: Array) -> Array:
+                  block: Int[Array, "nelem"], *fields: Array | tuple[Array, ...]) -> Array:
         """Integrate a function over a mesh block.
 
         Args:

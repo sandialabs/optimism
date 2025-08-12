@@ -105,3 +105,30 @@ class TestFieldOperator:
         force = jax.jit(jax.grad(energy))
         F = force(V)
         assert sum(F) == pytest.approx(0.0)
+
+    def test_dg_interpolation(self):
+        "Check interpolation of DG field"
+        k = 1
+        mesh = Mesh.construct_structured_mesh(3, 3, [0.0, 2.0], [0.0, 1.0])
+        space = DG_PkField(k, mesh)
+
+        # make a DG field that is u = 0.1*x on x < 1, u = 2 on x > 1
+        def field_values(el_coords):
+            centroid = np.mean(el_coords, axis=0)
+            return np.where(centroid[0] < 1.0, 0.1*el_coords[:, 0], 2.0*np.ones_like(el_coords[:, 0]))
+
+        U = jax.vmap(field_values)(space.coords)
+
+        coord_space = PkField(1, mesh)
+        field_operator = FieldOperator((space, coord_space), (Value(0), Value(1)), mesh, self.quad_rule)
+        def f(u, x):
+            return u, x
+        
+        # elements in left-hand side are [0:4] -> u = 0.1*x
+        Uq, Xq = field_operator.evaluate(f, mesh.coords, np.arange(4), U, mesh.coords)
+        Uq_expected = 0.1*Xq[..., 0]
+        assert Uq == pytest.approx(Uq_expected)
+
+        # elements in right-hand side [4:7] u = 2.0
+        Uq, Xq = field_operator.evaluate(f, mesh.coords, np.arange(4, 8), U, mesh.coords)
+        assert Uq == pytest.approx(2.0)
