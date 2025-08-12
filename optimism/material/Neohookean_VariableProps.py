@@ -95,15 +95,29 @@ def create_material_model_functions(const_props, version = 'adagio'):
 def _make_properties(props, const_props):
     dens = props[0]
 
-    # THIS IS NOT RIGHT
-    a = 580. * (1 - dens)
-    light_dose = 600. - a
-    # THIS IS NOT RIGHT
+    # # THIS IS NOT RIGHT
+    # a = 580. * (1 - dens)
+    # light_dose = 600. - a
+    # # THIS IS NOT RIGHT
 
-    # p = 1 - np.exp(-constProps[CONST_PROPS_K]*props[0])
-    p = 1 - np.exp(-constProps[CONST_PROPS_K]*light_dose)
+    # # p = 1 - np.exp(-constProps[CONST_PROPS_K]*props[0])
+    # p = 1 - np.exp(-constProps[CONST_PROPS_K]*light_dose)
 
-    E = (constProps[CONST_PROPS_EC] * np.exp(constProps[CONST_PROPS_B] * (p - constProps[CONST_PROPS_PGEL]))) + constProps[CONST_PROPS_ED]
+    # E = (constProps[CONST_PROPS_EC] * np.exp(constProps[CONST_PROPS_B] * (p - constProps[CONST_PROPS_PGEL]))) + constProps[CONST_PROPS_ED]
+
+    # Approximate conversion from density to light intensity to Elastic modulus
+    # firstly, density needs to be converted to light intensity percent, 
+    # ranging from 20-100%.
+    light_Intensity = 80*dens + 20
+    
+    # next, we can calculate the Elastic modulus based on light intensity. 
+    # It should be noted, that here we use 5 second exposure, max intensity
+    # of 18.5 mW/cm^2
+    # The curve fit was made using MatCal, fitted to a hyperbolic tangent 
+    # curve with a minimization fitness of 0.000193
+    # 12 hour cure at 120 C
+    E = 196.0684 * ((1 - np.exp(-0.1068 * (light_Intensity - 54.5464)))/(1 + np.exp(-0.1065 * (light_Intensity - 54.5464)))) + 228.178
+   
     # we also want Poisson's ratio to be a "constant prop"
     # otherwise that's additional "dead" properties Ryan has to deal with
     nu = constProps[CONST_PROPS_NU]
