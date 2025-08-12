@@ -116,7 +116,7 @@ def _make_properties(props, const_props):
     # The curve fit was made using MatCal, fitted to a hyperbolic tangent 
     # curve with a minimization fitness of 0.000193
     # 12 hour cure at 120 C
-    E = 196.0684 * ((1 - np.exp(-0.1068 * (light_Intensity - 54.5464)))/(1 + np.exp(-0.1065 * (light_Intensity - 54.5464)))) + 228.178
+    E = 196.0684 * ((1 - np.exp(-0.1056 * (light_Intensity - 54.5464)))/(1 + np.exp(-0.1056 * (light_Intensity - 54.5464)))) + 228.178
    
     # we also want Poisson's ratio to be a "constant prop"
     # otherwise that's additional "dead" properties Ryan has to deal with
