@@ -85,65 +85,9 @@
 <span class="n">PROPS_KAPPA</span>  <span class="o">=</span> <span class="mi">3</span>
 <span class="n">PROPS_LAMBDA</span> <span class="o">=</span> <span class="mi">4</span>
 
-<span class="c1"># constant props</span>
-<span class="n">CONST_PROPS_EC</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">CONST_PROPS_K</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">CONST_PROPS_B</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="n">CONST_PROPS_PGEL</span> <span class="o">=</span> <span class="mi">3</span>
-<span class="n">CONST_PROPS_ED</span> <span class="o">=</span> <span class="mi">4</span>
-<span class="n">CONST_PROPS_ER</span> <span class="o">=</span> <span class="mi">5</span>
-<span class="n">CONST_PROPS_R</span> <span class="o">=</span> <span class="mi">6</span>
-<span class="n">CONST_PROPS_G1</span> <span class="o">=</span> <span class="mi">7</span>
-<span class="n">CONST_PROPS_G2</span> <span class="o">=</span> <span class="mi">8</span>
-<span class="n">CONST_PROPS_XI</span> <span class="o">=</span> <span class="mi">9</span>
-<span class="n">CONST_PROPS_C1</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">CONST_PROPS_C2</span> <span class="o">=</span> <span class="mi">11</span>
-<span class="n">CONST_PROPS_RMTEMP</span> <span class="o">=</span> <span class="mi">12</span>
-<span class="n">CONST_PROPS_TAU</span> <span class="o">=</span> <span class="mi">13</span>
-<span class="n">CONST_PROPS_NU</span> <span class="o">=</span> <span class="mi">14</span>
-
-<span class="c1"># a dict is fine for now, but we&#39;ll eventually want to </span>
-<span class="c1"># move this into a np.array</span>
-<span class="c1"># dicts are slower to index then arrays which</span>
-<span class="c1"># for small things might not seem like a big slowdown</span>
-<span class="c1"># but can add up when the the thing is called millions of times</span>
-
-<span class="c1"># TODO make these inputs to the material model</span>
-<span class="c1"># we probably want to come up with a way</span>
-<span class="c1"># to specify required properties and</span>
-<span class="c1"># then pick and choose which ones to make variable</span>
-<span class="c1"># this is fine for now though since really for this</span>
-<span class="c1"># model it and class of materials we&#39;re interested in</span>
-<span class="c1"># it only makes sense to change the modulus</span>
-<span class="n">constProps</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="mf">1.059</span><span class="p">,</span> <span class="c1"># MPa</span>
-    <span class="mf">0.01</span><span class="p">,</span> <span class="c1"># cm^2/(mW*s)</span>
-    <span class="mf">5.248</span><span class="p">,</span> <span class="c1"># unitless</span>
-    <span class="mf">0.12</span><span class="p">,</span> <span class="c1"># unitless</span>
-    <span class="mf">3.321</span><span class="p">,</span> 
-    <span class="mi">18959</span><span class="p">,</span> 
-    <span class="mf">8.314</span><span class="p">,</span> 
-    <span class="mi">109603</span><span class="p">,</span> <span class="c1"># unitless</span>
-    <span class="mf">722.2</span><span class="p">,</span> <span class="c1"># unitless</span>
-    <span class="mf">3.73</span><span class="p">,</span><span class="c1"># unitless</span>
-    <span class="mi">61000</span><span class="p">,</span> <span class="c1"># unitless</span>
-    <span class="mf">511.792</span><span class="p">,</span> <span class="c1"># K</span>
-    <span class="mi">100</span><span class="p">,</span> <span class="c1"># C</span>
-    <span class="mf">0.001</span><span class="p">,</span> <span class="c1"># s</span>
-    <span class="mf">0.48</span> <span class="c1"># Poisson&#39;s ratio</span>
-<span class="p">]</span>
-
-<span class="c1"># TODO need to clean up const_props handling</span>
-<span class="c1"># probably best way to go is to read in a dict</span>
-<span class="c1"># and convert to an array on construction</span>
 <div class="viewcode-block" id="create_material_model_functions">
 <a class="viewcode-back" href="../../../optimism.material.html#optimism.material.Neohookean_VariableProps.create_material_model_functions">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">create_material_model_functions</span><span class="p">(</span><span class="n">const_props</span><span class="p">,</span> <span class="n">version</span> <span class="o">=</span> <span class="s1">&#39;adagio&#39;</span><span class="p">):</span>
-    <span class="c1"># TODO convert const_props from dict to list/np.array here</span>
-    
-    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;right here....&#39;</span><span class="p">)</span>
-
     <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="s1">&#39;adagio&#39;</span><span class="p">:</span>
         <span class="n">energy_density</span> <span class="o">=</span> <span class="n">_adagio_neohookean</span>
     <span class="k">elif</span> <span class="n">version</span> <span class="o">==</span> <span class="s1">&#39;coupled&#39;</span><span class="p">:</span>
@@ -173,34 +117,22 @@
 <div class="viewcode-block" id="_make_properties">
 <a class="viewcode-back" href="../../../optimism.material.html#optimism.material.Neohookean_VariableProps._make_properties">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">_make_properties</span><span class="p">(</span><span class="n">props</span><span class="p">,</span> <span class="n">const_props</span><span class="p">):</span>
-    <span class="n">dens</span> <span class="o">=</span> <span class="n">props</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">designVal</span> <span class="o">=</span> <span class="n">props</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># design variable value between 0 and 1</span>
 
-    <span class="c1"># # THIS IS NOT RIGHT</span>
-    <span class="c1"># a = 580. * (1 - dens)</span>
-    <span class="c1"># light_dose = 600. - a</span>
-    <span class="c1"># # THIS IS NOT RIGHT</span>
+    <span class="c1"># Linearly map design variable to light intensity percentage (same as grayscale percentage)</span>
+    <span class="c1"># Range is 20%-100% </span>
+    <span class="n">light_Intensity</span> <span class="o">=</span> <span class="mi">80</span><span class="o">*</span><span class="n">designVal</span> <span class="o">+</span> <span class="mi">20</span>
 
-    <span class="c1"># # p = 1 - np.exp(-constProps[CONST_PROPS_K]*props[0])</span>
-    <span class="c1"># p = 1 - np.exp(-constProps[CONST_PROPS_K]*light_dose)</span>
-
-    <span class="c1"># E = (constProps[CONST_PROPS_EC] * np.exp(constProps[CONST_PROPS_B] * (p - constProps[CONST_PROPS_PGEL]))) + constProps[CONST_PROPS_ED]</span>
-
-    <span class="c1"># Approximate conversion from density to light intensity to Elastic modulus</span>
-    <span class="c1"># firstly, density needs to be converted to light intensity percent, </span>
-    <span class="c1"># ranging from 20-100%.</span>
-    <span class="n">light_Intensity</span> <span class="o">=</span> <span class="mi">80</span><span class="o">*</span><span class="n">dens</span> <span class="o">+</span> <span class="mi">20</span>
-    
-    <span class="c1"># next, we can calculate the Elastic modulus based on light intensity. </span>
-    <span class="c1"># It should be noted, that here we use 5 second exposure, max intensity</span>
-    <span class="c1"># of 18.5 mW/cm^2</span>
-    <span class="c1"># The curve fit was made using MatCal, fitted to a hyperbolic tangent </span>
-    <span class="c1"># curve with a minimization fitness of 0.000193</span>
-    <span class="c1"># 12 hour cure at 120 C</span>
+    <span class="c1"># Fit of Young&#39;s modulus as a function of light intensity percentage</span>
+    <span class="c1"># Young&#39;s modulus values were obtained from experimental uniaxial tensile tests</span>
+    <span class="c1"># For these samples we use 5 second exposure with maximum intensity of 18.5 mW/cm^2</span>
+    <span class="c1"># and 12 hour cure at 120 C</span>
+    <span class="c1"># Young&#39;s modulus values were fit to a hyperbolic tangent using MatCal</span>
+    <span class="c1"># Fit has a minimization fitness of 0.000193</span>
     <span class="n">E</span> <span class="o">=</span> <span class="mf">196.0684</span> <span class="o">*</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1056</span> <span class="o">*</span> <span class="p">(</span><span class="n">light_Intensity</span> <span class="o">-</span> <span class="mf">54.5464</span><span class="p">)))</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1056</span> <span class="o">*</span> <span class="p">(</span><span class="n">light_Intensity</span> <span class="o">-</span> <span class="mf">54.5464</span><span class="p">))))</span> <span class="o">+</span> <span class="mf">228.178</span>
    
-    <span class="c1"># we also want Poisson&#39;s ratio to be a &quot;constant prop&quot;</span>
-    <span class="c1"># otherwise that&#39;s additional &quot;dead&quot; properties Ryan has to deal with</span>
-    <span class="n">nu</span> <span class="o">=</span> <span class="n">constProps</span><span class="p">[</span><span class="n">CONST_PROPS_NU</span><span class="p">]</span>
+    <span class="c1"># Specify Poisson&#39;s ratio as a &quot;constant prop&quot;</span>
+    <span class="n">nu</span> <span class="o">=</span> <span class="n">const_props</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;poisson ratio&#39;</span><span class="p">)</span>
     <span class="n">mu</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">E</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">nu</span><span class="p">)</span>
     <span class="n">kappa</span> <span class="o">=</span> <span class="n">E</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">nu</span><span class="p">)</span>
     <span class="n">lamda</span> <span class="o">=</span> <span class="n">E</span><span class="o">*</span><span class="n">nu</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">nu</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">nu</span><span class="p">)</span>
