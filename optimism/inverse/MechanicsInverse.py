@@ -16,7 +16,8 @@ PathDependentResidualInverseFunctions = namedtuple('PathDependentResidualInverse
                                                    'residual_jac_coords_vjp'])
 
 ResidualInverseFunctions = namedtuple('ResidualInverseFunctions',
-                                     ['residual_jac_coords_vjp'])
+                                     ['residual_jac_coords_vjp',
+                                      'residual_jac_disp_jvp'])
 
 def _get_2D_formulation(mode2D):
     if mode2D == 'plane strain':
@@ -152,12 +153,15 @@ def create_path_dependent_residual_inverse_functions(energyFunction):
                                                   vjp(lambda z: grad(energyFunction, 0)(u, q, iv, z), x)[1](vx)[0])
 
     return  PathDependentResidualInverseFunctions(compute_partial_residual_partial_ivs_prev,
-                                     compute_partial_residual_partial_coords
-                                    )
+                                                  compute_partial_residual_partial_coords)
 
 def create_residual_inverse_functions(energyFunction):
 
     compute_partial_residual_partial_coords = jit(lambda u, q, x, vx: 
                                                   vjp(lambda z: grad(energyFunction, 0)(u, q, z), x)[1](vx)[0])
 
-    return  ResidualInverseFunctions(compute_partial_residual_partial_coords)
+    compute_partial_parameterized_residual_partial_disp = jit(lambda u, q, x, vx: 
+                                                              jvp(lambda z: grad(energyFunction, 0)(z, q, x), (u,), (vx,))[1])
+
+    return  ResidualInverseFunctions(compute_partial_residual_partial_coords, 
+                                     compute_partial_parameterized_residual_partial_disp)
