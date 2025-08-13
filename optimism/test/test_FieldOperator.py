@@ -161,3 +161,47 @@ class TestDGField:
         # elements in right-hand side [4:7] -> grad u = 0
         dudX_q, _ = field_operator.evaluate(f, self.mesh.coords, np.arange(4, 8), U, self.mesh.coords)
         assert dudX_q == pytest.approx(0.0)
+
+def test_parameterized_elasticity():
+    mesh = Mesh.construct_structured_mesh(5, 3, [0.0, 1.0], [0.0, 1.0])
+    ne = Mesh.num_elements(mesh)
+    blocks = {'all': np.arange(Mesh.num_elements(mesh)),
+              'left': np.arange(ne//2),
+              'right': np.arange(ne//2, ne)}
+    quad_rule = QuadratureRule.create_quadrature_rule_on_triangle(2)
+    spaces = PkField(1, mesh), DG_PkField(0, mesh)
+    integrand_signature = Gradient(0), Value(1)
+    field_operator = FieldOperator(spaces, integrand_signature, mesh, quad_rule)
+    
+    lam = 3.0
+    
+    def f(dudX, mu):
+        strain = 0.5*(dudX + dudX.T)
+        return mu*np.tensordot(strain, strain) + 0.5*lam*np.trace(strain)**2
+    
+    target_disp_grad = np.array([[0.1, 0.01],
+                                 [0.05, 0.3]])
+    U = np.einsum('aj, ij', mesh.coords, target_disp_grad + np.identity(2)) - mesh.coords
+    
+    mu_left = 1.0
+    mu_right = 2.0
+    mu = np.zeros(spaces[1].field_shape)
+    mu = mu.at[blocks['left']].set(mu_left)
+    mu = mu.at[blocks['right']].set(mu_right)
+    
+    def energy(U, mu):
+        return field_operator.integrate(f, mesh.coords, blocks['all'], U, mu)
+    
+    R = jax.grad(energy, 0)(U, mu)
+    assert R[6] == pytest.approx(np.zeros(2))
+    assert R[8] == pytest.approx(np.zeros(2))
+    
+
+    stresses = field_operator.evaluate(jax.grad(f, 0), mesh.coords, blocks['all'], U, mu)
+    strain = 0.5*(target_disp_grad + target_disp_grad.T)
+    stress_left_exact = 2.0*mu_left*strain + lam*np.trace(strain)*np.identity(2)
+    stress_right_exact = 2.0*mu_right*strain + lam*np.trace(strain)*np.identity(2)
+    for stress in stresses[blocks['left']].reshape(-1, 2, 2):
+        assert stress == pytest.approx(stress_left_exact)
+    for stress in stresses[blocks['right']].reshape(-1, 2, 2):
+        assert stress == pytest.approx(stress_right_exact)
