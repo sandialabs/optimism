@@ -3,11 +3,12 @@ from jaxtyping import Array, Float
 from optimism import Interpolants
 from optimism import Mesh
 from optimism import QuadratureRule
-from typing import Tuple
+from typing import Tuple, List
 import equinox as eqx
 import jax
 import jax.numpy as np
 import numpy as onp
+import scipy.sparse as sp
 
 
 class EssentialBC(eqx.Module):
@@ -407,7 +408,6 @@ def integrate_function_on_edges(functionSpace, func, U, quadRule, edges):
     integrate_on_edges = jax.vmap(integrate_function_on_edge, (None, None, None, None, 0))
     return np.sum(integrate_on_edges(functionSpace, func, U, quadRule, edges))
 
-
 class DofManager(eqx.Module):
     # TODO get type hints below correct
     # TODO this one could be moved to jax types if we move towards
@@ -432,7 +432,7 @@ class DofManager(eqx.Module):
         self.isUnknown = ~self.isBc
 
         self.ids = onp.arange(self.isBc.size).reshape(self.fieldShape)
-
+        print(self.ids.shape)
         self.unknownIndices = self.ids[self.isUnknown]
         self.bcIndices = self.ids[self.isBc]
 
@@ -511,3 +511,100 @@ class DofManager(eqx.Module):
             hessian_bc_mask[e,eFlag,:] = False
             hessian_bc_mask[e,:,eFlag] = False
         return hessian_bc_mask
+
+# DofManager for Multi-Point Constrained Problem
+class DofManagerMPC(DofManager):
+    dim: int = eqx.field()
+    master_slave_pairs: dict = eqx.field()
+    C: np.ndarray = eqx.field()
+    C_reduced: np.ndarray = eqx.field()
+    s_reduced: np.ndarray = eqx.field()
+    s_tilde: np.ndarray = eqx.field()
+    T: np.ndarray = eqx.field()
+    isIndependent: np.ndarray = eqx.field()
+    isUnconstrained: np.ndarray = eqx.field()
+    is_slave: np.ndarray = eqx.field()
+    is_indep_dof: np.ndarray = eqx.field()
+    unconstrainedIndices: np.ndarray = eqx.field()
+    slaveIndices: np.ndarray = eqx.field()
+    bcIndices: np.ndarray = eqx.field()
+    dofToUnknown: np.ndarray = eqx.field()
+
+    def __init__(self, functionSpace, dim, EssentialBCs, master_slave_pairs, C, s):
+        super().__init__(functionSpace, dim, EssentialBCs)
+        self.fieldShape = Mesh.num_nodes(functionSpace.mesh), dim
+        self.dim = dim
+        self.master_slave_pairs = master_slave_pairs
+        self.C = np.array(C)
+        self.s_tilde = np.array(s)
+        self.C_reduced = np.array(C)  # Reduced constraint matrix
+        self.s_reduced = np.array(s)  # Reduced shift vector
+        self.isIndependent = None
+        self.isUnconstrained = None
+        self.is_indep_dof = None
+        self.is_slave = None
+        self.slaveIndices = None
+        self.unconstrainedIndices = None
+        self.create_mpc_transformation()
+
+    def create_mpc_transformation(self):
+        slave_nodes = np.array(list(self.master_slave_pairs.keys()))
+        master_nodes = np.array(list(self.master_slave_pairs.values()))
+        is_slave = onp.full(self.fieldShape, False, dtype=bool)
+        # self.is_slave = is_slave.at[slave_nodes, :].set(True)
+        
+        self.is_slave = onp.full(self.fieldShape, False, dtype=bool)
+        self.is_slave[slave_nodes,:] = True      
+
+        # self.is_slave = is_slave
+        self.isUnconstrained = ~self.is_slave
+
+        # print("shape of isUnknown: ", self.isUnknown.shape)
+
+        self.ids = onp.arange(self.is_slave.size).reshape(self.fieldShape)
+        print(self.ids.shape)
+        self.unconstrainedIndices = self.ids[self.isUnconstrained]
+        self.slaveIndices = self.ids[self.is_slave]
+
+        T = np.zeros((self.is_slave.size, self.unconstrainedIndices.size))
+
+        for local_idx, global_idx in enumerate(self.unconstrainedIndices):
+            T = T.at[global_idx, local_idx].set(1.0)
+
+        # Build s_tilde: global shift
+        s_tilde = np.zeros(self.is_slave.size)
+
+        for i, (slave_node, master_node) in enumerate(self.master_slave_pairs.items()):
+            for d in range(self.dim):
+                slave_dof = slave_node * self.dim + d
+                master_dof = master_node * self.dim + d
+
+
+                # Find column index in reduced DOFs
+                reduced_master_index = np.where(self.unconstrainedIndices == master_dof)[0]
+                if reduced_master_index.size == 0:
+                    raise ValueError(f"Master DOF {master_dof} is not independent")
+
+                T = T.at[slave_dof, reduced_master_index[0]].set(1.0)
+                s_tilde = s_tilde.at[slave_dof].set(self.s_reduced[i * self.dim + d])
+
+        self.T = T
+        self.s_tilde = s_tilde
+
+        # Track dof-to-unknown mapping
+        ones = onp.ones(self.is_slave.size, dtype=int) * -1
+        dofToUnknown = ones
+        dofToUnknown[self.unconstrainedIndices] = onp.arange(self.unconstrainedIndices.size)
+        self.dofToUnknown = dofToUnknown
+
+    def create_field(self, Uu, Ubc=0.0):
+        U_flat = np.matmul(self.T, Uu) + self.s_tilde
+        return U_flat.reshape(self.fieldShape)
+
+    def get_unknown_values(self, U):
+        print("shape of U in get unconstrained values: ", U.shape)
+        print("shape of isUnconstrained: ", self.isUnconstrained.shape)
+        return U[self.isUnknown]
+
+    def get_slave_values(self, U):
+        return U[self.is_slave]
