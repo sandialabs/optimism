@@ -257,9 +257,10 @@ def _compute_element_stiffnesses_multi_block(U, stateVariables, props, dt, funct
         materialModel = blockModels[blockKey]
         blockProps = props[blockKey]
         L = strain_energy_density_to_lagrangian_density(materialModel.compute_energy_density)
+        vmapValue = vmapPropValue(blockProps)
         elemIds = functionSpace.mesh.blocks[blockKey]
         f =  vmap(compute_element_stiffness_from_global_fields,
-                  (None, None, 0, None, 0, 0, 0, 0, None, None))
+                  (None, None, 0, vmapValue, None, 0, 0, 0, 0, None, None))
         blockHessians = f(U, fs.mesh.coords, stateVariables[elemIds], blockProps, dt, fs.mesh.conns[elemIds],
                           fs.shapes[elemIds], fs.shapeGrads[elemIds], fs.vols[elemIds],
                           L, modify_element_gradient)
