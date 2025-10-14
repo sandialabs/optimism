@@ -144,8 +144,12 @@ def rtsafe_(f, x0, bracket, settings):
 
     x = np.where(converged, x, np.nan)
 
-    return x, SolutionInfo(converged=converged, function_calls=functionCalls,
-                           iterations=iters, residual_norm=np.abs(F), correction_norm=np.abs(dx))
+    # BT 10/14/2025 As of Jax 0.4.34, the has_aux argument of custom_root is broken
+    # and cannot handle non-differentiable outputs.
+    # See https://github.com/jax-ml/jax/issues/24295
+    # return x, SolutionInfo(converged=converged, function_calls=functionCalls,
+    #                        iterations=iters, residual_norm=np.abs(F), correction_norm=np.abs(dx))
+    return x, None
 
 
 def bisection_step(x, xl, xh, df, f):
