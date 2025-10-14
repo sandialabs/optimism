@@ -6,11 +6,11 @@ setuptools.setup(
     author="Michael Tupek and Brandon Talamini",
     author_email='talamini1@llnl.gov', # todo: make an email list
     install_requires=['equinox',
-                      'jax[cpu]==0.4.28',
+                      'jax[cpu]',
                       'jaxtyping',
                       'matplotlib', # this is not strictly necessary
                       'netcdf4',
-                      'scipy<1.15.0'],
+                      'scipy'],
     #tests_require=[], # could put chex and pytest here
     extras_require={'sparse': ['scikit-sparse'],
                     'test': ['pytest', 'pytest-cov', 'pytest-xdist'],
