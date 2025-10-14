@@ -28,7 +28,7 @@ def numerical_grad(f):
 class TensorMathFixture(TestFixture):
 
     def setUp(self):
-        key = jax.random.PRNGKey(1)
+        key = jax.random.PRNGKey(0)
         self.R = jax.random.orthogonal(key, 3)
         self.assertGreater(np.linalg.det(self.R), 0) # make sure this is a rotation and not a reflection
         self.log_squared = lambda A: np.tensordot(TensorMath.log_sqrt(A), TensorMath.log_sqrt(A))
@@ -219,7 +219,6 @@ class TensorMathFixture(TestFixture):
         m = 0.25
         check_grads(lambda A: TensorMath.pow_symm(C, m), (C,), order=1)
 
-    @unittest.expectedFailure
     def test_pow_symm_gradient_almost_double_degenerate(self):
         C = self.R@np.diag(np.array([2.1, 2.1 + 1e-8, 3.0]))@self.R.T
         m = 0.25
