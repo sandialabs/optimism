@@ -15,7 +15,7 @@ setuptools.setup(
     extras_require={'sparse': ['scikit-sparse'],
                     'test': ['pytest', 'pytest-cov', 'pytest-xdist'],
                     'docs': ['sphinx', 'sphinx-copybutton', 'sphinx-rtd-theme', 'sphinxcontrib-bibtex', 'sphinxcontrib-napoleon']},
-    python_requires='>=3.7',
+    python_requires='>=3.13',
     version='0.0.1',
     license='MIT',
     url='https://github.com/sandialabs/optimism'
