@@ -27,13 +27,23 @@ def compute_min_p(ps, bounds):
         return min(max(quadMin, bounds[0]), bounds[1])
 
 
-def newton_step(residual, linear_op, x, settings=Settings(1e-2,100), precond=None):
+def make_scipy_linear_function(linear_function):
+    def linear_op(v):
+        # The v is going into a jax function (probably a jvp).
+        # Sometimes scipy passes in an array of dtype int, which breaks
+        # jax tracing and differentiation, so explicitly set type to
+        # something jax can handle.
+        jax_v = np.array(v, dtype=np.float64)
+        jax_Av = linear_function(jax_v)
+        # The result is going back into a scipy solver, so convert back
+        # to a standard numpy array.
+        return onp.array(jax_Av)
+    return linear_op
+
+
+def newton_step(residual, residual_jvp, x, settings=Settings(1e-2,100), precond=None):
     sz = x.size
-    # The call to onp.array copies the jax array output into a plain numpy
-    # array. The copy is necessary for safety, since as far as scipy knows,
-    # it is allowed to modify the output in place.
-    A = LinearOperator((sz,sz),
-                       lambda v: onp.array(linear_op(v)))
+    A = LinearOperator((sz, sz), make_scipy_linear_function(residual_jvp))
     r = onp.array(residual(x))
 
     numIters = 0
@@ -45,9 +55,7 @@ def newton_step(residual, linear_op, x, settings=Settings(1e-2,100), precond=Non
     maxIters = settings.max_gmres_iters
     
     if precond is not None:
-        # Another copy to a plain numpy array, see comment for A above.
-        M = LinearOperator((sz,sz),
-                           lambda v: onp.array(precond(v)))
+        M = LinearOperator((sz, sz), make_scipy_linear_function(precond))
     else:
         M = None
         

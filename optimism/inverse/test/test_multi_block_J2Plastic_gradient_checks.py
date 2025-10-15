@@ -24,6 +24,20 @@ EnergyFunctions = namedtuple('EnergyFunctions',
                             ['energy_function_coords',
                              'compute_dissipation'])
 
+
+def make_scipy_linear_function(linear_function):
+    def linear_op(v):
+        # The v is going into a jax function (like a jvp).
+        # Sometimes scipy passes in an array of dtype int, which breaks
+        # jax tracing and differentiation, so explicitly set type to
+        # something jax can handle.
+        jax_v = np.array(v, dtype=np.float64)
+        jax_Av = linear_function(jax_v)
+        # The result is going back into a scipy solver, so convert back
+        # to a standard numpy array.
+        return onp.array(jax_Av)
+    return linear_op
+
 class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
     def setUp(self):
         dispGrad0 =  np.array([[0.4, -0.2],
@@ -172,8 +186,8 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
             p_objective = Objective.Params(bc_data=p.bc_data, state_data=ivs_prev, prop_data=self.props) # remember R is a function of ivs_prev
             self.objective.p = p_objective 
             self.objective.update_precond(Uu) # update preconditioner for use in cg (will converge in 1 iteration as long as the preconditioner is not approximate)
-            dRdu = linalg.LinearOperator((n, n), lambda V: onp.asarray(self.objective.hessian_vec(Uu, V)))
-            dRdu_decomp = linalg.LinearOperator((n, n), lambda V: onp.asarray(self.objective.apply_precond(V)))
+            dRdu = linalg.LinearOperator((n, n), make_scipy_linear_function(lambda V: self.objective.hessian_vec(Uu, V)))
+            dRdu_decomp = linalg.LinearOperator((n, n), make_scipy_linear_function(self.objective.apply_precond))
             adjointVector = linalg.cg(dRdu, onp.array(adjointLoad, copy=False), rtol=1e-10, atol=0.0, M=dRdu_decomp)[0]
 
             gradient += residualInverseFuncs.residual_jac_coords_vjp(Uu, p, ivs_prev, parameters, adjointVector)
