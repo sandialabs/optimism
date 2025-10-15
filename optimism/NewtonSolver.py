@@ -2,7 +2,7 @@ import numpy as onp
 from scipy.sparse.linalg import LinearOperator, gmres
 
 from optimism.JaxConfig import *
-
+from optimism.ScipyInterface import make_scipy_linear_function
 
 Settings = namedtuple('Settings', ['relative_gmres_tol',
                                    'max_gmres_iters'])
@@ -25,20 +25,6 @@ def compute_min_p(ps, bounds):
         p = construct_quadratic(ps)
         quadMin = -b/(2*a)
         return min(max(quadMin, bounds[0]), bounds[1])
-
-
-def make_scipy_linear_function(linear_function):
-    def linear_op(v):
-        # The v is going into a jax function (probably a jvp).
-        # Sometimes scipy passes in an array of dtype int, which breaks
-        # jax tracing and differentiation, so explicitly set type to
-        # something jax can handle.
-        jax_v = np.array(v, dtype=np.float64)
-        jax_Av = linear_function(jax_v)
-        # The result is going back into a scipy solver, so convert back
-        # to a standard numpy array.
-        return onp.array(jax_Av)
-    return linear_op
 
 
 def newton_step(residual, residual_jvp, x, settings=Settings(1e-2,100), precond=None):

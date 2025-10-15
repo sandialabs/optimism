@@ -13,6 +13,7 @@ from optimism import Mechanics
 from optimism import Objective
 from optimism import Mesh
 from optimism.material import J2Plastic as J2
+from optimism.ScipyInterface import make_scipy_linear_function
 
 from .FiniteDifferenceFixture import FiniteDifferenceFixture
 
@@ -24,19 +25,6 @@ EnergyFunctions = namedtuple('EnergyFunctions',
                             ['energy_function_coords',
                              'compute_dissipation'])
 
-
-def make_scipy_linear_function(linear_function):
-    def linear_op(v):
-        # The v is going into a jax function (like a jvp).
-        # Sometimes scipy passes in an array of dtype int, which breaks
-        # jax tracing and differentiation, so explicitly set type to
-        # something jax can handle.
-        jax_v = np.array(v, dtype=np.float64)
-        jax_Av = linear_function(jax_v)
-        # The result is going back into a scipy solver, so convert back
-        # to a standard numpy array.
-        return onp.array(jax_Av)
-    return linear_op
 
 class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
     def setUp(self):
