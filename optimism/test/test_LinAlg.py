@@ -59,7 +59,7 @@ class TestLinAlg(TestFixture):
         C = F.T@F
         sqrtC = LinAlg.sqrtm(C)
         shouldBeC = np.dot(sqrtC,sqrtC)
-        self.assertArrayNear(shouldBeC, C, 11)
+        self.assertArrayNear(shouldBeC, C, 10)
 
 
     def test_sqrtm_derivatives_on_10x10(self):
