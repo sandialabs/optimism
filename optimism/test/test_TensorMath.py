@@ -177,7 +177,7 @@ class TensorMathFixture(TestFixture):
 
     def test_sqrt_symm_gradient_almost_double_degenerate(self):
         C = self.R@np.diag(np.array([2.1, 2.1 + 1e-8, 3.0]))@self.R.T
-        check_grads(TensorMath.exp_symm, (C,), order=1, eps=1e-10)
+        check_grads(TensorMath.exp_symm, (C,), order=1, eps=1e-8)
     
     # pow_symm tests
 
