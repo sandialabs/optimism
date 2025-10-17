@@ -222,7 +222,7 @@ class TensorMathFixture(TestFixture):
     def test_pow_symm_gradient_almost_double_degenerate(self):
         C = self.R@np.diag(np.array([2.1, 2.1 + 1e-8, 3.0]))@self.R.T
         m = 0.25
-        check_grads(lambda A: TensorMath.pow_symm(A, 0.25), (C,), order=1, atol=1e-16, eps=1e-10)
+        check_grads(lambda A: TensorMath.pow_symm(A, 0.25), (C,), order=1, atol=1e-16, eps=1e-6)
 
 
     def test_determinant(self):
