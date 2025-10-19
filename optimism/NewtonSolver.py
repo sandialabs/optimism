@@ -2,7 +2,7 @@ import numpy as onp
 from scipy.sparse.linalg import LinearOperator, gmres
 
 from optimism.JaxConfig import *
-
+from optimism.ScipyInterface import make_scipy_linear_function
 
 Settings = namedtuple('Settings', ['relative_gmres_tol',
                                    'max_gmres_iters'])
@@ -27,13 +27,9 @@ def compute_min_p(ps, bounds):
         return min(max(quadMin, bounds[0]), bounds[1])
 
 
-def newton_step(residual, linear_op, x, settings=Settings(1e-2,100), precond=None):
+def newton_step(residual, residual_jvp, x, settings=Settings(1e-2,100), precond=None):
     sz = x.size
-    # The call to onp.array copies the jax array output into a plain numpy
-    # array. The copy is necessary for safety, since as far as scipy knows,
-    # it is allowed to modify the output in place.
-    A = LinearOperator((sz,sz),
-                       lambda v: onp.array(linear_op(v)))
+    A = LinearOperator((sz, sz), make_scipy_linear_function(residual_jvp))
     r = onp.array(residual(x))
 
     numIters = 0
@@ -45,9 +41,7 @@ def newton_step(residual, linear_op, x, settings=Settings(1e-2,100), precond=Non
     maxIters = settings.max_gmres_iters
     
     if precond is not None:
-        # Another copy to a plain numpy array, see comment for A above.
-        M = LinearOperator((sz,sz),
-                           lambda v: onp.array(precond(v)))
+        M = LinearOperator((sz, sz), make_scipy_linear_function(precond))
     else:
         M = None
         

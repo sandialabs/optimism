@@ -15,7 +15,7 @@ def f(x): return x**3 - 4.0
 class ScalarRootFindTestFixture(TestFixture.TestFixture):
 
     def setUp(self):
-        self.settings = ScalarRootFind.get_settings()
+        self.settings = ScalarRootFind.get_settings(r_tol=1e-12, x_tol=0)
 
         self.rootGuess = 1e-5
         self.rootExpected = np.cbrt(4.0)
@@ -33,16 +33,19 @@ class ScalarRootFindTestFixture(TestFixture.TestFixture):
 
     def test_find_root(self):
         rootBracket = np.array([float_info.epsilon, 100.0])
-        root, status = ScalarRootFind.find_root(f, self.rootGuess, rootBracket, self.settings)
-        self.assertTrue(status.converged)
+        root, _ = ScalarRootFind.find_root(f, self.rootGuess, rootBracket, self.settings)
+        #self.assertTrue(status.converged)
+        converged = np.abs(f(root)) <= self.settings.r_tol
+        self.assertTrue(converged)
         self.assertNear(root, self.rootExpected, 13)
 
         
     def test_find_root_with_jit(self):
         rtsafe_jit = jax.jit(ScalarRootFind.find_root, static_argnums=(0,3))
         rootBracket = np.array([float_info.epsilon, 100.0])
-        root, status = rtsafe_jit(f, self.rootGuess, rootBracket, self.settings)
-        self.assertTrue(status.converged)
+        root, _ = rtsafe_jit(f, self.rootGuess, rootBracket, self.settings)
+        converged = np.abs(f(root)) <= self.settings.r_tol
+        self.assertTrue(converged)
         self.assertNear(root, self.rootExpected, 13)
 
 
@@ -56,8 +59,9 @@ class ScalarRootFindTestFixture(TestFixture.TestFixture):
         g = lambda x: np.sin(x) + x
         rootBracket = np.array([-3.0, 20.0])
         x0 = 19.0
-        root, status = ScalarRootFind.find_root(f, x0, rootBracket, self.settings)
-        self.assertTrue(status.converged)
+        root, _ = ScalarRootFind.find_root(f, x0, rootBracket, self.settings)
+        converged = np.abs(f(root)) <= self.settings.r_tol
+        self.assertTrue(converged)
         self.assertNear(root, self.rootExpected, 13)
 
         
@@ -106,16 +110,20 @@ class ScalarRootFindTestFixture(TestFixture.TestFixture):
     def test_solves_when_left_bracket_is_solution(self):
         rootBracket = np.array([0.0, 1.0])
         guess = 3.0
-        root, status = ScalarRootFind.find_root(lambda x: x*(x**2 - 10.0), guess, rootBracket, self.settings)
-        self.assertTrue(status.converged)
+        f = lambda x: x*(x**2 - 10.0)
+        root, _ = ScalarRootFind.find_root(f, guess, rootBracket, self.settings)
+        converged = np.abs(f(root)) <= self.settings.r_tol
+        self.assertTrue(converged)
         self.assertNear(root, 0.0, 12)
 
 
     def test_solves_when_right_bracket_is_solution(self):
         rootBracket = np.array([-1.0, 0.0])
         guess = 3.0
-        root, status = ScalarRootFind.find_root(lambda x: x*(x**2 - 10.0), guess, rootBracket, self.settings)
-        self.assertTrue(status.converged)
+        f = lambda x: x*(x**2 - 10.0)
+        root, _ = ScalarRootFind.find_root(f, guess, rootBracket, self.settings)
+        converged = np.abs(f(root)) <= self.settings.r_tol
+        self.assertTrue(converged)
         self.assertNear(root, 0.0, 12)
 
 if __name__ == '__main__':

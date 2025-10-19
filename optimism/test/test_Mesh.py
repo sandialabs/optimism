@@ -153,8 +153,12 @@ class TestSingleMeshFixture(MeshFixture.MeshFixture):
         # plt.show()
 
 
+def cross_prod_2d(v, w):
+    return v[0]*w[1] - w[0]*v[1]
+
+
 def triangle_inradius(tcoords):
-    area = 0.5*onp.cross(tcoords[1]-tcoords[0], tcoords[2]-tcoords[0])
+    area = 0.5*cross_prod_2d(tcoords[1]-tcoords[0], tcoords[2]-tcoords[0])
     peri = (onp.linalg.norm(tcoords[1]-tcoords[0])
             + onp.linalg.norm(tcoords[2]-tcoords[1])
             + onp.linalg.norm(tcoords[0]-tcoords[2]))

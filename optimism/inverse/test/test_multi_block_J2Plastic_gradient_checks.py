@@ -13,6 +13,7 @@ from optimism import Mechanics
 from optimism import Objective
 from optimism import Mesh
 from optimism.material import J2Plastic as J2
+from optimism.ScipyInterface import make_scipy_linear_function
 
 from .FiniteDifferenceFixture import FiniteDifferenceFixture
 
@@ -23,6 +24,7 @@ from collections import namedtuple
 EnergyFunctions = namedtuple('EnergyFunctions',
                             ['energy_function_coords',
                              'compute_dissipation'])
+
 
 class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
     def setUp(self):
@@ -172,8 +174,8 @@ class J2GlobalMeshAdjointSolveFixture(FiniteDifferenceFixture):
             p_objective = Objective.Params(bc_data=p.bc_data, state_data=ivs_prev, prop_data=self.props) # remember R is a function of ivs_prev
             self.objective.p = p_objective 
             self.objective.update_precond(Uu) # update preconditioner for use in cg (will converge in 1 iteration as long as the preconditioner is not approximate)
-            dRdu = linalg.LinearOperator((n, n), lambda V: onp.asarray(self.objective.hessian_vec(Uu, V)))
-            dRdu_decomp = linalg.LinearOperator((n, n), lambda V: onp.asarray(self.objective.apply_precond(V)))
+            dRdu = linalg.LinearOperator((n, n), make_scipy_linear_function(lambda V: self.objective.hessian_vec(Uu, V)))
+            dRdu_decomp = linalg.LinearOperator((n, n), make_scipy_linear_function(self.objective.apply_precond))
             adjointVector = linalg.cg(dRdu, onp.array(adjointLoad, copy=False), rtol=1e-10, atol=0.0, M=dRdu_decomp)[0]
 
             gradient += residualInverseFuncs.residual_jac_coords_vjp(Uu, p, ivs_prev, parameters, adjointVector)
