@@ -3,7 +3,7 @@ from scipy.sparse import csc_matrix, identity
 
 import numpy as onp
 
-from sksparse.cholmod import analyze, cholesky
+from sksparse import cholmod
 from sksparse.cholmod import CholmodNotPositiveDefiniteError as NotPosDefError
 
 from optimism.JaxConfig import *
@@ -21,15 +21,15 @@ class SparseCholesky:
         # we can improve this later if we are inclined
         assert isspmatrix_csc(self.A),  \
             "Preconditioner matrix is not in a valid sparse format"
-        self.Precond = analyze(self.A, mode='supernodal',
-                               ordering_method='nesdis')
+        self.Precond = cholmod.CholeskyFactor(self.A, sym_kind="sym", supernodal_mode="supernodal",
+                                              order="metis")
 
         attempt = 0
         maxAttempts = 10
         while attempt < maxAttempts:
             try:
                 print('Factorizing preconditioner')
-                self.Precond.cholesky_inplace(self.A)
+                self.Precond.factorize(self.A)
             except NotPosDefError:
                 attempt += 1
                 print('Cholesky failed, assembling preconditioner', attempt)
@@ -41,7 +41,7 @@ class SparseCholesky:
         if attempt == maxAttempts:
             print("Cholesky failed too many times, using identity preconditioner")
             self.A = identity(self.A.shape[0], format='csc')
-            self.Precond.cholesky_inplace(self.A)
+            self.Precond.factorize(self.A)
 
             
     def update(self, new_stiffness_func):
@@ -50,9 +50,7 @@ class SparseCholesky:
 
         
     def apply(self, b):
-        if type(b) == type(np.array([])):
-            b = onp.array(b, copy=False)
-        return self.Precond(b)
+        return np.asarray(self.Precond.solve(onp.array(b, copy=True)))
 
         
     def apply_transpose(self, b):
@@ -65,16 +63,6 @@ class SparseCholesky:
     
     def multiply_by_transpose(self, x):
         return self.A.T.dot(x)
-
-
-    def check_stability(self, x, p):
-        A = self.stiffness_func(x, p)
-        try:
-            self.Precond.cholesky(A)
-            print("Jacobian is stable.")
-        except NotPosDefError as e:
-            print(e)
-            print("Jacobian is unstable.")
 
 
     def get_diagonal_stiffness(self):
