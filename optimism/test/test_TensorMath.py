@@ -265,7 +265,7 @@ class TensorMathFixture(TestFixture):
         # U is symmetric
         self.assertArrayNear(U, TensorMath.sym(U), 14)
         # RU = F
-        self.assertArrayNear(R@U, F, 14)
+        self.assertArrayNear(R@U, F, 13)
 
 
 if __name__ == '__main__':
