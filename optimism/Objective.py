@@ -1,8 +1,12 @@
 from optimism.JaxConfig import *
 from optimism.SparseCholesky import SparseCholesky
 import numpy as onp
-from scipy.sparse import diags as sparse_diags
+import jax.numpy as np
+import jax
+from jax import jit, grad, jacfwd, jvp, vjp
 from scipy.sparse import csc_matrix
+from scipy.sparse import diags as sparse_diags 
+
 
 # static vs dynamics
 # differentiable vs undifferentiable
@@ -268,4 +272,76 @@ class ScaledObjective(Objective):
     def get_residual(self, x):
         return self.gradient(self.scaling * x)
 
-    
+# Objective class for handling Multi-Point Constraints
+class ObjectiveMPC(Objective):
+    def __init__(self, objective_func, x_full, p, dofManagerMPC, precondStrategy=None):
+        """
+        ObjectiveMPC: wraps the original energy functional to solve only for reduced DOFs.
+        - Applies u = T * ũ + s̃ for MPC condensation.
+        - Automatically condenses gradient and Hessian.
+        """
+        self.dofManagerMPC = dofManagerMPC
+        self.T = dofManagerMPC.T
+        self.s_tilde = dofManagerMPC.s_tilde
+        self.p = p
+        self.precondStrategy = precondStrategy
+
+        # Store full functional and derivatives
+        self.full_objective_func = jit(objective_func)
+        self.full_grad_x = jit(grad(objective_func, 0))
+        self.full_hess = jit(jacfwd(self.full_grad_x, 0))
+
+        self.scaling = 1.0
+        self.invScaling = 1.0
+
+        # Reduced initial guess from full vector
+        self.x_reduced0 = self.reduce_to_independent_dofs(x_full)
+
+        # Define reduced-space objective and gradient
+        self.objective = jit(lambda x_red, p: self.full_objective_func(self.expand_to_full_dofs(x_red), p))
+        self.grad_x = jit(lambda x_red, p: self.reduce_gradient(self.full_grad_x(self.expand_to_full_dofs(x_red), p)))
+
+        self.precond = SparseCholesky()
+
+    def reduce_to_independent_dofs(self, x_full):
+        """Extract reduced DOFs from full vector."""
+        return self.dofManagerMPC.get_unknown_values(x_full)
+
+    def expand_to_full_dofs(self, x_reduced):
+        """Reconstruct full DOF vector using u = T ũ + s̃."""
+        return self.dofManagerMPC.create_field(x_reduced)
+
+    def reduce_gradient(self, grad_full):
+        """Project full gradient to reduced space."""
+        return self.dofManagerMPC.get_unknown_values(grad_full)
+
+    def value(self, x_reduced):
+        """Return energy functional in reduced space."""
+        return self.objective(x_reduced, self.p)
+
+    def gradient(self, x_reduced):
+        """Return reduced gradient."""
+        return self.grad_x(x_reduced, self.p)
+
+    def hessian(self, x_reduced):
+        """Compute reduced Hessian H̃ = Tᵀ H T."""
+        x_full = self.expand_to_full_dofs(self.scaling * x_reduced)
+        H_full = self.full_hess(x_full, self.p)
+        H_reduced = np.matmul(self.T.T, np.matmul(H_full, self.T))
+        return H_reduced
+
+    def update_precond(self, x_reduced):
+        """Update preconditioner from reduced Hessian."""
+        print("Updating with condensed Hessian preconditioner.")
+        H_reduced = csc_matrix(self.hessian(x_reduced))
+        self.precond.update(lambda attempt: H_reduced)
+
+    def apply_precond(self, vx):
+        return self.precond.apply(vx) if self.precond else vx
+
+    def multiply_by_approx_hessian(self, vx):
+        return self.precond.multiply_by_approximate(vx) if self.precond else vx
+
+    def check_stability(self, x_reduced):
+        if self.precond:
+            self.precond.check_stability(x_reduced, self.p)
